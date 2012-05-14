@@ -1,0 +1,10 @@
+.build
+dist
+.tmp
+nbproject
+review
+vendor
+.DS_Store
+*~
+*.log
+.svn
