@@ -40,9 +40,9 @@ class BlankResource #extends ResourceAbstract
 		$this->constructParams = $params;
 	}
 
-	public function readApiResource($params, $another, $optional=null)
+	public function readApiResource($param1, $param2, $optional=null)
 	{
-		return array('method'=>__METHOD__, 'params'=>$params, 'constructParams'=>$this->constructParams);
+		return array('method'=>__METHOD__, 'param1'=>$param1, 'param1'=>$param2, 'constructParams'=>$this->constructParams);
 	}
 	
 	public function updateApiResource(array $params)
