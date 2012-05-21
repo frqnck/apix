@@ -113,13 +113,19 @@ class Response
 		}
 
 		$req = $this->server->request;
+		$route = $this->server->route;
+
 		$array = array(
 			'zenya' => array(
-				$this->server->route->name => $data,
+				$route->name => $data,
 			),
 			'signature'	=> array(
-				'status'	=> self::getStatusString($this->server->httpCode) . ' (' . $this->server->httpCode . ' ' . self::$defs[$this->server->httpCode] . ')',
-				'request'	=> $req->getMethod() . ' ' . $req->getUri(), # . '.' . $this->format,
+				'status'	=> sprintf('%d %s - %s', 
+										$this->server->httpCode,
+										self::$defs[$this->server->httpCode],
+										self::getStatusString($this->server->httpCode)
+								),
+				'request'	=> sprintf('%s %s', $req->getMethod(), $req->getUri()),
 				'timestamp'	=> $this->getDateTime()
 			)
 		);
@@ -127,11 +133,10 @@ class Response
 		if ($this->server->debug == true) {
 			$array['debug'] = array(
 				'debug' => array(
-				//	'request'	=> $req->getPathInfo(),	// Request URI
-					'params'	=> $req->getParams(),	// Params
+				//	'request'	=> $req->getPathInfo(),		// Request URI
+					'params'	=> $route->params,	// Params
 					'format'	=> $this->format,
-				//	'ip'		=> $req->getClientIp(true)
-					#'http'		=> $this->getHttp(),
+					'ip'		=> $req->getIp(true)
 				),
 			);
 		}

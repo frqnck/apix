@@ -173,9 +173,9 @@ class Server extends Listener
 			$this->stage = 'late';
 
 			// Process with the requested resource
-			$resource = new Resource(array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test'))));
+			$resources = new Resource(array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test'))));
 
-			$this->results = $resource->callNew($this->route);
+			$this->results = $resources->callNew($this->route);
 
 			/*
 			  if ($r->isException()) {

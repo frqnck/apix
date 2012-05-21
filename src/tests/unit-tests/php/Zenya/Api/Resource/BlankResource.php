@@ -5,44 +5,38 @@ namespace Zenya\Api\Resource;
 class BlankResource #extends ResourceAbstract
 {
 	/*
-	 * Another public var.
+	 * A public var.
 	 */
 	public $hello = 'World!!!';
 
 	/*
-	 * A public var.
+	 * Another public var.
 	 */
 	public $results = array();
 
 	/*
-	 * A private var
+	 * A protected var
 	 */
-	protected $_protected = 'Checking protected var.';
+	protected $_protected = 'protected';
 
 	/*
 	 * A private var
 	 */
-	protected $_private = 'Checking private var.';
-	
-	
-	/**
-	 * Stores the names and methods requirements.
-	 *
-	 * @var array
-	 */
-	protected $_requirements = array(
-		'paramName' => array('GET'),
-		array('PUT')
-	);
+	protected $_private = 'private';
 
 	public function __construct($params)
 	{
-		$this->constructParams = $params;
+		$this->constructorParams = $params;
 	}
 
 	public function readApiResource($param1, $param2, $optional=null)
 	{
-		return array('method'=>__METHOD__, 'param1'=>$param1, 'param1'=>$param2, 'constructParams'=>$this->constructParams);
+		return array(
+			'class' => __CLASS__,
+			'constructorParams'=>$this->constructorParams,
+			'method'=>__METHOD__,
+			'methodParams'=> get_defined_vars()
+		);
 	}
 	
 	public function updateApiResource(array $params)
