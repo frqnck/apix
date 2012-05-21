@@ -97,7 +97,7 @@ class Server extends Listener
 			'routes' => array(
 				#'/:controller/paramName/:paramName/:id' => array(),
 				#'/:controller/test' => array('class'=>'test'),
-				'/:controller/test' => array(
+				'/:controller/:param1/:param2' => array(
 					#'controller' => 'BlankResource',
 					'className' => 'Zenya\Api\Resource\BlankResource',
 					'classArgs' => array('arg1'=>'test', 'arg2'=>'test2'))
