@@ -66,10 +66,12 @@ Abstract class ResourceAbstract implements \IteratorAggregate
 	 * @return void
 	 * @throws Zenya\Api\Resource\Exception
 	 */
-	final public function __construct(\Zenya\Api\Request $request)
+	 
+	/*
+	final public function __construct(\Zenya\Api\Router $route)
 	{
-		$method = $request->getMethod();
-		$params = $request->getParams();
+		$method = $route->method;
+		$params = $route->params;
 
 		if (!in_array($method, $this->getMethods())) {
 			# TODO: move this out of here...
@@ -93,7 +95,7 @@ Abstract class ResourceAbstract implements \IteratorAggregate
 		$local_method = $_crud[$method] . 'ApiResource';
 		$this->$local_method($params);
 	}
-
+*/
 	/**
 	 * Help Handler, handles HTTP HEAD method
 	 *

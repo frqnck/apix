@@ -2,8 +2,7 @@
 
 namespace Zenya\Api\Resource;
 
-
-class BlankResource extends ResourceAbstract
+class BlankResource #extends ResourceAbstract
 {
 	/*
 	 * Another public var.
@@ -15,8 +14,6 @@ class BlankResource extends ResourceAbstract
 	 */
 	public $results = array();
 
-
-	
 	/*
 	 * A private var
 	 */
@@ -38,14 +35,19 @@ class BlankResource extends ResourceAbstract
 		array('PUT')
 	);
 
-	public function readApiResource(array $params)
+	public function __construct($params)
 	{
-		$this->results = array(__METHOD__);
+		$this->constructParams = $params;
+	}
+
+	public function readApiResource($params, $another, $optional=null)
+	{
+		return array('method'=>__METHOD__, 'params'=>$params, 'constructParams'=>$this->constructParams);
 	}
 	
 	public function updateApiResource(array $params)
 	{
-		$this->results = array('method'=>__METHOD__, 'params'=>$params);
+		return array('method'=>__METHOD__, 'params'=>$params);
 	}
 	
 }

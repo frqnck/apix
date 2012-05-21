@@ -3,15 +3,40 @@ namespace Zenya\Api;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
+	/*
+		public function testMerging()
+		{
+			$opt1 = array('q'=>'qwerty1', 'a'=>'asdfg1');
+			$opt2 = array('q'=>'qwerty2', 'a'=>'asdfg2');
+			$this->assertSame($opt1+$opt2, array_merge($opt2, $opt1));
+		}
 
-    public function offtestConstructor()
+	/**
+	 * @expectedException Zenya\Api\Exception
+	 * @expectedExceptionMessage Invalid rules array specified (not associative)
+	 * @expectedExceptionCode 500
+	 * @todo 
+	*/
+	public function testConstructorThrowsExceptionWhenNotAssociative()
 	{
-		$route = new Router( array('/:controller/:action/:id'), array('controller'=>'defaultController', 'action'=>'defaultAction'));
-		$route->match('/controller/action/123');
-		
-		$this->assertSame('controller', $route->controller);
-		$this->assertSame('action', $route->action);
-		$this->assertEquals(123, $route->params['id']);
+		#$route = new Router( array(1=>'/:controller/:action/:grab') );
+
+		$this->markTestIncomplete(
+				'This test has not been implemented yet.'
+		);
+	}
+	
+	/**
+	 * @covers Zenya\Api\Router::__construct
+ 	 */
+	public function testBasicConstructor()
+	{
+		$rules = array('/:one/:two/:three' => array('controller'=>'implyController', 'action'=>'implyAction'));
+		$route = new Router( $rules );
+		$route->map('/controller/action/123');
+		$this->assertSame('implyController', $route->controller);
+		$this->assertSame('implyAction', $route->action);
+		$this->assertEquals(123, $route->params['three']);
 	}
 
     /**
