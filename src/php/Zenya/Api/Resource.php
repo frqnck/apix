@@ -181,18 +181,37 @@ class Resource extends Listener
 
 			throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
 		}
-		
 
-		echo $method_args_count = $refMethod->getNumberOfRequiredParameters();
-
-		print_r($refMethod->getParameters());
 		print_r($route->params);
 
-		#$this->checkRequirments($route->action, $route->params);
+		print_r($refMethod->getParameters());
 
-		//todo: func_get_args() 
-		#$args = $this->_resources[$route->name]['args'];
-		return call_user_func_array(array(new $route->className($route->classArgs), $route->action), array($route->params));
+		// TODO: Finish this...
+		// url: http://zenya.dev/index.php/api/v1/BlankResource.html/param1/param2
+		$required = $refMethod->getNumberOfRequiredParameters();
+		if($required > count($route->params)) {
+			$i = 0;
+			foreach($refMethod->getParameters() as $k => $param) {
+				if (++$i <= $required 
+					|| !array_key_exists($param->name, $route->params) 
+					|| empty($route->params[$param->name])
+				) {
+					throw new Exception("Required {$route->method} parameter \"{$param->name}\" missing in action.", 400);
+				}
+			}
+		}
+		//todo: func_get_args()???
+		$params = ($route->params);
+		return call_user_func_array(array(new $route->className($route->classArgs), $route->action), $params);
 	}
 	
+	function replaceAndClean(/*query [, $arg1...$argN]*/){
+   $args = func_get_args();
+   if(count($args) == 1){
+       return $args[0];
+   }
+   $query = array_shift($args);
+   return vsprintf($query, $args);
+}
+
 }
