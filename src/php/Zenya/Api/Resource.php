@@ -181,19 +181,19 @@ class Resource extends Listener
 
 			throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
 		}
-
+		
+		$params = array();
 		foreach($refMethod->getParameters() as $k => $param) {
-
 			if (!$param->isOptional()
 				&& !array_key_exists($param->name, $route->params) 
 				&& empty($route->params[$param->name])
 			) {
 				throw new Exception("Required {$route->method} parameter \"{$param->name}\" missing in action.", 400);
+			} else if(isset($route->params[$param->name])) {
+				$params[$param->name] = $route->params[$param->name];
 			}
 		}
 
-		//todo: func_get_args()???
-		$params = ($route->params);
 		return call_user_func_array(array(new $route->className($route->classArgs), $route->action), $params);
 	}
 	
