@@ -44,7 +44,7 @@
 
 namespace Zenya\Api;
 
-class Resource
+class Resource extends Listener
 {
 
 	/**
@@ -59,7 +59,7 @@ class Resource
 	 * 
 	 * Import given object methods
      *
-     * @param	array	$$resources	An array of resources
+     * @param	array	$resources	Array of resources
      */
 
 	public function __construct(array $resources)
@@ -115,15 +115,84 @@ class Resource
  	 * @throws	Zenya\Api\Exception
 	 * @see		Zenya\Api\Resource::getPublicAppelation
 	 */
-	public function call($resourceName, \Zenya\Api\Request $request)
+	public function call(\Zenya\Api\Router $route)
 	{
-		$class = self::getInternalAppelation($resourceName);
+		// attach late listeners @ post-processing
+		$this->addAllListeners('resource', 'early');
+
+		$class = self::getInternalAppelation($route->name);
 
 		#$method = $request->method;
 		#$params = $request->params;
 		#$service = call_user_func_array(array($class, $local_method), $params);
 
-		return new $class($request);
+		return new $class($route);
+	}
+	
+	/**
+	 * Act as a data mapper, check required params, etc...
+	 *
+	 * @return void
+	 * @throws Zenya_Api_Exception
+	 */
+	private function checkRequirments($method, array $params)
+	{
+		foreach ($this->_requirements as $k => $v) {
+			if (in_array($method, $v)) {
+				if (true === is_int($k))
+					continue;
+				if (!array_key_exists($k, $params) || empty($params[$k])) {
+					throw new Exception("Required {$method} parameter \"{$k}\" missing in action.", 400);
+				}
+			}
+		}
+	}
+
+	
+	public function callNew(\Zenya\Api\Router $route)
+	{
+		// attach late listeners @ post-processing
+		$this->addAllListeners('resource', 'early');
+
+		$class = self::getInternalAppelation($route->name);
+
+		/* --- Relection --- */
+		$refClass = new \ReflectionClass($class['class']);
+
+		// Array of HTTP Methods to CRUD verbs.
+		$_crud = array(
+			'POST'		=> 'create',
+			'GET'		=> 'read',
+			'PUT'		=> 'update',
+			'DELETE'	=> 'delete',
+			'HEAD'		=> 'help',
+			'OPTIONS'	=> 'test'
+		);
+		$route->action = $_crud[$route->method] . 'ApiResource';
+
+		$refMethod = $refClass->getMethod($route->action);
+
+		if ( !in_array($refMethod, $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC))
+			&& !$refMethod->isConstructor()
+			&& !$refMethod->isAbstract()
+		) {
+			# TODO: move this out of here...
+			@header('Allow: ' . implode(', ', $refClass->getMethods()), true);
+
+			throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
+		}
+		
+
+		echo $method_args_count = $refMethod->getNumberOfRequiredParameters();
+
+		print_r($refMethod->getParameters());
+		print_r($route->params);
+
+		#$this->checkRequirments($route->action, $route->params);
+
+		//todo: func_get_args() 
+		#$args = $this->_resources[$route->name]['args'];
+		return call_user_func_array(array(new $route->className($route->classArgs), $route->action), array($route->params));
 	}
 	
 }

@@ -11,7 +11,6 @@ psr0_autoloader_searchFirst(APP_LIBDIR);
 psr0_autoloader_searchFirst(APP_TESTDIR);
 psr0_autoloader_searchFirst(APP_TOPDIR);
 
-
 # Test server
 
 $server = new Zenya\Api\Server;

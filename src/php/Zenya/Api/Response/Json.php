@@ -30,6 +30,8 @@ namespace Zenya\Api\Response;
 class Json implements Adapter
 {
 
+	static $contentType = 'application/json';
+
 	public static function generate(array $data)
 	{
 		#$autoloader = \Zend_Loader_Autoloader::getInstance();

@@ -4,7 +4,7 @@ namespace Zenya\Api;
 
 require_once 'HTTP/Request2.php';
 
-class Request extends Listener
+class Request
 {
 
     /**
@@ -97,7 +97,8 @@ class Request extends Listener
 	public function setHeaders($headers = null)
 	{
 		if (null === $headers) {
-			$params = http_get_request_headers();
+			#$params = http_get_request_headers();
+			$params = $_SERVER;
 		} else if(!is_array($headers)) {
 			throw new \InvalidArgumentException(sprintf("%s expects an array",__METHOD__ ));
 		}
@@ -159,11 +160,11 @@ class Request extends Listener
 	public function setBody($body = null)
 	{
 		if (null === $body) {
-			$body = http_get_request_body();
+			#$body = http_get_request_body();
+			$body = @file_get_contents('php://input');
 		}
 		$this->body = $body;
 	}
-	
 	
 	/*
 	 * alnum, alpha, digit

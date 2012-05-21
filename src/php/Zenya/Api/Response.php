@@ -99,38 +99,38 @@ class Response
      */
     protected $server;
 
-    public function __construct(Server $server)
+    public function __construct(Server $server, $format)
     {
 		$this->server = $server;
+		$this->format = $format;
     }
 
 	public function toArray()
 	{
-		$req = $this->server->request;
-		
 		$data = array();
 		foreach($this->server->results as $key => $value) {
 			$data[$key] = $value;
 		}
 
+		$req = $this->server->request;
 		$array = array(
 			'zenya' => array(
-				$this->server->resourceName => $data,
-				'signature' => array(
-					'status' => self::getStatusString($this->server->httpCode) . ' (' . $this->server->httpCode . ' ' . self::$defs[$this->server->httpCode] . ')',
-					'request' => $req->getMethod() . ' ' . $req->getUri(), # . '.' . $this->format,
-					'timestamp' => $this->getDateTime()
-				)
+				$this->server->route->name => $data,
+			),
+			'signature'	=> array(
+				'status'	=> self::getStatusString($this->server->httpCode) . ' (' . $this->server->httpCode . ' ' . self::$defs[$this->server->httpCode] . ')',
+				'request'	=> $req->getMethod() . ' ' . $req->getUri(), # . '.' . $this->format,
+				'timestamp'	=> $this->getDateTime()
 			)
 		);
 
 		if ($this->server->debug == true) {
-			$array['__debug'] = array(
+			$array['debug'] = array(
 				'debug' => array(
-					'request'	=> $req->getPathInfo(), // Request URI
-					'params'	=> $req->getParams(), // Params
+				//	'request'	=> $req->getPathInfo(),	// Request URI
+					'params'	=> $req->getParams(),	// Params
 					'format'	=> $this->format,
-					'ip'		=> $req->getClientIp(true)
+				//	'ip'		=> $req->getClientIp(true)
 					#'http'		=> $this->getHttp(),
 				),
 			);
@@ -160,15 +160,12 @@ class Response
 	
 	public function send()
     {
-		$format = isset($this->server->format) ? $this->server->format : self::DEFAULT_FORMAT;
+		$format = isset($this->format) ? $this->format : self::DEFAULT_FORMAT;
+		$formatter = '\Zenya\Api\Response' . '\\' . ucfirst($this->format);
 
-		if($format == 'php') {
-			return print_r($this->toArray(), true);
-		} else {
-	        $static = '\Zenya\Api\Response' . '\\' . ucfirst($format);
-			$this->setRestHeaders();
-			return $static::generate($this->toArray());
-		}
+		$this->setHeaders($formatter::$contentType);
+
+		return $formatter::generate($this->toArray());
 	}
 
     static public function throwExceptionIfUnsupportedFormat($format)
@@ -188,13 +185,21 @@ class Response
         return self::$formats;
     }
 
-    public function setRestHeaders()
+    public function setHeaders($contentType)
     {
-        $r = $this->server->request; // wrong!?
-        #$r->clearHeaders();
-        $r->setHeader('X-Powered-By', 'Zenya/' . 'TODO:version');
-        $r->setHeader('Vary', 'Accept');
-       # $r->setHttpResponseCode($this->_response->httpCode);
+		header('X-Powered-By: ' . $this->server->version, true, $this->server->httpCode);
+
+		header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+		header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+		header('Vary: Accept');
+
+		if(!$this->server->debug) {
+			header('Content-type: ' . $contentType);
+		}
+		// It will be called downloaded.pdf
+		#header('Content-Disposition: attachment; filename="downloaded.pdf"');
+		// The PDF source is in original.pdf
+		#readfile('original.pdf');
     }
 
     public function _addHeaderFromException()
