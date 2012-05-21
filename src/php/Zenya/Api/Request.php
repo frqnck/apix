@@ -116,7 +116,13 @@ class Request
 		$this->params[$key] = $value;
 	}
 
-	public function setParams($params = null)
+	/**
+     * Sets all parameters.
+     *
+     * @param	array	$params
+     * @return	array	
+     */
+	public function setParams(array $params = null)
 	{
 		if (null === $params) {
 			$params = $_REQUEST;
@@ -131,7 +137,6 @@ class Request
 		return $this->params;
 	}
 
-	
 	public function getMethod()
 	{
         if (null === $this->method) {
@@ -216,5 +221,18 @@ class Request
         }
 		return $decodedBody;
     }
+	
+	public function getIP()
+	{
+		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} else {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		}
+		return $ip; 
+	}
+
 	
 }
