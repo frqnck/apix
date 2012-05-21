@@ -49,6 +49,12 @@ ${contents}
         <max>3.999.9999</max>
       </package>
       <package>
+        <name>Net_URL_Mapper</name>
+        <channel>pear.php.net</channel>
+        <min>0.9.1</min>
+        <max>0.9.9999</max>
+      </package>
+      <package>
         <name>HTTP_Request2</name>
         <channel>pear.php.net</channel>
         <min>2.1.0</min>

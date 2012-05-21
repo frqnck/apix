@@ -23,6 +23,7 @@ namespace Zenya\Api\Response;
 
 class Html implements Adapter
 {
+	static $contentType = 'application/html';	
 
 	protected $_html = null;
 
@@ -38,8 +39,12 @@ class Html implements Adapter
 		$out = $this->_recursivelyAppend($data);
 		#$out = ob_get_contents();
 		#ob_end_clean();
-		$this->_html = $this->validate($out);
-		#$this->_html = $out;
+		
+		if(extension_loaded('tidy')) {
+			$this->_html = $this->validate($out);
+		} else {
+			$this->_html = $out;
+		}
 	}
 
 	protected function _recursivelyAppend(array $results)

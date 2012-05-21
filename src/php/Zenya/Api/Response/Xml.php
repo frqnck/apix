@@ -23,14 +23,17 @@ namespace Zenya\Api\Response;
 
 class Xml implements Adapter
 {
+	static $contentType = 'application/xml';	
 
 	protected $_xml = null;
-
+	
 	public static function generate(array $data)
 	{
 		$r = new self($data);
-		#return $r->_xml->asXML();
-		return $r->validate($r->_xml->asXML());
+		if(extension_loaded('tidy')) {
+			return $r->validate($r->_xml->asXML());
+		}
+		return $r->_xml->asXML();
 	}
 
 	public function __construct(array $data)
@@ -39,7 +42,6 @@ class Xml implements Adapter
 		$str .= '<zenya></zenya>'; // TODO: add attrib version maybe!
 		$this->_xml = simplexml_load_string($str);
 		#array_walk_recursive($data, array($this->_xml, 'addChild'));
-
 
 		#$this->_xml .= '<item>' . self::_xml($data['zenya']) . '</item>';
 		$this->_recursivelyAppend($data['zenya'], $this->_xml);
@@ -69,19 +71,19 @@ class Xml implements Adapter
 
 	public function validate($xml)
 	{
-		$tidy = new \tidy();
-		$conf = array(
-			'clean' => true,
-			'input-xml' => true,
-			'output-xml' => true,
-			'indent' => true, // BUG!!!
-			'wrap' => 80,
-		);
-		$tidy->parseString($xml, $conf, 'utf8');
-		$tidy->cleanRepair();
-		#return $tidy->html()->value;
-		return $tidy->value; // with DOCTYPE
-		#return tidy_get_output($tidy);
+			$tidy = new \tidy();
+			$conf = array(
+				'clean' => true,
+				'input-xml' => true,
+				'output-xml' => true,
+				'indent' => true, // BUG!!!
+				'wrap' => 80,
+			);
+			$tidy->parseString($xml, $conf, 'utf8');
+			$tidy->cleanRepair();
+			#return $tidy->html()->value;
+			return $tidy->value; // with DOCTYPE
+			#return tidy_get_output($tidy);
 	}
 
 }

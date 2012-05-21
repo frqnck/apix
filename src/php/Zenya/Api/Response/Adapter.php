@@ -10,6 +10,8 @@ namespace Zenya\Api\Response;
 
 interface Adapter {
 
+	#static $contentType;	
+
 	/**
      * Generate fromatted response data.
      *
