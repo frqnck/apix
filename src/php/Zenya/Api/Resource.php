@@ -182,24 +182,16 @@ class Resource extends Listener
 			throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
 		}
 
-		print_r($route->params);
+		foreach($refMethod->getParameters() as $k => $param) {
 
-		print_r($refMethod->getParameters());
-
-		// TODO: Finish this...
-		// url: http://zenya.dev/index.php/api/v1/BlankResource.html/param1/param2
-		$required = $refMethod->getNumberOfRequiredParameters();
-		if($required > count($route->params)) {
-			$i = 0;
-			foreach($refMethod->getParameters() as $k => $param) {
-				if (++$i <= $required 
-					|| !array_key_exists($param->name, $route->params) 
-					|| empty($route->params[$param->name])
-				) {
-					throw new Exception("Required {$route->method} parameter \"{$param->name}\" missing in action.", 400);
-				}
+			if (!$param->isOptional()
+				&& !array_key_exists($param->name, $route->params) 
+				&& empty($route->params[$param->name])
+			) {
+				throw new Exception("Required {$route->method} parameter \"{$param->name}\" missing in action.", 400);
 			}
 		}
+
 		//todo: func_get_args()???
 		$params = ($route->params);
 		return call_user_func_array(array(new $route->className($route->classArgs), $route->action), $params);
