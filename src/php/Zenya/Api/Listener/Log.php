@@ -17,7 +17,8 @@ class Log implements \SplObserver
      *
      * @var array $events
      */
-    public $events = array(
+    public $notices = array(
+        'late',
         'connect',
         'sentHeaders',
         'sentBody',
@@ -41,9 +42,10 @@ class Log implements \SplObserver
             $this->events = $events;
         }
         if (is_resource($target) || $target instanceof Log) {
+        	// use Pear::Log
             $this->target = $target;
         } elseif (false === ($this->target = @fopen($target, 'ab'))) {
-            throw new Exception("Unable to open '{$target}'");
+            throw new Exception("Unable to open '{$target}'", 500);
         }
     }
 
@@ -56,12 +58,25 @@ class Log implements \SplObserver
      */
     public function update(\SplSubject $subject)
     {
-		$event = $subject->getLastEvent();
-        if (!in_array($event['name'], $this->events)) {
+		$notice = $subject->getNotice();
+
+		#$data = $subject->response;
+
+		$this->log("*Log: ${notice['name']}, ${notice['data']}");
+
+		#$this->log('* Connected to ' . $notice['name']);
+
+return;
+
+        if (!in_array($notice['name'], $this->notices)) {
             return;
         }
 
-        switch ($event['name']) {
+        switch ($notice['name']) {
+        case 'late':
+
+			break;
+
         case 'connect':
             $this->log('* Connected to ' . $event['data']);
             break;
@@ -105,9 +120,9 @@ class Log implements \SplObserver
     protected function log($str)
     {
 		if ($this->target instanceof Log) {
-			$this->target->debug($message);
+			$this->target->debug($str);
 		} elseif (is_resource($this->target)) {
-			fwrite($this->target, $message . "\r\n");
+			fwrite($this->target, $str . "\r\n");
 		}
     }
 

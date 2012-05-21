@@ -3,12 +3,6 @@ namespace Zenya\Api\Listener;
 
 class Mock implements \SplObserver
 {
-    /**
-     * Last error message publicly readable
-     * 
-     * @var string
-     */
-    public $message;
     
 	/**
      * Constructor.
@@ -19,9 +13,9 @@ class Mock implements \SplObserver
      *
      * @return void
      */
-    public function __construct($target = 'php://filter/read=string.toupper/resource=dsa', array $events = array())
+    public function __construct()
     {
-		echo 'instantiated...';
+		echo 'instantiated...' . PHP_EOL;
 	}
 	
 	
@@ -33,7 +27,11 @@ class Mock implements \SplObserver
      */
     public function update(\SplSubject $subject)
     {
-		echo 'testing..';
+		$notice = $subject->getNotice();
+		echo '*** Notice update:'  . $notice['name'] . ' / obj: ' . $subject->stage;
+		echo xdebug_time_index(), "\n";
+
+		#print_r($subject);
     }
     
     /**

@@ -77,60 +77,85 @@ class Container
 
 }
 
-class Server
-{
 
+class Server extends Listener
+{
+	public $debug = true;
+	public $version = 'Zenya/0.2.1';
+
+	public $httpCode = 200;
 	public $resourceName;
-	public $debug = false;
 
 	public function __construct()
 	{
-		
 	}
 
 	public function run()
 	{
+		$config = array(
+			'route_prefix' => '@^(/index.php)?/api/v(\d*)@i', // regex
+			'routes' => array(
+				#'/:controller/paramName/:paramName/:id' => array(),
+				#'/:controller/test' => array('class'=>'test'),
+				'/:controller/test' => array(
+					#'controller' => 'BlankResource',
+					'className' => 'Zenya\Api\Resource\BlankResource',
+					'classArgs' => array('arg1'=>'test', 'arg2'=>'test2'))
+			),
+			// need DIC here!!
+			'listeners' => array(
+				// pre-processing stage
+				'early' => array(
+					'new Listener\Auth',
+					'new Listener\Acl',
+					'new Listener\Log',
+					'new Listener\Mock'
+				),
 
+				// post-processing stage
+				'late'=>array(
+					'new Listener\Log',
+				),
+			)
+		);
+		
 		try {
-
+			// Request
 			$this->request = new Request;
 
-			// get path without the api prefix
-			$api_prefix = "@^/rest/v(\d*)@i";
-			$path = preg_replace($api_prefix, '', $this->request->getUri());
-			$this->resourcePath = $path;
-			
-			// get teh path elements
-			#$paths = explode('/', $path);
-			#preg_sp('@@', $path, $paths);
-			$paths = preg_split('/\//', $path, null, PREG_SPLIT_NO_EMPTY);
+			// get path without the route prefix
+			$path = preg_replace($config['route_prefix'], '', $this->request->getUri());
 
-			// remove the script name 
-			#$scriptName = explode('/', $_SERVER['SCRIPT_NAME']);
-			$scriptNames = preg_split('/\//', $_SERVER['SCRIPT_NAME'], null, PREG_SPLIT_NO_EMPTY);
-			foreach($scriptNames as $k => $v) {
-				if ($v == $paths[$k]) {
-					unset($paths[$k]);
-				}
-			}
-			$paths = array_values($paths);
+			// Routing
+			$this->route = new Router($config['routes'], array(
+				'method' => $this->request->getMethod(),
+				'path'	 => $path,
+				'className'=>null,
+				'classArgs'=>null
+			));
+			$this->route->map($path);
 
-			// get resource name & extension
-			$name = explode('.', $paths[0]);
-			$this->resourceName = $name[0];
-			$this->resourceExtension = count($name)>1 ? end($name) : null;
+			$name = explode('.', $this->route->controller);
+			$this->route->name = $name[0];
+			$this->route->format = count($name)>1 ? end($name) : null;
+			$this->route->params = $this->route->params+$this->request->getParams();
 
 			// set format from extension then from html head
-			if(!is_null($this->resourceExtension)) {
-				$format = $this->resourceExtension;
+			if(isset($this->route->format)) {
+				$format = $this->route->format;
+			} elseif(isset($_GET['format'])) {
+				$format = $_GET['format'];
 			} else {
 				$accept = $this->request->getHeader('Accept');
 				switch (true) {
-					case (strstr($accept, 'application/json')):
+					
+					// 'application/json'
+					case (strstr($accept, '/json')):
 						$format = 'json';
 					break;
-				
-					case (strstr($accept, 'application/xml')
+
+					// 'text/xml', 'application/xml'
+					case (strstr($accept, '/xml')
 						&& (!strstr($accept, 'html'))):
 						$format = 'xml';
 					break;
@@ -139,32 +164,19 @@ class Server
 						$format = Response::DEFAULT_FORMAT;
 				}
 			}
-			
+			$this->route->format = $format;
 			Response::throwExceptionIfUnsupportedFormat($format);
-
-			$this->format = $format;
 			
-			// attach listeners
-			#$this->request->attach(new Listener\Log);
-			#$this->request->attach( new Listener\Mock() );
-			#$this->request->attach(new Listener\Format);
+			// attach early listeners @ pre-processing
+			$this->stage = 'early';
+			$this->addAllListeners('server', 'early');
+			$this->stage = 'late';
 
-			// AUTH
-			// ACL
-			// Log (request part, timing)
-			$this->request->notify();
-
-
-
-			// TODO getPathInfo!
-			//obsever for the following: 
-			// ContextSwitcher
 			// Process with the requested resource
-			$resource = new Resource(array('BlankResource' => 'Zenya\Api\Resource\BlankResource'));
+			$resource = new Resource(array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test'))));
 
-			$this->results = $resource->call($this->resourceName, $this->request);
+			$this->results = $resource->callNew($this->route);
 
-			$this->httpCode = 200;
 			/*
 			  if ($r->isException()) {
 			  $ex = $r->getException();
@@ -179,33 +191,24 @@ class Server
 			  }
 			 */
 
-
-			// Post processing
-			// ContextSwitcher
-			// AUTH
-			// ACL
-			// Log (processing result)
 		} catch (Exception $e) {
 			$this->results = array(
 				'error' => $e->getMessage(),
 			);
+			$this->httpCode = $e->getCode() ? $e->getCode() : 500;
 
-			$this->setHttpCode($e->getCode() ? $e->getCode() : 500);
+			// attach late listeners @ exceptions
+			$this->addAllListeners('server', 'exception');
 		}
 
-		$response = new Response($this);
+		$response = new Response($this, $this->route->format);
 		echo $response->send();
+
+		// attach late listeners @ post-processing
+		$this->addAllListeners('server', 'late');
+
+		#print_r($this);
 		exit;
-
-
-
-		// output the response
-		header('content-type: text/javascript');
-		echo json_encode($response);
-
-
-
-
 
 
 		try {
@@ -225,31 +228,6 @@ class Server
 
 		// send to stdout
 		echo $out;
-	}
-
-	/**
-	 * Set parameters
-	 *
-	 * @return void
-	 */
-	public function setParams(array $params)
-	{
-		$this->_rawParams = $params;
-		$this->format = Response::outputFormat($params['format']);
-		$this->action = strtolower($params['action']);
-		$this->body = self::getResponseBody();
-
-		// obsolete?
-		//$this->setHttpCodeFromException();
-	}
-
-	/**
-	 * Hold the output format (also used to set the default value).
-	 * @var	integer	$int
-	 */
-	public function setHttpCode($int)
-	{
-		$this->httpCode = $int;
 	}
 
 }
