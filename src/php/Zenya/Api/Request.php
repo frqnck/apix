@@ -2,8 +2,6 @@
 
 namespace Zenya\Api;
 
-require_once 'HTTP/Request2.php';
-
 class Request
 {
 
@@ -35,11 +33,8 @@ class Request
 		#exit;
 		
 		$this->setUri();
-		
 		$this->setHeaders();
-		
 		$this->setParams();
-
 		$this->setBody();
 	}
 	
@@ -208,12 +203,14 @@ class Request
 
             // Handle gzip encoding
             case 'gzip':
-                $decodedBody = \HTTP_Request2_Response::decodeGzip($this->body);
+				require_once 'HTTP/Request2.php';
+				$decodedBody = \HTTP_Request2_Response::decodeGzip($this->body);
 				break;
 			
             // Handle deflate encoding
             case 'deflate':
-                $decodedBody = \HTTP_Request2_Response::decodeDeflate($this->body);
+                require_once 'HTTP/Request2.php';
+				$decodedBody = \HTTP_Request2_Response::decodeDeflate($this->body);
 				break;
 				
             default:
@@ -224,14 +221,12 @@ class Request
 	
 	public function getIP()
 	{
-		if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-			$ip = $_SERVER['HTTP_CLIENT_IP'];
-		} else if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		} else {
-			$ip = $_SERVER['REMOTE_ADDR'];
-		}
-		return $ip; 
+		$ip = $this->getHeader('HTTP_CLIENT_IP');
+		if(empty($ip)) {
+			$ip = $this->getHeader('HTTP_X_FORWARDED_FOR');
+		} 
+
+		return empty($ip) ? $this->getHeader('REMOTE_ADDR') : $ip; 
 	}
 
 	

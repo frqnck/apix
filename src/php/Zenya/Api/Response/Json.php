@@ -25,26 +25,24 @@ namespace Zenya\Api\Response;
 #require_once '/www/php_libs/Zend/latest/library/Zend/Loader.php';
 #require_once '/www/php_libs/Zend/latest/library/Zend/Loader/Autoloader.php';
 
-
-
 class Json implements Adapter
 {
-
 	static $contentType = 'application/json';
 
-	public static function generate(array $data)
+	public function encode(array $data, $rootNode)
 	{
-		#$autoloader = \Zend_Loader_Autoloader::getInstance();
-
-		require_once '/www/php_libs/Zend/latest/library/Zend/Json.php';
-		require_once '/www/php_libs/Zend/latest/library/Zend/Json/Expr.php';
-
-		
-		$json = Zend_Json::encode($data);
 		if (isset($_REQUEST['indent']) && $_REQUEST['indent'] == '1') {
-			return \Zend_Json::prettyPrint($json, array('indent' => "  "));
+			if(version_compare(PHP_VERSION, '5.4.0') >= 0) {
+				return json_encode(array($rootNode=>$data), JSON_PRETTY_PRINT);
+			}
 		}
-		return $json;
+
+		return json_encode(array($rootNode=>$data));
+	}
+
+	public function decode($jsonStr, $assoc=true)
+	{
+		return json_decode($jsonStr, $assoc);
 	}
 
 }
