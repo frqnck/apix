@@ -43,5 +43,10 @@ class BlankResource #extends ResourceAbstract
 	{
 		return array('method'=>__METHOD__, 'params'=>$params);
 	}
-	
+
+	public function testApiResource()
+	{
+		return array('TEST');
+	}
+
 }

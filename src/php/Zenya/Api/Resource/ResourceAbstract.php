@@ -105,7 +105,13 @@ Abstract class ResourceAbstract implements \IteratorAggregate
 	final public function helpApiResource()
 	{
 		@header('Allow: ' . $this->_getStringOfMethods(), true);
-		
+
+		/*		
+		$man = $this->getParam('resource');
+		$resource = Zenya_Api_Resource::getInternalAppelation($man);
+		$help = new Zenya_Api_ManualParser($resource, $man, 'api_');
+		$this->_output = $help->toArray();
+		*/		
 		// TODO: add OPTIONS handler (help) here.
 		return array('Help Handler, handles HTTP HEAD method');
 	}

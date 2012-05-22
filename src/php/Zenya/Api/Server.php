@@ -81,10 +81,12 @@ class Container
 class Server extends Listener
 {
 	public $debug = true;
+
+	public $org = 'zenya';
+	public $rootNode = 'zenya';
 	public $version = 'Zenya/0.2.1';
 
 	public $httpCode = 200;
-	public $resourceName;
 
 	public function __construct()
 	{
@@ -164,7 +166,11 @@ class Server extends Listener
 						$format = Response::DEFAULT_FORMAT;
 				}
 			}
+			
+			
 			$this->route->format = $format;
+			
+			// TODO: fix this!
 			Response::throwExceptionIfUnsupportedFormat($format);
 			
 			// attach early listeners @ pre-processing
@@ -173,23 +179,9 @@ class Server extends Listener
 			$this->stage = 'late';
 
 			// Process with the requested resource
-			$resources = new Resource(array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test'))));
+			$resource = new Resource(array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test'))));
 
-			$this->results = $resources->callNew($this->route);
-
-			/*
-			  if ($r->isException()) {
-			  $ex = $r->getException();
-			  $e = is_array($ex) ? $ex[0] : $ex;
-			  if (is_a($e, 'Exception')) { // Zenya_Api_Exception
-			  $this->httpCode = $e->getCode() ? $e->getCode() : 500;
-			  $body = array('error' => $e->getMessage());
-			  $r->setHttpResponseCode($this->httpCode);
-			  }
-			  } else {
-			  $body = $Resource->getResource($params['action'], $req);
-			  }
-			 */
+			$this->results = $resource->call($this);
 
 		} catch (Exception $e) {
 			$this->results = array(
@@ -202,32 +194,18 @@ class Server extends Listener
 		}
 
 		$response = new Response($this, $this->route->format);
+		
 		echo $response->send();
 
 		// attach late listeners @ post-processing
 		$this->addAllListeners('server', 'late');
-
-		#print_r($this);
-		exit;
-
-
-		try {
-			$Response = new Zenya_Api_Response($data);
-			// send to stdout
-			$out = $Response->output($data->format);
-		} catch (Exception $e) {
-			$out = 'ERROR: Exception at ' . __METHOD__ . ': ' . PHP_EOL
-					. $e->getMessage() . PHP_EOL . $e->getTraceAsString();
-		}
-
-		$controller = Zend_Controller_Front::getInstance();
-		$response = $controller->getResponse()->setBody($out);
-		$response->renderExceptions(false);
-		//$response->headersSentThrowsException = false;
-		reg('logger')->info('Informational message');
-
-		// send to stdout
-		echo $out;
 	}
 
+	static function d($mix)
+	{
+		echo '<pre>';
+		print_r($mix);
+		echo '</pre>';
+	}
+	
 }

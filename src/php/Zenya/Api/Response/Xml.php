@@ -23,37 +23,76 @@ namespace Zenya\Api\Response;
 
 class Xml implements Adapter
 {
+	/**
+	 * @var string 
+	 */
 	static $contentType = 'application/xml';	
 
-	protected $_xml = null;
+	/**
+	 * @var	string
+	 */
+	public $encoding = 'utf-8'; #'iso-8859-1';
 	
-	public static function generate(array $data)
+	/**
+	 * @var	\SimpleXMLElement
+	 */
+	protected $xml;
+	
+	/**
+	 * Convert
+	 * 
+	 * @param	array	$data
+	 * @param	string	$rootNode	The root node
+ 	 * @return	string 
+	 */
+	public function encode(array $data, $rootNode="root")
 	{
-		$r = new self($data);
-		if(extension_loaded('tidy')) {
-			return $r->validate($r->_xml->asXML());
-		}
-		return $r->_xml->asXML();
+		$str = sprintf('<?xml version="1.0" encoding="%s"?><%s />',
+					$this->encoding,
+					$rootNode
+				);
+		
+		$Xml = new \SimpleXMLElement($str);
+		$this->arrayToXml($Xml, $data);	
+		return $this->validate($Xml->asXML());
 	}
 
-	public function __construct(array $data)
+	/**
+	 * Convert an XML string to its array representation
+	 * 
+	 * @param	string	$str	An XML string.
+	 * @param	boolean	$assoc	Convert objects to array.
+ 	 * @return	array
+	 */
+	public function decode($xmlStr, $assoc=true)
 	{
-		$str = '<?xml version="1.0" encoding="utf-8"?>';
-		$str .= '<zenya></zenya>'; // TODO: add attrib version maybe!
-		$this->_xml = simplexml_load_string($str);
-		#array_walk_recursive($data, array($this->_xml, 'addChild'));
+		/*
+			$array = json_decode(json_encode($xmlStr), true);
 
-		#$this->_xml .= '<item>' . self::_xml($data['zenya']) . '</item>';
-		$this->_recursivelyAppend($data['zenya'], $this->_xml);
-
-		#Zend_debug::dump( $this->_xml[0] );
+			foreach ( array_slice($array, 0) as $key => $value ) {
+				if ( empty($value) ) $array[$key] = NULL;
+				elseif ( is_array($value) ) $array[$key] = toArray($value);
+			}
+			return $array;
+		*/
+		
+		// only for UTF-8
+		return json_decode(json_encode((array) simplexml_load_string($xmlStr)), $assoc);
 	}
-
-	protected function _recursivelyAppend(array $results, $xml)
+	
+	
+	/**
+	 * Array to XML conversion
+	 * 
+	 * @param	\SimpleXMLElement	$xml
+	 * @param	array				$array
+	 */
+	protected function arrayToXml(\SimpleXMLElement $xml, array $array)
 	{
-		foreach ($results as $k => $v) {
-			if (is_int($k))
+		foreach ($array as $k => $v) {
+			if (is_int($k)) {
 				$k = 'item';
+			}
 			if (is_array($v)) {
 				if($k == '@attributes') {
 					foreach($v as $k => $v) {
@@ -61,29 +100,40 @@ class Xml implements Adapter
 					}
 				} else {
 					$child = $xml->addChild($k);
-					$this->_recursivelyAppend($v, $child);
+					$this->arrayToXml($child, $v);
 				}
 			} else {
-				$xml->addChild($k, htmlentities($v, ENT_NOQUOTES, 'UTF-8'));
+				$xml->addChild($k, htmlentities($v, ENT_NOQUOTES, $this->encoding));
 			}
 		}
 	}
 
+	/**
+	 * Sanitize
+	 * 
+	 * @param	string	$str
+	 * @return	string
+	 */
 	public function validate($xml)
 	{
+		if(extension_loaded('tidy')) {
 			$tidy = new \tidy();
 			$conf = array(
-				'clean' => true,
-				'input-xml' => true,
-				'output-xml' => true,
-				'indent' => true, // BUG!!!
-				'wrap' => 80,
+				'clean'			=> true,
+				'input-xml'		=> true,
+				'output-xml'	=> true,
+				'indent'		=> true, // TODO: check possible issue/bug here!
+				'wrap'			=> 80,
 			);
-			$tidy->parseString($xml, $conf, 'utf8');
+			$tidy->parseString($xml, $conf);
 			$tidy->cleanRepair();
-			#return $tidy->html()->value;
-			return $tidy->value; // with DOCTYPE
-			#return tidy_get_output($tidy);
+			
+			$xml = $tidy->value; // output with a DOCTYPE
+			#$xml = $tidy->html()->value;
+			#$xml = tidy_get_output($tidy);
+		}
+		
+		return $xml;
 	}
 
 }
