@@ -7,9 +7,9 @@ class Php implements Adapter
 {
 	static $contentType = 'application/php';	
 
-	public static function generate(array $data)
+	public function encode(array $data, $rootNode='root')
 	{
-		return print_r($data, true);
+		return print_r(array($rootNode=>$data), true);
 	}
 
 }
