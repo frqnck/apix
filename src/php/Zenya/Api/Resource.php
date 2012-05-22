@@ -48,27 +48,24 @@ class Resource extends Listener
 {
 
 	/**
-	 * Stores all the resources available.
+	 * Stores the resources'objects.
 	 *
 	 * @var	array
 	 */
 	protected $_resources = array();
 
     /**
-     * Zenya\Api\Resource Constructor.
-	 * 
-	 * Import given object methods
+	 * Import given objects
      *
-     * @param	array	$resources	Array of resources
+     * @param	array	$resources
      */
-
 	public function __construct(array $resources)
 	{
         $this->_resources = $resources;
 	}
 	
 	/**
-	 * Check and return a sanitized/clean resource name (short and public usage)
+	 * Check and return a sanitized/clean resource name (short and public)
 	 *
 	 * @params	string	$name	A resource name to check
 	 * @return	string
@@ -80,6 +77,7 @@ class Resource extends Listener
 		if (array_key_exists($name, $this->_resources)) {
 			return $name;
 		}
+		
 		throw new Exception("Invalid resource's name specified ({$name})", 404);
 	}
 	
@@ -108,28 +106,6 @@ class Resource extends Listener
 	}
 
 	/**
-	 * Get Resource
-	 *
-	 * @params	string	$name	Name of the resource
-	 * @return	array
- 	 * @throws	Zenya\Api\Exception
-	 * @see		Zenya\Api\Resource::getPublicAppelation
-	 */
-	public function call(\Zenya\Api\Router $route)
-	{
-		// attach late listeners @ post-processing
-		$this->addAllListeners('resource', 'early');
-
-		$class = self::getInternalAppelation($route->name);
-
-		#$method = $request->method;
-		#$params = $request->params;
-		#$service = call_user_func_array(array($class, $local_method), $params);
-
-		return new $class($route);
-	}
-	
-	/**
 	 * Act as a data mapper, check required params, etc...
 	 *
 	 * @return void
@@ -148,11 +124,22 @@ class Resource extends Listener
 		}
 	}
 
-	
-	public function callNew(\Zenya\Api\Router $route)
+	/**
+	 * Call a resource
+	 *
+	 * @params	string	$name	Name of the resource
+	 * @return	array
+ 	 * @throws	Zenya\Api\Exception
+	 * @see		Zenya\Api\Resource::getPublicAppelation
+	 */	
+	public function call(\Zenya\Api\Server $server)
 	{
+		$this->server = $server;
+		
 		// attach late listeners @ post-processing
 		$this->addAllListeners('resource', 'early');
+
+		$route = $this->server->route;
 
 		$class = self::getInternalAppelation($route->name);
 
@@ -168,15 +155,30 @@ class Resource extends Listener
 			'HEAD'		=> 'help',
 			'OPTIONS'	=> 'test'
 		);
+
+		$route->method = 'HEAD';
+
 		$route->action = $_crud[$route->method] . 'ApiResource';
+/*
+		switch() {
+			case 'HEAD':
+			case 'OPTIONS':
+				
+		}
+*/
+ 		if($route->method == 'HEAD' || $route->method == 'OPTIONS'
+			&& !$refClass->hasMethod($route->action)
+		) {
+			echo $route->action;
+			return $this->helpAction();
+		}
 
 		$refMethod = $refClass->getMethod($route->action);
-
 		if ( !in_array($refMethod, $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC))
 			&& !$refMethod->isConstructor()
 			&& !$refMethod->isAbstract()
 		) {
-			# TODO: move this out of here...
+			# TODO: move this from here...
 			@header('Allow: ' . implode(', ', $refClass->getMethods()), true);
 
 			throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
@@ -196,14 +198,86 @@ class Resource extends Listener
 
 		return call_user_func_array(array(new $route->className($route->classArgs), $route->action), $params);
 	}
+
+	/**
+	 * HTTP OPTIONS: Help action handler
+	 * 
+	 * The OPTIONS method represents a request for information about the
+	 * communication options available on the request/response chain
+	 * identified by the Request-URI. This method allows the client to determine
+	 * the options and/or requirements associated with a resource, 
+	 * or the capabilities of a server, without implying a resource action or 
+	 * initiating a resource retrieval.
+	 * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
+	 *
+	 * @todo	TODO
+	 * 
+	 * @expect	client request  has an entity-body (indicated by Content-Length or Transfer-Encoding) then client's Content-Type must be set.
+	 * 
+ 	 * @cacheable false
+	 */
+	final public function helpAction()
+	{
+		$request = $this->server->request;
+
+		echo $_SERVER['APPLICATION_ENV'];
+		
+		
+		
+		Server::d($request);
+
+		if($this->server->route->path == '*') {
+			// apply to the whole server
+
+			if( $request->hasHeader('Content-Length')
+				|| $request->hasHeader('Transfer-Encoding')
+			) {
+
+				// TODO: process the $this->server->body!
+
+			} else {
+				// resource specific
+				// A server that does not support such an extension MAY discard the request body.
+				@header('Allow: ' . implode(', ', $refClass->getMethods()), true);
+				if( null === $request->getRawBody()) {
+					header('Content-Length: 0');
+				}
+					
+				/*		
+				$man = $this->getParam('resource');
+				$resource = Zenya_Api_Resource::getInternalAppelation($man);
+				$help = new Zenya_Api_ManualParser($resource, $man, 'api_');
+				$this->_output = $help->toArray();
+				*/		
+			}
+
+		}
+
+		return array('Test Handler, handles HTTP OPTIONS method');
+	}
 	
-	function replaceAndClean(/*query [, $arg1...$argN]*/){
-   $args = func_get_args();
-   if(count($args) == 1){
-       return $args[0];
-   }
-   $query = array_shift($args);
-   return vsprintf($query, $args);
-}
+	/**
+	 * HTTP HEAD: test action handler 
+	 *
+	 * The HEAD method is identical to GET except that the server MUST NOT return
+	 * a message-body in the response. The metainformation contained in the HTTP
+	 * headers in response to a HEAD request SHOULD be identical to the information
+	 * sent in response to a GET request. This method can be used for obtaining 
+	 * metainformation about the entity implied by the request without transferring 
+	 * the entity-body itself. This method is often used for testing hypertext links 
+	 * for validity, accessibility, and recent modification.
+	 * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4
+	 * 
+	 * @return	null
+  	 * @cacheable true
+	 */
+	final public function testAction()
+	{
+		
+		// identical to get without the body output.
+		// shodul proxy to the get method!? 
+			
+		return null; // MUST NOT return a message-body in the response
+	}
 
 }

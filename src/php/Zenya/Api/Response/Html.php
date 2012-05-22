@@ -27,26 +27,23 @@ class Html implements Adapter
 
 	protected $_html = null;
 
-	public static function generate(array $data)
+	/**
+	 * Encode an array to HTML (list elements).
+	 * 
+	 * @param	array	$data
+	 * @param	string	$rootNode	The root node
+ 	 * @return	string 
+	 */
+	public function encode(array $data, $rootNode='root')
 	{
-		$r = new self($data);
-		return $r->_html;
-	}
-
-	public function __construct($data)
-	{
-		#ob_start();
-		$out = $this->_recursivelyAppend($data);
-		#$out = ob_get_contents();
-		#ob_end_clean();
-		
+		$out = $this->_recursivelyAppend(array($rootNode=>$data));
 		if(extension_loaded('tidy')) {
-			$this->_html = $this->validate($out);
+			return $this->validate($out);
 		} else {
-			$this->_html = $out;
+			return $out;
 		}
 	}
-
+	
 	protected function _recursivelyAppend(array $results)
 	{
 		$out = '<ul>';
@@ -58,23 +55,24 @@ class Html implements Adapter
 		$out .= '</ul>';
 		return $out;
 	}
-
+	
 	public function validate($html)
 	{
 		$tidy = new \tidy();
 		$conf = array(
 			// PHP Bug: commenting out 'indent' (with true or false)
 			// for some weird reason does chnage the Transfer-Encoding!
-			'indent' => true,
-			'tidy-mark' => false,
-			'clean' => true,
-			'output-xhtml' => false,
-			'show-body-only' => true,
+			'indent'			=> true,
+			'tidy-mark'			=> false,
+			'clean'				=> true,
+			'output-xhtml'		=> false,
+			'show-body-only'	=> true,
 		);
 		$tidy->parseString($html, $conf, 'UTF8');
 		$tidy->cleanRepair();
-		#return $tidy->html()->value;
+		
 		return $tidy->value; // with DOCTYPE
+		#return $tidy->html()->value;
 		#return tidy_get_output($tidy);
 	}
 

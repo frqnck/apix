@@ -88,7 +88,13 @@ class Response
 	 */
 	public $format = null;
 
-    /**
+	/**
+	 * Hold the encoding information.
+	 * @var string
+	 */
+	public $encoding = 'UTF-8';
+
+	/**
      * List of supported formats.
      * @var array
      */
@@ -116,9 +122,7 @@ class Response
 		$route = $this->server->route;
 
 		$array = array(
-			'zenya' => array(
-				$route->name => $data,
-			),
+			$this->server->route->name => $data,
 			'signature'	=> array(
 				'status'	=> sprintf('%d %s - %s', 
 										$this->server->httpCode,
@@ -132,12 +136,10 @@ class Response
 
 		if ($this->server->debug == true) {
 			$array['debug'] = array(
-				'debug' => array(
 				//	'request'	=> $req->getPathInfo(),		// Request URI
 					'params'	=> $route->params,	// Params
 					'format'	=> $this->format,
 					'ip'		=> $req->getIp(true)
-				),
 			);
 		}
 		return $array;
@@ -161,16 +163,20 @@ class Response
 		return floor($int/100)<=3 ? self::SUCCESS : self::FAILURE;
 	}
 
-	
-	
+	/**
+	 * Send the response 
+	 * 
+	 * @return	string
+	 */
 	public function send()
     {
 		$format = isset($this->format) ? $this->format : self::DEFAULT_FORMAT;
-		$formatter = '\Zenya\Api\Response' . '\\' . ucfirst($this->format);
 
-		$this->setHeaders($formatter::$contentType);
+		$classname = '\Zenya\Api\Response' . '\\' . ucfirst($this->format);
+		$this->setHeaders($classname::$contentType);
 
-		return $formatter::generate($this->toArray());
+		$formatter = new $classname($this->encoding);
+		return $formatter->encode($this->toArray(), $this->server->rootNode);
 	}
 
     static public function throwExceptionIfUnsupportedFormat($format)
@@ -257,5 +263,5 @@ class Response
 			'description' => $description,
 		);
 	}
-	
+
 }

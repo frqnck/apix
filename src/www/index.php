@@ -1,4 +1,3 @@
-<pre>
 <?php
 define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
 define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
