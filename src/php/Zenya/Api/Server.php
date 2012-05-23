@@ -180,9 +180,9 @@ class Server extends Listener
 			$this->stage = 'late';
 
 			// Process with the requested resource
-			$resource = new Resource(array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test'))));
+			$this->resource = new Resource(array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test'))));
 
-			$this->results = $resource->call($this);
+			$this->results = $this->resource->call($this);
 
 		} catch (Exception $e) {
 			$this->results = array(

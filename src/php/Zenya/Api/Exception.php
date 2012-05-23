@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2011 Zenya.com
  * All rights reserved.
@@ -44,27 +43,4 @@
 
 namespace Zenya\Api;
 
-class Exception extends \Exception
-{
-	
-	public function __construct($message, $code=0)
-	{
-		switch($code) {
-			case 405:
-				# TODO
-				#$this->getResponse()->setHeader('Allow', $this->_getStringOfMethods(), true);
-
-				break;
-		
-			default:
-		}
-			
-		parent::__construct($message, $code);
-	}
-
-	public function info()
-	{
-		return 'Catching exceptions...<br />Exception message: '.$this->getMessage().'<br />Source filename of exception: '.$this->getFile().'<br />Source line of exception: '.$this->getLine();
-	}
-	
-}
+class Exception extends \Exception {}
