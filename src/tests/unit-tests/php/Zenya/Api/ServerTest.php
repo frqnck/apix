@@ -52,39 +52,39 @@ namespace Zenya\Api;
 class ServerTest extends \PHPUnit_Framework_TestCase
 {
 
-	/**
-	 * @var Zenya_Api_Server
-	 */
-	protected $server;
+    /**
+     * @var Zenya_Api_Server
+     */
+    protected $server;
 
-	/**
-	 * Sets up the fixture, for example, opens a network connection.
-	 * This method is called before a test is executed.
-	 */
-	protected function setUp()
-	{
-		$this->server = new Server;
-	}
+    /**
+     * Sets up the fixture, for example, opens a network connection.
+     * This method is called before a test is executed.
+     */
+    protected function setUp()
+    {
+        $this->server = new Server;
+    }
 
-	/**
-	 * Tears down the fixture, for example, closes a network connection.
-	 * This method is called after a test is executed.
-	 */
-	protected function tearDown()
-	{
-		
-	}
+    /**
+     * Tears down the fixture, for example, closes a network connection.
+     * This method is called after a test is executed.
+     */
+    protected function tearDown()
+    {
 
-	/**
-	 * @covers Zenya\Api\Server::__construct
-	 */
-	public function testConstructor()
-	{
-		$this->server->run();
-		
-		$this->markTestIncomplete(
-				'This test has not been implemented yet.'
-		);
-	}
+    }
+
+    /**
+     * @covers Zenya\Api\Server::__construct
+     */
+    public function testConstructor()
+    {
+        $this->server->run();
+
+        $this->markTestIncomplete(
+                'This test has not been implemented yet.'
+        );
+    }
 
 }

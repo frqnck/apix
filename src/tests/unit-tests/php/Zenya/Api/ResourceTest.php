@@ -47,20 +47,20 @@ namespace Zenya\Api;
 
 class HelpTest
 {
-	/*
-	 * Hold the output array
-	 */
-	protected $_output = array();
-	
-	public function __construct()
-	{
-	}
+    /*
+     * Hold the output array
+     */
+    protected $_output = array();
+
+    public function __construct()
+    {
+    }
 
 
-	public function toArray()
-	{
-		return $this->_output;
-	}
+    public function toArray()
+    {
+        return $this->_output;
+    }
 }
 
 
@@ -71,79 +71,79 @@ class HelpTest
 class ResourceTest extends \PHPUnit_Framework_TestCase
 {
 
-	/**
-	 * @var Resource object
-	 */
-	protected $Obj;
+    /**
+     * @var Resource object
+     */
+    protected $Obj;
 
-	public $resources = array('BlankResource'=>'Zenya\Api\Resource\BlankResource');
-	
-	/**
-	 * Sets up the fixture, for example, opens a network connection.
-	 * This method is called before a test is executed.
-	 */
-	protected function setUp()
-	{
-		$this->Obj = new Resource($this->resources);
-	}
+    public $resources = array('BlankResource'=>'Zenya\Api\Resource\BlankResource');
 
-	/**
-	 * Tears down the fixture, for example, closes a network connection.
-	 * This method is called after a test is executed.
-	 */
-	protected function tearDown()
-	{
-		
-	}
+    /**
+     * Sets up the fixture, for example, opens a network connection.
+     * This method is called before a test is executed.
+     */
+    protected function setUp()
+    {
+        $this->Obj = new Resource($this->resources);
+    }
 
-	/**
-	 * @covers Zenya\Api\Resource::getPublicAppelation
-	 */
-	public function testGetPublicAppelationAlwaysUcFirst()
-	{
-		// check resource name is always higner case
-		$this->assertEquals('BlankResource', $this->Obj->getPublicAppelation('BlankResource'));
-	}
+    /**
+     * Tears down the fixture, for example, closes a network connection.
+     * This method is called after a test is executed.
+     */
+    protected function tearDown()
+    {
 
-	/**
-	 * @covers						Zenya\Api\Resource::getPublicAppelation
+    }
+
+    /**
+     * @covers Zenya\Api\Resource::getPublicAppelation
+     */
+    public function testGetPublicAppelationAlwaysUcFirst()
+    {
+        // check resource name is always higner case
+        $this->assertEquals('BlankResource', $this->Obj->getPublicAppelation('BlankResource'));
+    }
+
+    /**
+     * @covers						Zenya\Api\Resource::getPublicAppelation
      * @expectedException			Zenya\Api\Exception
      * @expectedExceptionMessage	Invalid resource's name specified (Resource-that-does-not-exist-ever)
      * @expectedExceptionCode		404
- 	 */
-	public function testGetPublicAppelationThrowsException()
-	{
-		$this->Obj->getPublicAppelation('resource-that-does-not-exist-ever');
-	}
+      */
+    public function testGetPublicAppelationThrowsException()
+    {
+        $this->Obj->getPublicAppelation('resource-that-does-not-exist-ever');
+    }
 
-	/**
-	 * @covers Zenya\Api\Resource::getInternalAppelation
-	 */
-	public function testGetInternalAppelation()
-	{
-		$this->assertEquals('Zenya\Api\Resource\BlankResource', $this->Obj->getInternalAppelation('blankResource'));
-	}
+    /**
+     * @covers Zenya\Api\Resource::getInternalAppelation
+     */
+    public function testGetInternalAppelation()
+    {
+        $this->assertEquals('Zenya\Api\Resource\BlankResource', $this->Obj->getInternalAppelation('blankResource'));
+    }
 
-	/**
-	 * @covers Zenya\Api\Resource::getResources
-	 */
-	public function testGetResources()
-	{
-		$this->assertSame( $this->resources, $this->Obj->getResources() );
-	}
-	
-	/**
-	 * @covers Zenya\Api\Resource::call
-	 * @todo: mock request
-	 */
-	public function testCallResourceReturnAnArray()
-	{
-		// mock request
-		
-		
+    /**
+     * @covers Zenya\Api\Resource::getResources
+     */
+    public function testGetResources()
+    {
+        $this->assertSame( $this->resources, $this->Obj->getResources() );
+    }
+
+    /**
+     * @covers Zenya\Api\Resource::call
+     * @todo: mock request
+     */
+    public function testCallResourceReturnAnArray()
+    {
+        // mock request
+
+
 #		$results = $this->Obj->call('BlankResource');
 #		$this->assertTrue( is_array( $results ));
 #		print_r($results);
-	}
-	
+    }
+
 }

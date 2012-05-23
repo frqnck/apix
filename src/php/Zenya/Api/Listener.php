@@ -49,15 +49,15 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      * @var SplObjectStorage
      */
     protected $_observers = array();
-    
-	 /**
+
+     /**
      * Attaches a new observer
      *
-	 * @param	SplObserver	$observer	Any object implementing SplObserver
+     * @param SplObserver $observer Any object implementing SplObserver
      */
     public function attach(\SplObserver $observer)
     {
-		foreach ($this->_observers as $attached) {
+        foreach ($this->_observers as $attached) {
             if ($attached === $observer) {
                 return;
             }
@@ -65,47 +65,48 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
         $this->_observers[] = $observer;
     }
 
-	/**
+    /**
      * Detaches an existing observer
      *
-     * @param	SplObserver	$observer	any object implementing SplObserver
+     * @param SplObserver $observer any object implementing SplObserver
      */
     public function detach(\SplObserver $observer)
     {
         foreach ($this->_observers as $key => $attached) {
             if ($attached === $observer) {
                 unset($this->_observers[$key]);
+
                 return;
             }
         }
     }
-	
+
     /**
      * Notifies all the observers
-	 * 
-	 * @return	void
-	 * @throws	Zenya\Api\Exception
+     *
+     * @return void
+     * @throws Zenya\Api\Exception
      */
     public function notify()
     {
-		foreach ($this->_observers as $observer) {
+        foreach ($this->_observers as $observer) {
             $observer->update($this);
         }
     }
 
-	/**
+    /**
      * IteratorAggregate
-     * 
+     *
      * @return \Iterator
      */
     public function getIterator()
     {
         return $this->_observers;
     }
-    
+
     /**
      * Countable
-     * 
+     *
      * @return int
      */
     public function count()
@@ -113,22 +114,24 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
         return count($this->_observers);
     }
 
-	/* ---- */
-	
-	/*
-	function __get($prop) {
-        return $this->$prop;
-	}
+    /* ---- */
 
-	function __set($prop, $val) {
+    /*
+    public function __get($prop)
+    {
+        return $this->$prop;
+    }
+
+    public function __set($prop, $val)
+    {
         echo 'set';
         $this->$prop = $val;
         $this->notify();
     }
-	*/
+    */
 
-	
-	/**
+
+    /**
      * Last event in request / response handling, intended for observers
      * @var  array
      * @see  getLastEvent()
@@ -137,15 +140,15 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
         'name' => null,
         'obj' => null
     );
-	
-	/**
+
+    /**
      * Sets the last event
      *
      * Adapters should use this method to set the current state of the request
      * and notify the observers.
      *
-     * @param string	$name	event name
-     * @param mixed		$data	some event data
+     * @param string $name event name
+     * @param mixed  $data some event data
      */
     public function setNotice($name, $data=null)
     {
@@ -153,7 +156,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
             'name' => $name,
             'data' => $data
         );
- 		$this->notify();
+         $this->notify();
     }
 
     /**
@@ -183,72 +186,72 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      * Different adapters may not send all the event types. Mock adapter does
      * not send any events to the observers.
      *
-     * @return   array   The array has two keys: 'name' and 'data'
+     * @return array The array has two keys: 'name' and 'data'
      */
     public function getNotice()
     {
         return $this->_notice;
     }
 
-	public function addAllListeners($level, $type=null)
-	{
-		// 
-		$config = array(
-			'listeners' => array(
-				'server' => array(
-					// pre-processing stage
-					'early' => array(
-						#'Zenya\Api\Listener\Mock',
-					),
-					// post-processing stage
-					'late'=>array(),
-					// errors and exceptions
-					'exception' => array(
-						#'Zenya\Api\Listener\Log' => array('php://output'),
-					)
-				),
-				'request' => array(
-					#'Zenya\Api\Listener\Log',
-				),
-				'resource' => array(
-					'early' => array(
-						#'Zenya\Api\Listener\Auth',
-						#'Zenya\Api\Listener\CheckIp' => null,
-						#'Zenya\Api\Listener\Acl',
-						#'Zenya\Api\Listener\Log',
-						#'Listener\Log',
-					),
-					// post-processing stage
-					'late'=>array(
-						#'Zenya\Api\Listener\Mock',
-						#'Zenya\Api\Listener\Log' => array('php://output'),
-					),
-				),
-				'response' => array(),
-			)
-		);
-		
-		$stage = is_null($type) ? $config['listeners'][$level] : $config['listeners'][$level][$type];
-		if(isset($stage)) {
-			foreach($stage as $k=>$v) {
-				if(is_int($k)) {
-					$call = new $v();
-				} else {
-					$args = $v[0];
-					$call = new $k($args);
-				}
-				$this->attach($call);
-			}
-		}		
-		switch($type) {
-			case 'late':
-			break;
-			default:
+    public function addAllListeners($level, $type=null)
+    {
+        //
+        $config = array(
+            'listeners' => array(
+                'server' => array(
+                    // pre-processing stage
+                    'early' => array(
+                        #'Zenya\Api\Listener\Mock',
+                    ),
+                    // post-processing stage
+                    'late'=>array(),
+                    // errors and exceptions
+                    'exception' => array(
+                        #'Zenya\Api\Listener\Log' => array('php://output'),
+                    )
+                ),
+                'request' => array(
+                    #'Zenya\Api\Listener\Log',
+                ),
+                'resource' => array(
+                    'early' => array(
+                        #'Zenya\Api\Listener\Auth',
+                        #'Zenya\Api\Listener\CheckIp' => null,
+                        #'Zenya\Api\Listener\Acl',
+                        #'Zenya\Api\Listener\Log',
+                        #'Listener\Log',
+                    ),
+                    // post-processing stage
+                    'late'=>array(
+                        #'Zenya\Api\Listener\Mock',
+                        #'Zenya\Api\Listener\Log' => array('php://output'),
+                    ),
+                ),
+                'response' => array(),
+            )
+        );
+
+        $stage = is_null($type) ? $config['listeners'][$level] : $config['listeners'][$level][$type];
+        if (isset($stage)) {
+            foreach ($stage as $k=>$v) {
+                if (is_int($k)) {
+                    $call = new $v();
+                } else {
+                    $args = $v[0];
+                    $call = new $k($args);
+                }
+                $this->attach($call);
+            }
+        }
+        switch ($type) {
+            case 'late':
+            break;
+            default:
 #				for($i=0;$i<2;$i++)
 #				$this->attach(new Listener\Mock);
-				//$this->setNotice('early');
-		}
-		$this->setNotice($type);
-	}
+                //$this->setNotice('early');
+        }
+        $this->setNotice($type);
+    }
 
 }

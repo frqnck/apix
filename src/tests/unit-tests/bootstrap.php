@@ -27,7 +27,6 @@ psr0_autoloader_searchFirst(APP_TESTDIR);
 psr0_autoloader_searchFirst(APP_TOPDIR);
 
 // step 4: enable ContractLib if it is available
-if (class_exists('Phix_Project\ContractLib\Contract'))
-{
+if (class_exists('Phix_Project\ContractLib\Contract')) {
         \Phix_Project\ContractLib\Contract::EnforceWrappedContracts();
 }
