@@ -32,10 +32,10 @@ class BlankResource #extends ResourceAbstract
 	public function readApiResource($param1, $param2, $optional=null)
 	{
 		return array(
-			'class' => __CLASS__,
-			'constructorParams'=>$this->constructorParams,
-			'method'=>__METHOD__,
-			'methodParams'=> get_defined_vars()
+			'class' 			=> __CLASS__,
+			'constructorParams'	=> $this->constructorParams,
+			'method'			=> __METHOD__,
+			'methodParams'		=> get_defined_vars()
 		);
 	}
 	
