@@ -5,7 +5,7 @@ namespace Zenya\Api\Response;
 
 class Php implements Adapter
 {
-	static $contentType = 'application/php';	
+	static $contentType = 'text/plain';	
 
 	public function encode(array $data, $rootNode='root')
 	{
