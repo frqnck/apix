@@ -26,7 +26,7 @@ class Xml implements Adapter
 	/**
 	 * @var string 
 	 */
-	static $contentType = 'application/xml';	
+	static $contentType = 'text/xml';	
 
 	/**
 	 * @var	string

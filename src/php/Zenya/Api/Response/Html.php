@@ -23,7 +23,7 @@ namespace Zenya\Api\Response;
 
 class Html implements Adapter
 {
-	static $contentType = 'application/html';	
+	static $contentType = 'text/html';	
 
 	protected $_html = null;
 
