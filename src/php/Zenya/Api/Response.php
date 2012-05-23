@@ -15,7 +15,8 @@ class Response
 	/**
 	 * Constante used for status report.
 	 */
-	const SUCCESS = 'successful', FAILURE = 'failed';
+	const SUCCESS = 'successful';
+	const FAILURE = 'failed';
 
 	/**
      * Associative array of HTTP status code / reason phrase.
@@ -113,12 +114,10 @@ class Response
 
 	public function toArray()
 	{
-
 		#$data = array();
 		#foreach($this->server->results as $k => $v) {
 		#	$data[$k] = $v;
 		#}
-
 
 		$req = $this->server->request;
 		$route = $this->server->route;
@@ -141,7 +140,8 @@ class Response
 				//	'request'	=> $req->getPathInfo(),		// Request URI
 					'params'	=> $route->params,	// Params
 					'format'	=> $this->format,
-					'ip'		=> $req->getIp(true)
+					'ip'		=> $req->getIp(true),
+					'headers'	=> $this->headers
 			);
 		}
 		return $array;
@@ -172,6 +172,8 @@ class Response
 	 */
 	public function send()
     {
+		$this->setHeaders();
+
 		$format = isset($this->format) ? $this->format : self::DEFAULT_FORMAT;
 
 		$classname = '\Zenya\Api\Response' . '\\' . ucfirst($this->format);
@@ -181,7 +183,12 @@ class Response
 
 		$this->setHeader('Content-type', $classname::$contentType);
 		
-		$this->setResponseHeaders();
+		header('X-Powered-By: ' . $this->server->version, true, $this->server->httpCode);
+
+		// iterate and send all the headers
+		foreach($this->headers as $key => $value) {
+			header($key . ': ' . $value);
+		}
 
 		if($this->server->route->method == 'HEAD') {
 			#$body = null;
@@ -208,34 +215,32 @@ class Response
         return self::$formats;
     }
 
-	private $_httpHeaders = array();
-	
-	
-	public function setHeader($k, $v)
+	private $headers = array();
+
+	public function setHeader($key, $value)
 	{
-		$this->_httpHeaders[$k] = $v;
+		$this->headers[$key] = $value;
 	}
 
-	
-    public function setHeaders(array $headers)
+	/**
+	 *	#header('Cache-Control: no-cache, must-revalidate');	// HTTP/1.1
+	 *	#header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');	// Date in the past
+	 *		// upload example
+	 *	#header('Content-Disposition: attachment; filename="downloaded.pdf"');
+	 *	#readfile('original.pdf');
+	 */
+    public function setHeaders()
     {
-		header('X-Powered-By: ' . $this->server->version, true, $this->server->httpCode);
-		header('Vary: Accept');
+		$this->setHeader('Vary', 'Accept');
 
-		#header('Cache-Control: no-cache, must-revalidate');	// HTTP/1.1
-		#header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');	// Date in the past
-
-		foreach($this->_httpHeaders as $k => $v) {
-			header($k . ': ' . $v);
+		// check $this->httpCode
+		switch($this->server->httpCode) {
+			case 405:
+				#Server::d($this->resource);
+				$this->setHeader('Allow', 'TODO: add HTTP methods here.');
+				#$this->setHeader('Allow', implode(', ', $this->server->res->getMethods()));
 		}
-		
-		// error
-		#$this->setHeader('Allow', implode(', ', $this->server->res->getMethods()));
-		
-		// It will be called downloaded.pdf
-		#header('Content-Disposition: attachment; filename="downloaded.pdf"');
-		// The PDF source is in original.pdf
-		#readfile('original.pdf');
+
     }
 
     public function _addHeaderFromException()
@@ -253,7 +258,7 @@ class Response
     }
 	
 	
-		/*
+	/**
 	 * Hold alist of Http status used by Zenya_Api
 	 * as per http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
 	 *
