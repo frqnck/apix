@@ -27,22 +27,22 @@ namespace Zenya\Api\Response;
 
 class Json implements Adapter
 {
-	static $contentType = 'application/json';
+    public static $contentType = 'application/json';
 
-	public function encode(array $data, $rootNode)
-	{
-		if (isset($_REQUEST['indent']) && $_REQUEST['indent'] == '1') {
-			if(version_compare(PHP_VERSION, '5.4.0') >= 0) {
-				return json_encode(array($rootNode=>$data), JSON_PRETTY_PRINT);
-			}
-		}
+    public function encode(array $data, $rootNode)
+    {
+        if (isset($_REQUEST['indent']) && $_REQUEST['indent'] == '1') {
+            if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
+                return json_encode(array($rootNode=>$data), JSON_PRETTY_PRINT);
+            }
+        }
 
-		return json_encode(array($rootNode=>$data));
-	}
+        return json_encode(array($rootNode=>$data));
+    }
 
-	public function decode($jsonStr, $assoc=true)
-	{
-		return json_decode($jsonStr, $assoc);
-	}
+    public function decode($jsonStr, $assoc=true)
+    {
+        return json_decode($jsonStr, $assoc);
+    }
 
 }

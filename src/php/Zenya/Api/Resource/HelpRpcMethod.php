@@ -2,7 +2,7 @@
 
 /* vim: set expandtab tabstop=4 shiftwidth=4 softtabstop=4 foldmethod=marker: */
 
-// LICENSE AGREEMENT. If folded, press za here to unfold and read license {{{ 
+// LICENSE AGREEMENT. If folded, press za here to unfold and read license {{{
 
 /**
 * +-----------------------------------------------------------------------------+
@@ -30,7 +30,7 @@
 *
 * @category   XML
 * @package    XML_RPC2
-* @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>  
+* @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>
 * @copyright  2004-2006 Sergio Carvalho
 * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
 * @version    CVS: $Id$
@@ -44,14 +44,14 @@ require_once 'XML/RPC2/Exception.php';
 // }}}
 
 /**
- * Class representing an XML-RPC exported method. 
+ * Class representing an XML-RPC exported method.
  *
- * This class is used internally by XML_RPC2_Server. External users of the 
+ * This class is used internally by XML_RPC2_Server. External users of the
  * package should not need to ever instantiate XML_RPC2_Server_Method
  *
  * @category   XML
  * @package    XML_RPC2
- * @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>  
+ * @author     Sergio Carvalho <sergio.carvalho@portugalmail.com>
  * @copyright  2004-2006 Sergio Carvalho
  * @license    http://www.gnu.org/copyleft/lesser.html  LGPL License 2.1
  * @link       http://pear.php.net/package/XML_RPC2
@@ -59,98 +59,98 @@ require_once 'XML/RPC2/Exception.php';
 class XML_RPC2_Server_Method
 {
     // {{{ properties
-    
-    /** 
-     * Method signature parameters 
+
+    /**
+     * Method signature parameters
      *
      * @var array
      */
     private $_parameters;
-    
+
     /**
-     * Method signature return type 
+     * Method signature return type
      *
      * @var string
      */
     private $_returns ;
-    
-    /** 
-     * Method help, for introspection 
-     * 
+
+    /**
+     * Method help, for introspection
+     *
      * @var string
      */
     private $_help;
-    
+
     /**
      * internalMethod field : method name in PHP-land
      *
      * @var string
      */
     private $_internalMethod;
-    
+
     /**
-     * hidden field : true if the method is hidden 
+     * hidden field : true if the method is hidden
      *
      * @var boolean
      */
     private $_hidden;
-    
+
     /**
      * name Field : external method name
      *
-     * @var string 
+     * @var string
      */
     private $_name;
-    
+
     /**
      * Number of required parameters
      *
      * @var int
      */
     private $_numberOfRequiredParameters;
-    
+
     // }}}
     // {{{ getInternalMethod()
-    
-    /** 
-     * internalMethod getter 
-     * 
+
+    /**
+     * internalMethod getter
+     *
      * @return string internalMethod
      */
-    public function getInternalMethod() 
+    public function getInternalMethod()
     {
         return $this->_internalMethod;
     }
-        
+
     // }}}
     // {{{ isHidden()
-    
-    /** 
+
+    /**
      * hidden getter
-     * 
+     *
      * @return boolean hidden value
      */
-    public function isHidden() 
+    public function isHidden()
     {
         return $this->_hidden;
     }
-        
+
     // }}}
     // {{{ getName()
-    
+
     /**
      * name getter
      *
      * @return string name
      */
-    public function getName() 
+    public function getName()
     {
         return $this->_name;
     }
-        
+
     // }}}
     // {{{ constructor
-    
+
     /**
      * Create a new XML-RPC method by introspecting a PHP method
      *
@@ -223,7 +223,7 @@ class XML_RPC2_Server_Method
                 if (strpos($matches[3], '$' . $tmp) === 0) {
                     $newParameter['doc'] = $matches[3];
                 } else {
-                    // The phpdoc comment is something like "@param string $param description of param"    
+                    // The phpdoc comment is something like "@param string $param description of param"
                     // Let's keep only "description of param" as documentation (remove $param)
                     $newParameter['doc'] = substr($matches[3], strlen($tmp));
                 }
@@ -244,13 +244,13 @@ class XML_RPC2_Server_Method
         $this->_name = $methodname;
         $this->_hidden = $hidden;
     }
-    
+
     // }}}
     // {{{ matchesSignature()
-    
-    /** 
-     * Check if method matches provided call signature 
-     * 
+
+    /**
+     * Check if method matches provided call signature
+     *
      * Compare the provided call signature with this methods' signature and
      * return true iff they match.
      *
@@ -264,7 +264,7 @@ class XML_RPC2_Server_Method
         if (count($callParams) < $this->_numberOfRequiredParameters) return false;
         if (count($callParams) > $this->_parameters) return false;
         $paramIndex = 0;
-        foreach($this->_parameters as $param) {
+        foreach ($this->_parameters as $param) {
             $paramIndex++;
             if ($paramIndex <= $this->_numberOfRequiredParameters) {
                 // the parameter is not optional
@@ -274,18 +274,19 @@ class XML_RPC2_Server_Method
                 }
             }
         }
+
         return true;
     }
-    
+
     // }}}
     // {{{ getHTMLSignature()
-    
+
     /**
      * Return a HTML signature of the method
-     * 
+     *
      * @return string HTML signature
      */
-    public function getHTMLSignature() 
+    public function getHTMLSignature()
     {
         $name = $this->_name;
         $returnType = $this->_returns;
@@ -313,15 +314,16 @@ class XML_RPC2_Server_Method
             $result .= "<span class=\"other\"> ] </span>";
         }
         $result .= "<span class=\"other\">)</span>";
+
         return $result;
     }
-    
+
     // }}}
     // {{{ autoDocument()
     /**
      * Print a complete HTML description of the method
      */
-    public function autoDocument() 
+    public function autoDocument()
     {
         $name = $this->getName();
         $signature = $this->getHTMLSignature();
@@ -347,12 +349,12 @@ class XML_RPC2_Server_Method
             }
         }
     }
-    
+
     // }}}
     // {{{ _limitPHPType()
     /**
      * standardise type names between gettype php function and phpdoc comments (and limit to xmlrpc available types)
-     * 
+     *
      * @var string $type
      * @return string standardised type
      */
@@ -383,9 +385,10 @@ class XML_RPC2_Server_Method
         if (isset($convertArray[$tmp])) {
             return $convertArray[$tmp];
         }
+
         return 'mixed';
     }
-    
+
 }
 
 ?>
