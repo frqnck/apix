@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright (c) 2011 Zenya.com
  * All rights reserved.
@@ -52,7 +51,7 @@ class Resource extends Listener
 	 *
 	 * @var	array
 	 */
-	protected $_resources = array();
+	protected $resources = array();
 
     /**
 	 * Import given objects
@@ -61,23 +60,20 @@ class Resource extends Listener
      */
 	public function __construct(array $resources)
 	{
-
 		$internals = array(
-			// OPTIONS
 			'HTTP_OPTIONS' => array(
 					'class'		=>	'Zenya\Api\Resource\Help',
 					#'classArgs'	=> array('resource' => &$this),
 					'args'		=> array('params'=>'dd')
 				),
 			'HTTP_HEAD' => array(
-					'class'		=>	'Zenya\Api\Resource\Test',
+					'class'		=> 'Zenya\Api\Resource\Test',
 					'classArgs'	=> array('resource' => &$this),
 					'args'		=> array()
-				),
-
+				)
 		);
 
-        $this->_resources = $resources+$internals;
+        $this->resources = $resources+$internals;
 	}
 	
 	/**
@@ -87,8 +83,9 @@ class Resource extends Listener
 	 */
 	public function getResources()
 	{
-		return $this->_resources;
+		return $this->resources;
 	}
+
 	/**
 	 * Return the classname for a resource (long and private)
 	 *
@@ -102,17 +99,16 @@ class Resource extends Listener
 			case 'OPTIONS':	// help
 				$route->name = 'HTTP_OPTIONS';
 				break;
-
 			case 'HEAD':	// test
 				$route->name = 'HTTP_HEAD';
 				break;
 		}
 		
-		if (!array_key_exists($route->name, $this->_resources)) {
+		if (!array_key_exists($route->name, $this->resources)) {
 			throw new Exception("Invalid resource's name specified ({$route->name})", 404);
 		}
 
-		return $this->_resources[$route->name];
+		return $this->resources[$route->name];
 	}
 
 	/**
@@ -123,12 +119,13 @@ class Resource extends Listener
 	 */
 	private function checkRequirments($method, array $params)
 	{
-		foreach ($this->_requirements as $k => $v) {
-			if (in_array($method, $v)) {
-				if (true === is_int($k))
+		foreach ($this->_requirements as $key => $value) {
+			if (in_array($method, $value)) {
+				if (true === is_int($key)) {
 					continue;
-				if (!array_key_exists($k, $params) || empty($params[$k])) {
-					throw new Exception("Required {$method} parameter \"{$k}\" missing in action.", 400);
+				}
+				if (!array_key_exists($key, $params) || empty($params[$key])) {
+					throw new Exception("Required {$method} parameter \"{$key}\" missing in action.", 400);
 				}
 			}
 		}
@@ -142,7 +139,7 @@ class Resource extends Listener
  	 * @throws	Zenya\Api\Exception
 	 * @see		Zenya\Api\Resource::getPublicAppelation
 	 */	
-	public function call(\Zenya\Api\Server $server)
+	public function call(Server $server)
 	{
 		$this->server = $server;
 		
@@ -151,12 +148,14 @@ class Resource extends Listener
 
 		$route = $this->server->route;
 
-		/* --- Relection --- */
+		// Relection
 		$class		= self::getInternalAppelation($route);
 		$className	= $class['class'];
-		$classArgs = isset($class['classArgs'])?$class['classArgs']:$route->classArgs;
+		$classArgs = isset($class['classArgs'])
+			? $class['classArgs']
+			: $route->classArgs;
 
-		$refClass	= new \ReflectionClass($className);
+		$refClass = new \ReflectionClass($className);
 
 		// Array of HTTP Methods to CRUD verbs.
 		$crud = array(
@@ -169,40 +168,31 @@ class Resource extends Listener
 			'TRACE'		=> 'trace'
 		);
 
-		$route->action = isset($crud[$route->method]) ? $crud[$route->method] . 'ApiResource' : null;
+		$route->action = isset($crud[$route->method])
+			? $crud[$route->method] . 'ApiResource'
+			: null;
 
-		if(null !== $route->action) {
+		if (null !== $route->action) {
 			$refMethod = $refClass->getMethod($route->action);
 		}
-		if ( null === $route->action OR !in_array($refMethod, $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC))
+		
+		if (
+			null === $route->action
+			OR !in_array($refMethod, $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC))
 			&& !$refMethod->isConstructor()
 			&& !$refMethod->isAbstract()
 		) {
-			# TODO: move this from here...
-			#$this->server->response->setHeader('Allow', implode(', ', $refClass->getMethods()));
-			header('Allow: ' . implode(', ', $refClass->getMethods()), true);
+			# TODO: List all the HTTP methods on 405
+			#$this->server->response->setHeader('Allow', $this->getMethods());
+			#header('Allow: ' . implode(', ', $refClass->getMethods()));
 
 			throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
 		}
 
-		/*
-			if($route->method == 'HEAD' || $route->method != 'OPTIONS'
-				// && !$this->server->http->headOverride || !$this->server->http->optionsOverride 
-				&& $refClass->hasMethod($route->action)
-			) {
-				echo $route->action . PHP_EOL;
-				return $this->{$route->action}();
-			}
-	
-			if(!$refClass->hasMethod($route->action)) {
-				throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
-			}
-		*/
-
-		
 		$params = array();
-		foreach($refMethod->getParameters() as $k => $param) {
-			if (!$param->isOptional()
+		foreach($refMethod->getParameters() as $key => $param) {
+			if (
+				!$param->isOptional()
 				&& !array_key_exists($param->name, $route->params) 
 				&& empty($route->params[$param->name])
 			) {
