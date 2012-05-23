@@ -61,38 +61,23 @@ class Resource extends Listener
      */
 	public function __construct(array $resources)
 	{
-        $this->_resources = $resources;
-	}
-	
-	/**
-	 * Check and return a sanitized/clean resource name (short and public)
-	 *
-	 * @params	string	$name	A resource name to check
-	 * @return	string
-	 * @throws	Zenya\Api\Exception	If it doesn't not exist.
-	 */
-	public function getPublicAppelation($name)
-	{
-		$name = ucfirst($name);
-		if (array_key_exists($name, $this->_resources)) {
-			return $name;
-		}
-		
-		throw new Exception("Invalid resource's name specified ({$name})", 404);
-	}
-	
-	/**
-	 * Return the class name for a resource (long and private)
-	 *
-	 * @params	string	$name
-	 * @return	string
-	 * @throws	Zenya\Api\Exception
- 	 * @see		Zenya\Api\Resource::getPublicAppelation
-	 */
-	public function getInternalAppelation($name)
-	{
-		$short = $this->getPublicAppelation($name);
-		return $this->_resources[$short];
+
+		$internals = array(
+			// OPTIONS
+			'HTTP_OPTIONS' => array(
+					'class'		=>	'Zenya\Api\Resource\Help',
+					#'classArgs'	=> array('resource' => &$this),
+					'args'		=> array('params'=>'dd')
+				),
+			'HTTP_HEAD' => array(
+					'class'		=>	'Zenya\Api\Resource\Test',
+					'classArgs'	=> array('resource' => &$this),
+					'args'		=> array()
+				),
+
+		);
+
+        $this->_resources = $resources+$internals;
 	}
 	
 	/**
@@ -103,6 +88,31 @@ class Resource extends Listener
 	public function getResources()
 	{
 		return $this->_resources;
+	}
+	/**
+	 * Return the classname for a resource (long and private)
+	 *
+	 * @params	string	$name
+	 * @return	string
+	 * @throws	Zenya\Api\Exception	If it doesn't not exist.
+	 */
+	public function getInternalAppelation(Router $route)
+	{
+		switch($route->method) {
+			case 'OPTIONS':	// help
+				$route->name = 'HTTP_OPTIONS';
+				break;
+
+			case 'HEAD':	// test
+				$route->name = 'HTTP_HEAD';
+				break;
+		}
+		
+		if (!array_key_exists($route->name, $this->_resources)) {
+			throw new Exception("Invalid resource's name specified ({$route->name})", 404);
+		}
+
+		return $this->_resources[$route->name];
 	}
 
 	/**
@@ -141,48 +151,53 @@ class Resource extends Listener
 
 		$route = $this->server->route;
 
-		$class = self::getInternalAppelation($route->name);
-
 		/* --- Relection --- */
-		$refClass = new \ReflectionClass($class['class']);
+		$class		= self::getInternalAppelation($route);
+		$className	= $class['class'];
+		$classArgs = isset($class['classArgs'])?$class['classArgs']:$route->classArgs;
+
+		$refClass	= new \ReflectionClass($className);
 
 		// Array of HTTP Methods to CRUD verbs.
-		$_crud = array(
+		$crud = array(
 			'POST'		=> 'create',
 			'GET'		=> 'read',
 			'PUT'		=> 'update',
 			'DELETE'	=> 'delete',
-			'HEAD'		=> 'help',
-			'OPTIONS'	=> 'test'
+			'OPTIONS'	=> 'help',
+			'HEAD'		=> 'test',
+			'TRACE'		=> 'trace'
 		);
 
-		$route->method = 'HEAD';
+		$route->action = isset($crud[$route->method]) ? $crud[$route->method] . 'ApiResource' : null;
 
-		$route->action = $_crud[$route->method] . 'ApiResource';
-/*
-		switch() {
-			case 'HEAD':
-			case 'OPTIONS':
-				
+		if(null !== $route->action) {
+			$refMethod = $refClass->getMethod($route->action);
 		}
-*/
- 		if($route->method == 'HEAD' || $route->method == 'OPTIONS'
-			&& !$refClass->hasMethod($route->action)
-		) {
-			echo $route->action;
-			return $this->helpAction();
-		}
-
-		$refMethod = $refClass->getMethod($route->action);
-		if ( !in_array($refMethod, $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC))
+		if ( null === $route->action OR !in_array($refMethod, $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC))
 			&& !$refMethod->isConstructor()
 			&& !$refMethod->isAbstract()
 		) {
 			# TODO: move this from here...
-			@header('Allow: ' . implode(', ', $refClass->getMethods()), true);
+			header('Allow: ' . implode(', ', $refClass->getMethods()), true);
 
 			throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
 		}
+
+		/*
+			if($route->method == 'HEAD' || $route->method != 'OPTIONS'
+				// && !$this->server->http->headOverride || !$this->server->http->optionsOverride 
+				&& $refClass->hasMethod($route->action)
+			) {
+				echo $route->action . PHP_EOL;
+				return $this->{$route->action}();
+			}
+	
+			if(!$refClass->hasMethod($route->action)) {
+				throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
+			}
+		*/
+
 		
 		$params = array();
 		foreach($refMethod->getParameters() as $k => $param) {
@@ -196,88 +211,7 @@ class Resource extends Listener
 			}
 		}
 
-		return call_user_func_array(array(new $route->className($route->classArgs), $route->action), $params);
-	}
-
-	/**
-	 * HTTP OPTIONS: Help action handler
-	 * 
-	 * The OPTIONS method represents a request for information about the
-	 * communication options available on the request/response chain
-	 * identified by the Request-URI. This method allows the client to determine
-	 * the options and/or requirements associated with a resource, 
-	 * or the capabilities of a server, without implying a resource action or 
-	 * initiating a resource retrieval.
-	 * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
-	 *
-	 * @todo	TODO
-	 * 
-	 * @expect	client request  has an entity-body (indicated by Content-Length or Transfer-Encoding) then client's Content-Type must be set.
-	 * 
- 	 * @cacheable false
-	 */
-	final public function helpAction()
-	{
-		$request = $this->server->request;
-
-		echo $_SERVER['APPLICATION_ENV'];
-		
-		
-		
-		Server::d($request);
-
-		if($this->server->route->path == '*') {
-			// apply to the whole server
-
-			if( $request->hasHeader('Content-Length')
-				|| $request->hasHeader('Transfer-Encoding')
-			) {
-
-				// TODO: process the $this->server->body!
-
-			} else {
-				// resource specific
-				// A server that does not support such an extension MAY discard the request body.
-				@header('Allow: ' . implode(', ', $refClass->getMethods()), true);
-				if( null === $request->getRawBody()) {
-					header('Content-Length: 0');
-				}
-					
-				/*		
-				$man = $this->getParam('resource');
-				$resource = Zenya_Api_Resource::getInternalAppelation($man);
-				$help = new Zenya_Api_ManualParser($resource, $man, 'api_');
-				$this->_output = $help->toArray();
-				*/		
-			}
-
-		}
-
-		return array('Test Handler, handles HTTP OPTIONS method');
-	}
-	
-	/**
-	 * HTTP HEAD: test action handler 
-	 *
-	 * The HEAD method is identical to GET except that the server MUST NOT return
-	 * a message-body in the response. The metainformation contained in the HTTP
-	 * headers in response to a HEAD request SHOULD be identical to the information
-	 * sent in response to a GET request. This method can be used for obtaining 
-	 * metainformation about the entity implied by the request without transferring 
-	 * the entity-body itself. This method is often used for testing hypertext links 
-	 * for validity, accessibility, and recent modification.
-	 * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4
-	 * 
-	 * @return	null
-  	 * @cacheable true
-	 */
-	final public function testAction()
-	{
-		
-		// identical to get without the body output.
-		// shodul proxy to the get method!? 
-			
-		return null; // MUST NOT return a message-body in the response
+		return call_user_func_array(array(new $className($classArgs), $route->action), $params);
 	}
 
 }

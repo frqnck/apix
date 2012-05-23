@@ -113,16 +113,18 @@ class Response
 
 	public function toArray()
 	{
-		$data = array();
-		foreach($this->server->results as $key => $value) {
-			$data[$key] = $value;
-		}
+
+		#$data = array();
+		#foreach($this->server->results as $k => $v) {
+		#	$data[$k] = $v;
+		#}
+
 
 		$req = $this->server->request;
 		$route = $this->server->route;
 
 		$array = array(
-			$this->server->route->name => $data,
+			$this->server->route->name => $this->server->results,
 			'signature'	=> array(
 				'status'	=> sprintf('%d %s - %s', 
 										$this->server->httpCode,
@@ -173,10 +175,23 @@ class Response
 		$format = isset($this->format) ? $this->format : self::DEFAULT_FORMAT;
 
 		$classname = '\Zenya\Api\Response' . '\\' . ucfirst($this->format);
-		$this->setHeaders($classname::$contentType);
 
 		$formatter = new $classname($this->encoding);
-		return $formatter->encode($this->toArray(), $this->server->rootNode);
+		$body = $formatter->encode($this->toArray(), $this->server->rootNode);
+
+		$headers = array(
+			'Content-length'	=> strlen($body),
+			'Content-type' 		=> $classname::$contentType,
+		);
+		if($this->server->debug) unset($headers['Content-type']);
+		$this->setHeaders($headers);
+
+		if($this->server->route->method == 'HEAD') {
+			#$body = null;
+			$body = 'null';
+		}
+
+		return $body;
 	}
 
     static public function throwExceptionIfUnsupportedFormat($format)
@@ -196,17 +211,18 @@ class Response
         return self::$formats;
     }
 
-    public function setHeaders($contentType)
+    public function setHeaders(array $headers)
     {
 		header('X-Powered-By: ' . $this->server->version, true, $this->server->httpCode);
 
-		header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
-		header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+		header('Cache-Control: no-cache, must-revalidate');	// HTTP/1.1
+		header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');	// Date in the past
 		header('Vary: Accept');
 
-		if(!$this->server->debug) {
-			header('Content-type: ' . $contentType);
+		foreach($headers as $k => $v) {
+			header($k . ': ' . $v);
 		}
+		
 		// It will be called downloaded.pdf
 		#header('Content-Disposition: attachment; filename="downloaded.pdf"');
 		// The PDF source is in original.pdf
