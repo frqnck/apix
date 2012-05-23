@@ -179,6 +179,7 @@ class Resource extends Listener
 			&& !$refMethod->isAbstract()
 		) {
 			# TODO: move this from here...
+			#$this->server->response->setHeader('Allow', implode(', ', $refClass->getMethods()));
 			header('Allow: ' . implode(', ', $refClass->getMethods()), true);
 
 			throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
