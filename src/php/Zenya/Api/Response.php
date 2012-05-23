@@ -179,12 +179,9 @@ class Response
 		$formatter = new $classname($this->encoding);
 		$body = $formatter->encode($this->toArray(), $this->server->rootNode);
 
-		$headers = array(
-			'Content-length'	=> strlen($body),
-			'Content-type' 		=> $classname::$contentType,
-		);
-		if($this->server->debug) unset($headers['Content-type']);
-		$this->setHeaders($headers);
+		$this->setHeader('Content-type', $classname::$contentType);
+
+		$this->setResponseHeaders($headers);
 
 		if($this->server->route->method == 'HEAD') {
 			#$body = null;
@@ -211,15 +208,24 @@ class Response
         return self::$formats;
     }
 
+	private $_httpHeaders = array();
+	
+	
+	public function setHeader($k, $v)
+	{
+		$this->_httpHeaders[$k] = $v;
+	}
+
+	
     public function setHeaders(array $headers)
     {
 		header('X-Powered-By: ' . $this->server->version, true, $this->server->httpCode);
-
-		header('Cache-Control: no-cache, must-revalidate');	// HTTP/1.1
-		header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');	// Date in the past
 		header('Vary: Accept');
 
-		foreach($headers as $k => $v) {
+		#header('Cache-Control: no-cache, must-revalidate');	// HTTP/1.1
+		#header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');	// Date in the past
+
+		foreach($this->_httpHeaders as $k => $v) {
 			header($k . ': ' . $v);
 		}
 		
