@@ -180,8 +180,8 @@ class Response
 		$body = $formatter->encode($this->toArray(), $this->server->rootNode);
 
 		$this->setHeader('Content-type', $classname::$contentType);
-
-		$this->setResponseHeaders($headers);
+		
+		$this->setResponseHeaders();
 
 		if($this->server->route->method == 'HEAD') {
 			#$body = null;
@@ -228,6 +228,9 @@ class Response
 		foreach($this->_httpHeaders as $k => $v) {
 			header($k . ': ' . $v);
 		}
+		
+		// error
+		#$this->setHeader('Allow', implode(', ', $this->server->res->getMethods()));
 		
 		// It will be called downloaded.pdf
 		#header('Content-Disposition: attachment; filename="downloaded.pdf"');
