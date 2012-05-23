@@ -7,25 +7,26 @@ class Request
 
     /**
      * The HTTP response headers array
-     *
      * @var array
      */
     protected $headers = array();
 
     /**
      * Hold the request body (raw)
-     *
      * @var string
      */
     protected $body = null;
 
 	/**
      * Hold the HTTP method
-     *
      * @var string
      */
     protected $method = null;
-	
+
+	/**
+	 * Constructor
+	 * return void
+	 */	
 	public function __construct()
 	{
 		#$request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
@@ -67,11 +68,14 @@ class Request
 		}
 		$uri = parse_url($uri, PHP_URL_PATH);
 
-		if ($uri == '')
+		if ($uri == '') {
 			$uri = '/';
-
-		if ($uri != '/'
-			&& substr($uri, -1) == '/') {
+		}
+		
+		if (
+			$uri != '/'
+			&& substr($uri, -1) == '/'
+		) {
 			$uri = substr($uri, 0, -1);
 		}
 
@@ -94,8 +98,8 @@ class Request
 		if (null === $headers) {
 			#$params = http_get_request_headers();
 			$params = $_SERVER;
-		} else if(!is_array($headers)) {
-			throw new \InvalidArgumentException(sprintf("%s expects an array",__METHOD__ ));
+		} elseif (!is_array($headers)) {
+			throw new \InvalidArgumentException(sprintf("%s expects an array", __METHOD__));
 		}
 		$this->headers = $params;
 	}
@@ -121,7 +125,7 @@ class Request
 	{
 		if (null === $params) {
 			$params = $_REQUEST;
-		} else if(!is_array($params)) {
+		} elseif (!is_array($params)) {
 			throw new \InvalidArgumentException(sprintf("%s expects an array",__METHOD__ ));
 		}
 		$this->params = $params;

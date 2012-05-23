@@ -1,5 +1,5 @@
 <?php
-/** @see Zendya\Api\Input */
+
 namespace Zenya\Api\Input;
 
 class Xml implements Adapter
@@ -8,11 +8,11 @@ class Xml implements Adapter
 	/**
 	 * @var	string
 	 */
-	public $encoding = 'utf-8'; #'iso-8859-1';
+	public $encoding = 'utf-8';
 	
 	/**
 	 * Convert an XML string to its array representation
-
+	 *
 	 * @param	string	$str	An XML string.
 	 * @param	boolean	$assoc	Convert objects to array.
  	 * @return	mix

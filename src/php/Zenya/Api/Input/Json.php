@@ -1,6 +1,5 @@
 <?php
 
-/** @see Zenya\Api\Input */
 namespace Zenya\Api\Input;
 
 class Json implements Adapter
@@ -8,7 +7,7 @@ class Json implements Adapter
 
 	/**
 	 * Decode a JSON string
-
+	 *
 	 * @param	string	$str	An XML string.
 	 * @param	boolean	$assoc	Convert objects to array.
  	 * @return	mix
