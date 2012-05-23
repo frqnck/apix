@@ -46,129 +46,130 @@ namespace Zenya\Api\Resource;
 
 Abstract class ResourceAbstract implements \IteratorAggregate
 {
-	
-	/**
-	 * Return the output array.
-	 *
-	 * @return	array
-	 */
-	#public function toArray()
-	public function getIterator()
-	{
-		return new \ArrayIterator($this);
-	}
-	
-	/**
-	 * Constructor.
-	 *
-	 * $param	string	$method
- 	 * $param	array	$params
-	 * @return void
-	 * @throws Zenya\Api\Resource\Exception
-	 */
-	 
-	/*
-	final public function __construct(\Zenya\Api\Router $route)
-	{
-		$method = $route->method;
-		$params = $route->params;
 
-		if (!in_array($method, $this->getMethods())) {
-			# TODO: move this out of here...
-			@header('Allow: ' . $this->_getStringOfMethods(), true);
+    /**
+     * Return the output array.
+     *
+     * @return array
+     */
+    #public function toArray()
+    public function getIterator()
+    {
+        return new \ArrayIterator($this);
+    }
 
-			throw new Exception("Invalid resource's method ({$method}) specified.", 405);
-		}
+    /**
+     * Constructor.
+     *
+     * $param	string	$method
+      * $param	array	$params
+     * @return void
+     * @throws Zenya\Api\Resource\Exception
+     */
 
-		$this->checkRequirments($method, $params);
+    /*
+    final public function __construct(\Zenya\Api\Router $route)
+    {
+        $method = $route->method;
+        $params = $route->params;
 
-		// Array of HTTP Methods to CRUD verbs.
-		$_crud = array(
-			'POST'		=> 'create',
-			'GET'		=> 'read',
-			'PUT'		=> 'update',
-			'DELETE'	=> 'delete',
-			'HEAD'		=> 'help',
-			'OPTIONS'	=> 'test'
-		);
-		
-		$local_method = $_crud[$method] . 'ApiResource';
-		$this->$local_method($params);
-	}
+        if (!in_array($method, $this->getMethods())) {
+            # TODO: move this out of here...
+            @header('Allow: ' . $this->_getStringOfMethods(), true);
+
+            throw new Exception("Invalid resource's method ({$method}) specified.", 405);
+        }
+
+        $this->checkRequirments($method, $params);
+
+        // Array of HTTP Methods to CRUD verbs.
+        $_crud = array(
+            'POST'		=> 'create',
+            'GET'		=> 'read',
+            'PUT'		=> 'update',
+            'DELETE'	=> 'delete',
+            'HEAD'		=> 'help',
+            'OPTIONS'	=> 'test'
+        );
+
+        $local_method = $_crud[$method] . 'ApiResource';
+        $this->$local_method($params);
+    }
 */
-	/**
-	 * Help Handler, handles HTTP HEAD method
-	 *
-	 * @todo	TODO
-	 * @return	array
-	 */
-	final public function helpApiResource()
-	{
-		@header('Allow: ' . $this->_getStringOfMethods(), true);
+    /**
+     * Help Handler, handles HTTP HEAD method
+     *
+     * @todo	TODO
+     * @return array
+     */
+    final public function helpApiResource()
+    {
+        @header('Allow: ' . $this->_getStringOfMethods(), true);
 
-		/*		
-		$man = $this->getParam('resource');
-		$resource = Zenya_Api_Resource::getInternalAppelation($man);
-		$help = new Zenya_Api_ManualParser($resource, $man, 'api_');
-		$this->_output = $help->toArray();
-		*/		
-		// TODO: add OPTIONS handler (help) here.
-		return array('Help Handler, handles HTTP HEAD method');
-	}
+        /*
+        $man = $this->getParam('resource');
+        $resource = Zenya_Api_Resource::getInternalAppelation($man);
+        $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
+        $this->_output = $help->toArray();
+        */
+        // TODO: add OPTIONS handler (help) here.
+        return array('Help Handler, handles HTTP HEAD method');
+    }
 
-	/**
-	 * Test Handler, handles HTTP OPTIONS method
-	 *
-	 * @todo	TODO
-	 * @return	array
-	 */
-	final public function testApiResource()
-	{
-		return array('Test Handler, handles HTTP OPTIONS method');
-	}
-	
-	/**
-	 * Get all the methods available, include the generic ones.
-	 *
-	 * @return array
-	 */
-	private function getMethods()
-	{
-		$methods = array();
-		foreach ($this->_requirements as $k => $v) {
-			$methods = array_merge($methods, $v);
-		}
-		$methods = array_unique($methods);
-		return array_merge($methods, array('HEAD', 'OPTIONS'));
-	}
+    /**
+     * Test Handler, handles HTTP OPTIONS method
+     *
+     * @todo	TODO
+     * @return array
+     */
+    final public function testApiResource()
+    {
+        return array('Test Handler, handles HTTP OPTIONS method');
+    }
 
-	/**
-	 * Act as a data mapper, check required params, etc...
-	 *
-	 * @return void
-	 * @throws Zenya_Api_Exception
-	 */
-	private function checkRequirments($method, array $params)
-	{
-		foreach ($this->_requirements as $k => $v) {
-			if (in_array($method, $v)) {
-				if (true === is_int($k))
-					continue;
-				if (!array_key_exists($k, $params) || empty($params[$k])) {
-					throw new Exception("Required {$method} parameter \"{$k}\" missing in action.", 400);
-				}
-			}
-		}
-	}
-	
-	/**
-	 * Return string with all the available methods.
-	 *__toString
-	 * @return	string
-	 */
-	private function _getStringOfMethods()
-	{
-		return implode(', ', $this->getMethods());
-	}
-	
+    /**
+     * Get all the methods available, include the generic ones.
+     *
+     * @return array
+     */
+    private function getMethods()
+    {
+        $methods = array();
+        foreach ($this->_requirements as $k => $v) {
+            $methods = array_merge($methods, $v);
+        }
+        $methods = array_unique($methods);
+
+        return array_merge($methods, array('HEAD', 'OPTIONS'));
+    }
+
+    /**
+     * Act as a data mapper, check required params, etc...
+     *
+     * @return void
+     * @throws Zenya_Api_Exception
+     */
+    private function checkRequirments($method, array $params)
+    {
+        foreach ($this->_requirements as $k => $v) {
+            if (in_array($method, $v)) {
+                if (true === is_int($k))
+                    continue;
+                if (!array_key_exists($k, $params) || empty($params[$k])) {
+                    throw new Exception("Required {$method} parameter \"{$k}\" missing in action.", 400);
+                }
+            }
+        }
+    }
+
+    /**
+     * Return string with all the available methods.
+     *__toString
+     * @return string
+     */
+    private function _getStringOfMethods()
+    {
+        return implode(', ', $this->getMethods());
+    }
+
 }
