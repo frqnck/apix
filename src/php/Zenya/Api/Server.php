@@ -102,7 +102,7 @@ class Server extends Listener
 				'/:controller/:param1/:param2' => array(
 					#'controller' => 'BlankResource',
 					'className' => 'Zenya\Api\Resource\BlankResource',
-					'classArgs' => array('arg1'=>'test', 'arg2'=>'test2'))
+					'classArgs' => array('classArg1' => 'test1', 'classArg2' => 'test2'))
 			),
 			// need DIC here!!
 			'listeners' => array(
@@ -130,13 +130,14 @@ class Server extends Listener
 
 			// Routing
 			$this->route = new Router($config['routes'], array(
-				'method' => $this->request->getMethod(),
-				'path'	 => $path,
-				'className'=>null,
-				'classArgs'=>null
+				'method' 	=> $this->request->getMethod(),
+				'path'	 	=> $path,
+				'className'	=> null,
+				'classArgs'	=> null
 			));
-			$this->route->map($path);
 
+			$this->route->map($path);
+			
 			$name = explode('.', $this->route->controller);
 			$this->route->name = $name[0];
 			$this->route->format = count($name)>1 ? end($name) : null;
