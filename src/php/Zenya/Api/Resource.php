@@ -137,7 +137,6 @@ class Resource extends Listener
      * @params string	$name	Name of the resource
      * @return array
      * @throws Zenya\Api\Exception
-     * @see    Zenya\Api\Resource::getPublicAppelation
      */
     public function call(Server $server)
     {
