@@ -82,7 +82,6 @@ class Xml implements Adapter
         return json_decode(json_encode((array) simplexml_load_string($xmlStr)), $assoc);
     }
 
-
     /**
      * Array to XML conversion
      *

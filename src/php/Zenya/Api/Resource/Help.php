@@ -24,7 +24,6 @@ class Help #extends ResourceAbstract
      */
     protected $_private = 'Checking private var.';
 
-
     /**
      * Stores the names and methods requirements.
      *

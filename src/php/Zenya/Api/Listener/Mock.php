@@ -18,8 +18,6 @@ class Mock implements \SplObserver
         echo 'instantiated...' . PHP_EOL;
     }
 
-
-
     /**
      * Observer
      *
