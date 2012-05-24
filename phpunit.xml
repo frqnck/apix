@@ -1,10 +1,19 @@
-<?xml version="1.0"?>
-<phpunit 
-  bootstrap="src/tests/unit-tests/bootstrap.php"
-  colors="true">
+<?xml version="1.0" encoding="UTF-8"?>
 
+<phpunit 
+	bootstrap="src/tests/unit-tests/bootstrap.php"
+	backupGlobals="false"
+	backupStaticAttributes="false"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	processIsolation="false"
+	stopOnFailure="false"
+	syntaxCheck="false"
+>
     <testsuites>
-        <testsuite name="Unit Tests">
+        <testsuite name="Sleepover Unit Tests">
             <directory suffix="Test.php">src/tests/unit-tests</directory>
         </testsuite>
     </testsuites>
