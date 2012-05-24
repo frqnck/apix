@@ -259,7 +259,6 @@ class Response
         }
     }
 
-
     /**
      * Hold alist of Http status used by Zenya_Api
      * as per http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html

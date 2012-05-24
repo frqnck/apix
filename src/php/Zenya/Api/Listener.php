@@ -130,7 +130,6 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     }
     */
 
-
     /**
      * Last event in request / response handling, intended for observers
      * @var  array
@@ -166,18 +165,18 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      * The following event names are possible:
      * <ul>
      *   <li>'connect'                 - after connection to remote server,
-     *                                   data is the destination (string)</li>
+     *                                   data is the destination (string) </li>
      *   <li>'disconnect'              - after disconnection from server</li>
      *   <li>'sentHeaders'             - after sending the request headers,
-     *                                   data is the headers sent (string)</li>
+     *                                   data is the headers sent (string) </li>
      *   <li>'sentBodyPart'            - after sending a part of the request body,
-     *                                   data is the length of that part (int)</li>
+     *                                   data is the length of that part (int) </li>
      *   <li>'sentBody'                - after sending the whole request body,
-     *                                   data is request body length (int)</li>
+     *                                   data is request body length (int) </li>
      *   <li>'receivedHeaders'         - after receiving the response headers,
      *                                   data is HTTP_Request2_Response object</li>
      *   <li>'receivedBodyPart'        - after receiving a part of the response
-     *                                   body, data is that part (string)</li>
+     *                                   body, data is that part (string) </li>
      *   <li>'receivedEncodedBodyPart' - as 'receivedBodyPart', but data is still
      *                                   encoded by Content-Encoding</li>
      *   <li>'receivedBody'            - after receiving the complete response
