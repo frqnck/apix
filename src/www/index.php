@@ -17,9 +17,6 @@ $server->run();
 
 exit;
 
-
-
-
 // TODO write tes;
 $request = new Zenya\Api\Request();
 
@@ -36,7 +33,6 @@ $request->setBody( gzdeflate($data) );
 $request->setHeader('content-encoding', 'gzip' );
 $request->setBody(gzencode($data));
 
-
 #$request = new \HTTP_Request2;
 
 print_r($request);
@@ -44,9 +40,6 @@ print_r($request);
 #print_r($request->getParam('alnum', 'alnum'));
 
 print_r( $request->getBody() );
-
-
-
 
 exit;
 #$h = $request->getHeaders();

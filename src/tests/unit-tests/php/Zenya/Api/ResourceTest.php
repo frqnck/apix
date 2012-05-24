@@ -56,13 +56,11 @@ class HelpTest
     {
     }
 
-
     public function toArray()
     {
         return $this->_output;
     }
 }
-
 
 /**
  * Test class for Resource.
