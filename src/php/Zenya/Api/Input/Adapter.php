@@ -11,6 +11,6 @@ interface Adapter {
      * @oaram bool    $assoc	Convert object to associative arrays.
      * @return object|array
      */
-    abstract public function decode($str, $assoc=true);
+    public function decode($str, $assoc=true);
 
 }
