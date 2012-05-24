@@ -80,11 +80,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructor()
     {
-        $this->server->run();
-
         $this->markTestIncomplete(
                 'This test has not been implemented yet.'
         );
+        $this->server->run();
     }
 
 }
