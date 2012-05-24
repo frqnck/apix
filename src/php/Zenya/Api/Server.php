@@ -78,7 +78,6 @@ class Container
 
 }
 
-
 class Server extends Listener
 {
     public $debug = true;
@@ -168,7 +167,6 @@ class Server extends Listener
                         $format = Response::DEFAULT_FORMAT;
                 }
             }
-
 
             $this->route->format = $format;
 

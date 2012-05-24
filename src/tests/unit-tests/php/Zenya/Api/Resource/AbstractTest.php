@@ -14,7 +14,6 @@ class ResourceAbstractTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Zenya\Api\Resource\ResourceAbstract', $obj);
     }
 
-
     /**
      * @covers Zenya\Api\Resource::__construct
      */

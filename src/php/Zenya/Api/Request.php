@@ -162,7 +162,6 @@ class Request
         $this->method = strtoupper($method);
     }
 
-
     public function setBody($body = null)
     {
         if (null === $body) {
@@ -241,6 +240,5 @@ class Request
 
         return empty($ip) ? $this->getHeader('REMOTE_ADDR') : $ip;
     }
-
 
 }
