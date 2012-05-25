@@ -166,7 +166,7 @@ class Zenya_Api_ManualParser
         return $this->helps;
     }
 
-    /*
+    /**
      * Get the array of strings from a specified name.
      *
      * @param  string      $name
@@ -304,7 +304,6 @@ class Zenya_Api_ManualParser
     public function __isset($name)
     {
         $name = $this->prefix . $name;
-
         return isset($this->raw[$name]);
     }
 
