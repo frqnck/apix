@@ -40,11 +40,11 @@ class RefMethodTest extends \PHPUnit_Framework_TestCase
         $className = 'Zenya\Api\Resource\FixtureTestClass';
         $methodName = 'methodNameOne';
 
-        $this->method = new RefMethod($className, $methodName, 'api_' );
+        #$this->method = new RefMethod($className, $methodName, 'api_' );
 
         // usign decorator patern
-        # $method = new RefMethod($className, $methodName, 'api_' );
-        # $this->method = new RefDoc($method);
+        $method = new RefMethod($className, $methodName, 'api_' );
+        $this->method = new RefDoc( $method );
     }
 
     protected function tearDown()

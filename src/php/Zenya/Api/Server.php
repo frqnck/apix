@@ -1,45 +1,4 @@
 <?php
-/**
- * Copyright (c) 2011 Zenya.com
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
- *
- *   * Neither the name of Zenya nor the names of his
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
- * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
- * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
- * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- *
- * @package     Zenya
- * @subpackage  ApiServer
- * @author      Franck Cassedanne <fcassedanne@zenya.com>
- * @copyright   2011 zenya.com
- * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link        http://zenya.github.com
- * @version     @@PACKAGE_VERSION@@
- */
 
 namespace Zenya\Api;
 
@@ -88,9 +47,65 @@ class Server extends Listener
 
     public $httpCode = 200;
 
-    public function __construct()
+    protected $resources = array();
+
+    public function __construct() //array $resources)
     {
+        // to pass in the constructor!!!
+        $resources = array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test')));
+
+        // from config
+        $internals = array(
+            'HTTP_OPTIONS' => array(
+                    'class'     =>  'Zenya\Api\Resource\Help',
+                    #'classArgs'    => array('resource' => &$this),
+                    'args'      => array('params'=>'dd')
+                ),
+            'HTTP_HEAD' => array(
+                    'class'     => 'Zenya\Api\Resource\Test',
+                    'classArgs' => array('resource' => &$this),
+                    'args'      => array()
+                )
+        );
+
+        $this->resources = $resources+$internals;
     }
+
+    /**
+     * Gets a ressource.
+     *
+     * @param string $name A resource name
+     */
+    public function getResource($name)
+    {
+        if (!isset($this->resources[$name])) {
+            throw new \InvalidArgumentException(sprintf("Invalid resource's name specified (%s).", $name), 404);
+        }
+
+        return $this->resources[$name];
+    }
+
+    /**
+     * Adds a resource.
+     *
+     * @param Resource $resource A resource object
+     */
+    public function addResource(Resource $resource)
+    {
+        $resource = new Resource();
+        $this->resources[$resource->getName()] = $resource;
+    }
+
+    /**
+     * Gets all the resources.
+     *
+     * @return array An array of resources
+     */
+    public function getResources()
+    {
+        return $this->resources;
+    }
+
 
     public function run()
     {
@@ -179,9 +194,11 @@ class Server extends Listener
             $this->stage = 'late';
 
             // Process with the requested resource
-            $this->resource = new Resource(array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test'))));
+            ###$resource = $this->getResource($this->route->name);
+            $resource = new Resource($this);
+            $this->results = $resource->call();
+           # print_r($this->results);exit;
 
-            $this->results = $this->resource->call($this);
 
         } catch (Exception $e) {
             $this->results = array(

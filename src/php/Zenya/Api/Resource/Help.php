@@ -36,7 +36,7 @@ class Help #extends ResourceAbstract
 
     public function __construct($self)
     {
-        #print_r($self);
+        // instantiate
         #if ($route->path == '/*' && $route->method == 'OPTIONS') {
         #$route->name = '*';
     }
@@ -58,11 +58,20 @@ class Help #extends ResourceAbstract
      *
       * @cacheable false
      */
-    public function helpApiResource($params=null)
+    public function helpApiResource($resource, $method=null, $params=null)
     {
-        print_r($params);
 
-        return array(__METHOD__);
+
+
+        $out = array('HELP'=>array(
+            'user resource'=> $resource,
+            'user method'=> $method,
+            'user params' => $params
+            )
+        );
+#        $out .= new \Zenya\Api\Resource\RefMethod($resource, $method, 'api_');
+
+        return $out;
 
         $request = $this->server->request;
 
