@@ -1,6 +1,9 @@
 <?php
 namespace Zenya\Api\Resource;
 
+Use Zenya\Api\fixtures as fixture;
+
+//require_once '../fixture/DoockbookClassFixture.php';
 /**
  * Class Title
  *
@@ -16,7 +19,7 @@ namespace Zenya\Api\Resource;
  * @api_permission admin
  * @api_randomName classRandomValue
  */
-class FixtureTestClass {
+class OffFixtureTestClass {
     /**
      * Title
      *
@@ -48,7 +51,7 @@ class RefClassTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $className = 'Zenya\Api\Resource\FixtureTestClass';
+        $className = '\fixture\DoockbookClassFixture';
         $methodName = 'methodNameOne';
 
         $this->class = new RefClass($className, 'api_');
