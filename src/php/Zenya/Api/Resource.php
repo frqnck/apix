@@ -2,47 +2,31 @@
 
 namespace Zenya\Api;
 
+/**
+ * Represents a resource.
+ *
+ */
 class Resource extends Listener
 {
 
     /**
-     * Stores the resources'objects.
+     * Stores the resource methods.
      *
-     * @var	array
+     * @var array
      */
-    protected $resources = array();
+    protected $methods = array(); // todo extract!
 
     /**
      * Import given objects
      *
      * @param array $resources
      */
-    public function __construct(array $resources)
+    public function __construct(Server $server)
     {
-        $internals = array(
-            'HTTP_OPTIONS' => array(
-                    'class'		=>	'Zenya\Api\Resource\Help',
-                    #'classArgs'	=> array('resource' => &$this),
-                    'args'		=> array('params'=>'dd')
-                ),
-            'HTTP_HEAD' => array(
-                    'class'		=> 'Zenya\Api\Resource\Test',
-                    'classArgs'	=> array('resource' => &$this),
-                    'args'		=> array()
-                )
-        );
+        $this->server = $server;
 
-        $this->resources = $resources+$internals;
-    }
-
-    /**
-     * Get the full resources array
-     *
-     * @return array array of resources.
-     */
-    public function getResources()
-    {
-        return $this->resources;
+        // attach late listeners @ post-processing
+        $this->addAllListeners('resource', 'early');
     }
 
     /**
@@ -55,39 +39,16 @@ class Resource extends Listener
     public function getInternalAppelation(Router $route)
     {
         switch ($route->method) {
-            case 'OPTIONS':	// help
-                $route->name = 'HTTP_OPTIONS';
-                break;
-            case 'HEAD':	// test
-                $route->name = 'HTTP_HEAD';
-                break;
+            case 'OPTIONS':	// help about a resource
+            case 'HEAD':    // test a resource
+                $route->params = array(
+                        'resource'  => $route->name,
+                        'params'    => $route->params
+                    );
+                $route->name = 'HTTP_' . $route->method;
+            break;
         }
-
-        if (!array_key_exists($route->name, $this->resources)) {
-            throw new Exception("Invalid resource's name specified ({$route->name})", 404);
-        }
-
-        return $this->resources[$route->name];
-    }
-
-    /**
-     * Act as a data mapper, check required params, etc...
-     *
-     * @return void
-     * @throws Zenya_Api_Exception
-     */
-    private function checkRequirments($method, array $params)
-    {
-        foreach ($this->_requirements as $key => $value) {
-            if (in_array($method, $value)) {
-                if (true === is_int($key)) {
-                    continue;
-                }
-                if (!array_key_exists($key, $params) || empty($params[$key])) {
-                    throw new Exception("Required {$method} parameter \"{$key}\" missing in action.", 400);
-                }
-            }
-        }
+        return $this->server->getResource($route->name);
     }
 
     /**
@@ -97,25 +58,20 @@ class Resource extends Listener
      * @return array
      * @throws Zenya\Api\Exception
      */
-    public function call(Server $server)
+    public function call()
     {
-        $this->server = $server;
-
-        // attach late listeners @ post-processing
-        $this->addAllListeners('resource', 'early');
-
         $route = $this->server->route;
 
         // Relection
-        $class		= self::getInternalAppelation($route);
-        $className	= $class['class'];
-        $classArgs = isset($class['classArgs'])
-            ? $class['classArgs']
+        $classArray = self::getInternalAppelation($route);
+        $className = $classArray['class'];
+        $classArgs = isset($classArray['classArgs'])
+            ? $classArray['classArgs']
             : $route->classArgs;
 
         $refClass = new \ReflectionClass($className);
 
-        // Array of HTTP Methods to CRUD verbs.
+        // Array of HTTP methods to CRUD verbs.
         $crud = array(
             'POST'		=> 'create',
             'GET'		=> 'read',
@@ -134,6 +90,7 @@ class Resource extends Listener
             $refMethod = $refClass->getMethod($route->action);
         }
 
+        // check the Method
         if (
             null === $route->action
             OR !in_array($refMethod, $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC))
@@ -147,6 +104,7 @@ class Resource extends Listener
             throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
         }
 
+        // check the Params
         $params = array();
         foreach ($refMethod->getParameters() as $key => $param) {
             if (
@@ -159,6 +117,12 @@ class Resource extends Listener
                 $params[$param->name] = $route->params[$param->name];
             }
         }
+        
+        // TODO: re-order the params to match the method!
+        print_r($refMethod->getParameters());
+        echo '<hr>';
+        print_r($params);
+        exit;
 
         return call_user_func_array(array(new $className($classArgs), $route->action), $params);
     }

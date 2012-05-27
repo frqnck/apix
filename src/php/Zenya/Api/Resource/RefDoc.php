@@ -83,21 +83,8 @@ class RefDoc
         return $this;
     }
 
-    /**
-     * Gets a project.
-     *
-     * @param string $slug A project slug
-     */
-    public function getProject($slug)
-    {
-        if (!isset($this->projects[$slug])) {
-            throw new \InvalidArgumentException(sprintf('Project "%s" does not exist.', $slug));
-        }
-
-        return $this->projects[$slug];
-    }
-
 /* shared */
+
     /**
      * Returns the full docbook array.
      *
