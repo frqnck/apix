@@ -29,7 +29,7 @@ class BlankResource #extends ResourceAbstract
         $this->constructorParams = $params;
     }
 
-    public function readApiResource($param1, $param2, $optional=null)
+    public function onRead($param1, $param2, $optional=null)
     {
         return array(
             'class' 			=> __CLASS__,
@@ -39,12 +39,12 @@ class BlankResource #extends ResourceAbstract
         );
     }
 
-    public function updateApiResource(array $params)
+    public function onUpdate(array $params)
     {
         return array('method'=>__METHOD__, 'params'=>$params);
     }
 
-    public function testApiResource()
+    public function onTest()
     {
         return array('TEST');
     }
