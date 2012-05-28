@@ -172,8 +172,10 @@ class Response
      *
      * @return string
      */
-    public function send()
+    public function send(Resource $resource, $method)
     {
+        $this->resource = $resource;
+
         $this->setHeaders();
 
         $format = isset($this->format) ? $this->format : self::DEFAULT_FORMAT;
@@ -192,7 +194,7 @@ class Response
             header($key . ': ' . $value);
         }
 
-        if ($this->server->route->method == 'HEAD') {
+        if ($method == 'HEAD') {
             #$body = null;
             $body = 'null';
         }
@@ -238,9 +240,10 @@ class Response
         // check $this->httpCode
         switch ($this->server->httpCode) {
             case 405:
-                #Server::d($this->resource);
                 $this->setHeader('Allow', 'TODO: add HTTP methods here.');
-                #$this->setHeader('Allow', implode(', ', $this->server->res->getMethods()));
+                $this->setHeader('Allow',
+                    implode(', ', $this->resource->getMethods())
+                );
         }
 
     }
