@@ -200,7 +200,7 @@ class Server extends Listener
            # print_r($this->results);exit;
 
 
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->results = array(
                 'error' => $e->getMessage(),
             );

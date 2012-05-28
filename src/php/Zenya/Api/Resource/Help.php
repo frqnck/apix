@@ -58,10 +58,8 @@ class Help #extends ResourceAbstract
      *
       * @cacheable false
      */
-    public function helpApiResource($resource, $method=null, $params=null)
+    public function onHelp($resource, $method=null, $params=null)
     {
-
-
 
         $out = array('HELP'=>array(
             'user resource'=> $resource,
@@ -111,11 +109,6 @@ class Help #extends ResourceAbstract
         }
 
         return array('Help Handler, handles HTTP OPTIONS method');
-    }
-
-    public function updateApiResource(array $params)
-    {
-        $this->results = array('method'=>__METHOD__, 'params'=>$params);
     }
 
 }
