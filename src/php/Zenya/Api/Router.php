@@ -31,10 +31,16 @@ class Router
     public $controller = null;
 
     /**
-     * Holds the action string.
+     * Holds the current action.
      * @var	string
      */
     protected $action = null;
+
+    /**
+     * Holds all the actions.
+     * @var array
+     */
+    protected $actions = array();
 
     /**
      * Holds the array of params.
@@ -74,6 +80,18 @@ class Router
         foreach ($this->_defaults as $k => $v) {
             $this->$k = $v;
         }
+
+        // Array of HTTP methods to CRUD verbs.
+        $this->actions = array(
+            'POST'      => 'onCreate',
+            'GET'       => 'onRead',
+            'PUT'       => 'onUpdate',
+            'DELETE'    => 'onDelete',
+            'OPTIONS'   => 'onHelp',
+            'HEAD'      => 'onTest',
+            'TRACE'     => 'onTrace'
+        );
+
     }
 
      /**
@@ -140,37 +158,34 @@ class Router
     }
 
     /**
-     * Setter action
+     * Get action
      *
      * @param string $name
      * @param array $action
      */
-    public function setAction($name=null, array $actions=null)
+    public function getActions()
     {
-        if(!is_null($name)) {
-            $this->action = $name;
-        }
+        return $this->actions;
+    }
 
-        if(is_null($actions)) {
-            // Array of HTTP methods to CRUD verbs.
-            $actions = array(
-                'POST'      => 'onCreate',
-                'GET'       => 'onRead',
-                'PUT'       => 'onUpdate',
-                'DELETE'    => 'onDelete',
-                'OPTIONS'   => 'onHelp',
-                'HEAD'      => 'onTest',
-                'TRACE'     => 'onTrace'
-            );
+    /**
+     * Set the action based on the current method or passed $method string.
+     *
+     * @param string $method
+     * @return void
+     */
+    public function setAction($method=null)
+    {
+        if(!is_null($method)) {
+            $this->method = $method;
         }
-
-        $this->action = isset($actions[$this->method])
-            ? $actions[$this->method]
+        $this->action = isset($this->actions[$this->method])
+            ? $this->actions[$this->method]
             : null;
     }
 
     /**
-     * Getter action
+     * Get the action string
      *
      * @retun string
      */
