@@ -14,7 +14,7 @@ class Resource extends Listener
      *
      * @var array
      */
-    protected $methods = array(); // todo extract!
+    protected $methods = array();
 
     /**
      * Import given objects
@@ -69,25 +69,28 @@ class Resource extends Listener
             ? $classArray['classArgs']
             : $route->classArgs;
 
-        try{
+            // map to an action
             $action = $route->getAction();
 
+        try{
             $refClass = new \ReflectionClass($className);
+            
+            $this->actions = $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+            
+#print_r( $this->actions );exit;
+#    $route->setMethodActions();
+
             $refMethod = $refClass->getMethod($action);
 
-            // check the Method
+            // check the actionMethod
             if (
-                !in_array($refMethod, $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC))
+                !in_array($refMethod, $this->actions)
                 && !$refMethod->isConstructor()
                 && !$refMethod->isAbstract()
             ) {
-                throw new \Exception();
+                throw new Exception();
             }
         } catch(\Exception $e) {
-            # TODO: List all the HTTP methods on 405
-            #$this->server->response->setHeader('Allow', $this->getMethods());
-            #header('Allow: ' . implode(', ', $refClass->getMethods()));
-
             throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
         }
 
@@ -109,6 +112,16 @@ class Resource extends Listener
         // TODO: maybe we need to check the order of params key match the method?
 
         return call_user_func_array(array(new $className($classArgs), $action), $params);
+    }
+
+    public function getMethods()
+    {
+        $actions = array();
+        foreach($this->actions as $obj) {
+                $actions[] = $obj->name;
+        }
+        $methods = array_intersect($this->server->route->getActions(), $actions);
+        return array_keys($methods); 
     }
 
 }

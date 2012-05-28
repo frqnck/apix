@@ -197,7 +197,7 @@ class Server extends Listener
             ###$resource = $this->getResource($this->route->name);
             $resource = new Resource($this);
             $this->results = $resource->call();
-           # print_r($this->results);exit;
+           # print_r($resource);exit;
 
 
         } catch (\Exception $e) {
@@ -211,8 +211,7 @@ class Server extends Listener
         }
 
         $response = new Response($this, $this->route->format);
-
-        echo $response->send();
+        echo $response->send($resource, $this->route->method);
 
         // attach late listeners @ post-processing
         $this->addAllListeners('server', 'late');
