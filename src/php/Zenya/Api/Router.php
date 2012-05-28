@@ -34,7 +34,7 @@ class Router
      * Holds the action string.
      * @var	string
      */
-    public $action = null;
+    protected $action = null;
 
     /**
      * Holds the array of params.
@@ -137,6 +137,50 @@ class Router
         }
 
         return $result;
+    }
+
+    /**
+     * Setter action
+     *
+     * @param string $name
+     * @param array $action
+     */
+    public function setAction($name=null, array $actions=null)
+    {
+        if(!is_null($name)) {
+            $this->action = $name;
+        }
+
+        if(is_null($actions)) {
+            // Array of HTTP methods to CRUD verbs.
+            $actions = array(
+                'POST'      => 'onCreate',
+                'GET'       => 'onRead',
+                'PUT'       => 'onUpdate',
+                'DELETE'    => 'onDelete',
+                'OPTIONS'   => 'onHelp',
+                'HEAD'      => 'onTest',
+                'TRACE'     => 'onTrace'
+            );
+        }
+
+        $this->action = isset($actions[$this->method])
+            ? $actions[$this->method]
+            : null;
+    }
+
+    /**
+     * Getter action
+     *
+     * @retun string
+     */
+    public function getAction()
+    {
+        if (null === $this->action) {
+            $this->setAction();
+        }
+
+        return $this->action;
     }
 
 }
