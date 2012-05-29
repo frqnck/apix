@@ -26,7 +26,7 @@ class Resource extends Listener
         $this->server = $server;
 
         // attach late listeners @ post-processing
-        $this->addAllListeners('resource', 'early');
+      #  $this->addAllListeners('resource', 'early');
     }
 
     /**
@@ -74,11 +74,8 @@ class Resource extends Listener
 
         try{
             $refClass = new \ReflectionClass($className);
-            
+
             $this->actions = $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
-            
-#print_r( $this->actions );exit;
-#    $route->setMethodActions();
 
             $refMethod = $refClass->getMethod($action);
 
@@ -111,6 +108,11 @@ class Resource extends Listener
 
         // TODO: maybe we need to check the order of params key match the method?
 
+        // TODO: type casting handler
+
+        // attach late listeners @ post-processing
+        $this->addAllListeners('resource', 'early');
+
         return call_user_func_array(array(new $className($classArgs), $action), $params);
     }
 
@@ -121,7 +123,7 @@ class Resource extends Listener
                 $actions[] = $obj->name;
         }
         $methods = array_intersect($this->server->route->getActions(), $actions);
-        return array_keys($methods); 
+        return array_keys($methods);
     }
 
 }
