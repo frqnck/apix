@@ -2,7 +2,7 @@
 
 namespace Zenya\Api\Resource;
 
-class Help #extends ResourceAbstract
+class Help
 {
     /*
      * Another public var.
@@ -60,11 +60,11 @@ class Help #extends ResourceAbstract
      */
     public function onHelp($resource, $method=null, $params=null)
     {
-
-        $out = array('HELP'=>array(
-            'user resource'=> $resource,
-            'user method'=> $method,
-            'user params' => $params
+        $out = array(
+            'HELP'=>array(
+                'user resource' => $resource,
+                'user method'   => $method,
+                'user params'   => $params
             )
         );
 #        $out .= new \Zenya\Api\Resource\RefMethod($resource, $method, 'api_');

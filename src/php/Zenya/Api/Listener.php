@@ -194,7 +194,6 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
 
     public function addAllListeners($level, $type=null)
     {
-        //
         $config = array(
             'listeners' => array(
                 'server' => array(
@@ -214,7 +213,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
                 ),
                 'resource' => array(
                     'early' => array(
-                        #'Zenya\Api\Listener\Auth',
+                        'Zenya\Api\Listener\Auth',
                         #'Zenya\Api\Listener\CheckIp' => null,
                         #'Zenya\Api\Listener\Acl',
                         #'Zenya\Api\Listener\Log',
