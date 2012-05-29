@@ -18,10 +18,9 @@
  * @version		$Id$
  */
 
-/** @see Zendya\Api\Response */
-namespace Zenya\Api\Response;
+namespace Zenya\Api\Output;
 
-class Xml implements Adapter
+class Xml extends Adapter
 {
     /**
      * @var string
@@ -31,7 +30,7 @@ class Xml implements Adapter
     /**
      * @var	string
      */
-    public $encoding = 'utf-8'; #'iso-8859-1';
+    protected $encoding = 'utf-8'; #'iso-8859-1';
 
     /**
      * @var	\SimpleXMLElement
@@ -56,30 +55,6 @@ class Xml implements Adapter
         $this->arrayToXml($Xml, $data);
 
         return $this->validate($Xml->asXML());
-    }
-
-    /**
-     * Convert an XML string to its array representation
-     *
-     * @param string  $str   An XML string.
-     * @param boolean $assoc Convert objects to array.
-      * @return	array
-     */
-    public function decode($xmlStr, $assoc=true)
-    {
-        /*
-            $array = json_decode(json_encode($xmlStr), true);
-
-            foreach ( array_slice($array, 0) as $key => $value ) {
-                if ( empty($value) ) $array[$key] = NULL;
-                elseif ( is_array($value) ) $array[$key] = toArray($value);
-            }
-
-            return $array;
-        */
-
-        // only for UTF-8
-        return json_decode(json_encode((array) simplexml_load_string($xmlStr)), $assoc);
     }
 
     /**
@@ -115,7 +90,7 @@ class Xml implements Adapter
      * @param  string $str
      * @return string
      */
-    public function validate($xml)
+    protected function validate($xml)
     {
         if (extension_loaded('tidy')) {
             $tidy = new \tidy();

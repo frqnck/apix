@@ -3,7 +3,6 @@ namespace Zenya\Api\Listener;
 
 class Log implements \SplObserver
 {
-    // properties {{{
 
     /**
      * The log target, it can be a a resource or a PEAR Log instance.

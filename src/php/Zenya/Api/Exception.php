@@ -43,4 +43,51 @@
 
 namespace Zenya\Api;
 
-class Exception extends \Exception {}
+class Exception extends \Exception {
+
+    /**
+     *  E_RECOVERABLE_ERROR handler
+     *
+     *  Throws exception occur.
+     *
+     * @param int $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param int $errline
+     * @return boolean
+     * @throws \ErrorException
+     */
+    static public function errorHandler($errno, $errstr, $errfile, $errline)
+    {
+      if ( E_RECOVERABLE_ERROR===$errno ) {
+        $errstr = preg_replace('@to\s.*::\w+\(\)@', '', $errstr, 1);
+        throw new \ErrorException($errstr, 400, 0, $errfile, $errline);
+      }
+      return false;
+    }
+
+    /**
+     *  Fatal error handler
+     *
+     *  Throws exception occur.
+     *
+     * @param int $errno
+     * @param string $errstr
+     * @param string $errfile
+     * @param int $errline
+     * @return boolean
+     * @throws \ErrorException
+     */
+    static public function shutdownHandler()
+    {
+        $error = error_get_last();
+        if($error !== NULL) {
+            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+            echo "<h1>500 Internal Server Error</h1>" . $e->getMessage();
+
+            $info = "[SHUTDOWN] file:".$error['file']." | ln:".$error['line']." | msg:".$error['message'] .PHP_EOL;
+            echo $info;
+        }
+    }
+
+}
