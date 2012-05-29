@@ -19,13 +19,11 @@
  */
 
 /** @see Zendya\Api\Response */
-namespace Zenya\Api\Response;
+namespace Zenya\Api\Output;
 
-class Html implements Adapter
+class Html extends Adapter
 {
-    public static $contentType = 'text/html';
-
-    protected $_html = null;
+    public $contentType = 'text/html';
 
     /**
      * Encode an array to HTML (list elements).
@@ -57,7 +55,7 @@ class Html implements Adapter
         return $out;
     }
 
-    public function validate($html)
+    protected function validate($html)
     {
         $tidy = new \tidy();
         $conf = array(

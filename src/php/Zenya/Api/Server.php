@@ -51,24 +51,57 @@ class Server extends Listener
 
     public function __construct() //array $resources)
     {
-        // to pass in the constructor!!!
+
+        // to be passed thru the constructor!!!
         $resources = array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test')));
 
-        // from config
-        $internals = array(
-            'HTTP_OPTIONS' => array(
-                    'class'     =>  'Zenya\Api\Resource\Help',
-                    #'classArgs'    => array('resource' => &$this),
-                    'args'      => array('params'=>'dd')
+       $config = array(
+            'route_prefix' => '@^(/index.php)?/api/v(\d*)@i', // regex
+            'routes' => array(
+                #'/:controller/paramName/:paramName/:id' => array(),
+                #'/:controller/test' => array('class'=>'test'),
+                '/:controller/:param1/:param2' => array(
+                    #'controller' => 'BlankResource',
+                    'className' => 'Zenya\Api\Resource\BlankResource',
+                    'classArgs' => array('classArg1' => 'test1', 'classArg2' => 'test2'))
+            ),
+            // need DIC here!!
+            'listeners' => array(
+                // pre-processing stage
+                'early' => array(
+                    'new Listener\Auth',
+                    'new Listener\Acl',
+                    'new Listener\Log',
+                    'new Listener\Mock'
                 ),
-            'HTTP_HEAD' => array(
-                    'class'     => 'Zenya\Api\Resource\Test',
-                    'classArgs' => array('resource' => &$this),
-                    'args'      => array()
-                )
+
+                // post-processing stage
+                'late'=>array(
+                    'new Listener\Log',
+                ),
+            ),
+
+            // -- advanced options --
+            'internals' => array(
+                'HTTP_OPTIONS' => array(
+                        'class'     =>  'Zenya\Api\Resource\Help',
+                        #'classArgs'    => array('resource' => &$this),
+                        'args'      => array('params'=>'dd')
+                    ),
+                'HTTP_HEAD' => array(
+                        'class'     => 'Zenya\Api\Resource\Test',
+                        'classArgs' => array('resource' => $this),
+                        'args'      => array()
+                    )
+            )
         );
 
-        $this->resources = $resources+$internals;
+        $this->config = $config;
+
+        $this->resources = $resources+$this->config['internals'];
+
+        set_error_handler(array('Zenya\Api\Exception', 'errorHandler'));
+        register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
     }
 
     /**
@@ -107,49 +140,27 @@ class Server extends Listener
     }
 
 
+
     public function run()
     {
-        $config = array(
-            'route_prefix' => '@^(/index.php)?/api/v(\d*)@i', // regex
-            'routes' => array(
-                #'/:controller/paramName/:paramName/:id' => array(),
-                #'/:controller/test' => array('class'=>'test'),
-                '/:controller/:param1/:param2' => array(
-                    #'controller' => 'BlankResource',
-                    'className' => 'Zenya\Api\Resource\BlankResource',
-                    'classArgs' => array('classArg1' => 'test1', 'classArg2' => 'test2'))
-            ),
-            // need DIC here!!
-            'listeners' => array(
-                // pre-processing stage
-                'early' => array(
-                    'new Listener\Auth',
-                    'new Listener\Acl',
-                    'new Listener\Log',
-                    'new Listener\Mock'
-                ),
+        $config = $this->config;
 
-                // post-processing stage
-                'late'=>array(
-                    'new Listener\Log',
-                ),
-            )
-        );
+        // Request
+        $this->request = new Request;
+
+        // get path without the route prefix
+        $path = preg_replace($config['route_prefix'], '', $this->request->getUri());
+
+        // Routing
+        $this->route = new Router($config['routes'], array(
+            'method'    => $this->request->getMethod(),
+            'path'      => $path,
+            'className' => null,
+            'classArgs' => null
+        ));
+
 
         try {
-            // Request
-            $this->request = new Request;
-
-            // get path without the route prefix
-            $path = preg_replace($config['route_prefix'], '', $this->request->getUri());
-
-            // Routing
-            $this->route = new Router($config['routes'], array(
-                'method' 	=> $this->request->getMethod(),
-                'path'	 	=> $path,
-                'className'	=> null,
-                'classArgs'	=> null
-            ));
 
             $this->route->map($path);
 
@@ -164,7 +175,11 @@ class Server extends Listener
             } elseif (isset($_GET['format'])) {
                 $format = $_GET['format'];
             } else {
-                $accept = $this->request->getHeader('Accept');
+                if($this->request->hasHeader('HTTP_ACCEPT')) {
+                    $this->response->setHeader('Vary', 'Accept');
+                }
+
+                $accept = $this->request->getHeader('HTTP_ACCEPT');
                 switch (true) {
 
                     // 'application/json'
@@ -183,9 +198,7 @@ class Server extends Listener
                 }
             }
 
-            $this->route->format = $format;
-
-            // TODO: fix this!
+            // Sanittize the Response format...
             Response::throwExceptionIfUnsupportedFormat($format);
 
             // attach early listeners @ pre-processing
@@ -194,11 +207,10 @@ class Server extends Listener
             $this->stage = 'late';
 
             // Process with the requested resource
-            ###$resource = $this->getResource($this->route->name);
-            $resource = new Resource($this);
-            $this->results = $resource->call();
-           # print_r($resource);exit;
+            #  $resource = $this->getResource($this->route->name);
+            $this->resource = new Resource($this);
 
+            $this->results = $this->resource->call();
 
         } catch (\Exception $e) {
             $this->results = array(
@@ -210,11 +222,20 @@ class Server extends Listener
             $this->addAllListeners('server', 'exception');
         }
 
-        $response = new Response($this, $this->route->format);
-        echo $response->send($resource, $this->route->method);
+        $this->response = new Response($this);
+
+        // Process with the requested resource
+        #  $resource = $this->getResource($this->route->name);
+        $this->resource = new Resource($this);
+
+
+        $withBody = true; //isset($this->route->method) != 'HEAD';
+        return $this->response->send( $withBody);
 
         // attach late listeners @ post-processing
         $this->addAllListeners('server', 'late');
+
+        return $body;
     }
 
     public static function d($mix)

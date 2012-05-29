@@ -1,11 +1,11 @@
 <?php
 
 /** @see Zendya\Api\Response */
-namespace Zenya\Api\Response;
+namespace Zenya\Api\Output;
 
-class Php implements Adapter
+class Php extends Adapter
 {
-    public static $contentType = 'text/plain';
+    public $contentType = 'text/plain';
 
     public function encode(array $data, $rootNode='root')
     {

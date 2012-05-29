@@ -2,7 +2,7 @@
 
 namespace Zenya\Api\Resource;
 
-class Test # extends ResourceAbstract
+class Test
 {
     /*
      * Another public var.
@@ -34,12 +34,12 @@ class Test # extends ResourceAbstract
         array('PUT')
     );
 
-    public function readApiResource(array $params)
+    public function onRead(array $params)
     {
         $this->results = array(__METHOD__);
     }
 
-    public function updateApiResource(array $params)
+    public function onUpdate(array $params)
     {
         $this->results = array('method'=>__METHOD__, 'params'=>$params);
     }
@@ -59,7 +59,7 @@ class Test # extends ResourceAbstract
      * @return null
        * @cacheable true
      */
-    final public function testApiResource()
+    final public function onTest()
     {
         // identical to get without the body output.
         // shodul proxy to the get method!?

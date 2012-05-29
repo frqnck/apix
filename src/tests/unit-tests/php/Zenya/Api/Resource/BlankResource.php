@@ -39,9 +39,9 @@ class BlankResource #extends ResourceAbstract
         );
     }
 
-    public function onUpdate(array $params)
+    public function onUpdate(integer $param1)
     {
-        return array('method'=>__METHOD__, 'params'=>$params);
+        return array('method'=>__METHOD__, 'params' => $params);
     }
 
     public function onTest()

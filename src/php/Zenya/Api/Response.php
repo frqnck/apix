@@ -9,14 +9,24 @@ class Response
 {
     /**
      * Format to use by default when not provided.
+     * @var string
      */
     const DEFAULT_FORMAT = 'html';
 
-    /**
-     * Constante used for status report.
-     */
     const SUCCESS = 'successful';
     const FAILURE = 'failed';
+
+    /**
+     * Holds the current output format.
+     * @var string
+     */
+    public $format = null;
+
+    /**
+     * Holds the arrays of HTTP headers
+     * @var  array
+     */
+    protected $headers = array();
 
     /**
      * Associative array of HTTP status code / reason phrase.
@@ -39,6 +49,7 @@ class Response
         204 => 'No Content',
         205 => 'Reset Content',
         206 => 'Partial Content',
+        207 => 'Multi-Status',
 
         // 3xx: Redirection - Further action must be taken in order to complete
         // the request
@@ -70,6 +81,10 @@ class Response
         415 => 'Unsupported Media Type',
         416 => 'Requested Range Not Satisfiable',
         417 => 'Expectation Failed',
+        422 => 'Unprocessable Entity',
+        423 => 'Locked',
+        424 => 'Failed Dependency',
+        426 => 'Upgrade Required',
 
         // 5xx: Server Error - The server failed to fulfill an apparently
         // valid request
@@ -79,18 +94,15 @@ class Response
         503 => 'Service Unavailable',
         504 => 'Gateway Timeout',
         505 => 'HTTP Version Not Supported',
+        506 => 'Variant Also Negotiates',
+        507 => 'Insufficient Storage',
         509 => 'Bandwidth Limit Exceeded',
+        510 => 'Not Extended'
 
     );
 
     /**
-     * Hold the output format.
-     * @var string
-     */
-    public $format = null;
-
-    /**
-     * Hold the encoding information.
+     * Holds the encoding information.
      * @var string
      */
     public $encoding = 'UTF-8';
@@ -102,14 +114,13 @@ class Response
     public static $formats = array('json', 'xml', 'html', 'php');
 
     /**
-     * @var Zenya_Api_Server
+     * @var Zenya\Api\Server
      */
     protected $server;
 
-    public function __construct(Server $server, $format)
+    public function __construct(Server $server)
     {
         $this->server = $server;
-        $this->format = $format;
     }
 
     public function toArray()
@@ -125,22 +136,22 @@ class Response
         $array = array(
             $this->server->route->name => $this->server->results,
             'signature'	=> array(
-                'status'	=> sprintf('%d %s - %s',
-                                        $this->server->httpCode,
-                                        self::$defs[$this->server->httpCode],
-                                        self::getStatusString($this->server->httpCode)
+                'request'   => sprintf('%s %s', $req->getMethod(), $req->getUri()),
+                'timestamp' => $this->getDateTime(),
+                'status'	=> sprintf(
+                                    '%d %s - %s',
+                                    $this->server->httpCode,
+                                    self::$defs[$this->server->httpCode],
+                                    self::getStatusString($this->server->httpCode)
                                 ),
-                'request'	=> sprintf('%s %s', $req->getMethod(), $req->getUri()),
-                'timestamp'	=> $this->getDateTime()
             )
         );
 
         if ($this->server->debug == true) {
             $array['debug'] = array(
-                //	'request'	=> $req->getPathInfo(),		// Request URI
+                    'format'    => $this->format,
+                    'ip'        => $req->getIp(true),
                     'params'	=> $route->params,	// Params
-                    'format'	=> $this->format,
-                    'ip'		=> $req->getIp(true),
                     'headers'	=> $this->headers
             );
         }
@@ -170,36 +181,57 @@ class Response
     /**
      * Send the response
      *
+     * @param Resource $resource The Resource object
+     * @param boolean
+     *
      * @return string
      */
-    public function send(Resource $resource, $method)
+    public function send($withBody=true)
     {
-        $this->resource = $resource;
+        $resource = $this->server->resource;
 
-        $this->setHeaders();
+        $this->format = isset($this->server->format)
+            ? $this->server->format : self::DEFAULT_FORMAT;
 
-        $format = isset($this->format) ? $this->format : self::DEFAULT_FORMAT;
+        Response::throwExceptionIfUnsupportedFormat($this->format);
 
-        $classname = '\Zenya\Api\Response' . '\\' . ucfirst($this->format);
 
-        $formatter = new $classname($this->encoding);
-        $body = $formatter->encode($this->toArray(), $this->server->rootNode);
+        // format
+        $output = 'Zenya\Api\Output\\' . ucfirst($this->format);
+        $output = new $output($this->encoding);
 
-        $this->setHeader('Content-type', $classname::$contentType);
+        // sset the headers entries
+        $this->setHeader('Content-Type', $output->getContentType());
 
+        switch ($this->server->httpCode) {
+            case 405:
+                $this->setHeader('Allow',
+                    implode(', ', $resource->getMethods())
+                );
+        }
+
+        $body = $output->encode($this->toArray(), $this->server->rootNode);
+
+        $this->sendHttpHeaders();
+
+        return $withBody !== false ? $body : null;
+    }
+
+    /**
+     *  #header('Cache-Control: no-cache, must-revalidate');    // HTTP/1.1
+     *  #header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');  // Date in the past
+     *      // upload example
+     *  #header('Content-Disposition: attachment; filename="downloaded.pdf"');
+     *  #readfile('original.pdf');
+     */
+    public function sendHttpHeaders()
+    {
         header('X-Powered-By: ' . $this->server->version, true, $this->server->httpCode);
 
         // iterate and send all the headers
         foreach ($this->headers as $key => $value) {
-            header($key . ': ' . $value);
+           header($key . ': ' . $value);
         }
-
-        if ($method == 'HEAD') {
-            #$body = null;
-            $body = 'null';
-        }
-
-        return $body;
     }
 
     public static function throwExceptionIfUnsupportedFormat($format)
@@ -219,33 +251,15 @@ class Response
         return self::$formats;
     }
 
-    private $headers = array();
-
+    /**
+     * Setter for header
+     *
+     * @param string $key
+     * @param string $value
+     */
     public function setHeader($key, $value)
     {
         $this->headers[$key] = $value;
-    }
-
-    /**
-     *	#header('Cache-Control: no-cache, must-revalidate');	// HTTP/1.1
-     *	#header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');	// Date in the past
-     *		// upload example
-     *	#header('Content-Disposition: attachment; filename="downloaded.pdf"');
-     *	#readfile('original.pdf');
-     */
-    public function setHeaders()
-    {
-        $this->setHeader('Vary', 'Accept');
-
-        // check $this->httpCode
-        switch ($this->server->httpCode) {
-            case 405:
-                $this->setHeader('Allow', 'TODO: add HTTP methods here.');
-                $this->setHeader('Allow',
-                    implode(', ', $this->resource->getMethods())
-                );
-        }
-
     }
 
     public function _addHeaderFromException()

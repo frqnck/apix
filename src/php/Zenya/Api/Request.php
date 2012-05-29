@@ -151,8 +151,8 @@ class Request
         if (null === $method) {
             if ($this->getHeader('X-HTTP-Method-Override')) {
                 $method = $this->getHeader('X-HTTP-Method-Override');
-            } elseif ($this->getParam('method')) {
-                $method = $this->getParam('method');
+            } elseif ($this->getParam('_method')) {
+                $method = $this->getParam('_method');
             } else {
                 $method = isset($_SERVER['REQUEST_METHOD'])
                     ? $_SERVER['REQUEST_METHOD']
