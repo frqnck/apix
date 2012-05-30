@@ -13,29 +13,39 @@ class Auth implements \SplObserver
      *
      * @return void
      */
-    public function __construct($target = 'php://output', array $events = array())
+    public function __construct($target = 'Basic')
     {
-        if (!empty($events)) {
-            $this->events = $events;
+        //user => password
+        #$this->users = array('admin' => 'mypass', 'guest' => 'guest');
+
+
+        switch($target) {
+            case $target instanceof \Zend_Auth:
+
+               # print_r($target);
+               # echo "TODO: ZEND";exit;
+            break;
+
+            case 'Digest':
+                echo "TODO: Digest";exit;
+            break;
+
+
+            case 'Basic':
+                echo "TODO: Basic";exit;
+            break;
+
+            default:
+                throw new \Exception("Unable to open '{$target}'", 500);
         }
-        if (is_resource($target) || $target instanceof Log) {
-            // use Pear::Log
-            $this->target = $target;
-        } elseif (false === ($this->target = @fopen($target, 'ab'))) {
-            throw new Exception("Unable to open '{$target}'", 500);
-        }
+
     }
 
     public function update(\SplSubject $subject)
     {
-        #echo '<pre>';
-        #print_r($subject->server->resource->getMethods());
-
-        #throw new \Exception("Auth error", 401);
-
-        $request = $subject->server->request;
 
         $action = $subject->server->route->getAction();
+        $request = $subject->server->request;
         $method = $request->getMethod();
 
         // skip for user login, testing & help!
@@ -48,14 +58,41 @@ class Auth implements \SplObserver
                 return;
         endswitch;
 
+        // temp
+        // Authorization: Basic ZnJhbmNrOnRlc3Q=";
+        # print_r($request->getHeaders());
+/*
+        $username = 'franck';#$pass = 'pass';
+
+        $conf = array(
+            'accept_schemes'    => 'digest',
+            'realm'             =>  'ZenyaApi',
+            #'digest_domains'    => <string> Space-delimited list of URIs
+            #'nonce_timeout'     => <int>
+            #'use_opaque'        => <bool> Whether to send the opaque value in the header
+            #'alogrithm'         => <string> See $_supportedAlgos. Default: MD5
+            #'proxy_auth'        => <bool> Whether to do authentication as a Proxy
+        );
+
+        $adapter = new \Zend_Auth_Adapter_Http($conf);
+
+        $result = $adapter->authenticate();
+        $identity = $result->getIdentity();
+
+        print_r($identity);exit;
+*/
+        $s = new \Zend_Session;
+
+        $s = new \Zenya_Model_Session;
+
         if ($request->hasHeader('X-session_id')) {
             //$_POST['session_id'] = $headers['X-session_id']; // temp!
-            Zend_Session::setId( $request->getHeader('X-session_id') );
+            \Zend_Session::setId( $request->getHeader('X-session_id') );
         }
 
-        $auth = Zend_Auth::getInstance();
+        $auth = \Zend_Auth::getInstance();
         if ($auth->hasIdentity() === false) {
-            Zend_Session::regenerateId();
+            \Zend_Session::regenerateId();
             throw new Exception('Session_id invalid.', 401);
         }
 
@@ -63,7 +100,7 @@ class Auth implements \SplObserver
         $user = $user->getUser();
 
         if ($user->session->ip != $request->getIp()) {
-            Zend_Session::destroy();
+            \Zend_Session::destroy();
             throw new Exception('Session\'s IP invalid.', 401);
         }
 
