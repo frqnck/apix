@@ -84,28 +84,6 @@ class Request
     }
 
     /**
-     * Sets a header by name.
-     *
-     * @param string $key   The key
-     * @param mixed  $value The value
-     */
-    public function setHeader($key, $value)
-    {
-        $this->headers[$key] = $value;
-    }
-
-    public function setHeaders($headers = null)
-    {
-        if (null === $headers) {
-            #$params = http_get_request_headers();
-            $params = $_SERVER;
-        } elseif (!is_array($headers)) {
-            throw new \InvalidArgumentException(sprintf("%s expects an array", __METHOD__));
-        }
-        $this->headers = $params;
-    }
-
-    /**
      * Sets a parameter by name.
      *
      * @param string $key   The key
@@ -185,6 +163,34 @@ class Request
         }
     }
 
+    /**
+     * Sets a header by name.
+     *
+     * @param string $key   The key
+     * @param mixed  $value The value
+     */
+    public function setHeader($key, $value)
+    {
+        $this->headers[$key] = $value;
+    }
+
+    /**
+     * Populate the header array.
+     *
+     * @param string $key   The key
+     * @param mixed  $value The value
+     */
+    public function setHeaders($headers = null)
+    {
+        if (null === $headers) {
+            #$params = http_get_request_headers();
+            $params = $_SERVER;
+        } elseif (!is_array($headers)) {
+            throw new \InvalidArgumentException(sprintf("%s expects an array", __METHOD__));
+        }
+        $this->headers = $params;
+    }
+
     public function hasHeader($key)
     {
         return isset($this->headers[$key]);
@@ -195,6 +201,11 @@ class Request
         if (isset($this->headers[$key])) {
             return $this->headers[$key];
         }
+    }
+
+    public function getHeaders()
+    {
+        return $this->headers;
     }
 
     public function getRawBody()

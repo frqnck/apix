@@ -25,7 +25,7 @@ class Xml extends Adapter
     /**
      * @var string
      */
-    public static $contentType = 'text/xml';
+    public $contentType = 'text/xml';
 
     /**
      * @var	string
