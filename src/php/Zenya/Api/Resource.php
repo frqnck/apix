@@ -74,7 +74,6 @@ class Resource extends Listener
 
         try{
             $refClass = new \ReflectionClass($className);
-
             $this->actions = $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
 
             $refMethod = $refClass->getMethod($action);
