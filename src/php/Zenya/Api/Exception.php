@@ -83,7 +83,7 @@ class Exception extends \Exception {
         $error = error_get_last();
         if($error !== NULL) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-            echo "<h1>500 Internal Server Error</h1>" . $e->getMessage();
+            echo "<h1>500 Internal Server Error</h1>";
 
             $info = "[SHUTDOWN] file:".$error['file']." | ln:".$error['line']." | msg:".$error['message'] .PHP_EOL;
             echo $info;

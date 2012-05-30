@@ -56,6 +56,7 @@ class Server extends Listener
         $resources = array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test')));
 
        $config = array(
+            'org' => "Zenya",
             'route_prefix' => '@^(/index.php)?/api/v(\d*)@i', // regex
             'routes' => array(
                 #'/:controller/paramName/:paramName/:id' => array(),
@@ -82,6 +83,10 @@ class Server extends Listener
             ),
 
             // -- advanced options --
+            'auth' => array(
+                    'type'=>'Basic',
+                    #'type'=>'Digest',
+                ),
             'internals' => array(
                 'HTTP_OPTIONS' => array(
                         'class'     =>  'Zenya\Api\Resource\Help',
@@ -159,6 +164,7 @@ class Server extends Listener
             'classArgs' => null
         ));
 
+        $this->response = new Response($this);
 
         try {
 
@@ -178,7 +184,6 @@ class Server extends Listener
                 if($this->request->hasHeader('HTTP_ACCEPT')) {
                     $this->response->setHeader('Vary', 'Accept');
                 }
-
                 $accept = $this->request->getHeader('HTTP_ACCEPT');
                 switch (true) {
 
@@ -198,8 +203,8 @@ class Server extends Listener
                 }
             }
 
-            // Sanittize the Response format...
-            Response::throwExceptionIfUnsupportedFormat($format);
+            // Set and sanittize the Response format...
+            $this->response->setFormat($format);
 
             // attach early listeners @ pre-processing
             $this->stage = 'early';
@@ -222,14 +227,20 @@ class Server extends Listener
             $this->addAllListeners('server', 'exception');
         }
 
-        $this->response = new Response($this);
+        switch ($this->httpCode) {
+            case 401;
+                #$this->response->setHeader('WWW-Authenticate',
+                #    sprintf('%s realm="%s"', $this->config['auth']['type'], $this->config['org'])
+                #);
+            break;
 
-        // Process with the requested resource
-        #  $resource = $this->getResource($this->route->name);
-        $this->resource = new Resource($this);
+            case 405:
+                $this->response->setHeader('Allow',
+                    implode(', ', $this->resource->getMethods())
+                );
+        }
 
-
-        $withBody = true; //isset($this->route->method) != 'HEAD';
+        $withBody = $this->route->method != 'HEAD';
         return $this->response->send( $withBody);
 
         // attach late listeners @ post-processing

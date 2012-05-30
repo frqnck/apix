@@ -188,13 +188,12 @@ class Response
      */
     public function send($withBody=true)
     {
-        $resource = $this->server->resource;
+        $resource = &$this->server->resource;
 
-        $this->format = isset($this->server->format)
-            ? $this->server->format : self::DEFAULT_FORMAT;
+        $format = isset($this->format)
+            ? $this->format : self::DEFAULT_FORMAT;
 
-        Response::throwExceptionIfUnsupportedFormat($this->format);
-
+        $this->setFormat($format);
 
         // format
         $output = 'Zenya\Api\Output\\' . ucfirst($this->format);
@@ -202,13 +201,6 @@ class Response
 
         // sset the headers entries
         $this->setHeader('Content-Type', $output->getContentType());
-
-        switch ($this->server->httpCode) {
-            case 405:
-                $this->setHeader('Allow',
-                    implode(', ', $resource->getMethods())
-                );
-        }
 
         $body = $output->encode($this->toArray(), $this->server->rootNode);
 
@@ -234,11 +226,12 @@ class Response
         }
     }
 
-    public static function throwExceptionIfUnsupportedFormat($format)
+    public function setFormat($format)
     {
         if (!in_array(strtolower($format), self::$formats)) {
             throw new Exception("Format ({$format}) not supported.", 404); // TODO: maybe 406?
         }
+        $this->format = $format;
     }
 
     /**
