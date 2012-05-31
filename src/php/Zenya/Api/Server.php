@@ -53,19 +53,37 @@ class Server extends Listener
     {
 
         // to be passed thru the constructor!!!
-        $resources = array('BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test')));
+        $resources = array(
+            'BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test')),
+
+            'Category' => array(
+                'class'=>'Zenya\Api\Resource\CategoryResource',
+                'args'=>array('test')
+            ),
+        );
 
        $config = array(
             'org' => "Zenya",
+
             'route_prefix' => '@^(/index.php)?/api/v(\d*)@i', // regex
+
+            // routes
             'routes' => array(
                 #'/:controller/paramName/:paramName/:id' => array(),
                 #'/:controller/test' => array('class'=>'test'),
+
+                '/category/:param1/:param2/:param3' => array(
+                    'controller' => 'Category',
+
+                ),
+
+
                 '/:controller/:param1/:param2' => array(
                     #'controller' => 'BlankResource',
-                    'className' => 'Zenya\Api\Resource\BlankResource',
+                    #'className' => 'Zenya\Api\Resource\BlankResource',
                     'classArgs' => array('classArg1' => 'test1', 'classArg2' => 'test2'))
             ),
+
             // need DIC here!!
             'listeners' => array(
                 // pre-processing stage

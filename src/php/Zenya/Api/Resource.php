@@ -64,7 +64,7 @@ class Resource extends Listener
 
         // Relection
         $classArray = self::getInternalAppelation($route);
-        $className = $classArray['class'];
+        $className = isset($classArray['class']) ?  $classArray['class'] : null;
         $classArgs = isset($classArray['classArgs'])
             ? $classArray['classArgs']
             : $route->classArgs;
@@ -77,7 +77,6 @@ class Resource extends Listener
             $this->actions = $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
 
             $refMethod = $refClass->getMethod($action);
-
             // check the actionMethod
             if (
                 !in_array($refMethod, $this->actions)
@@ -118,8 +117,10 @@ class Resource extends Listener
     public function getMethods()
     {
         $actions = array();
-        foreach($this->actions as $obj) {
-                $actions[] = $obj->name;
+        if(isset($this->Actions)) {
+          foreach($this->actions as $obj) {
+                  $actions[] = $obj->name;
+          }
         }
         $methods = array_intersect($this->server->route->getActions(), $actions);
         return array_keys($methods);
