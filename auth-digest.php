@@ -1,13 +1,15 @@
 <?php
 /**
  * Authorization Digest Challenge + Logic
+ *
+ * http://php.net/manual/en/features.http-auth.php
  */
-class Authorization_HTTP_Digest #extends Authorization
+class Authorization_HTTP_Digest extends Authorization
 {
     /**
      * The secret key
      *
-     * @var string The secret key
+     * @var     string The secret key
      */
     public $secretKey = 'secretKey--&@72';
 
@@ -45,10 +47,10 @@ class Authorization_HTTP_Digest #extends Authorization
      */
     public $passwordsHashed = true;
 
-	/**
-	 * This variable contains the parsed digest data
-	 */
-	protected $digest = null;
+    /**
+     * This variable contains the parsed digest data
+     */
+    protected $digest = null;
 
     /**
      * Constructor
@@ -69,13 +71,13 @@ class Authorization_HTTP_Digest #extends Authorization
      * This method is used to modify the secretKey salt value of
      * the Auth object.
      *
-     * @param string $secretKey  The new secret key to use when salting
+     * @param string $secretKey The new secret key to use when salting
      *                           the authentication challenge.
      * @return void
      */
     public function setSecretKey($secretKey)
     {
-        $this->secretKey = $secretKey;
+         $this->secretKey = $secretKey;
     }
 
     /**
@@ -89,7 +91,7 @@ class Authorization_HTTP_Digest #extends Authorization
     public function getNonce()
     {
         $time = ceil(time() / $this->nonceLife) * $this->nonceLife;
-        $remoteAddress = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? 
+        $remoteAddress = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ?
             $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
         return hash(
@@ -137,7 +139,7 @@ class Authorization_HTTP_Digest #extends Authorization
         }
 
         if ($this->_parseDigest($_SERVER['PHP_AUTH_DIGEST'])) {
-            
+
             #print_r($_SERVER['PHP_AUTH_DIGEST']);
             #print_r($this->digest);exit;
 
@@ -174,52 +176,54 @@ class Authorization_HTTP_Digest #extends Authorization
         {
             $this->digest = compact('username', 'nonce', 'response', 'opaque', 'uri');
             $this->digest['username'] = $this->digest['username'][1];
-			return true;
+
+            return true;
         }
 
         return false;
     }
 
-	protected function _validateResponse($api_key)
-	{
-		echo $requestURI = $_SERVER['REQUEST_URI'];
-		#$_SERVER['X_FRAPI_AUTH_USER'] = $this->digest['username'];
+    protected function _validateResponse($api_key)
+    {
+        echo $requestURI = $_SERVER['REQUEST_URI'];
+        #$_SERVER['X_FRAPI_AUTH_USER'] = $this->digest['username'];
 
-		if (strpos($requestURI, '?') !== false) {
-			$requestURI = substr($requestURI, 0, strlen($this->digest['uri'][1]));
-		}
+        if (strpos($requestURI, '?') !== false) {
+            $requestURI = substr($requestURI, 0, strlen($this->digest['uri'][1]));
+        }
 
-		if (
+        if (
             $this->getOpaque() == $this->digest['opaque'][1]
             && $requestURI == $this->digest['uri'][1]
             && $this->getNonce() == $this->digest['nonce'][1]
         ) {
 
-			$passphrase = hash('md5', "{$this->digest['username']}:{$this->realm}:{$api_key}");
+            $passphrase = hash('md5', "{$this->digest['username']}:{$this->realm}:{$api_key}");
 
-			if ($this->passwordsHashed) {
-				$a1 = $passphrase;
-			} else {
-				$a1 = md5($this->digest['username'] . ':' . $this->realm . ':' . $passphrase);
-			}
+            if ($this->passwordsHashed) {
+                $a1 = $passphrase;
+            } else {
+                $a1 = md5($this->digest['username'] . ':' . $this->realm . ':' . $passphrase);
+            }
 
             $expectedResp = $a1 . ':' . $this->digest['nonce'][1] . ':';
-			if (
+            if (
                 preg_match('/qop="?([^,\s"]+)/', $_SERVER['PHP_AUTH_DIGEST'], $qop)
                 && preg_match('/nc=([^,\s"]+)/', $_SERVER['PHP_AUTH_DIGEST'], $nc)
                 && preg_match('/cnonce="([^"]+)"/', $_SERVER['PHP_AUTH_DIGEST'], $cnonce)
             ) {
-				$expectedResp .= $nc[1] . ':' . $cnonce[1] . ':' . $qop[1];
-			}
+                $expectedResp .= $nc[1] . ':' . $cnonce[1] . ':' . $qop[1];
+            }
             $a2 = md5($_SERVER['REQUEST_METHOD'] . ':' . $requestURI);
             $expectedResp .= ':' . $a2;
 
-			if ($this->digest['response'][1] == md5($expectedResp)) {
-				return $this->digest['username'];
-			}
-		}
+            if ($this->digest['response'][1] == md5($expectedResp)) {
+                return $this->digest['username'];
+            }
+        }
+
         return $this->send();
-	}
+    }
 
     /**
      * Send the Authentication digest
@@ -251,31 +255,31 @@ class Authorization_HTTP_Digest #extends Authorization
 
 ////////////////////////////////////////////
 
-	// If this is a public action, it doesn't need authorization.
-	#if (Frapi_Rules::isPublicAction($this->getAction())) {
-	#	return true;
-	#}
+    // If this is a public action, it doesn't need authorization.
+    #if (Frapi_Rules::isPublicAction($this->getAction())) {
+    #	return true;
+    #}
 
-	//For Basic HTTP Auth, use headers automatically filled by PHP, if available.
+    //For Basic HTTP Auth, use headers automatically filled by PHP, if available.
 
-	$auth_params = array(
-		'digest' => isset($_SERVER['PHP_AUTH_DIGEST']) ? $_SERVER['PHP_AUTH_DIGEST'] : null
-	);
+    $auth_params = array(
+        'digest' => isset($_SERVER['PHP_AUTH_DIGEST']) ? $_SERVER['PHP_AUTH_DIGEST'] : null
+    );
 
-	// First step: Set the state of the context objects.
+    // First step: Set the state of the context objects.
 #	$partner =
 #		$this->authorization
 #			 ->getPartner()
 #			 ->setAction($this->getAction())
 #			 ->setAuthorizationParams($auth_params);
 
-	/**
-	 * Second step: Run the authorization, error in case of
-	 * error in returned values, else it's just a true.
-	 */
-	#$partnerAuth = $partner->authorize();
+    /**
+     * Second step: Run the authorization, error in case of
+     * error in returned values, else it's just a true.
+     */
+    #$partnerAuth = $partner->authorize();
 $auth = new Authorization_HTTP_Digest();
-    
+
 /**
  * Make sure the params needed are passed
  * if not, return an error with invalid partner
@@ -284,13 +288,12 @@ $auth = new Authorization_HTTP_Digest();
 #if (!empty($_SERVER['digest'])) {
 $authed = $auth->authorize();
 
-if(isset($_GET['clean']))
-{
+if (isset($_GET['clean'])) {
     $_SERVER['PHP_AUTH_DIGEST'] = null;
     $auth->send();
 }
 
-if($authed) {
+if ($authed) {
     echo "<pre>";
     print_r($_SERVER);
 }
