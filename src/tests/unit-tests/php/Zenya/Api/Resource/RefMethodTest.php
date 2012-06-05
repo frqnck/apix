@@ -2,11 +2,12 @@
 namespace Zenya\Api\Resource;
 
 class FixtureTestClass {
+    
     /**
-     * Title
+     * Method Title
      *
-     * Description 1st line
-     * Description 2nd line
+     * Method description 1st line
+     * Method description 2nd line
      *
      * @param int $namedInteger an integer
      * @param string $namedString a string
@@ -18,7 +19,8 @@ class FixtureTestClass {
 	 * @api_permission admin
      * @api_randomName randomValue
      */
-    public static function methodNameOne($namedInteger, $namedString, $namedBoolean, array $optional=null) {
+    public static function methodNameOne($namedInteger, $namedString, $namedBoolean, array $optional=null)
+    {
         return array($namedInteger, $namedString, $namedBoolean, $optional);
     }
 }
@@ -40,12 +42,19 @@ class RefMethodTest extends \PHPUnit_Framework_TestCase
         $className = 'Zenya\Api\Resource\FixtureTestClass';
         $methodName = 'methodNameOne';
 
-        #$this->method = new RefMethod($className, $methodName, 'api_' );
+        $refClass = new \ReflectionClass($className);
+        $this->class = new RefDoc($refClass);
 
-        // usign decorator patern
-        $method = new RefMethod($className, $methodName, 'api_' );
-        $this->method = new RefDoc( $method );
+        $refMethod = new \ReflectionMethod($className, $methodName);
+        $docMethod = $this->class->parseMethod( $refMethod );
+        
+        $this->method = $docMethod->getDoc('methodNameOne');
+
+        print_r($docMethod->getDoc('title'));exit;
+        // TODO
+        #$this->method = $this->class->parseMethod( $methodName );
     }
+
 
     protected function tearDown()
     {
@@ -58,17 +67,19 @@ class RefMethodTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('methodNameOne', $this->method->getShortName());
     }
 
-    public function testDocBookTitleAndDEscription()
+    public function testMethodDocBookTitleAndDEscription()
     {
-        $this->assertSame('Title', $this->method->getDoc('title'));
+        $this->assertSame('Method title', $this->method->getDoc('title'));
         $this->assertSame(
-            'Description 1st line' . PHP_EOL .'Description 2nd line',
+            'Method description 1st line' . PHP_EOL .'Method description 2nd line',
             $this->method->getDoc('description')
         );
     }
 
-    public function testDocBookParam()
+    public function testMethodDocBookParam()
     {
+        
+print_r($this->method);exit;
         $params = $this->method->getDoc('params');
         $this->assertInternalType('array', $params);
 

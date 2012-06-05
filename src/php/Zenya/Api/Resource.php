@@ -26,29 +26,27 @@ class Resource extends Listener
         $this->server = $server;
 
         // attach late listeners @ post-processing
-      #  $this->addAllListeners('resource', 'early');
+        #$this->addAllListeners('resource', 'early');
     }
 
     /**
      * Return the classname for a resource (long and private)
      *
-     * @params	string	$name
+     * @param Router $route
      * @return string
-     * @throws Zenya\Api\Exception If it doesn't not exist.
      */
-    public function getInternalAppelation(Router $route)
+    public function setRouteOverrides(Router $route)
     {
-        switch ($route->method) {
-            case 'OPTIONS':	// help about a resource
-            case 'HEAD':    // test a resource
+        switch ($route->getMethod()) {
+            case 'OPTIONS': // resource's help
+            case 'HEAD':    // resource's test
                 $route->params = array(
-                        'resource'  => $route->name,
-                        'params'    => $route->params
+                        'resource'  => $route->getController(),
+                        'params'    => $route->getParams()
                     );
-                $route->name = 'HTTP_' . $route->method;
+                $route->setController('HTTP_' . $route->getMethod());
             break;
         }
-        return $this->server->getResource($route->name);
     }
 
     /**
@@ -61,22 +59,24 @@ class Resource extends Listener
     public function call()
     {
         $route = $this->server->route;
+        $this->setRouteOverrides($route);
 
-        // Relection
-        $classArray = self::getInternalAppelation($route);
+        $classArray = $this->server->getResource( $route->getController() );
+
         $className = isset($classArray['class']) ?  $classArray['class'] : null;
         $classArgs = isset($classArray['classArgs'])
-            ? $classArray['classArgs']
-            : $route->classArgs;
+            ? $classArray['classArgs']  // use provided
+            : $route->classArgs;        // use route's default
 
-            // map to an action
-            $action = $route->getAction();
+        // map to an action
+        $action = $route->getAction();
 
         try{
+            // Relection
             $refClass = new \ReflectionClass($className);
             $this->actions = $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
 
-            $refMethod = $refClass->getMethod($action);
+            $refMethod = $refClass->getMethod( $route->getAction() );
             // check the actionMethod
             if (
                 !in_array($refMethod, $this->actions)
@@ -105,10 +105,14 @@ class Resource extends Listener
         }
 
         // TODO: maybe we need to check the order of params key match the method?
-
-        // TODO: type casting handler
+        // TODO: maybe add a type casting handler here
 
         // attach late listeners @ post-processing
+
+        // TODO: docs
+#        $classDoc = RefDoc::parseDocBook($refClass);
+#        $methodDoc = RefDoc::parseDocBook($refMethod);
+ 
         $this->addAllListeners('resource', 'early');
 
         return call_user_func_array(array(new $className($classArgs), $action), $params);
@@ -117,7 +121,7 @@ class Resource extends Listener
     public function getMethods()
     {
         $actions = array();
-        if(isset($this->Actions)) {
+        if(isset($this->actions)) {
           foreach($this->actions as $obj) {
                   $actions[] = $obj->name;
           }

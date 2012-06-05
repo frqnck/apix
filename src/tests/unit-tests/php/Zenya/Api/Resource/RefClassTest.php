@@ -1,11 +1,12 @@
 <?php
 namespace Zenya\Api\Resource;
 
-Use Zenya\Api\fixtures as fixture;
+//Use Zenya\Api\Resource as Fixture;
 
 //require_once '../fixture/DoockbookClassFixture.php';
+
 /**
- * Class Title
+ * Class title
  *
  * Class description 1st line
  * Class description 2nd line
@@ -19,7 +20,8 @@ Use Zenya\Api\fixtures as fixture;
  * @api_permission admin
  * @api_randomName classRandomValue
  */
-class OffFixtureTestClass {
+class DoockbookClassFixture {
+
     /**
      * Title
      *
@@ -36,7 +38,8 @@ class OffFixtureTestClass {
 	 * @api_permission admin
      * @api_randomName randomValue
      */
-    public static function methodNameOne($namedInteger, $namedString, $namedBoolean, array $optional=null) {
+    public static function methodNameOne($namedInteger, $namedString, $namedBoolean, array $optional=null)
+    {
         return array($namedInteger, $namedString, $namedBoolean, $optional);
     }
 }
@@ -51,10 +54,11 @@ class RefClassTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $className = '\fixture\DoockbookClassFixture';
+        $className = 'Zenya\Api\Resource\DoockbookClassFixture';
         $methodName = 'methodNameOne';
 
-        $this->class = new RefClass($className, 'api_');
+        $refClass = new \ReflectionClass($className);
+        $this->class = new RefDoc($refClass);
     }
 
     protected function tearDown()
@@ -64,20 +68,23 @@ class RefClassTest extends \PHPUnit_Framework_TestCase
 
     public function testClassIsInstanceOfReflectionClass()
     {
-        $this->assertInstanceOf('ReflectionClass', $this->class);
-        $this->assertSame('FixtureTestClass', $this->class->getShortName());
+        $this->assertInstanceOf('Zenya\Api\Resource\RefDoc', $this->class);
+        #$this->assertSame('DoockbookClassFixture', $this->class->getShortName());
     }
 
-    public function testDocBookTitleAndDescription()
+    public function testClassDocBookTitleAndDescription()
     {
-        $this->assertSame('Class Title', $this->class->getDoc('title'));
+        //print_r($this->class);exit;
+
+        $this->assertSame('Class title', $this->class->getDoc('title'));
+
         $this->assertSame(
             'Class description 1st line' . PHP_EOL .'Class description 2nd line',
-            $this->class->getDoc('description')
+             $this->class->getDoc('description')
         );
     }
 
-    public function testDocBookParam()
+    public function testClassDocBookParam()
     {
         $params = $this->class->getDoc('params');
         $this->assertInternalType('array', $params);
@@ -92,9 +99,9 @@ class RefClassTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-   public function testPrefixedParamsAsStrings()
+   public function testClassPrefixedParamsAsStrings()
     {
-        $this->assertSame('true', $this->class->getDoc('api_public'));
+        $this->assertEquals('true', $this->class->getDoc('api_public'));
         $this->assertSame('1.0', $this->class->getDoc('api_version'));
         $this->assertSame('admin', $this->class->getDoc('api_permission'));
         $this->assertSame('classRandomValue', $this->class->getDoc('api_randomName'));
@@ -105,7 +112,7 @@ class RefClassTest extends \PHPUnit_Framework_TestCase
      * @expectedExceptionMessage    Invalid element "notDefined"
      * @todo
     */
-   public function testParamsThatAreNotDefinedThrowsException()
+   public function testClassParamsThatAreNotDefinedThrowsException()
     {
         $this->class->getDoc('notDefined');
     }

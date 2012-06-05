@@ -67,6 +67,8 @@ class RefClass extends \ReflectionClass
 
 
 
+    /* --  below obsolete --- */
+
     /**
      * Return array representation.
      *
