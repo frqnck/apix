@@ -172,9 +172,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
                 ),
                 'resource' => array(
                     'early' => array(
-                        'Zenya\Api\Listener\Auth' => array(
-                            \Zend_Auth::getInstance()
-                        ),
+                        #'Zenya\Api\Listener\Auth',# => array(#Zenya\_Auth::getInstance()),
 
                         #'Zenya\Api\Listener\CheckIp' => null,
                         #'Zenya\Api\Listener\Acl',

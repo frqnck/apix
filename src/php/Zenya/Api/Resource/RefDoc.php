@@ -10,7 +10,13 @@ class RefDoc
     protected $prefix = null;
 
     /**
-     * Hold the help entries.
+     * Holds reflected class object.
+     * @var array
+     */
+    protected $reflected = array();
+
+    /**
+     * Holds the help entries.
      * @var array
      */
     protected $docs = array();
@@ -18,21 +24,44 @@ class RefDoc
     /**
      * Constructor
      *
-     * @param mixed     $mixed Either a string containing the name of the class to reflect, or an object.
+     * @param mixed     $reflected Either a string containing the name of the class to reflect, or an object.
      * @param string|null $prefix    [optional default:null]
      */
-    function __construct(\Reflector $r, $prefix=null)
+    function __construct(\ReflectionClass $reflected, $prefix=null)
     {
+        $this->prefix = $prefix;
+/*
+        if ($reflected instanceof \ReflectionClass) {
+            $this->class = $reflected;
+        } else if ($reflected instanceof \ReflectionMethod) {
 
-        #$this->r = $r;
+        }
+*/
+        $this->reflected = $reflected;
+        
+        $this->docs =
+            self::parseDocBook($reflected->getDocComment());
+        
+        return $this;
+    }
 
-        #$this->r->docs = RefDoc::parseDocBook($this->r->getDocComment(), $prefix);
-        #return $this->r;
+    /**
+     * Constructor
+     *
+     * @param mixed     $reflected Either a string containing the name of the class to reflect, or an object.
+     * @param string|null $prefix    [optional default:null]
+     */
+    function parseMethod($mix, $prefix=null)
+    {
+        $refClass->getMethod( $route->getAction() );
 
-        #$docs = explode(PHP_EOL, $this->getDocComment());
-        #$this->class = new \ReflectionClass($mixed);
-        #$this->parseDocBook( $this->class->getDocComment() );
-        #$this->prefix = $prefix;
+        if (!$mix instanceof \ReflectionMethod) {
+            $mix = new \ReflectionMethod($this, $mix);               
+        }
+
+        $this->docs[$mix->getShortName()] = self::parseDocBook($mix->getDocComment());
+
+        return $this;
     }
 
     /**
@@ -46,19 +75,16 @@ class RefDoc
      */
     public function getDoc($name)
     {
-        /*
-        if ($this->r instanceof \ReflectionMethod) {
-            $this->r;       
-        #} else if ($this instanceof \ReflectionMethod) {
-        }
-        */
-        if (!array_key_exists($name, $this->docs)) {
+//        $ref = $this->docs[$this->reflected->getDocComment()];
+        $ref = $this->docs;
+
+        if (!array_key_exists($name, $ref)) {
             #$name = $this->prefix . $name;
             #if (!array_key_exists($name, $this->docs)) {
                 throw new \InvalidArgumentException("Invalid element \"{$name}\"");
             #}
         }
-        $prop = $this->r->getDoc($name);
+        $prop = $ref[$name];
         if(is_array($prop) && count($prop) == 1) {
             return reset($prop);
         } 
@@ -73,14 +99,9 @@ class RefDoc
      */
     function getMethod($string)
     {
-
-        #$docs = explode(PHP_EOL, $this->getDocComment());
         $this->method = $this->class->getMethod($string);
-
-
         $this->parseDocBook( $this->class->getDocComment() );
 
-        return $this;
     }
 
 /* shared */
@@ -90,10 +111,10 @@ class RefDoc
      *
      * @return array
      */
-    public function getDocs()
-    {
-        return $this->docs;
-    }
+    #public function getDocs()
+    #{
+    #    return $this->docs;
+    #}
 
     /**
      * Extract docbook
@@ -101,11 +122,11 @@ class RefDoc
      * @param  string $classname
      * @return array
      */
-    public static function parseDocBook($doc)
+    public static function parseDocBook($str)
     {
         $docs = array();
         // 1. Remove /*, *, */ from the lines
-        $doc = substr($doc, 3, -2);
+        $doc = substr($str, 3, -2);
 
         // 2. remove the carrier returns
         #$pattern = '/\r?\n *\* */';
