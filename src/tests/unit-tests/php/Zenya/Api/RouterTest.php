@@ -25,17 +25,30 @@ class RouterTest extends \PHPUnit_Framework_TestCase
                 'This test has not been implemented yet.'
         );
     }
+    
+    /**
+     * @covers Zenya\Api\Router::__construct
+     */
+    public function testEmptyConstructor()
+    {
+        $rules = array();
+        $route = new Router( $rules );
+        $route->map('/');
+        $this->assertSame(null, $route->getController());
+        $this->assertSame(null, $route->getAction());
+        $this->assertEquals(array(), $route->getParams());
+    }
 
     /**
      * @covers Zenya\Api\Router::__construct
-      */
+     */
     public function testBasicConstructor()
     {
         $rules = array('/:one/:two/:three' => array('controller'=>'implyController', 'action'=>'implyAction'));
         $route = new Router( $rules );
         $route->map('/controller/action/123');
         $this->assertSame('implyController', $route->controller);
-        $this->assertSame('implyAction', $route->action);
+        $this->assertSame('implyAction', $route->getAction());
         $this->assertEquals(123, $route->params['three']);
     }
 
@@ -60,7 +73,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $route->map($url);
 
         $this->assertSame($expected['controller'], $route->controller);
-        $this->assertSame($expected['action'], $route->action);
+        $this->assertSame($expected['action'], $route->getAction());
         $this->assertEquals($expected['params'], $route->params);
 
         if ( isset($route->newProp) ) {
@@ -107,7 +120,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $route = new Router($rules, $defaults);
         $route->map($url);
         $this->assertSame($results['controller'], $route->controller);
-        $this->assertSame($results['action'], $route->action);
+        $this->assertSame($results['action'], $route->getAction());
         $this->assertEquals($results['params'], $route->params);
 
         if ( isset($route->newProp) ) {
@@ -187,7 +200,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $route->setMainProperties($rules, $params);
 
         $this->assertSame($results['controller'], $route->controller);
-        $this->assertSame($results['action'], $route->action);
+        $this->assertSame($results['action'], $route->getAction());
         $this->assertEquals($results['params'], $route->params);
 
         if (isset($route->newProperty)) {

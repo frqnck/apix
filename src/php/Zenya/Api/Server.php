@@ -186,19 +186,18 @@ class Server extends Listener
 
         try {
 
-            $this->route->map($path);
-
-            $name = explode('.', $this->route->controller);
-            $this->route->name = $name[0];
-            $this->route->format = count($name)>1 ? end($name) : null;
-            $this->route->params = $this->route->params+$this->request->getParams();
-
-            // set format from extension then from html head
-            if (isset($this->route->format)) {
-                $format = $this->route->format;
-            } elseif (isset($_GET['format'])) {
+            $this->route->map($path, $this->request->getParams());
+            $name = explode('.', $this->route->getController());
+            $this->route->controller = $name[0];
+            
+            // set format first fromcontroller extension
+            
+            if (  count($name)>1 ) {
+                $format = end($name);
+            } elseif (isset($_GET['format'])) { // or from GET['format']
                 $format = $_GET['format'];
-            } else {
+            } else {    // or from HTTP header
+
                 if($this->request->hasHeader('HTTP_ACCEPT')) {
                     $this->response->setHeader('Vary', 'Accept');
                 }
@@ -258,7 +257,7 @@ class Server extends Listener
                 );
         }
 
-        $withBody = $this->route->method != 'HEAD';
+        $withBody = $this->route->getMethod() != 'HEAD';
         return $this->response->send( $withBody);
 
         // attach late listeners @ post-processing
