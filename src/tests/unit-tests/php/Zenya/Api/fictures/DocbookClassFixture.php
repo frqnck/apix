@@ -17,6 +17,7 @@ namespace Zenya\Api\fixtures;
  * @api_randomName classRandomValue
  */
 class DocbookClassFixture {
+    
     /**
      * Title
      *

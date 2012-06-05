@@ -31,6 +31,12 @@ class Router
     public $controller = null;
 
     /**
+     * Holds the current method.
+     * @var string
+     */
+    protected $method = null;
+
+    /**
      * Holds the current action.
      * @var	string
      */
@@ -117,13 +123,16 @@ class Router
      * @param  string $url
      * @return void
      */
-    public function map($url)
+    public function map($url, array $params=null)
     {
+        if(!is_null($params)) {
+            // merge with exisitin, precedence!
+            $this->setParams( $this->params+$params );
+        }
         foreach ($this->_rules as $k => $rules) {
             $params = $this->ruleMatch($k, $url);
             if ($params) {
                 $this->setMainProperties($rules, $params);
-
                 return;
             }
         }
@@ -158,14 +167,33 @@ class Router
     }
 
     /**
-     * Get action
+     * Get actions
      *
-     * @param string $name
-     * @param array $action
+     * @return array
      */
     public function getActions()
     {
         return $this->actions;
+    }
+    
+    /**
+     * Get params
+     *
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    /**
+     * Set params
+     *
+     * @return void
+     */
+    public function setParams(array $params)
+    {
+        return $this->params = $params;
     }
 
     /**
@@ -185,9 +213,29 @@ class Router
     }
 
     /**
-     * Get the action string
+     * Get the controller name
      *
-     * @retun string
+     * @return string
+     */
+    public function getController()
+    {
+        return $this->controller;
+    }
+
+    /**
+     * Set the controller
+     *
+     * @return string
+     */
+    public function setController($controller)
+    {
+        $this->controller = $controller;
+    }
+
+    /**
+     * Get the action name
+     *
+     * @return string
      */
     public function getAction()
     {
@@ -196,6 +244,26 @@ class Router
         }
 
         return $this->action;
+    }
+
+    /**
+     * Get method name
+     *
+     * @return string
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * Set the method
+     *
+     * @return string
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
     }
 
 }

@@ -134,7 +134,7 @@ class Response
         $route = $this->server->route;
 
         $array = array(
-            $this->server->route->name => $this->server->results,
+            $this->server->route->controller => $this->server->results,
             'signature'	=> array(
                 'request'   => sprintf('%s %s', $req->getMethod(), $req->getUri()),
                 'timestamp' => $this->getDateTime(),
