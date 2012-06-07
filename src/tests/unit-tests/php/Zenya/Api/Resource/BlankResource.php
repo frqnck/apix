@@ -2,6 +2,16 @@
 
 namespace Zenya\Api\Resource;
 
+/**
+ * BlankResource
+ *
+ * This is just a blank resource. Use for testing and demo.
+ *
+ * @api_public true
+ * @api_version 1.0
+ * @api_permission admin
+ * @api_randomName classRandomValue
+ */
 class BlankResource #extends ResourceAbstract
 {
     /*
@@ -15,7 +25,7 @@ class BlankResource #extends ResourceAbstract
     public $results = array();
 
     /*
-     * A protected var
+     * A protected var.
      */
     protected $_protected = 'protected';
 
@@ -24,11 +34,25 @@ class BlankResource #extends ResourceAbstract
      */
     protected $_private = 'private';
 
-    public function __construct($params)
+    /**
+     * constructor
+     *
+     * @param   array   $params
+     * @return void
+     */
+    public function __construct(array $params)
     {
-        $this->constructorParams = $params;
+        $this->constructorParams = get_defined_vars();
     }
 
+    /**
+     * GET method
+     *
+     * @param   string   $param1
+     * @param   string   $param2    with comments
+     * @param   mixed    $optional
+     * @return array
+     */
     public function onRead($param1, $param2, $optional=null)
     {
         return array(
@@ -39,11 +63,22 @@ class BlankResource #extends ResourceAbstract
         );
     }
 
+    /**
+     * UPDATE method
+     *
+     * @param   integer   $param1
+     * @return array
+     */
     public function onUpdate(integer $param1)
     {
         return array('method'=>__METHOD__, 'params' => $params);
     }
 
+    /**
+     * TEST method
+     *
+     * @return array
+     */
     public function onTest()
     {
         return array('TEST');
