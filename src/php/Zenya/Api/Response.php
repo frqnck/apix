@@ -13,14 +13,23 @@ class Response
      */
     const DEFAULT_FORMAT = 'html';
 
-    const SUCCESS = 'successful';
-    const FAILURE = 'failed';
+    /**
+     * List of supported formats.
+     * @var array
+     */
+    protected $formats = array('json', 'xml', 'html', 'php');
 
     /**
      * Holds the current output format.
      * @var string
      */
-    public $format = null;
+    protected $format = null;
+
+    /**
+     * Character encoding.
+     * @var string
+     */
+    protected $encoding = 'UTF-8';
 
     /**
      * Holds the arrays of HTTP headers
@@ -29,12 +38,19 @@ class Response
     protected $headers = array();
 
     /**
-     * Associative array of HTTP status code / reason phrase.
+     * Holds the current HTTP Code
+     * @var  string
+     */
+    protected $httpCode = 200;
+
+    /**
+     * Associative array of HTTP phrases.
      *
      * @var  array
+     * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      * @link http://tools.ietf.org/html/rfc2616#section-10
      */
-    protected static $defs = array(
+    protected static $httpPhrases = array(
 
         // 1xx: Informational - Request received, continuing process
         100 => 'Continue',
@@ -102,71 +118,182 @@ class Response
     );
 
     /**
-     * Holds the encoding information.
-     * @var string
+     * Associative array of long HTTP phrases.
+     *
+     * @var  array
      */
-    public $encoding = 'UTF-8';
+    protected static $longHttpPhrases = array(
 
-    /**
-     * List of supported formats.
-     * @var array
-     */
-    public static $formats = array('json', 'xml', 'html', 'php');
+        200 => 'The request has succeeded.',
+        201 => 'The request has been fulfilled and resulted in a new resource being created.',
+        
+        // Resulting from a POST, requires to use ->setHeader("Location", "http://url/action/id")
+        202 => 'The request has been accepted for processing, but the processing has not been completed.',
+        
+        // DELETE
+        204 => 'Request fulfilled successfully.',
+
+        // Errors
+        400 => 'Request is malformed.',
+        401 => 'Not Authenticated.',
+        403 => 'Access to this ressource has been denied.',
+        404 => 'No ressource found at the Request-URI.',
+        503 => 'The service is currently unable to handle the request due to a temporary overloading or maintenance of the server. Try again later.',
+    
+    );
 
     /**
      * @var Zenya\Api\Server
      */
     protected $server;
 
-    public function __construct(Server $server)
+    public function __construct(Server $server=null)
     {
         $this->server = $server;
     }
 
-    public function toArray()
+    /**
+     * Set the current format
+     *
+     * @param string $format
+     * @throws \InvalidArgumentException    406
+     */
+    public function setFormat($format)
     {
-        #$data = array();
-        #foreach ($this->server->results as $k => $v) {
-        #	$data[$k] = $v;
-        #}
-
-        $req = $this->server->request;
-        $route = $this->server->route;
-
-        $array = array(
-            $this->server->route->controller => $this->server->results,
-            'signature'	=> array(
-                'request'   => sprintf('%s %s', $req->getMethod(), $req->getUri()),
-                'timestamp' => $this->getDateTime(),
-                'status'	=> sprintf(
-                                    '%d %s - %s',
-                                    $this->server->httpCode,
-                                    self::$defs[$this->server->httpCode],
-                                    self::getStatusString($this->server->httpCode)
-                                ),
-            )
-        );
-
-        if ($this->server->debug == true) {
-            $array['debug'] = array(
-                    'format'    => $this->format,
-                    'ip'        => $req->getIp(true),
-                    'params'	=> $route->params,	// Params
-                    'headers'	=> $this->headers
-            );
+        if (!in_array(strtolower($format), $this->formats)) {
+            throw new \InvalidArgumentException("Format ({$format}) not supported.", 406); // TODO: maybe 404?
         }
-
-        return $array;
+        $this->format = strtolower($format);
     }
 
-    protected function getDateTime($time=null)
+    /**
+     * Get all the response formats available.
+     *
+     * @return array
+     */
+    public function getFormat()
     {
-        return gmdate('Y-m-d H:i:s') . ' UTC';
-        #$dt = new \DateTime($time);
-        #$dt->setTimezone(new \DateTimeZone('UTC'));
-        #return $dt->format(\DateTime::ISO8601);
+        return $this->format;
     }
 
+    /**
+     * Set all the response formats available.
+     *
+     * @return void
+     */
+    public function setFormats(array $formats)
+    {
+        $this->formats = $formats;
+    }
+
+    /**
+     * Set/store a HTTP header.
+     *
+     * @param string $key
+     * @param string $value
+     */
+    public function setHeader($key, $value)
+    {
+        $this->headers[$key] = $value;
+    }
+
+    /**
+     * Set/store a HTTP header.
+     *
+     * @param string $key
+     * @param string $value
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+
+    /**
+     * Set all the HTTP headers
+     *
+     *  #header('Cache-Control: no-cache, must-revalidate');    // HTTP/1.1
+     *  #header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');  // Date in the past
+     *      // upload example
+     *  #header('Content-Disposition: attachment; filename="downloaded.pdf"');
+     *  #readfile('original.pdf');
+     * @param   integer  $httpCode
+     * @param   string  $versionString
+     */
+    public function sendAllHttpHeaders($httpCode, $versionString)
+    {
+        $out = array( $this->sendHeader('X-Powered-By: ' . $versionString, true, $httpCode) );
+
+        // iterate and send all the headers
+        foreach($this->headers as $key => $value) {
+           $out[] = $this->sendheader($key . ': ' . $value);
+        }
+        return $out;
+    }
+
+    public function sendHeader()
+    {
+        if(isset($this->unit_test)) {
+            return func_get_args();
+        }
+        return call_user_func_array('header', func_get_args());
+    }
+
+    /**
+     * Get all the response formats available.
+     *
+     * @return array
+     */
+    public function getFormats()
+    {
+        return $this->formats;
+    }
+
+    /**
+     * Set the current HTTP code.
+     *
+     * @param   integer     $int
+     * @return void
+     */
+    public function setHttpCode($int)
+    {
+        $this->httpCode = (int) $int;
+    }
+
+    /**
+     * Get the current HTTP code.
+     *
+     * @return intger
+     */
+    public function getHttpCode()
+    {
+        return $this->httpCode;
+    }
+
+    /**
+     * Get an HTTP status phrase.
+     *
+     * @param   integer $httpCode
+     * @param   bolean $long
+     * @return  string
+     */
+    public function getStatusPrases($httpCode=null, $long=false)
+    {
+        $httpCode = is_null($httpCode) ? $this->httpCode : $httpCode;
+        $type = $long === true ? self::$longHttpPhrases : self::$httpPhrases;
+        $status = $httpCode . ' ' . self::$httpPhrases[$httpCode];
+        return $long === true
+            ? isset($type[$httpCode]) ? $type[$httpCode] : $status . ' (not implemented)'
+            : $status;
+    }
+
+    /**
+     * TODO: Get the an HTTP phrase (long or short).
+     *
+     * @param   integer $httpCode
+     * @param   bolean $long
+     * @return  string
+     */
     public static function getStatusString($int)
     {
         static $status = null;
@@ -175,7 +302,44 @@ class Response
             throw new \Exception('Internal Error', 500);
         }
 
-        return floor($int/100)<=3 ? self::SUCCESS : self::FAILURE;
+        return floor($int/100)<=3 ? 'successful' : 'failed';
+    }
+
+    public function toArray()
+    {
+        $req = $this->server->request;
+        $route = $this->server->route;
+
+        $signature = true; //$this->server->signature;
+        $debug = $this->server->debug;
+
+        $array = array(
+            $this->server->route->getController() => $this->server->getResults()
+        );
+
+        if ($signature == true) {
+            $array['signature'] = array(
+                'request'   => sprintf('%s %s', $req->getMethod(), $req->getUri()),
+                'timestamp' => gmdate('Y-m-d H:i:s') . ' UTC',
+                'status'    => sprintf(
+                                '%d %s - %s',
+                                $this->httpCode,
+                                self::$httpPhrases[$this->httpCode], // todo
+                                self::getStatusString($this->httpCode)
+                            ),
+                'client_ip'        => $req->getIp(true)
+            );
+        }
+
+        if ($debug == true) {
+            $array['debug'] = array(
+                    'headers'	=> $this->headers,
+                    'format'    => $this->format,
+                    'params'    => $route->params,  // Params
+            );
+        }
+
+        return $array;
     }
 
     /**
@@ -204,105 +368,9 @@ class Response
 
         $body = $output->encode($this->toArray(), $this->server->rootNode);
 
-        $this->sendHttpHeaders();
+        $this->sendAllHttpHeaders($this->server->httpCode, $this->server->version);
 
         return $withBody !== false ? $body : null;
-    }
-
-    /**
-     *  #header('Cache-Control: no-cache, must-revalidate');    // HTTP/1.1
-     *  #header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');  // Date in the past
-     *      // upload example
-     *  #header('Content-Disposition: attachment; filename="downloaded.pdf"');
-     *  #readfile('original.pdf');
-     */
-    public function sendHttpHeaders()
-    {
-        header('X-Powered-By: ' . $this->server->version, true, $this->server->httpCode);
-
-        // iterate and send all the headers
-        foreach ($this->headers as $key => $value) {
-           header($key . ': ' . $value);
-        }
-    }
-
-    public function setFormat($format)
-    {
-        if (!in_array(strtolower($format), self::$formats)) {
-            throw new Exception("Format ({$format}) not supported.", 404); // TODO: maybe 406?
-        }
-        $this->format = $format;
-    }
-
-    /**
-     * Get all the response formats available.
-     *
-     * @return array
-     */
-    public static function getFormats()
-    {
-        return self::$formats;
-    }
-
-    /**
-     * Setter for header
-     *
-     * @param string $key
-     * @param string $value
-     */
-    public function setHeader($key, $value)
-    {
-        $this->headers[$key] = $value;
-    }
-
-    public function _addHeaderFromException()
-    {
-        $r = $this->getResponse();
-        if ($r->isException()) {
-            $stack = $r->getException();
-            $e = is_array($stack) ? $stack[0] : $stack;
-            if (is_a($e, 'Zenya_Api_Exception')) {
-                //Zend_debug::dump($e);
-                $r->setHttpResponseCode($e->getCode());
-                #$resp->setHeader('X-Error', $e->getCode());
-            }
-        }
-    }
-
-    /**
-     * Hold alist of Http status used by Zenya_Api
-     * as per http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-     *
-     * k=Code, Desc, Msg
-     */
-    protected $_httpStatuses = array(
-        200 => array('OK', 'The request has succeeded.'),
-        // POST
-        '201' => array('Created', 'The request has been fulfilled and resulted in a new resource being created.'),
-        // Note: require to use ->setHeader("Location", "http://url/action/id")
-
-        '202' => array('Accepted', 'The request has been accepted for processing, but the processing has not been completed.'),
-        // DELETE
-        '204' => array('No Content', 'Request fulfilled successfully.'),
-        // Error
-        '400' => array('Bad Request', 'Request is malformed.'),
-        '401' => array('Unauthorized', 'Not Authenticated.'),
-        '403' => array('Forbidden', 'Access to this ressource has been denied.'),
-        '404' => array('Not Found', 'No ressource found at the Request-URI.'),
-        '503' => array('Service Unavailable', 'The service is currently unable to handle the request due to a temporary overloading or maintenance of the server. Try again later.'),
-    );
-
-    /* depreciated */
-    public function getHttp()
-    {
-        $status = $this->httpCode . ' ' . Zend_Http_Response::responseCodeAsText($this->httpCode);
-        $description = isset($this->_httpStatuses[$this->httpCode][1]) ? $this->_httpStatuses[$this->httpCode][1] : $status . ' (not implemented)';
-
-        // Zend_Http_Response::fromString
-        return array(
-            'status' => $status,
-            'description' => $description,
-        );
     }
 
 }
