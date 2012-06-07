@@ -4,6 +4,11 @@ namespace Zenya\Api;
 
 class Request
 {
+    /**
+     * Holds the URI string
+     * @var string
+     */
+    protected $uri = null;
 
     /**
      * The HTTP response headers array
@@ -48,9 +53,9 @@ class Request
         return $this->uri;
     }
 
-    public function setUri($uri = null)
+    public function setUri($uri=false)
     {
-        if (null === $uri) {
+        if (false === $uri) {
             if (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
                 $uri = $_SERVER['HTTP_X_REWRITE_URL'];
             } elseif (isset($_SERVER['IIS_WasUrlRewritten'])
@@ -73,10 +78,7 @@ class Request
             $uri = '/';
         }
 
-        if (
-            $uri != '/'
-            && substr($uri, -1) == '/'
-        ) {
+        if ( $uri != '/' && substr($uri, -1) == '/' ) {
             $uri = substr($uri, 0, -1);
         }
 
@@ -95,61 +97,6 @@ class Request
     }
 
     /**
-     * Sets all parameters.
-     *
-     * @param  array $params
-     * @return array
-     */
-    public function setParams(array $params = null)
-    {
-        if (null === $params) {
-            $params = $_REQUEST;
-        } elseif (!is_array($params)) {
-            throw new \InvalidArgumentException(sprintf("%s expects an array",__METHOD__ ));
-        }
-        $this->params = $params;
-    }
-
-    public function getParams()
-    {
-        return $this->params;
-    }
-
-    public function getMethod()
-    {
-        if (null === $this->method) {
-            $this->setMethod();
-        }
-
-        return $this->method;
-    }
-
-    public function setMethod($method = null, $default='GET')
-    {
-        if (null === $method) {
-            if ($this->getHeader('X-HTTP-Method-Override')) {
-                $method = $this->getHeader('X-HTTP-Method-Override');
-            } elseif ($this->getParam('_method')) {
-                $method = $this->getParam('_method');
-            } else {
-                $method = isset($_SERVER['REQUEST_METHOD'])
-                    ? $_SERVER['REQUEST_METHOD']
-                    : $default;
-            }
-        }
-        $this->method = strtoupper($method);
-    }
-
-    public function setBody($body = null)
-    {
-        if (null === $body) {
-            #$body = http_get_request_body();
-            $body = @file_get_contents('php://input');
-        }
-        $this->body = $body;
-    }
-
-    /*
      * alnum, alpha, digit
      */
     public function getParam($key, $filter=null)
@@ -164,6 +111,50 @@ class Request
     }
 
     /**
+     * Sets all parameters.
+     *
+     * @param  array $params
+     * @return array
+     */
+    public function setParams(array $params = null)
+    {
+        if (null === $params) {
+            $params = $_REQUEST;
+        }
+        $this->params = $params;
+    }
+
+    public function getParams()
+    {
+        return $this->params;
+    }
+
+    public function setMethod($method = null, $default='GET')
+    {
+        if (null === $method) {
+            if ($this->hasHeader('X-HTTP-Method-Override')) {
+                $method = $this->getHeader('X-HTTP-Method-Override');
+            } elseif ($this->getParam('_method')) {
+                $method = $this->getParam('_method');
+            } else {
+                $method = isset($_SERVER['REQUEST_METHOD'])
+                    ? $_SERVER['REQUEST_METHOD']
+                    : $default;
+            }
+        }
+        $this->method = strtoupper($method);
+    }
+
+    public function getMethod()
+    {
+        if (null === $this->method) {
+            $this->setMethod();
+        }
+
+        return $this->method;
+    }
+
+    /**
      * Sets a header by name.
      *
      * @param string $key   The key
@@ -172,23 +163,6 @@ class Request
     public function setHeader($key, $value)
     {
         $this->headers[$key] = $value;
-    }
-
-    /**
-     * Populate the header array.
-     *
-     * @param string $key   The key
-     * @param mixed  $value The value
-     */
-    public function setHeaders($headers = null)
-    {
-        if (null === $headers) {
-            #$params = http_get_request_headers();
-            $params = $_SERVER;
-        } elseif (!is_array($headers)) {
-            throw new \InvalidArgumentException(sprintf("%s expects an array", __METHOD__));
-        }
-        $this->headers = $params;
     }
 
     public function hasHeader($key)
@@ -203,9 +177,43 @@ class Request
         }
     }
 
+    /**
+     * Populate the header array.
+     *
+     * @param string $key   The key
+     * @param mixed  $value The value
+     */
+    public function setHeaders(array $headers = null)
+    {
+        if (null === $headers) {
+            #$params = http_get_request_headers();
+            $headers = $_SERVER;
+        }
+        $this->headers = $headers;
+    }
+
     public function getHeaders()
     {
         return $this->headers;
+    }
+
+    public function getIP()
+    {
+        $ip = $this->getHeader('HTTP_CLIENT_IP');
+        if (empty($ip)) {
+            $ip = $this->getHeader('HTTP_X_FORWARDED_FOR');
+        }
+
+        return empty($ip) ? $this->getHeader('REMOTE_ADDR') : $ip;
+    }
+
+    public function setBody($body = null)
+    {
+        if (null === $body) {
+            #$body = http_get_request_body();
+            $body = @file_get_contents('php://input');
+        }
+        $this->body = $body;
     }
 
     public function getRawBody()
@@ -215,11 +223,12 @@ class Request
 
     public function getBody()
     {
+/*
         static $decodedBody = null;
         if (!is_null($decodedBody)) {
             return $decodedBody;
         }
-
+*/
         // Decode any content-encoding (gzip or deflate) if needed
         switch (strtolower($this->getHeader('content-encoding'))) {
 
@@ -240,16 +249,6 @@ class Request
         }
 
         return $decodedBody;
-    }
-
-    public function getIP()
-    {
-        $ip = $this->getHeader('HTTP_CLIENT_IP');
-        if (empty($ip)) {
-            $ip = $this->getHeader('HTTP_X_FORWARDED_FOR');
-        }
-
-        return empty($ip) ? $this->getHeader('REMOTE_ADDR') : $ip;
     }
 
 }

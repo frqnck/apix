@@ -22,7 +22,7 @@ abstract class Adapter {
     public function getContentType()
     {
         if(is_null($this->contentType)) {
-            throw new \Exception('Content-Type is missing from the implementation.');
+            throw new \Exception('Content-Type is missing from this implementation.');
         }
 
         return $this->contentType;

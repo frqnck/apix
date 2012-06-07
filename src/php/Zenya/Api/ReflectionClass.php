@@ -1,19 +1,13 @@
 <?php
 
-namespace Zenya\Api\Resource;
+namespace Zenya\Api;
 
-class RefDoc
+class ReflectionClass extends \ReflectionClass
 {
     /**
      * @var string|null
      */
     protected $prefix = null;
-
-    /**
-     * Holds reflected class object.
-     * @var array
-     */
-    protected $reflected = array();
 
     /**
      * Holds the help entries.
@@ -27,94 +21,50 @@ class RefDoc
      * @param mixed     $reflected Either a string containing the name of the class to reflect, or an object.
      * @param string|null $prefix    [optional default:null]
      */
-    function __construct(\ReflectionClass $reflected, $prefix=null)
+    function __construct($mixed, $prefix=null)
     {
         $this->prefix = $prefix;
-/*
-        if ($reflected instanceof \ReflectionClass) {
-            $this->class = $reflected;
-        } else if ($reflected instanceof \ReflectionMethod) {
 
-        }
-*/
-        $this->reflected = $reflected;
+        parent::__construct($mixed);
+    }
+
+    /**
+     * Parse class documentation
+     *
+     * @return array
+     */
+    public function parseClassDoc()
+    {
+        return $this->docs =
+            self::parseDocBook(
+                $this->getDocComment()
+            );
+    }
+
+    /**
+     * parse method documentation
+     *
+     * @param string     $name A string containing the name of a method to reflect (todo: start from an object).
+     */
+    function parseMethodDoc($name)
+    {
+        $method = parent::getMethod($name);
         
-        $this->docs =
-            self::parseDocBook($reflected->getDocComment());
-        
-        return $this;
+        return $this->docs['methods'][ $method->getShortName() ] =
+            self::parseDocBook(
+                $method->getDocComment()
+            );
     }
-
-    /**
-     * Constructor
-     *
-     * @param mixed     $reflected Either a string containing the name of the class to reflect, or an object.
-     * @param string|null $prefix    [optional default:null]
-     */
-    function parseMethod($mix, $prefix=null)
-    {
-        $refClass->getMethod( $route->getAction() );
-
-        if (!$mix instanceof \ReflectionMethod) {
-            $mix = new \ReflectionMethod($this, $mix);               
-        }
-
-        $this->docs[$mix->getShortName()] = self::parseDocBook($mix->getDocComment());
-
-        return $this;
-    }
-
-    /**
-     * Returns the value for a named parameter, returns null if it does not exist.
-     *
-     * The magic __get method works in the context of naming the option
-     * as a virtual member of this class.
-     *
-     * @param  string      $key
-     * @return string
-     */
-    public function getDoc($name)
-    {
-//        $ref = $this->docs[$this->reflected->getDocComment()];
-        $ref = $this->docs;
-
-        if (!array_key_exists($name, $ref)) {
-            #$name = $this->prefix . $name;
-            #if (!array_key_exists($name, $this->docs)) {
-                throw new \InvalidArgumentException("Invalid element \"{$name}\"");
-            #}
-        }
-        $prop = $ref[$name];
-        if(is_array($prop) && count($prop) == 1) {
-            return reset($prop);
-        } 
-        return $prop;
-    }
-
-    /**
-     * Get Method
-     *
-     * @param mixed     $mixed Either a string containing the name of the class to reflect, or an object.
-     * @param string|null $prefix    [optional default:null]
-     */
-    function getMethod($string)
-    {
-        $this->method = $this->class->getMethod($string);
-        $this->parseDocBook( $this->class->getDocComment() );
-
-    }
-
-/* shared */
 
     /**
      * Returns the full docbook array.
      *
      * @return array
      */
-    #public function getDocs()
-    #{
-    #    return $this->docs;
-    #}
+    public function getDocs()
+    {
+        return $this->docs;
+    }
 
     /**
      * Extract docbook
@@ -164,22 +114,31 @@ class RefDoc
 
             if($grp == 'param') {
                 // "@param string $param description of param"
-                preg_match('/(\S+)\s+\$(\S+)\s+(.+)/', $v, $m);
+                preg_match('/(\S+)\s+\$(\S+)(\s+(.+))?/', $v, $m);
+
                 $docs['params'][$m[2]] = array(
                     'type'          => $m[1],
                     'name'          => $m[2],
-                    'description'   => $m[3],
+                    'description'   => isset($m[3]) ? trim($m[3]) : null,
                     #'required'      => $this->isReq
                 );
             } else {
-                // other @entries
+                // other @entries as group
                 $docs[$grp][] = $v;
             }
         }
+
+        //reduce group
+        foreach($docs as $key => $value) {
+            if($key !== 'params') {
+                if(is_array($value) && count($value) == 1) {
+                    $docs[$key] = reset( $docs[$key] );
+                } 
+            }
+        }
+
         return $docs;
     }
-
-/* TODO */
 
     public function getSource()
     { 
