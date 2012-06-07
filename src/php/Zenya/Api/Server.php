@@ -54,11 +54,11 @@ class Server extends Listener
 
         // to be passed thru the constructor!!!
         $resources = array(
-            'BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'args'=>array('test')),
+            'BlankResource' => array('class'=>'Zenya\Api\Resource\BlankResource', 'classArgs'=>array('arg1'=>'value1', 'string')),
 
             'Category' => array(
                 'class'=>'Zenya\Api\Resource\CategoryResource',
-                'args'=>array('test')
+                'classArgs'=>array('test')
             ),
         );
 
@@ -106,14 +106,16 @@ class Server extends Listener
                     #'type'=>'Digest',
                 ),
             'internals' => array(
-                'HTTP_OPTIONS' => array(
-                        'class'     =>  'Zenya\Api\Resource\Help',
-                        #'classArgs'    => array('resource' => &$this),
+                // OPTIONS
+                'help' => array(
+                        'class'     => 'Zenya\Api\Resource\Help',
+                        'classArgs' => &$this,
                         'args'      => array('params'=>'dd')
                     ),
-                'HTTP_HEAD' => array(
+                // HEAD
+                'test' => array(
                         'class'     => 'Zenya\Api\Resource\Test',
-                        'classArgs' => array('resource' => $this),
+                        'classArgs' => &$this,
                         'args'      => array()
                     )
             )
@@ -161,8 +163,6 @@ class Server extends Listener
     {
         return $this->resources;
     }
-
-
 
     public function run()
     {
@@ -231,7 +231,6 @@ class Server extends Listener
             // Process with the requested resource
             #  $resource = $this->getResource($this->route->name);
             $this->resource = new Resource($this);
-
             $this->results = $this->resource->call();
 
         } catch (\Exception $e) {
@@ -253,7 +252,7 @@ class Server extends Listener
 
             case 405:
                 $this->response->setHeader('Allow',
-                    implode(', ', $this->resource->getMethods())
+                    implode(', ', $this->resource->getMethods($this->route))
                 );
         }
 

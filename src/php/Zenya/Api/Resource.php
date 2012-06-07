@@ -41,10 +41,11 @@ class Resource extends Listener
             case 'OPTIONS': // resource's help
             case 'HEAD':    // resource's test
                 $route->params = array(
-                        'resource'  => $route->getController(),
-                        'params'    => $route->getParams()
-                    );
-                $route->setController('HTTP_' . $route->getMethod());
+                      'name'      => $route->getController(),
+                      'resource'  => $this->server->getResource( $route->getController() ),
+                      'params'    => $route->getParams(),
+                );
+                $route->setController($route->getMethod()=='OPTIONS'?'help':'test');
             break;
         }
     }
@@ -89,7 +90,7 @@ class Resource extends Listener
             throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
         }
 
-        // check the Params
+        // check the params
         $params = array();
         foreach ($refMethod->getParameters() as $param) {
             $name = $param->getName();
@@ -110,24 +111,40 @@ class Resource extends Listener
         // attach late listeners @ post-processing
 
         // TODO: docs
-#        $classDoc = RefDoc::parseDocBook($refClass);
-#        $methodDoc = RefDoc::parseDocBook($refMethod);
+        #$classDoc = RefDoc::parseDocBook($refClass);
+        #$methodDoc = RefDoc::parseDocBook($refMethod);
  
         $this->addAllListeners('resource', 'early');
 
         return call_user_func_array(array(new $className($classArgs), $action), $params);
     }
 
-    public function getMethods()
+    /**
+     * Get methods
+     *
+     * @return array
+     */
+    public function getMethods(Router $route)
     {
         $actions = array();
         if(isset($this->actions)) {
-          foreach($this->actions as $obj) {
-                  $actions[] = $obj->name;
+          foreach($this->actions as $action) {
+            $actions[] = $action->name;
           }
         }
-        $methods = array_intersect($this->server->route->getActions(), $actions);
+        $methods = array_intersect($route->getActions(), $actions);
         return array_keys($methods);
     }
+
+    /**
+     * Get public methods
+     *
+     * @return array
+     */
+    #public function getPublicMethods()
+    #{
+    #  $actions = $this->refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+    #  return $action;
+    #}
 
 }

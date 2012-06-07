@@ -2,7 +2,10 @@
 
 namespace Zenya\Api\Resource;
 
-class Help
+use Zenya\Api\ReflectionClass as ReflectionClass;
+use Zenya\Api\Server as Server;
+
+class Help //extends Abstracted
 {
     /*
      * Another public var.
@@ -34,11 +37,9 @@ class Help
         array('PUT')
     );
 
-    public function __construct($self)
+    public function __construct(Server $server)
     {
-        // instantiate
-        #if ($route->path == '/*' && $route->method == 'OPTIONS') {
-        #$route->name = '*';
+        $this->server = $server;
     }
 
     /**
@@ -58,57 +59,53 @@ class Help
      *
       * @cacheable false
      */
-    public function onHelp($resource, $method=null, $params=null)
+    public function onHelp($name, $resource, $params=null)
     {
-        $out = array(
-            'HELP'=>array(
-                'user resource' => $resource,
-                'user method'   => $method,
-                'user params'   => $params
-            )
-        );
-#        $out .= new \Zenya\Api\Resource\RefMethod($resource, $method, 'api_');
+        Server::d(get_defined_vars());
 
-        return $out;
 
-        $request = $this->server->request;
-
-        #Server::d($request);
 
         // apply to the whole server
         if ($this->server->route->path == '/*') {
-                // set Content-Type (negotiate or default)
-
+            
+            // set Content-Type (negotiate or default)
             if( $request->hasHeader('CONTENT_LENGTH')
                 || $request->hasHeader('TRANSFER_ENCODING')
             ) {
                 // TODO: process the $this->server->body!
-                return array('doc'=>'All the resource doc');
+                return array('doc'=>'Todo: return all the resource doc');
             }
 
             // return the whole API doc.
-            return array('doc'=>'All the resources...');
 
         } else {
-            // specific to one resource
-            header('Allow: ' . implode(', ', $refClass->getMethods()), true);
+            // specific to just one resource.
+            $doc = new ReflectionClass($resource['class']);
+            $doc->parseClassDoc();
+
+            // TODO: set headers
+            #$this->server->response->setHeader('Allow',
+            #    implode(', ', $this->server->resource->getMethods())
+            #);
 
             // A server that does not support such an extension MAY discard the request body.
-            if ( null === $request->getRawBody()) {
-                header('Content-Length: 0');
+            if ( null === $this->server->request->getRawBody()) {
+                $this->server->response->setHeader('Content-Length', 0);
             }
 
-            /*
-                $man = $this->getParam('resource');
-                $resource = Zenya_Api_Resource::getInternalAppelation($man);
-                $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
-                $this->_output = $help->toArray();
-            */
-
-            return array('doc'=>'a specific resource doc');
+            foreach($doc->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
+                $doc->parseMethodDoc($method->name);
+            }
         }
 
-        return array('Help Handler, handles HTTP OPTIONS method');
+        return $doc->getDocs();
+
+        /*
+            $man = $this->getParam('resource');
+            $resource = Zenya_Api_Resource::getInternalAppelation($man);
+            $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
+            $this->_output = $help->toArray();
+        */
     }
 
 }
