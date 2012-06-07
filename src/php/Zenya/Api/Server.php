@@ -2,41 +2,6 @@
 
 namespace Zenya\Api;
 
-class Container
-{
-
-    protected $params = array();
-
-    public function __set($key, $value)
-    {
-        $this->params[$key] = $value;
-    }
-
-    public function __get($key)
-    {
-        if (!isset($this->params[$key])) {
-            throw new InvalidArgumentException(sprintf('Value "%s" is not defined.', $key));
-        } if (is_callable($this->params[$key])) {
-            return $this->params[$key]($this);
-        } else {
-            return $this->params[$key];
-        }
-    }
-
-    public function asShared($callable)
-    {
-        return function ($c) use ($callable) {
-                    static $object;
-                    if (is_null($object)) {
-                        $object = $callable($c);
-                    }
-
-                    return $object;
-                };
-    }
-
-}
-
 class Server extends Listener
 {
     public $debug = true;
@@ -49,7 +14,7 @@ class Server extends Listener
 
     protected $resources = array();
 
-    public function __construct() //array $resources)
+    public function __construct(array $resources=null)
     {
 
         // to be passed thru the constructor!!!
@@ -237,13 +202,13 @@ class Server extends Listener
             $this->results = array(
                 'error' => $e->getMessage(),
             );
-            $this->httpCode = $e->getCode() ? $e->getCode() : 500;
+            $this->response->setHttpCode($e->getCode() ? $e->getCode() : 500);
 
             // attach late listeners @ exceptions
             $this->addAllListeners('server', 'exception');
         }
 
-        switch ($this->httpCode) {
+        switch ($this->response->getHttpCode()) {
             case 401;
                 #$this->response->setHeader('WWW-Authenticate',
                 #    sprintf('%s realm="%s"', $this->config['auth']['type'], $this->config['org'])
@@ -263,6 +228,16 @@ class Server extends Listener
         $this->addAllListeners('server', 'late');
 
         return $body;
+    }
+
+    /**
+     * Get the output/results.
+     *
+     * @return array
+     */
+    public function getResults()
+    {
+        return $this->results;
     }
 
     public static function d($mix)
