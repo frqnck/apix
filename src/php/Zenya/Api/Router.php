@@ -69,12 +69,13 @@ class Router
      *
      * @param array $rules
      * @param array $defaults
+     * @throws \InvalidArgumentException 500
      */
     public function __construct(array $rules, array $defaults=array())
     {
         foreach ($rules as $k => $v) {
             if ( is_int($k) ) {
-                throw new Exception("Invalid rules array specified (not associative)", 500);
+                throw new \InvalidArgumentException("Invalid rules array specified (not associative)", 500);
             }
             $this->_rules[$k] = $v;
         }
