@@ -3,29 +3,28 @@ namespace Zenya\Api;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
-    /*
-        public function testMerging()
-        {
-            $opt1 = array('q'=>'qwerty1', 'a'=>'asdfg1');
-            $opt2 = array('q'=>'qwerty2', 'a'=>'asdfg2');
-            $this->assertSame($opt1+$opt2, array_merge($opt2, $opt1));
-        }
-
     /**
-     * @expectedException Zenya\Api\Exception
-     * @expectedExceptionMessage Invalid rules array specified (not associative)
-     * @expectedExceptionCode 500
-     * @todo
-    */
+     * @expectedException           Zenya\Api\Exception
+     * @expectedExceptionMessage    Invalid rules array specified (not associative)
+     * @expectedExceptionCode       500
+     */
     public function testConstructorThrowsExceptionWhenNotAssociative()
     {
-        #$route = new Router( array(1=>'/:controller/:action/:grab') );
-
-        $this->markTestIncomplete(
-                'This test has not been implemented yet.'
-        );
+        new Router( array('/:controller/:action/:grab') );
     }
-    
+
+    public function testMapMerging()
+    {
+        $r1 = array('/test'=>'/:test');
+        $r2 = array('/test2'=>'/:test2');
+        $this->assertSame($r1+$r2, array_merge($r1, $r2));
+
+        $route = new Router( array() );
+        $route->setParams($r1);       
+        $route->map('/', $r2);
+        $this->assertSame($r1+$r2, $route->getParams());
+    }
+
     /**
      * @covers Zenya\Api\Router::__construct
      */
@@ -283,4 +282,39 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetActions()
+    {
+        $router = new Router(array());
+        $actions = array(
+            'POST'      => 'onCreate',
+            'GET'       => 'onRead',
+            'PUT'       => 'onUpdate',
+            'DELETE'    => 'onDelete',
+            'OPTIONS'   => 'onHelp',
+            'HEAD'      => 'onTest',
+            'TRACE'     => 'onTrace'
+        );
+        $this->assertSame($actions, $router->getActions());
+    }
+
+    public function testGetSetActions()
+    {
+        $router = new Router(array());
+        $router->setAction('PUT');
+        $this->assertSame('onUpdate', $router->getAction() );
+    }
+
+    public function testGetSetController()
+    {
+        $router = new Router(array());
+        $router->setController('aContollerStr');
+        $this->assertSame('aContollerStr', $router->getController() );
+    }
+
+    public function testGetSetMethod()
+    {
+        $router = new Router(array());
+        $router->setMethod('aMethodStr');
+        $this->assertSame('aMethodStr', $router->getMethod() );
+    }
 }
