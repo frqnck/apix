@@ -4,8 +4,7 @@ namespace Zenya\Api;
 class RouterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @expectedException           Zenya\Api\Exception
-     * @expectedExceptionMessage    Invalid rules array specified (not associative)
+     * @expectedException           \InvalidArgumentException
      * @expectedExceptionCode       500
      */
     public function testConstructorThrowsExceptionWhenNotAssociative()
