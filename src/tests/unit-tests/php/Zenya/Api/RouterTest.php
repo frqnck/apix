@@ -32,7 +32,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $rules = array();
         $route = new Router( $rules );
         $route->map('/');
-        $this->assertSame(null, $route->getController());
+        $this->assertSame(null, $route->getControllerName());
         $this->assertSame(null, $route->getAction());
         $this->assertEquals(array(), $route->getParams());
     }
@@ -307,7 +307,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     {
         $router = new Router(array());
         $router->setController('aContollerStr');
-        $this->assertSame('aContollerStr', $router->getController() );
+        $this->assertSame('aContollerStr', $router->getControllerName() );
     }
 
     public function testGetSetMethod()

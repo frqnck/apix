@@ -41,8 +41,8 @@ class Resource extends Listener
             case 'OPTIONS': // resource's help
             case 'HEAD':    // resource's test
                 $route->params = array(
-                      'name'      => $route->getController(),
-                      'resource'  => $this->server->getResource( $route->getController() ),
+                      'name'      => $route->getControllerName(),
+                      'resource'  => $this->server->getResource( $route->getControllerName() ),
                       'params'    => $route->getParams(),
                 );
                 $route->setController($route->getMethod()=='OPTIONS'?'help':'test');
@@ -62,7 +62,7 @@ class Resource extends Listener
         $route = $this->server->route;
         $this->setRouteOverrides($route);
 
-        $classArray = $this->server->getResource( $route->getController() );
+        $classArray = $this->server->getResource( $route->getControllerName() );
 
         $className = isset($classArray['class']) ?  $classArray['class'] : null;
         $classArgs = isset($classArray['classArgs'])
@@ -87,7 +87,7 @@ class Resource extends Listener
                 throw new Exception();
             }
         } catch(\Exception $e) {
-            throw new Exception("Invalid resource's method ({$route->method}) specified.", 405);
+            throw new Exception("Invalid resource's method ({$route->getMethod()}) specified.", 405);
         }
 
         // check the params
@@ -99,7 +99,7 @@ class Resource extends Listener
                 && !array_key_exists($name, $route->params)
                 && empty($route->params[$name])
             ) {
-                throw new Exception("Required {$route->method} parameter \"{$name}\" missing in action.", 400);
+                throw new Exception("Required {$route->getMethod()} parameter \"{$name}\" missing in action.", 400);
             } elseif (isset($route->params[$name])) {
                 $params[$name] = $route->params[$name];
             }

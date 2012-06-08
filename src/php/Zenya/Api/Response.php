@@ -7,11 +7,6 @@ namespace Zenya\Api;
 
 class Response
 {
-    /**
-     * Format to use by default when not provided.
-     * @var string
-     */
-    const DEFAULT_FORMAT = 'html';
 
     /**
      * List of supported formats.
@@ -21,9 +16,10 @@ class Response
 
     /**
      * Holds the current output format.
+     * Also use to set the default value.
      * @var string
      */
-    protected $format = null;
+    protected $format = 'html';
 
     /**
      * Character encoding.
@@ -126,10 +122,10 @@ class Response
 
         200 => 'The request has succeeded.',
         201 => 'The request has been fulfilled and resulted in a new resource being created.',
-        
+
         // Resulting from a POST, requires to use ->setHeader("Location", "http://url/action/id")
         202 => 'The request has been accepted for processing, but the processing has not been completed.',
-        
+
         // DELETE
         204 => 'Request fulfilled successfully.',
 
@@ -139,30 +135,35 @@ class Response
         403 => 'Access to this ressource has been denied.',
         404 => 'No ressource found at the Request-URI.',
         503 => 'The service is currently unable to handle the request due to a temporary overloading or maintenance of the server. Try again later.',
-    
+
     );
 
     /**
-     * @var Zenya\Api\Server
+     * @var Zenya\Api\Request
      */
-    protected $server;
+    protected $request;
 
-    public function __construct(Server $server=null)
+    public function __construct(Request $request, $sign=false, $debug=false)
     {
-        $this->server = $server;
+        $this->request = $request;
+
+        $this->sign = $sign;
+        $this->debug = $debug;
     }
 
     /**
      * Set the current format
      *
-     * @param string $format
-     * @throws \InvalidArgumentException    406
+     * @param  string                    $format
+     * @throws \InvalidArgumentException 406
      */
-    public function setFormat($format)
+    public function setFormat($format=null)
     {
-        if (!in_array(strtolower($format), $this->formats)) {
+        $format = is_null($format) ? $this->format : $format;
+        if (!in_array(strtolower($format), $this->getFormats())) {
             throw new \InvalidArgumentException("Format ({$format}) not supported.", 406); // TODO: maybe 404?
         }
+
         $this->format = strtolower($format);
     }
 
@@ -208,35 +209,36 @@ class Response
         return $this->headers;
     }
 
-
     /**
      * Set all the HTTP headers
      *
-     *  #header('Cache-Control: no-cache, must-revalidate');    // HTTP/1.1
-     *  #header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');  // Date in the past
-     *      // upload example
-     *  #header('Content-Disposition: attachment; filename="downloaded.pdf"');
-     *  #readfile('original.pdf');
-     * @param   integer  $httpCode
-     * @param   string  $versionString
+     * header('Cache-Control: no-cache, must-revalidate');    // HTTP/1.1
+     * header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');  // Date in the past
+     * // upload example
+     * header('Content-Disposition: attachment; filename="downloaded.pdf"');
+     * readfile('original.pdf');
+     *
+     * @param integer $httpCode
+     * @param string  $versionString
      */
     public function sendAllHttpHeaders($httpCode, $versionString)
     {
         $out = array( $this->sendHeader('X-Powered-By: ' . $versionString, true, $httpCode) );
 
-        // iterate and send all the headers
-        foreach($this->headers as $key => $value) {
+        foreach ($this->headers as $key => $value) {
            $out[] = $this->sendheader($key . ': ' . $value);
         }
+
         return $out;
     }
 
     public function sendHeader()
     {
-        if(isset($this->unit_test)) {
-            return func_get_args();
-        }
-        return call_user_func_array('header', func_get_args());
+        $args = func_get_args();
+        
+        return isset($this->unit_test)
+            ? $args
+            : call_user_func_array('header', $args);
     }
 
     /**
@@ -252,7 +254,7 @@ class Response
     /**
      * Set the current HTTP code.
      *
-     * @param   integer     $int
+     * @param  integer $int
      * @return void
      */
     public function setHttpCode($int)
@@ -273,69 +275,62 @@ class Response
     /**
      * Get an HTTP status phrase.
      *
-     * @param   integer $httpCode
-     * @param   bolean $long
-     * @return  string
+     * @param  integer $httpCode
+     * @param  bolean  $long
+     * @return string
      */
     public function getStatusPrases($httpCode=null, $long=false)
     {
         $httpCode = is_null($httpCode) ? $this->httpCode : $httpCode;
         $type = $long === true ? self::$longHttpPhrases : self::$httpPhrases;
-        $status = $httpCode . ' ' . self::$httpPhrases[$httpCode];
+        $status =  self::$httpPhrases[$httpCode];
+
         return $long === true
-            ? isset($type[$httpCode]) ? $type[$httpCode] : $status . ' (not implemented)'
+            ? isset($type[$httpCode]) ? $type[$httpCode] : $httpCode . ' ' . $status
             : $status;
     }
 
     /**
-     * TODO: Get the an HTTP phrase (long or short).
+     * Returns sucessful or failed string.
      *
-     * @param   integer $httpCode
-     * @param   bolean $long
-     * @return  string
+     * @param  integer $httpCode
+     * @return string
      */
-    public static function getStatusString($int)
+    public function getStatusAdjective($httpCode = null)
     {
-        static $status = null;
-        if (!is_null($status)) {
-            // Response status already set, something must be wrong.
-            throw new \Exception('Internal Error', 500);
-        }
+        $httpCode = is_null($httpCode) ? $this->httpCode : $httpCode;
 
-        return floor($int/100)<=3 ? 'successful' : 'failed';
+        return floor($httpCode/100)<=3 ? 'successful' : 'failed';
     }
 
-    public function toArray()
+    /**
+     * Returns an array representation of the output
+     *
+     * @return array
+     */
+    public function collate($name, $results)
     {
-        $req = $this->server->request;
-        $route = $this->server->route;
+        $array = array($name => $results);
 
-        $signature = true; //$this->server->signature;
-        $debug = $this->server->debug;
-
-        $array = array(
-            $this->server->route->getController() => $this->server->getResults()
-        );
-
-        if ($signature == true) {
+        if ($this->sign === true) {
             $array['signature'] = array(
-                'request'   => sprintf('%s %s', $req->getMethod(), $req->getUri()),
+                'request'   => sprintf('%s %s', $this->request->getMethod(), $this->request->getUri()),
                 'timestamp' => gmdate('Y-m-d H:i:s') . ' UTC',
                 'status'    => sprintf(
                                 '%d %s - %s',
-                                $this->httpCode,
-                                self::$httpPhrases[$this->httpCode], // todo
-                                self::getStatusString($this->httpCode)
+                                $this->getHttpCode(),
+                                $this->getStatusPrases(),
+                                $this->getStatusAdjective()
                             ),
-                'client_ip'        => $req->getIp(true)
+                'client_ip' => $this->request->getIp(true)
             );
         }
 
-        if ($debug == true) {
+        if ($this->debug === true) {
             $array['debug'] = array(
-                    'headers'	=> $this->headers,
-                    'format'    => $this->format,
-                    'params'    => $route->params,  // Params
+                    'headers'	=> $this->getHeaders(),
+                    'format'    => $this->getFormat(),
+                    #'params'    => $this->request->route->getParams(),
             );
         }
 
@@ -343,34 +338,22 @@ class Response
     }
 
     /**
-     * Send the response
+     * Generate the response, send the headers...
      *
-     * @param Resource $resource The Resource object
-     * @param boolean
-     *
+     * @param  array  $results
+     * @param  string $versionString
+     * @param  string $rootNode
      * @return string
      */
-    public function send($withBody=true)
+    public function generate($name, array $results, $versionString='ouarz', $rootNode='root')
     {
-        $resource = &$this->server->resource;
-
-        $format = isset($this->format)
-            ? $this->format : self::DEFAULT_FORMAT;
-
-        $this->setFormat($format);
-
-        // format
-        $output = 'Zenya\Api\Output\\' . ucfirst($this->format);
-        $output = new $output($this->encoding);
-
-        // sset the headers entries
+        $renderer = 'Zenya\Api\Output\\' . ucfirst($this->getFormat());
+        $output = new $renderer($this->encoding);
         $this->setHeader('Content-Type', $output->getContentType());
 
-        $body = $output->encode($this->toArray(), $this->server->rootNode);
+        $this->sendAllHttpHeaders($this->getHttpCode(), $versionString);
 
-        $this->sendAllHttpHeaders($this->server->httpCode, $this->server->version);
-
-        return $withBody !== false ? $body : null;
+        return $output->encode($this->collate($name, $results), $rootNode);
     }
 
 }
