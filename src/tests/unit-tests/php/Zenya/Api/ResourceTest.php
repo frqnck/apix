@@ -40,7 +40,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $route->map('/controller/paramUn');
         $route->setMethod('GET');
         $this->resource->setRouteOverrides($route);
-        $this->assertEquals('controller', $route->getController());
+        $this->assertEquals('controller', $route->getControllerName());
     }
 
     /**
@@ -56,7 +56,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $route->setMethod('HEAD');
         $this->resource->setRouteOverrides($route);
         
-        $this->assertEquals('test', $route->getController());
+        $this->assertEquals('test', $route->getControllerName());
     }
 
     /**
@@ -72,7 +72,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $route->setMethod('OPTIONS');
         $this->resource->setRouteOverrides($route);
         
-        $this->assertEquals('help', $route->getController());
+        $this->assertEquals('help', $route->getControllerName());
 
 #        $params = $route->params; // TODO: review!
 #        $this->assertEquals('resourceName', $params['name']);

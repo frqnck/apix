@@ -4,8 +4,6 @@ namespace Zenya\Api;
 
 class Server extends Listener
 {
-    public $debug = true;
-
     public $org = 'zenya';
     public $rootNode = 'zenya';
     public $version = 'Zenya/0.2.1';
@@ -29,7 +27,8 @@ class Server extends Listener
 
        $config = array(
             'org' => "Zenya",
-
+            'debug' => true,
+            'sign'  => true,
             'route_prefix' => '@^(/index.php)?/api/v(\d*)@i', // regex
 
             // routes
@@ -147,17 +146,17 @@ class Server extends Listener
             'classArgs' => null
         ));
 
-        $this->response = new Response($this);
+        $this->response = new Response($this->request, $this->config['sign'], $this->config['debug']);
 
         try {
 
             $this->route->map($path, $this->request->getParams());
-            $name = explode('.', $this->route->getController());
+            $name = explode('.', $this->route->getControllerName());
             $this->route->controller = $name[0];
             
             // set format first fromcontroller extension
             
-            if (  count($name)>1 ) {
+            if (  count($name)>1 && end($name)!=null) {
                 $format = end($name);
             } elseif (isset($_GET['format'])) { // or from GET['format']
                 $format = $_GET['format'];
@@ -181,7 +180,7 @@ class Server extends Listener
                     break;
 
                     default:
-                        $format = Response::DEFAULT_FORMAT;
+                       $format = null;
                 }
             }
 
@@ -221,13 +220,17 @@ class Server extends Listener
                 );
         }
 
-        $withBody = $this->route->getMethod() != 'HEAD';
-        return $this->response->send( $withBody);
+        $output = $this->response->generate(
+                    $this->route->getControllerName(),
+                    $this->results,
+                    $this->version,
+                    $this->rootNode
+                );
 
         // attach late listeners @ post-processing
         $this->addAllListeners('server', 'late');
 
-        return $body;
+        return $this->route->getMethod() != 'HEAD' ? $output : null;
     }
 
     /**

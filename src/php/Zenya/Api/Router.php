@@ -218,7 +218,7 @@ class Router
      *
      * @return string
      */
-    public function getController()
+    public function getControllerName()
     {
         return $this->controller;
     }
