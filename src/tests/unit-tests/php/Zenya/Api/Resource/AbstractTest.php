@@ -5,8 +5,6 @@ namespace Zenya\Api\Resource;
 class ResourceAbstractTest extends \PHPUnit_Framework_TestCase
 {
 
-
-
     /**
      * @covers Zenya\Api\Resource::__construct
      * @expectedException			Zenya\Api\Resource\Exception
@@ -20,9 +18,9 @@ class ResourceAbstractTest extends \PHPUnit_Framework_TestCase
         );
 
         $obj = new BlankResource('POST', array('paramName' => 'someValue'));
-        
 
-        
+
+
         // TODO create assertHeader
         $this->assertHeader('Allow: GET, HEAD, OPTIONS');
     }
@@ -47,6 +45,10 @@ class ResourceAbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function testRespondToOPTIONS()
     {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+
         $obj = new BlankResource('OPTIONS', array('xxx' => 'someValue'));
         $this->markTestIncomplete(
                 'This test has not been implemented yet.'
@@ -60,6 +62,11 @@ class ResourceAbstractTest extends \PHPUnit_Framework_TestCase
      */
     public function testRespondToHEAD()
     {
+        
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+
         $obj = new BlankResource('HEAD', array('xxx' => 'someValue'));
         // TODO create assertHeader
         #$this->assertHeader('Allow: GET, HEAD, OPTIONS');

@@ -1,8 +1,5 @@
 <?php
 
-/** @see Zenya_Api_Response_Interface */
-#require_once 'Zenya/Api/Response/Interface.php';
-
 namespace Zenya\Api;
 
 class Response
@@ -123,7 +120,7 @@ class Response
         200 => 'The request has succeeded.',
         201 => 'The request has been fulfilled and resulted in a new resource being created.',
 
-        // Resulting from a POST, requires to use ->setHeader("Location", "http://url/action/id")
+        // Resulting from a POST, requires to use ->setHeader("Location", "/resource/action/id")
         202 => 'The request has been accepted for processing, but the processing has not been completed.',
 
         // DELETE
@@ -193,8 +190,11 @@ class Response
      * @param string $key
      * @param string $value
      */
-    public function setHeader($key, $value)
+    public function setHeader($key, $value, $replace=true)
     {
+        if(!$replace && isset($this->headers[$key])) {
+            return;
+        }
         $this->headers[$key] = $value;
     }
 
@@ -235,7 +235,7 @@ class Response
     public function sendHeader()
     {
         $args = func_get_args();
-        
+
         return isset($this->unit_test)
             ? $args
             : call_user_func_array('header', $args);
@@ -338,7 +338,7 @@ class Response
     }
 
     /**
-     * Generate the response, send the headers...
+     * Generate the response & send the headers...
      *
      * @param  array  $results
      * @param  string $versionString
@@ -347,7 +347,7 @@ class Response
      */
     public function generate($name, array $results, $versionString='ouarz', $rootNode='root')
     {
-        $renderer = 'Zenya\Api\Output\\' . ucfirst($this->getFormat());
+        $renderer = __NAMESPACE__ . '\Output\\' . ucfirst($this->getFormat());
         $output = new $renderer($this->encoding);
         $this->setHeader('Content-Type', $output->getContentType());
 

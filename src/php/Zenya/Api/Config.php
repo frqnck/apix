@@ -20,10 +20,9 @@ class Config #extends Pimple
 
                 ),
 
-
                 '/:controller/:param1/:param2' => array(
                     #'controller' => 'BlankResource',
-                    #'className' => 'Zenya\Api\Resource\BlankResource',
+                    #'className' => 'Zenya\Api\Fixtures\BlankResource',
                     'classArgs' => array('classArg1' => 'test1', 'classArg2' => 'test2'))
             ),
 

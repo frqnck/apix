@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenya\Api\Resource;
+namespace Zenya\Api\Fixtures;
 
 /**
  * BlankResource
@@ -37,7 +37,7 @@ class BlankResource #extends ResourceAbstract
     /**
      * constructor
      *
-     * @param   array   $params
+     * @param  array $params
      * @return void
      */
     public function __construct(array $params)
@@ -48,9 +48,9 @@ class BlankResource #extends ResourceAbstract
     /**
      * GET method
      *
-     * @param   string   $param1
-     * @param   string   $param2    with comments
-     * @param   mixed    $optional
+     * @param  string $param1
+     * @param  string $param2   with comments
+     * @param  mixed  $optional
      * @return array
      */
     public function onRead($param1, $param2, $optional=null)
@@ -66,7 +66,7 @@ class BlankResource #extends ResourceAbstract
     /**
      * UPDATE method
      *
-     * @param   integer   $param1
+     * @param  integer $param1
      * @return array
      */
     public function onUpdate(integer $param1)
