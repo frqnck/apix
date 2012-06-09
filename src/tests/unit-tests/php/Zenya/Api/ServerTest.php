@@ -5,9 +5,6 @@ namespace Zenya\Api;
 class ServerTest extends \PHPUnit_Framework_TestCase
 {
 
-    /**
-     * @var Zenya_Api_Server
-     */
     protected $server;
 
     protected function setUp()
@@ -15,24 +12,45 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->server = new Server;
     }
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
     protected function tearDown()
     {
         unset($this->server);
     }
 
-    /**
-     * @covers Zenya\Api\Server::__construct
-     */
     public function testConstructor()
     {
         $this->markTestIncomplete(
                 'This test has not been implemented yet.'
         );
         $this->server->run();
+    }
+
+    ##
+    # format_negotiation
+    ##
+
+    public function testGetNegotiatedFormatUseDefault()
+    {
+        $c = array(
+            'default'        => 'json',
+            'controller_ext' => false,
+            'request_chain'  => false, #isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
+            'http_accept'    => false,
+        );
+        $format = $this->server->getNegotiatedFormat($c);
+        $this->assertEquals('json', $format, "should get default format when negotation chain is off");
+    }
+
+    public function testGetNegotiatedFormatUseControllerExtension()
+    {
+        $c = array(
+            'default'        => 'json',
+            'controller_ext' => true,
+            'request_chain'  => false, #isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
+            'http_accept'    => false,
+        );
+        $format = $this->server->getNegotiatedFormat($c);
+        $this->assertEquals('json', $format, "should get default format when negotation chain is off");
     }
 
 }
