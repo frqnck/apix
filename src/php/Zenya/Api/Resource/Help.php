@@ -38,12 +38,12 @@ class Help
      *
      * @api_link GET /help/resource/method/filters
      */
-    public function onRead($resource, $httpMethod=null, array $filters=null)
+    public function onRead($resource, $http_method=null, array $filters=null)
     {
         #echo "onRead";Server::d(func_get_args());
 
         return array(
-            $resource => $this->_getHelp($resource, $httpMethod, $filters)
+            $resource => $this->_getHelp($resource, $http_method, $filters)
         );
     }
 
@@ -67,7 +67,7 @@ class Help
      * @api_links OPTIONS /resource/method/filters
      * @api_links OPTIONS /\*\/method/filters
      */
-    public function onHelp($resource, $httpMethod=null, array $filters=null)
+    public function onHelp($resource, $http_method=null, array $filters=null)
     {
         echo "onHelp";Server::d(func_get_args());
 
@@ -93,9 +93,9 @@ class Help
 
             // specific to just one resource.
             if($resource == 'help') {
-                $doc = $this->_getHelp($resource, $httpMethod, $filters);
+                $doc = $this->_getHelp($resource, $http_method, $filters);
             } else  {
-                $doc = array($resource => $this->_getHelp($resource, $httpMethod, $filters));
+                $doc = array($resource => $this->_getHelp($resource, $http_method, $filters));
             }
 
             // // A server that does not support such an extension MAY discard the request body.
