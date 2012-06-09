@@ -44,10 +44,10 @@ class Resource extends Listener
 
                 $route->setParams(
                     array(
-                      'resource'    => $route->getControllerName(),
-                      'httpMethod'      => $route->hasParam('httpMethod')?$route->getParam('httpMethod'):null,
+                      'resource'     => $route->getControllerName(),
+                      'http_method'  => $route->hasParam('http_method') ? $route->getParam('http_method') : null,
                       #'optionals'   => new Request,
-                      'filters'    => 'test'
+                      #'filters'     => 'itest'
                     )
                 );
                 #Server::d($route->getParams());
@@ -73,13 +73,26 @@ class Resource extends Listener
         $refClass = new ReflectionClass($class->name);
         $this->actions = $refClass->getActionsMethods($route->getActions());
 
-        try {
-            $refMethod = $refClass->getMethod($route->getAction());
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
-        }
+// TODO: merge with TEST & OPTIONS ??? 
+Server::d( $this->actions );
 
-        $params = $this->getRequiredParams($route->getMethod(), $refMethod, $route->getParams());
+        // if( !in_array($route->getMethod(), array('OPTIONS')) )
+        // {
+
+            try {
+                $refMethod = $refClass->getMethod($route->getAction());
+            } catch (\Exception $e) {
+                throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
+            }
+
+            $params = $this->getRequiredParams($route->getMethod(), $refMethod, $route->getParams());
+
+        // } else { 
+        //     $refMethod = $refClass->getMethod($route->getAction());
+        //     $params = array();
+        // }
+
+
 
         // TODO: maybe we need to check the order of params key match the method?
         
