@@ -15,27 +15,35 @@ class Server extends Listener
         $c = new Config($config);
         #$c->injet('server', $this);
         $this->config = $c->getConfig();
-        //self::d($this->config);
-
 
         // to be passed thru the constructor!!!
         $resources = array(
-            //'test' => array('class_args'=>array('arg1'=>'value1', 'arg2'=>'string')),
+            
+            // 'test' => array(
+            //     'class_args'=>array('arg1'=>'value1', 'arg2'=>'string')
+            // ),
 
-            'resourceName' => array('class_name'=>'Zenya\Api\Fixtures\BlankResource', 'class_args'=>array('arg1'=>'value1', 'arg2'=>'string')),
-
-            'Category' => array(
-                'class_name'=>'Zenya\Api\Fixtures\BlankResource',
-                #'class_args'=>array('test')
+            'resourceName' => array(
+                'class_name' => 'Zenya\Api\Fixtures\BlankResource',
+                'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
             ),
+
+            'someName' => array(
+                'class_name' => 'Zenya\Api\Fixtures\BlankResource',
+                #'class_args' => array('test')
+            )
 
         );
 
         $this->config['resources'] = $resources;
-        // // add the resources
-        // foreach($resources+$this->config['resources_default'] as $key => $values) {
-        //     $this->addResource($key, $values);
-        // }
+
+        $this->request = new Request;
+        
+        $this->response = new Response(
+            $this->request,
+            $this->config['sign'],
+            $this->config['debug']
+        );
 
         set_error_handler(array('Zenya\Api\Exception', 'errorHandler'));
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
@@ -43,17 +51,14 @@ class Server extends Listener
 
     public function run()
     {
-        $config = $this->config;
-
-        // Request
-        $this->request = new Request;
+        $c = &$this->config;
 
         // Get path without the route prefix
-        $path = preg_replace($config['route_prefix'], '', $this->request->getUri());
+        $path = preg_replace($c['route_prefix'], '', $this->request->getUri());
 
         // Routing
         $this->route = new Router(
-            $config['routes'],
+            $c['routes'],
             array(
                 'method'        => $this->request->getMethod(),
                 'path'          => $path,
@@ -62,65 +67,30 @@ class Server extends Listener
             )
         );
 
-        $this->response = new Response($this->request, $this->config['sign'], $this->config['debug']);
-
         try {
 
             $this->route->map($path, $this->request->getParams());
-
-        // add the resources
-        foreach($this->config['resources']+$this->config['resources_default'] as $key => $values) {
-            $this->addResource($key, $values);
-        }
-
-
-            $name = explode('.', $this->route->getControllerName());
-            $this->route->setControllerName($name[0]);
-
-            // set format, at first from controller extension
-            if (  count($name)>1 && end($name)!=null) {
-                $format = end($name);
-            // or from GET['format']
-            } elseif (isset($_REQUEST['format'])) {
-                $format = $_REQUEST['format'];
-            // or from HTTP headers
-            } else {
-                if ($this->request->hasHeader('HTTP_ACCEPT')) {
-                    $this->response->setHeader('Vary', 'Accept');
-                }
-                $accept = $this->request->getHeader('HTTP_ACCEPT');
-                switch (true) {
-
-                    // 'application/json'
-                    case (strstr($accept, '/json')):
-                        $format = 'json';
-                    break;
-
-                    // 'text/xml', 'application/xml'
-                    case (strstr($accept, '/xml')
-                        && (!strstr($accept, 'html'))):
-                        $format = 'xml';
-                    break;
-
-                    default:
-                       $format = null;
-                }
+    
+            // add the resources
+            foreach($c['resources']+$c['resources_default'] as $key => $values) {
+                $this->addResource($key, $values);
             }
 
-            // Set and sanittize the Response format...
-            $this->response->setFormat($format);
+            // Set and sanittize the format of the response...
+            $this->response->setFormat(
+                $this->getNegotiatedFormat($c['format_negotiation'])
+            );
 
-            // attach early listeners @ pre-processing
-            $this->stage = 'early';
+            // attach the early listeners @ pre-processing stage
             $this->addAllListeners('server', 'early');
-            $this->stage = 'late';
 
             // Process with the requested resource
-            #  $resource = $this->getResource($this->route->name);
             $this->resource = new Resource($this->route);
             
             $this->results = $this->resource->call(
-                $this->getResource( $this->route->getControllerName() )
+                $this->getResource(
+                    $this->route->getControllerName()
+                )
             );
 
         } catch (\Exception $e) {
@@ -132,14 +102,17 @@ class Server extends Listener
                 $this->results['error'] = $e->getMessage();
             }
             
-            $this->response->setHttpCode($e->getCode()>199 ? $e->getCode() : 500);
+            $this->response->setHttpCode(
+                $e->getCode()>199 ? $e->getCode() : 500
+            );
 
-            // attach late listeners @ exceptions
+            // attach the listeners @ exception stage
             $this->addAllListeners('server', 'exception');
         }
 
         switch ($this->response->getHttpCode()) {
             case 401;
+                // TODO
                 #$this->response->setHeader('WWW-Authenticate',
                 #    sprintf('%s realm="%s"', $this->config['auth']['type'], $this->config['org'])
                 #);
@@ -159,10 +132,59 @@ class Server extends Listener
                     $this->config['rootNode']
                 );
 
-        // attach late listeners @ post-processing
+        // attach the late listeners @ post-processing stage
         $this->addAllListeners('server', 'late');
 
         return $this->route->getMethod() != 'HEAD' ? $output : null;
+    }
+
+    /**
+     * get the output format from the request chain.
+     * Options are:
+     *  - [default] => json
+     *  - [controller_ext] => boolean
+     *  - [request_chain] => e.g. $_REQUEST['format'] or false
+     *  - [http_accept] => boolean
+     * @param array $config
+     * @return string
+     */
+    public function getNegotiatedFormat(array $opts)
+    {
+        // extracting from the controller name
+        if($opts['controller_ext']) {
+            $name = explode('.', $this->route->getControllerName());
+            $this->route->setControllerName($name[0]);
+        }
+
+        // try controller extension
+        if ( $opts['controller_ext'] && count($name)>1 && end($name)!=null) {
+            $format = end($name);
+        } else if ( false !== $opts['request_chain']) {
+            $format = $opts['request_chain'];
+        } else if ( $opts['http_accept'] ) {
+            // try HTTP_ACCEPT
+           $format = null;
+            if ($this->request->hasHeader('HTTP_ACCEPT')) {
+                $this->response->setHeader('Vary', 'Accept');
+                $accept = $this->request->getHeader('HTTP_ACCEPT');
+                
+                switch (true) {
+                    // 'application/json'
+                    case (strstr($accept, '/json')):
+                        $format = 'json';
+                    break;
+
+                    // 'text/xml', 'application/xml'
+                    case (strstr($accept, '/xml')
+                        && (!strstr($accept, 'html'))):
+                        $format = 'xml';
+                    break;
+
+                }
+
+            }
+        }
+        return is_null($format) ? $opts['default'] : $format;
     }
 
     /**
@@ -173,13 +195,6 @@ class Server extends Listener
     public function getResults()
     {
         return $this->results;
-    }
-
-    public static function d($mix)
-    {
-        echo '<pre>';
-        print_r($mix);
-        echo '</pre>';
     }
 
     /**
@@ -203,6 +218,7 @@ class Server extends Listener
      *
      * @param string $name The resource name
      * @param array $resource the resource array
+     * @return void
      */
     public function addResource($name, array $resource)
     {
@@ -229,6 +245,16 @@ class Server extends Listener
     public function getResources()
     {
         return $this->resources;
+    }
+
+    /**
+     * Temp Debug
+     */
+    public static function d($mix)
+    {
+        echo '<pre>';
+        print_r($mix);
+        echo '</pre>';
     }
 
 }
