@@ -1,23 +1,24 @@
 <?php
-require_once APP_TOPDIR . '/Zenya/Api/Server.php';
 
-use Zenya\Api;
+namespace Zenya\Api;
 
 class ResourceTest extends \PHPUnit_Framework_TestCase
 {
 
-    protected $resource;
-
-    public $resources = array('BlankResource'=>'Zenya\Api\Resource\BlankResource');
+    protected $resource, $routes;
 
     protected function setUp()
     {
-        $server = new Zenya\Api\Server;
-        $this->resource = new Zenya\Api\Resource($server);
+        $routes = array('/:controller/:id/:optional' => array());
+        $this->route = new Router($routes);
+        $this->route->map('/controller/123');
+        $this->route->setMethod('GET');
+        $this->resource = new Resource($this->route);
     }
 
     protected function tearDown()
     {
+        unset($this->resource);
     }
 
     /**
@@ -33,14 +34,8 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetRouteOverridesOnGet()
     {
-        $routes = array(
-            '/:controller/:paramUn' => array(),
-        );
-        $route = new Zenya\Api\Router($routes);
-        $route->map('/controller/paramUn');
-        $route->setMethod('GET');
-        $this->resource->setRouteOverrides($route);
-        $this->assertEquals('controller', $route->getControllerName());
+        $this->resource->setRouteOverrides($this->route);
+        $this->assertEquals('controller', $this->route->getControllerName());
     }
 
     /**
@@ -51,58 +46,98 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $routes = array(
             '/:controller/:arg1' => array(),
         );
-        $route = new Zenya\Api\Router($routes);
+        $route = new Router($routes);
         $route->map('/resourceName/param1');
         $route->setMethod('HEAD');
         $this->resource->setRouteOverrides($route);
-        
+
         $this->assertEquals('test', $route->getControllerName());
+
+/* todo review        
+        $params = $route->getParams(); // TODO: review!
+        $this->assertSame('resourceName', $params['name']);
+        $this->assertSame(array('controller' => 'resourceName', 'arg1' => 'param1'), $params['params']);
+*/
     }
 
     /**
      * @covers Zenya\Api\Resource::SetRouteOverrides
+     * @todo
      */
     public function testSetRouteOverridesHelpOnOptions()
     {
         $routes = array(
             '/:controller/:arg1' => array(),
         );
-        $route = new Zenya\Api\Router($routes);
+        $route = new Router($routes);
         $route->map('/resourceName/param1');
         $route->setMethod('OPTIONS');
         $this->resource->setRouteOverrides($route);
-        
+
         $this->assertEquals('help', $route->getControllerName());
 
-#        $params = $route->params; // TODO: review!
-#        $this->assertEquals('resourceName', $params['name']);
-#        $this->assertSame('resourceName', $params['params']);
+        $params = $route->getParams(); // TODO: review!
+        #$this->assertSame('resourceName', $params['name']);
+        #$this->assertSame(array('controller' => 'resourceName', 'arg1' => 'param1'), $params['params']);
     }
 
     /**
-     * @covers Zenya\Api\Resource::call
+     * @expectedException           \BadMethodCallException
+     * @expectedExceptionCode       400
      */
+    public function testGetRequiredParams()
+    {
+        $refClass = new ReflectionClass('Zenya\Api\Fixtures\DocbookClass');
+        $refMethod = $refClass->getMethod('methodNameTwo');
+
+        $params = $this->resource->getRequiredParams('methodNameTwo', $refMethod, array('arg1'=>123));
+        $this->assertSame(array('arg1'=>123), $params);
+
+        $params = $this->resource->getRequiredParams('methodNameTwo', $refMethod, array('arg2'=>345));
+    }
+
     public function testCall()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
-        $this->assertSame( $this->resources, $this->Obj->getResources() );
+        $class = new \stdClass;
+        $class->name = 'Zenya\Api\Fixtures\CrudClass';
+
+        $results = $this->resource->call($class);
+        $this->assertSame(array('123'), $results );
     }
 
     /**
-     * @covers Zenya\Api\Resource::getMethods
+     * @expectedException           \InvalidArgumentException
+     * @expectedExceptionCode       405
      */
-    public function testGetMethods()
+    public function testCallThrowsInvalidArgumentException()
     {
-        $this->markTestIncomplete('This test has not been implemented yet.');
+        $routes = array('/:controller/:id/:optional' => array());
+        $route = new Router($routes);
+        $route->map('/controller/id');
+        $route->setMethod('XXX');
+        $resource = new Resource($route);
 
-        $routes = array(
-            '/:controller/:arg1' => array(),
-        );
-        $route = new Zenya\Api\Router($routes);
-        $route->map('/resourceName/param1');
-        $route->setMethod('OPTIONS');
+        $class = new \stdClass;
+        $class->name = 'Zenya\Api\Fixtures\CrudClass';
 
-        $this->assertSame('', $this->resource->getMethods($route) );
+        $results = $resource->call($class);
     }
 
+    /**
+     * @expectedException           \BadMethodCallException
+     * @expectedExceptionCode       400
+     */
+    public function testCallThrowsBadMethodCallException()
+    {
+        $routes = array('/:controller/:id/:optional' => array());
+        $route = new Router($routes);
+        $route->map('/controller');
+        $route->setMethod('GET');
+        $resource = new Resource($route);
+
+        $class = new \stdClass;
+        $class->name = 'Zenya\Api\Fixtures\CrudClass';
+
+        $results = $resource->call($class);
+    }
 }

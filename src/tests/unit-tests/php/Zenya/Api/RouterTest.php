@@ -1,4 +1,5 @@
 <?php
+
 namespace Zenya\Api;
 
 class RouterTest extends \PHPUnit_Framework_TestCase
@@ -19,7 +20,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($r1+$r2, array_merge($r1, $r2));
 
         $route = new Router( array() );
-        $route->setParams($r1);       
+        $route->setParams($r1);
         $route->map('/', $r2);
         $this->assertSame($r1+$r2, $route->getParams());
     }
@@ -37,17 +38,18 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $route->getParams());
     }
 
-    /**
-     * @covers Zenya\Api\Router::__construct
-     */
-    public function testBasicConstructor()
+
+    public function testBasicRouting()
     {
         $rules = array('/:one/:two/:three' => array('controller'=>'implyController', 'action'=>'implyAction'));
         $route = new Router( $rules );
         $route->map('/controller/action/123');
-        $this->assertSame('implyController', $route->controller);
+        $this->assertSame('implyController', $route->getControllerName());
         $this->assertSame('implyAction', $route->getAction());
-        $this->assertEquals(123, $route->params['three']);
+        $this->assertEquals(123, $route->getParam('three'));
+
+        $this->assertTrue($route->hasParam('three'));
+        $this->assertFalse($route->hasParam('zzzzz'));
     }
 
     /**
@@ -70,9 +72,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $route = new Router($routes['rules'], $routes['defaults']);
         $route->map($url);
 
-        $this->assertSame($expected['controller'], $route->controller);
+        $this->assertSame($expected['controller'], $route->getControllerName());
         $this->assertSame($expected['action'], $route->getAction());
-        $this->assertEquals($expected['params'], $route->params);
+        $this->assertEquals($expected['params'], $route->getParams());
 
         if ( isset($route->newProp) ) {
             $this->assertSame($results['newProp'], $route->newProp);
@@ -117,9 +119,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         extract($r);
         $route = new Router($rules, $defaults);
         $route->map($url);
-        $this->assertSame($results['controller'], $route->controller);
+        $this->assertSame($results['controller'], $route->getControllerName());
         $this->assertSame($results['action'], $route->getAction());
-        $this->assertEquals($results['params'], $route->params);
+        $this->assertEquals($results['params'], $route->getParams());
 
         if ( isset($route->newProp) ) {
             $this->assertSame($results['newProp'], $route->newProp);
@@ -197,9 +199,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $route = new Router(array(), $defaults);
         $route->setMainProperties($rules, $params);
 
-        $this->assertSame($results['controller'], $route->controller);
+        $this->assertSame($results['controller'], $route->getControllerName());
         $this->assertSame($results['action'], $route->getAction());
-        $this->assertEquals($results['params'], $route->params);
+        $this->assertEquals($results['params'], $route->getParams());
 
         if (isset($route->newProperty)) {
             $this->assertSame($results['newProperty'], $route->newProperty);
@@ -296,6 +298,14 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($actions, $router->getActions());
     }
 
+    public function testGetActionWithMethod()
+    {
+        $router = new Router();
+        $this->assertSame(null, $router->getAction());
+        $this->assertSame('onCreate', $router->getAction('POST'));
+        $this->assertSame('onUpdate', $router->getAction('PUT'));
+    }
+
     public function testGetSetActions()
     {
         $router = new Router(array());
@@ -303,17 +313,25 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('onUpdate', $router->getAction() );
     }
 
-    public function testGetSetController()
+    public function testGetsetControllerName()
     {
         $router = new Router(array());
-        $router->setController('aContollerStr');
-        $this->assertSame('aContollerStr', $router->getControllerName() );
+        $router->setControllerName('resourceName');
+        $this->assertSame('resourceName', $router->getControllerName() );
     }
 
-    public function testGetSetMethod()
+    public function testGetSetMethodGoesUppercase()
     {
         $router = new Router(array());
-        $router->setMethod('aMethodStr');
-        $this->assertSame('aMethodStr', $router->getMethod() );
+        $router->setMethod('get');
+        $this->assertSame('GET', $router->getMethod() );
     }
+
+    public function testGetSetParam()
+    {
+        $router = new Router(array());
+        $router->setParam('test', 'value');
+        $this->assertSame('value', $router->getParam('test') );
+    }
+
 }

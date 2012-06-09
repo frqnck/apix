@@ -18,8 +18,7 @@ class Auth implements \SplObserver
         //user => password
         #$this->users = array('admin' => 'mypass', 'guest' => 'guest');
 
-
-        switch($target) {
+        switch ($target) {
             case $target instanceof \Zend_Auth:
 
                # print_r($target);
@@ -29,7 +28,6 @@ class Auth implements \SplObserver
             case 'Digest':
                 echo "TODO: Digest";exit;
             break;
-
 
             case 'Basic':
                 echo "TODO: Basic";exit;
