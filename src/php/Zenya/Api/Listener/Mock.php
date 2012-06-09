@@ -26,6 +26,8 @@ class Mock implements \SplObserver
     public function update(\SplSubject $subject)
     {
         $notice = $subject->getNotice();
+
+        print_r($notice);
         echo '*** Notice update:'  . $notice['name'] . ' / obj: ' . $subject->stage;
         echo xdebug_time_index(), "\n";
 

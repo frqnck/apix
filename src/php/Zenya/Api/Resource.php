@@ -21,9 +21,9 @@ class Resource extends Listener
      *
      * @param array $resources
      */
-    public function __construct(Server $server)
+    public function __construct(Router $route)
     {
-        $this->server = $server;
+        $this->route = $route;
 
         // attach late listeners @ post-processing
         #$this->addAllListeners('resource', 'early');
@@ -32,7 +32,7 @@ class Resource extends Listener
     /**
      * Return the classname for a resource (long and private)
      *
-     * @param Router $route
+     * @param  Router $route
      * @return string
      */
     public function setRouteOverrides(Router $route)
@@ -40,111 +40,79 @@ class Resource extends Listener
         switch ($route->getMethod()) {
             case 'OPTIONS': // resource's help
             case 'HEAD':    // resource's test
-                $route->params = array(
-                      'name'      => $route->getControllerName(),
-                      'resource'  => $this->server->getResource( $route->getControllerName() ),
-                      'params'    => $route->getParams(),
+                $route->setControllerName($route->getMethod()=='OPTIONS' ? 'help' : 'test');
+
+                $route->setParams(
+                    array(
+                      'resource'    => $route->getControllerName(),
+                      'httpMethod'      => $route->hasParam('httpMethod')?$route->getParam('httpMethod'):null,
+                      #'optionals'   => new Request,
+                      'filters'    => 'test'
+                    )
                 );
-                $route->setController($route->getMethod()=='OPTIONS'?'help':'test');
+                #Server::d($route->getParams());
+
             break;
         }
     }
 
     /**
-     * Call a resource
+     * Call a resource from route
      *
-     * @params string	$name	Name of the resource
+     * @params Router	$route	Route object
      * @return array
      * @throws Zenya\Api\Exception
      */
-    public function call()
+    public function call(\stdClass $class)
     {
-        $route = $this->server->route;
+        $route = $this->route;
+
         $this->setRouteOverrides($route);
 
-        $classArray = $this->server->getResource( $route->getControllerName() );
+        // Relection
+        $refClass = new ReflectionClass($class->name);
+        $this->actions = $refClass->getActionsMethods($route->getActions());
 
-        $className = isset($classArray['class']) ?  $classArray['class'] : null;
-        $classArgs = isset($classArray['classArgs'])
-            ? $classArray['classArgs']  // use provided
-            : $route->classArgs;        // use route's default
-
-        // map to an action
-        $action = $route->getAction();
-
-        try{
-            // Relection
-            $refClass = new \ReflectionClass($className);
-            $this->actions = $refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
-
-            $refMethod = $refClass->getMethod( $route->getAction() );
-            // check the actionMethod
-            if (
-                !in_array($refMethod, $this->actions)
-                && !$refMethod->isConstructor()
-                && !$refMethod->isAbstract()
-            ) {
-                throw new Exception();
-            }
-        } catch(\Exception $e) {
-            throw new Exception("Invalid resource's method ({$route->getMethod()}) specified.", 405);
+        try {
+            $refMethod = $refClass->getMethod($route->getAction());
+        } catch (\Exception $e) {
+            throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
         }
 
-        // check the params
-        $params = array();
-        foreach ($refMethod->getParameters() as $param) {
-            $name = $param->getName();
-            if (
-                !$param->isOptional()
-                && !array_key_exists($name, $route->params)
-                && empty($route->params[$name])
-            ) {
-                throw new Exception("Required {$route->getMethod()} parameter \"{$name}\" missing in action.", 400);
-            } elseif (isset($route->params[$name])) {
-                $params[$name] = $route->params[$name];
-            }
-        }
+        $params = $this->getRequiredParams($route->getMethod(), $refMethod, $route->getParams());
 
         // TODO: maybe we need to check the order of params key match the method?
+        
         // TODO: maybe add a type casting handler here
+        #Server::d($route);exit;
+
 
         // attach late listeners @ post-processing
 
         // TODO: docs
         #$classDoc = RefDoc::parseDocBook($refClass);
         #$methodDoc = RefDoc::parseDocBook($refMethod);
- 
+
         $this->addAllListeners('resource', 'early');
 
-        return call_user_func_array(array(new $className($classArgs), $action), $params);
+        return call_user_func_array(array(new $class->name($class->args), $route->getAction()), $params);
     }
 
-    /**
-     * Get methods
-     *
-     * @return array
-     */
-    public function getMethods(Router $route)
+    public function getRequiredParams($method, $refMethod, array $routeParams)
     {
-        $actions = array();
-        if(isset($this->actions)) {
-          foreach($this->actions as $action) {
-            $actions[] = $action->name;
-          }
+        $params = array();
+        foreach ($refMethod->getParameters() as $param) {
+            $name = $param->getName();
+            if (
+                !$param->isOptional()
+                && !array_key_exists($name, $routeParams)
+            ) {
+                throw new \BadMethodCallException("Required {$method} parameter \"{$name}\" missing in action.", 400);
+            } else if (isset($routeParams[$name])) {
+                $params[$name] = $routeParams[$name];
+            }
         }
-        $methods = array_intersect($route->getActions(), $actions);
-        return array_keys($methods);
+        return $params;
     }
-
-    /**
-     * Get public methods
-     *
-     * @return array
-     */
-    #public function getPublicMethods()
-    #{
-    #  $actions = $this->refClass->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
-    #  return $action;
-    #}
 
 }

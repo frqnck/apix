@@ -33,7 +33,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->response->setFormat('html');
         $this->assertSame('html', $this->response->getFormat() );
-        
+
         $this->response->setFormat('XML');
         $this->assertSame('xml', $this->response->getFormat() );
     }
@@ -61,7 +61,15 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     public function testSetHeader()
     {
         $headers = array('Vary' => 'Accept', 'X-HTTP-Method-Override' => 'PUT');
+        $this->response->setHeader('Vary', '*');
+
+        // check overide initial Vary header
         $this->response->setHeader('Vary', 'Accept');
+
+        // check preserve previous Vary header
+        $this->response->setHeader('Vary', 'Accept-Encoding', false);
+
+        $this->response->setHeader('Vary', 'Accept-Encoding', false);
         $this->response->setHeader('X-HTTP-Method-Override', 'PUT');
         $this->assertSame(
             $headers,
@@ -133,7 +141,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->response->sign = true;
         $results = $this->response->collate('resource', array('results'));
-        
+
         $this->assertArrayHasKey('signature', $results);
     }
 

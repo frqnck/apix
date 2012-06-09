@@ -5,9 +5,9 @@ namespace Zenya\Api;
 class Listener implements \SplSubject, \IteratorAggregate, \Countable
 {
     /**
-     * @var SplObjectStorage
+     * @var array of SplObjectStorage
      */
-    protected $_observers = array();
+    protected $observers = array();
 
      /**
      * Attaches a new observer
@@ -16,12 +16,12 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      */
     public function attach(\SplObserver $observer)
     {
-        foreach ($this->_observers as $attached) {
+        foreach ($this->observers as $attached) {
             if ($attached === $observer) {
                 return;
             }
         }
-        $this->_observers[] = $observer;
+        $this->observers[] = $observer;
     }
 
     /**
@@ -31,9 +31,9 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      */
     public function detach(\SplObserver $observer)
     {
-        foreach ($this->_observers as $key => $attached) {
+        foreach ($this->observers as $key => $attached) {
             if ($attached === $observer) {
-                unset($this->_observers[$key]);
+                unset($this->observers[$key]);
 
                 return;
             }
@@ -44,11 +44,10 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      * Notifies all the observers
      *
      * @return void
-     * @throws Zenya\Api\Exception
      */
     public function notify()
     {
-        foreach ($this->_observers as $observer) {
+        foreach ($this->observers as $observer) {
             $observer->update($this);
         }
     }
@@ -60,34 +59,18 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      */
     public function getIterator()
     {
-        return $this->_observers;
+        return $this->observers;
     }
 
     /**
      * Countable
      *
-     * @return int
+     * @return integer
      */
     public function count()
     {
-        return count($this->_observers);
+        return count($this->observers);
     }
-
-    /* ---- */
-
-    /*
-    public function __get($prop)
-    {
-        return $this->$prop;
-    }
-
-    public function __set($prop, $val)
-    {
-        echo 'set';
-        $this->$prop = $val;
-        $this->notify();
-    }
-    */
 
     /**
      * Last event in request / response handling, intended for observers
@@ -205,14 +188,6 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
             }
         }
 
-        switch ($type) {
-            case 'late':
-            break;
-            default:
-#				for($i=0;$i<2;$i++)
-#				$this->attach(new Listener\Mock);
-                //$this->setNotice('early');
-        }
         $this->setNotice($type);
     }
 

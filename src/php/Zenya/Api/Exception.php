@@ -50,19 +50,21 @@ class Exception extends \Exception {
      *
      *  Throws exception occur.
      *
-     * @param int $errno
-     * @param string $errstr
-     * @param string $errfile
-     * @param int $errline
+     * @param  int             $errno
+     * @param  string          $errstr
+     * @param  string          $errfile
+     * @param  int             $errline
      * @return boolean
      * @throws \ErrorException
      */
-    static public function errorHandler($errno, $errstr, $errfile, $errline)
+    public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
       if ( E_RECOVERABLE_ERROR===$errno ) {
+        echo __CLASS__;
         $errstr = preg_replace('@to\s.*::\w+\(\)@', '', $errstr, 1);
         throw new \ErrorException($errstr, 400, 0, $errfile, $errline);
       }
+
       return false;
     }
 
@@ -71,23 +73,28 @@ class Exception extends \Exception {
      *
      *  Throws exception occur.
      *
-     * @param int $errno
-     * @param string $errstr
-     * @param string $errfile
-     * @param int $errline
+     * @param  int             $errno
+     * @param  string          $errstr
+     * @param  string          $errfile
+     * @param  int             $errline
      * @return boolean
      * @throws \ErrorException
      */
-    static public function shutdownHandler()
+    public static function shutdownHandler()
     {
         $error = error_get_last();
-        if($error !== NULL) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+        if ($error !== NULL) {
+            #header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
             echo "<h1>500 Internal Server Error</h1>";
-
-            $info = "[SHUTDOWN] file:".$error['file']." | ln:".$error['line']." | msg:".$error['message'] .PHP_EOL;
-            echo $info;
+            $info = sprintf(
+                    '[SHUTDOWN] file: %s | line: %d | message: %s',
+                    $error['file'],
+                    $error['line'],
+                    $error['message']
+                );
+            die( $info );
         }
+
     }
 
 }

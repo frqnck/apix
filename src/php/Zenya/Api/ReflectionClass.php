@@ -18,10 +18,10 @@ class ReflectionClass extends \ReflectionClass
     /**
      * Constructor
      *
-     * @param mixed     $reflected Either a string containing the name of the class to reflect, or an object.
+     * @param mixed       $reflected Either a string containing the name of the class to reflect, or an object.
      * @param string|null $prefix    [optional default:null]
      */
-    function __construct($mixed, $prefix=null)
+    public function __construct($mixed, $prefix=null)
     {
         $this->prefix = $prefix;
 
@@ -44,12 +44,12 @@ class ReflectionClass extends \ReflectionClass
     /**
      * parse method documentation
      *
-     * @param string     $name A string containing the name of a method to reflect (todo: start from an object).
+     * @param string $name A string containing the name of a method to reflect (todo: start from an object).
      */
-    function parseMethodDoc($name)
+    public function parseMethodDoc($name)
     {
         $method = parent::getMethod($name);
-        
+
         return $this->docs['methods'][ $method->getShortName() ] =
             self::parseDocBook(
                 $method->getDocComment()
@@ -85,13 +85,13 @@ class ReflectionClass extends \ReflectionClass
         #$pattern = '%(\r?\n(?! \* ?@))?^(/\*\*\r?\n \* | \*/| \* ?)%m';
 
         // same as 2. BUT keep the carrier returns in.
-        $pattern = '/(\r+|\t+)? *\* */';
+        $pattern = '@(\r+|\t+)? *\* *@';
 
         $str = preg_replace($pattern, '', $doc);
 
        # $lines =array_map('trim',explode(PHP_EOL, $str));
 
-        $lines = preg_split("@\r?\n|\r@", $str, null, PREG_SPLIT_NO_EMPTY); 
+        $lines = preg_split("@\r?\n|\r@", $str, null, PREG_SPLIT_NO_EMPTY);
 
         // Extract the title
         $docs['title'] = array_shift($lines);
@@ -112,7 +112,7 @@ class ReflectionClass extends \ReflectionClass
         foreach ($lines[2] as $i => $v) {
             $grp = $lines[1][$i];
 
-            if($grp == 'param') {
+            if ($grp == 'param') {
                 // "@param string $param description of param"
                 preg_match('/(\S+)\s+\$(\S+)(\s+(.+))?/', $v, $m);
 
@@ -129,25 +129,70 @@ class ReflectionClass extends \ReflectionClass
         }
 
         //reduce group
-        foreach($docs as $key => $value) {
-            if($key !== 'params') {
-                if(is_array($value) && count($value) == 1) {
+        foreach ($docs as $key => $value) {
+            if ($key !== 'params') {
+                if (is_array($value) && count($value) == 1) {
                     $docs[$key] = reset( $docs[$key] );
-                } 
+                }
             }
         }
 
         return $docs;
     }
 
-    public function getSource()
-    { 
-        if( !file_exists( $this->getFileName() ) ) return false; 
-        
-        $start_offset = ( $this->getStartLine() - 1 ); 
-        $end_offset   = ( $this->getEndLine() - $this->getStartLine() ) + 1; 
+    /**
+     * Returns an array of resource's methods and actions
+     * 
+     * @param array $array
+     * @return array
+     */
+    public function getActionsMethods(array $array=array())
+    {
+        $actions = $this->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
+        $_actions = array();
+        foreach ($actions as $action) {
+            $_actions[] = $action->name;
+        }
 
-        return join( '', array_slice( file( $this->getFileName() ), $start_offset, $end_offset ) ); 
-    } 
+        return array_intersect($array, $_actions);
+    }
+
+    // obsolete
+    // /**
+    //  * Returns all the resource's methods
+    //  *
+    //  * @return array
+    //  */
+    // public function getMethodKeys()
+    // {
+    //     return array_keys($this->getActionsMethods());
+    // }
+
+    // obsolete
+    // /**
+    //  * Returns all the resource's actions
+    //  *
+    //  * @return array
+    //  */
+    // public function getActions()
+    // {
+    //     return array_values($this->getActionsMethods());
+    // }
+
+    /**
+     * Extract source code
+     *
+     * @param  string $classname
+     * @return array
+     */
+    public function getSource()
+    {
+        if( !file_exists( $this->getFileName() ) ) return false;
+
+        $start_offset = ( $this->getStartLine() - 1 );
+        $end_offset   = ( $this->getEndLine() - $this->getStartLine() ) + 1;
+
+        return join( '', array_slice( file( $this->getFileName() ), $start_offset, $end_offset ) );
+    }
 
 }

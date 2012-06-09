@@ -1,8 +1,8 @@
 <?php
 namespace Zenya\Api\Output;
 
-abstract class Adapter {
-
+abstract class Adapter
+{
     protected $contentType = null;
 
     /**
@@ -21,7 +21,7 @@ abstract class Adapter {
      */
     public function getContentType()
     {
-        if(is_null($this->contentType)) {
+        if (is_null($this->contentType)) {
             throw new \Exception('Content-Type is missing from this implementation.');
         }
 
