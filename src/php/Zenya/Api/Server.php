@@ -4,103 +4,38 @@ namespace Zenya\Api;
 
 class Server extends Listener
 {
-    public $org = 'zenya';
-    public $rootNode = 'zenya';
-    public $version = 'Zenya/0.2.1';
+    const VERSION = 'Sleepover/0.2.11';
 
+    private $config = array();
     private $resources = array();
 
-    public function __construct(array $resources=null)
+    public function __construct(array $resources=null, array $config=array())
     {
+
+        $c = new Config($config);
+        #$c->injet('server', $this);
+        $this->config = $c->getConfig();
+        //self::d($this->config);
+
+
         // to be passed thru the constructor!!!
         $resources = array(
-            'test' => array('classArgs'=>array('arg1'=>'value1', 'arg2'=>'string')),
+            //'test' => array('class_args'=>array('arg1'=>'value1', 'arg2'=>'string')),
 
-            'resourceName' => array('class'=>'Zenya\Api\Fixtures\BlankResource', 'classArgs'=>array('arg1'=>'value1', 'arg2'=>'string')),
+            'resourceName' => array('class_name'=>'Zenya\Api\Fixtures\BlankResource', 'class_args'=>array('arg1'=>'value1', 'arg2'=>'string')),
 
             'Category' => array(
-                'class'=>'Zenya\Api\Resource\CategoryResource',
-                'classArgs'=>array('test')
+                'class_name'=>'Zenya\Api\Fixtures\BlankResource',
+                #'class_args'=>array('test')
             ),
 
         );
 
-       $config = array(
-            'org' => "Zenya",
-            'routeNode' => 'zenya',
-            'debug' => true,
-            'sign'  => true,
-            'route_prefix' => '@^(/index.php)?/api/v(\d*)@i', // regex
-
-            // routes
-            'routes' => array(
-                #'/:controller/paramName/:paramName/:id' => array(),
-                #'/:controller/test' => array('class'=>'test'),
-
-               '/help/:resource/:httpMethod/:filters' => array(
-                    'controller' => 'help',
-                    #'method'=>'GET'
-                ),
-
-
-                '/category/:param1/:param2/:param3' => array(
-                    'controller' => 'Category',
-                ),
-
-                '/:controller/:param1/:param2' => array(
-                    #'controller' => 'BlankResource',
-                    #'className' => 'Zenya\Api\Fixtures\BlankResource',
-                    'classArgs' => array('classArg1' => 'test1', 'classArg2' => 'test2'))
-            ),
-
-            // need a DIC !
-            'listeners' => array(
-                // pre-processing stage
-                'early' => array(
-                    'new Listener\Auth',
-                    'new Listener\Acl',
-                    'new Listener\Log',
-                    'new Listener\Mock'
-                ),
-
-                // post-processing stage
-                'late'=>array(
-                    'new Listener\Log',
-                ),
-            ),
-
-            // -- advanced options --
-            'auth' => array(
-                    'type'=>'Basic',
-                    #'type'=>'Digest',
-                ),
-            'defaultResources' => array(
-                // OPTIONS
-                'help' => array(
-                        'class'     => 'Zenya\Api\Resource\Help',
-                        'classArgs' => &$this,
-                        'args'      => array(
-                        # 'method'  => 'GET',
-                        # 'name'    => $this->route->getControllerName(),
-                        # 'resource'  => $this->server->getResource( $route->getControllerName() ),
-                        # 'params'    => $route->getParams(),
-                        )
-                    ),
-                // HEAD
-                'test' => array(
-                        'class'     => 'Zenya\Api\Resource\Test',
-                        'classArgs' => &$this,
-                        'args'      => array()
-                    )
-            )
-        );
-
-        $this->config = $config;
-
-        // add the resources
-        foreach($resources+$this->config['defaultResources'] as $key => $values) {
-            $this->addResource($key, $values);
-        }
+        $this->config['resources'] = $resources;
+        // // add the resources
+        // foreach($resources+$this->config['resources_default'] as $key => $values) {
+        //     $this->addResource($key, $values);
+        // }
 
         set_error_handler(array('Zenya\Api\Exception', 'errorHandler'));
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
@@ -120,10 +55,10 @@ class Server extends Listener
         $this->route = new Router(
             $config['routes'],
             array(
-                'method'    => $this->request->getMethod(),
-                'path'      => $path,
-                'className' => null,
-                'classArgs' => null
+                'method'        => $this->request->getMethod(),
+                'path'          => $path,
+                'class_name'    => null,
+                'class_args'    => &$this, // temp!
             )
         );
 
@@ -132,6 +67,13 @@ class Server extends Listener
         try {
 
             $this->route->map($path, $this->request->getParams());
+
+        // add the resources
+        foreach($this->config['resources']+$this->config['resources_default'] as $key => $values) {
+            $this->addResource($key, $values);
+        }
+
+
             $name = explode('.', $this->route->getControllerName());
             $this->route->setControllerName($name[0]);
 
@@ -182,13 +124,15 @@ class Server extends Listener
             );
 
         } catch (\Exception $e) {
+
             if( !in_array($this->route->getControllerName(), array_keys($this->getResources())) ) {
                 $this->route->setControllerName('error');
                 $this->results[] = $e->getMessage();
             } else {
                 $this->results['error'] = $e->getMessage();
             }
-            $this->response->setHttpCode($e->getCode() ? $e->getCode() : 500);
+            
+            $this->response->setHttpCode($e->getCode()>199 ? $e->getCode() : 500);
 
             // attach late listeners @ exceptions
             $this->addAllListeners('server', 'exception');
@@ -211,8 +155,8 @@ class Server extends Listener
         $output = $this->response->generate(
                     $this->route->getControllerName(),
                     $this->results,
-                    $this->version,
-                    $this->rootNode
+                    sprintf("%s/%s #%s", $this->config['org'], $this->config['version'], self::VERSION),
+                    $this->config['rootNode']
                 );
 
         // attach late listeners @ post-processing
@@ -262,16 +206,17 @@ class Server extends Listener
      */
     public function addResource($name, array $resource)
     {
-        if (! isset($resource['class']) ) {
-            $resource['class'] = '\stdClass';
-            #throw new \InvalidArgumentException("Resource missing a class.", 500);
+        if (! isset($resource['class_name']) ) {
+            $resource['class_name'] = '\stdClass';
+            //throw new \InvalidArgumentException("todo: Resource missing a class name.", 500);
         }
 
         $class = new \stdClass;
-        $class->name = $resource['class'];
-        $class->args = isset($resource['classArgs'])
-            ? $resource['classArgs']    // use provided
-            : $this->route->classArgs;  // use route's default
+        $class->name = $resource['class_name'];
+
+        $class->args = isset($resource['class_args'])
+            ? $resource['class_args']    // use provided
+            : $this->route->class_args;  // use route's default
 
         $this->resources[$name] = $class;
     }

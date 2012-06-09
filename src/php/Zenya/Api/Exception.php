@@ -82,6 +82,8 @@ class Exception extends \Exception {
      */
     public static function shutdownHandler()
     {
+                echo __CLASS__;
+
         $error = error_get_last();
         if ($error !== NULL) {
             #header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
