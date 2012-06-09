@@ -1,63 +1,8 @@
 <?php
 namespace Zenya\Api;
 
-/**
- * Class title
- *
- * Class description 1st line
- * Class description 2nd line
- *
- * @param int $classNamedInteger an integer
- * @api_public          true
- * @api_version         1.0
- * @api_permission      admin
- * @api_randomName      classRandomValue
- * @randomGrouping      a group value
- * @randomGrouping      another group value
- */
-class DockbookClassFixture
-{
-    
-    /**
-     * Method one title
-     *
-     * Method description 1st line
-     * Method description 2nd line
-     *
-     * @param int $namedInteger an integer
-     * @param string $namedString a string
-     * @param boolean $namedBoolean a boolean
-     * @param array $optional something optional (here an array)
-     * @return array result
-     * @api_public true
-     * @api_version 1.0
-     * @api_permission admin
-     * @api_randomName methodRandomValue
-     * @rndGrouping      a group value
-     * @rndGrouping      another group value
-     */
-    public function methodNameOne($namedInteger, $namedString, $namedBoolean, array $optional=null)
-    {
-        return array($namedInteger, $namedString, $namedBoolean, $optional);
-    }
-
-    /**
-     * Method two title
-     *
-     * Method two description 1st line
-     * Method two description 2nd line
-     *
-     * @param string $arg1 an integer
-     * @param array $optional something optional (here an array)
-     * @api_public false
-     * @api_version 1.0
-     */
-    public static function methodNameTwo($arg1, $optional=null)
-    {
-        return array($arg1, $optional);
-    }
-
-}
+//use Zenya\Api\Fixtures as Fixture;
+//require_once APP_TESTDIR . '/Zenya/Api/Fixtures/DocbookClass.php';
 
 class ReflectionClassTest extends \PHPUnit_Framework_TestCase
 {
@@ -69,7 +14,7 @@ class ReflectionClassTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $className = 'Zenya\Api\DockbookClassFixture';
+        $className = 'Zenya\Api\Fixtures\DocbookClass';
         $methodName = 'methodNameOne';
 
         $this->reflected = new ReflectionClass($className);
@@ -88,7 +33,7 @@ class ReflectionClassTest extends \PHPUnit_Framework_TestCase
     {
         $class = $this->reflected;
         $this->assertInstanceOf('Zenya\Api\ReflectionClass', $class);
-        $this->assertSame('DockbookClassFixture', $class->getShortName());
+        $this->assertSame('DocbookClass', $class->getShortName());
     }
 
     public function testOneMethodIsInstanceOfReflectionMethod()
@@ -135,7 +80,7 @@ class ReflectionClassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('1.0', $this->class['api_version']);
         $this->assertSame('admin', $this->class['api_permission']);
         $this->assertSame('classRandomValue', $this->class['api_randomName']);
-	}
+    }
 
     public function testMethodDocBookTitleAndDescription()
     {
@@ -146,7 +91,7 @@ class ReflectionClassTest extends \PHPUnit_Framework_TestCase
             $this->method['description']
         );
     }
-    
+
     public function testMethodDocBookParam()
     {
         $params = $this->method['params'];
@@ -194,33 +139,32 @@ class ReflectionClassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(2, count($docs['methods']));
     }
 
+    /**
+     * @covers Zenya\Api\ReflectionClass::getActionsMethods
+     */
+    public function testGetActionsMethods()
+    {
+        $this->assertSame(
+            array('PUT'=>'methodNameTwo', 'GET'=>'methodNameOne'),
+            $this->reflected->getActionsMethods(
+                array('PUT'=>'methodNameTwo', 'POST'=>'postMethod', 'GET'=>'methodNameOne')
+            )
+        );
+    }
+
     public function testGetClassSource()
     {
         $src = $this->reflected->getSource();
-        $this->assertTrue( preg_match('/^class Dockbook/', $src) === 1, "Source should start by 'class ...'");
+        $this->assertTrue( preg_match('/^class Docbook/', $src) === 1, "Source should start by 'class ...'");
         $this->assertTrue( preg_match('/\s+}\n\n}$/', $src) === 1, "Source should end by '...}'");
     }
 
-
-    /*
-     * @expectedException           \InvalidArgumentException
-     * @expectedExceptionMessage    Invalid element "not-defined"
+    /**
+     * @todo maybe?
      */
-    /*
-   public function testParamsThatAreNotDefinedThrowsException()
+    public function testSpecialCharacteres()
     {
-        $this->method->get('not-defined');
+        $this->assertSame('OPTIONS /*/etc...', $this->method['api_link']);
     }
-    */
 
-    /*
-     * @expectedException           \ReflectionException
-     * @expectedExceptionMessage    Method undefined-method does not exist
-     */
-    /*
-   public function testUndefinedMethodThrowsException()
-    {
-        $this->class->getMethod('undefined-method');
-    }
-    */
 }

@@ -155,7 +155,7 @@ class Request
     }
 
     /**
-     * Sets a header by name.
+     * Sets a header by name
      *
      * @param string $key   The key
      * @param mixed  $value The value
@@ -165,11 +165,23 @@ class Request
         $this->headers[$key] = $value;
     }
 
+   /**
+     * Checks if specified header exist
+     *
+     * @param string $key   The key
+     * @return bolean
+     */
     public function hasHeader($key)
     {
         return isset($this->headers[$key]);
     }
-
+   
+    /**
+     * Returns the specified header
+     *
+     * @param string $key   The key
+     * @return mixed
+     */
     public function getHeader($key)
     {
         if (isset($this->headers[$key])) {
@@ -178,7 +190,7 @@ class Request
     }
 
     /**
-     * Populate the header array.
+     * Populates the header array.
      *
      * @param string $key   The key
      * @param mixed  $value The value
