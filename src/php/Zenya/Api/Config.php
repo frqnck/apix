@@ -22,6 +22,7 @@ class Config #extends Pimple
     public function getConfig()
     {
         #$this->config['resources_default']['help']['class_args'] = $this->injected['server'];
+
         return $this->config;
     }
 
@@ -38,31 +39,30 @@ class Config #extends Pimple
 
             // routes
             'route_prefix' => '@^(/index.php)?/api/v(\d*)@i', // regex
-            
+
             'routes' => array(
-                #'/:controller/paramName/:paramName/:id' => array(),
+                #/:controller/paramName/:paramName/:id' => array(),
                 #'/:controller/test' => array('class_name'=>'test'),
 
-               '/help/:resource/:http_method/:filters' => array(
-                    'controller' => 'help',
-                    #'method'=>'GET'
+                '/help/:resource/:http_method/:filters' => array(
+                     'controller' => 'help',
                 ),
 
-                '/category/:param1/:param2/:param3' => array(
-                    'controller' => 'Category',
-                ),
+                // '/category/:param1/:param2/:param3' => array(
+                //     'controller' => 'Category',
+                // ),
 
-                '/:controller/:param1/:param2' => array(
+                '/:controller/:resource/:param2' => array(
                     #'controller' => 'BlankResource',
                     #'class_name' => 'Zenya\Api\Fixtures\BlankResource',
-                    'class_args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
+                    #'class_args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
                 )
             ),
             // format negociation
             'format_negotiation' => array(
                 'default'        => 'json',
                 'controller_ext' => true, // true or false (e.g. resource.json)
-                'request_chain'  => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
+                'override'       => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
                 'http_accept'    => true, // true or false
             ),
 
@@ -87,14 +87,14 @@ class Config #extends Pimple
                     'type'=>'Basic',
                     #'type'=>'Digest',
                 ),
-            
-            // resources
+
+            // resources definition
             'resources' => null, // user defined
 
             'resources_default' => array(
                 // OPTIONS
                 'help' => array(
-                        'class_name'    => 'Zenya\Api\Resource\Help',
+                        'class_name'    => __NAMESPACE__ . '\Resource\Help',
                         'class_args'    => null, //&$this
                         'args'          => array(
                             # 'method'  => 'GET',
