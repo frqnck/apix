@@ -73,7 +73,7 @@ class Resource extends Listener
         $refClass = new ReflectionClass($class->name);
         $this->actions = $refClass->getActionsMethods($route->getActions());
 
-// TODO: merge with TEST & OPTIONS ??? 
+// TODO: merge with TEST & OPTIONS ???
 Server::d( $this->actions );
 
         // if( !in_array($route->getMethod(), array('OPTIONS')) )
@@ -87,18 +87,15 @@ Server::d( $this->actions );
 
             $params = $this->getRequiredParams($route->getMethod(), $refMethod, $route->getParams());
 
-        // } else { 
+        // } else {
         //     $refMethod = $refClass->getMethod($route->getAction());
         //     $params = array();
         // }
 
-
-
         // TODO: maybe we need to check the order of params key match the method?
-        
+
         // TODO: maybe add a type casting handler here
         #Server::d($route);exit;
-
 
         // attach late listeners @ post-processing
 
@@ -121,10 +118,11 @@ Server::d( $this->actions );
                 && !array_key_exists($name, $routeParams)
             ) {
                 throw new \BadMethodCallException("Required {$method} parameter \"{$name}\" missing in action.", 400);
-            } else if (isset($routeParams[$name])) {
+            } elseif (isset($routeParams[$name])) {
                 $params[$name] = $routeParams[$name];
             }
         }
+
         return $params;
     }
 

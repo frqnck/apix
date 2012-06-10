@@ -18,7 +18,7 @@ class Server extends Listener
 
         // to be passed thru the constructor!!!
         $resources = array(
-            
+
             // 'test' => array(
             //     'class_args'=>array('arg1'=>'value1', 'arg2'=>'string')
             // ),
@@ -38,7 +38,7 @@ class Server extends Listener
         $this->config['resources'] = $resources;
 
         $this->request = new Request;
-        
+
         $this->response = new Response(
             $this->request,
             $this->config['sign'],
@@ -49,21 +49,21 @@ class Server extends Listener
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
     }
 
-    public function setRouting()
+    public function setRouting(Request $request)
     {
         // Get path without the route prefix
-        $path = preg_replace($this->config['route_prefix'], '', $this->request->getUri());
+        $path = preg_replace($this->config['route_prefix'], '', $request->getUri());
 
         $this->route = new Router(
             $this->config['routes'],
             array(
-                'method'        => $this->request->getMethod(),
+                'method'        => $request->getMethod(),
                 'path'          => $path,
                 'class_name'    => null,
                 'class_args'    => &$this, // temp!
             )
         );
-        $this->route->map($path, $this->request->getParams());
+        $this->route->map($path, $request->getParams());
     }
 
     public function run()
@@ -71,19 +71,19 @@ class Server extends Listener
         $c = &$this->config;
 
         try {
-    
+
             // Routing
-            $this->setRouting();
+           $this->setRouting($this->request);
 
             // add the resources
-            foreach($c['resources']+$c['resources_default'] as $key => $values) {
+            foreach ($c['resources']+$c['resources_default'] as $key => $values) {
                 $this->addResource($key, $values);
             }
 
-            // Set and sanittize the format of the response...
+            // TODO: review!!! Set and sanittize the format of the response...
             $this->negotiateFormat($c['format_negotiation']);
 
-            // if($c['format_negotiation']['http_accept']) {
+            // if ($c['format_negotiation']['http_accept']) {
             //     // $this->response->setHeader('Vary', 'Accept');
             // }
 
@@ -92,7 +92,7 @@ class Server extends Listener
 
             // Process with the requested resource
             $this->resource = new Resource($this->route);
-            
+
             $this->results = $this->resource->call(
                 $this->getResource(
                     $this->route->getControllerName()
@@ -101,13 +101,13 @@ class Server extends Listener
 
         } catch (\Exception $e) {
 
-            if( !in_array($this->route->getControllerName(), array_keys($this->getResources())) ) {
+            if ( !in_array($this->route->getControllerName(), array_keys($this->getResources())) ) {
                 $this->route->setControllerName('error');
                 $this->results[] = $e->getMessage();
             } else {
                 $this->results['error'] = $e->getMessage();
             }
-            
+
             $this->response->setHttpCode(
                 $e->getCode()>199 ? $e->getCode() : 500
             );
@@ -146,25 +146,24 @@ class Server extends Listener
 
     /**
      * Returns the output format from the request chain.
-     * Options are:
-     *  - [default] => value e.g. json
-     *  - [controller_ext] => boolean
-     *  - [request_chain] => such as $_REQUEST['format'] or false
-     *  - [http_accept] => boolean
-     * @param array $config
+     * @param array $opts Options are:
+     *                      - [default] => string e.g. 'json',
+     *                      - [controller_ext] => boolean,
+     *                      - [override] => false or string use $_REQUEST['format'],
+     *                      - [http_accept] => boolean.
      * @return string
      */
     public function negotiateFormat(array $opts)
     {
-        switch(true) {
+        switch (true) {
             case $opts['controller_ext']
                 && $extract = $this->extractExtension($this->route->getControllerName()):
                     $this->route->setControllerName($extract[0]);
                     $format = $extract[1];
             break;
 
-            case false !== $opts['request_chain']
-                && $format = $opts['request_chain']:
+            case false !== $opts['override']
+                && $format = $opts['override']:
             break;
 
             case $opts['http_accept']
@@ -185,7 +184,7 @@ class Server extends Listener
      * Returns the output format from controller.
      *
      * @param string A string ending wiht an extension
-     * @return string|false The output format
+     * @return array|false An array with name and extension
      */
     public function extractExtension($name)
     {
@@ -199,14 +198,14 @@ class Server extends Listener
     /**
      * Returns the output format from an HTTP Accept.
      *
-     * @param Request $request
-     * @return string The output format
+     * @param  Request $request
+     * @return string  The output format
      */
     public function getFormatFromHttpAccept(Request $request)
     {
         if ($request->hasHeader('HTTP_ACCEPT')) {
             $accept = $request->getHeader('HTTP_ACCEPT');
-            
+
             switch (true) {
                 // 'application/json'
                 case (strstr($accept, '/json')):
@@ -219,6 +218,7 @@ class Server extends Listener
                     $format = 'xml';
             }
         }
+
         return isset($format) ? $format : false;
     }
 
@@ -235,9 +235,9 @@ class Server extends Listener
     /**
      * Gets a ressource.
      *
-     * @param   string $name A resource name
-     * @return  string
-     * @throws  \InvalidArgumentException    404
+     * @param  string                    $name A resource name
+     * @return string
+     * @throws \InvalidArgumentException 404
      */
     public function getResource($name)
     {
@@ -251,8 +251,8 @@ class Server extends Listener
     /**
      * Adds a resource, sanitize, etc...
      *
-     * @param string $name The resource name
-     * @param array $resource the resource array
+     * @param  string $name     The resource name
+     * @param  array  $resource the resource array
      * @return void
      */
     public function addResource($name, array $resource)

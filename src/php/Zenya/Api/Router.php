@@ -8,7 +8,7 @@ namespace Zenya\Api;
  * @example     $rules = array('/resource/:keyname/:id' => array('controller'=>'aController', 'action'=>'anAction'));
  *              $router = Router($rules);
  *              $router->init( $_SERVER['REQUEST_URI'] ); // execute router
- *    
+ *
  * @todo    add a regex parser
  *          $r = array(
  *            '@^/resource/[\w-]+/list/(.+)/$@i' =>
@@ -117,7 +117,7 @@ class Router
      * Url mapper
      *
      * @param  string $uri
-     * @param  array $params Additional params to merge with the current set(optional)
+     * @param  array  $params Additional params to merge with the current set(optional)
      * @return void
      */
     public function map($uri, array $params=null)
@@ -165,9 +165,9 @@ class Router
     }
 
     /**
-     * Sets the current action using the current or a specified method 
+     * Sets the current action using the current or a specified method
      *
-     * @param  string $method The method to set the action (optional) 
+     * @param  string $method The method to set the action (optional)
      * @return void
      */
     public function setAction($method=null)
@@ -181,14 +181,14 @@ class Router
     }
 
     /**
-     * Returns the current or specified action 
+     * Returns the current or specified action
      *
-     * @param   string  $method    A method key (optional)
-     * @return  string
+     * @param  string $method A method key (optional)
+     * @return string
      */
     public function getAction($method=null)
     {
-        if(isset($method)) {
+        if (isset($method)) {
             return isset($this->actions[$method]) ? $this->actions[$method] : null;
         }
         if (null === $this->action) {
@@ -211,7 +211,7 @@ class Router
     /**
      * Sets the router's params
      *
-     * @param   array $params
+     * @param  array $params
      * @return void
      */
     public function setParams(array $params)
@@ -255,7 +255,7 @@ class Router
    /**
      * Checks if specified router param exist
      *
-     * @param string $key   A key to check
+     * @param  string $key A key to check
      * @return bolean
      */
     public function hasParam($key)

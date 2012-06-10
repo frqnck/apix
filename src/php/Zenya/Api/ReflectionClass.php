@@ -142,8 +142,8 @@ class ReflectionClass extends \ReflectionClass
 
     /**
      * Returns an array of resource's methods and actions
-     * 
-     * @param array $array
+     *
+     * @param  array $array
      * @return array
      */
     public function getActionsMethods(array $array=array())

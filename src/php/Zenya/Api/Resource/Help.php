@@ -9,7 +9,7 @@ use Zenya\Api\Server as Server;
  * Help
  *
  * The Help resource provides in-line referencial to the API resources and methods.
- * By specify a resource and/or method you can narrow down to specific section. 
+ * By specify a resource and/or method you can narrow down to specific section.
  *
  * @api_version 1
  */
@@ -18,8 +18,8 @@ class Help
     /**
      * Constructor
      *
-     * @param   Server  $server The resource's to retrieve
-     * @return  void
+     * @param  Server $server The resource's to retrieve
+     * @return void
      */
     public function __construct(Server $server)
     {
@@ -31,10 +31,10 @@ class Help
      *
      * Retrieve help for a specified resource/method.
      *
-     * @param   string  $resource   The resource's to retrieve
-     * @param   string  $method     The resource's method to focus upon (optional)
-     * @param   array   $filters        An array of filters (optional)
-     * @return  array
+     * @param  string $resource The resource's to retrieve
+     * @param  string $method   The resource's method to focus upon (optional)
+     * @param  array  $filters  An array of filters (optional)
+     * @return array
      *
      * @api_link GET /help/resource/method/filters
      */
@@ -59,10 +59,10 @@ class Help
      *
      * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
      *
-     * @param   string  $resource   The resource's to retrieve
-     * @param   string  $method     The resource's method to focus upon (optional)
-     * @param   array   $filters        An array of filters (optional)
-     * @return  array
+     * @param  string $resource The resource's to retrieve
+     * @param  string $method   The resource's method to focus upon (optional)
+     * @param  array  $filters  An array of filters (optional)
+     * @return array
      *
      * @api_links OPTIONS /resource/method/filters
      * @api_links OPTIONS /\*\/method/filters
@@ -76,7 +76,7 @@ class Help
 
             // return all the full api doc
             $doc = array();
-            foreach($this->server->getResources() as $key => $class) {
+            foreach ($this->server->getResources() as $key => $class) {
                 $doc[$resource] =  $this->_getHelp($key, null, $filters);
             }
 
@@ -92,9 +92,9 @@ class Help
         } else {
 
             // specific to just one resource.
-            if($resource == 'help') {
+            if ($resource == 'help') {
                 $doc = $this->_getHelp($resource, $http_method, $filters);
-            } else  {
+            } else {
                 $doc = array($resource => $this->_getHelp($resource, $http_method, $filters));
             }
 
@@ -105,7 +105,7 @@ class Help
             // $this->server->response->setHeader('Allow',
             //     implode(', ', $this->server->resource->getMethodKeys())
             // );
-            
+
         }
 
         return $doc;
@@ -114,10 +114,10 @@ class Help
     /**
      * Retrieve help for a resource
      *
-     * @param   string    $resource
-     * @param   string    $method
-     * @param   array     $filters
-     * @return  mixed    array or string on error
+     * @param  string $resource
+     * @param  string $method
+     * @param  array  $filters
+     * @return mixed  array or string on error
      * @access  private
      */
     private function _getHelp($name, $method=null, array $filters=null)
@@ -135,11 +135,11 @@ class Help
 
         $actions = $doc->getActionsMethods($this->server->route->getActions());
 
-        if(isset($method)) {
-            try{
+        if (isset($method)) {
+            try {
                 $action = $this->server->route->getAction($method);
                 $doc->parseMethodDoc($action);
-            } catch(\Exception $e) {
+            } catch (\Exception $e) {
                 $this->server->response->setHeader('Allow',
                     implode(', ', array_keys($actions))
                 );
