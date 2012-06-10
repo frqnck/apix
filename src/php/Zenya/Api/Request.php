@@ -168,18 +168,18 @@ class Request
    /**
      * Checks if specified header exist
      *
-     * @param string $key   The key
+     * @param  string $key The key
      * @return bolean
      */
     public function hasHeader($key)
     {
         return isset($this->headers[$key]);
     }
-   
+
     /**
      * Returns the specified header
      *
-     * @param string $key   The key
+     * @param  string $key The key
      * @return mixed
      */
     public function getHeader($key)
