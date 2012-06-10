@@ -154,13 +154,13 @@ class Response
      * @param  string                    $format
      * @throws \InvalidArgumentException 406
      */
-    public function setFormat($format=null)
+    public function setFormat($format, $default)
     {
-        $format = is_null($format) ? $this->format : $format;
+        $format = is_null($format) ? $default : $format;
         if (!in_array(strtolower($format), $this->getFormats())) {
-            throw new \InvalidArgumentException("Format ({$format}) not supported.", 406); // TODO: maybe 404?
+            $this->format = strtolower($default);
+            throw new \InvalidArgumentException("Format ({$format}) not supported.", 406); // maybe 404?
         }
-
         $this->format = strtolower($format);
     }
 
