@@ -31,10 +31,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetFormat()
     {
-        $this->response->setFormat('html');
+        $this->response->setFormat('html', 'default');
         $this->assertSame('html', $this->response->getFormat() );
 
-        $this->response->setFormat('XML');
+        $this->response->setFormat('XML', 'default');
         $this->assertSame('xml', $this->response->getFormat() );
     }
 
@@ -44,7 +44,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetFormatThrowsException()
     {
-        $this->response->setFormat('whatever');
+        $this->response->setFormat('whatever', 'default');
     }
 
     public function testGetSetFormats()
@@ -158,7 +158,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateAsHtml()
     {
-        $this->response->setFormat('html');
+        $this->response->setFormat('html', 'default');
         $results = array('results');
         $this->assertSame(
             '<ul><li>root: <ul><li>resource: <ul><li>0: results</li></ul></li></ul></li></ul>',
@@ -168,7 +168,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateAsJson()
     {
-        $this->response->setFormat('json');
+        $this->response->setFormat('json', 'default');
         $results = array('results');
         $this->assertSame(
             '{"root":{"resource":["results"]}}',
@@ -178,7 +178,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testGenerateAsXml()
     {
-        $this->response->setFormat('xml');
+        $this->response->setFormat('xml', 'default');
         $results = array('results');
         $this->assertSame('<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL . '<root><resource><item>results</item></resource></root>' . PHP_EOL,
             $this->response->generate('resource', $results)
