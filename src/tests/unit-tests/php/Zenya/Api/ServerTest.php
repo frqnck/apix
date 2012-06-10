@@ -60,7 +60,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $c = array(
             'default'        => 'defaultExt',
             'controller_ext' => false,
-            'request_chain'  => false,
+            'override'       => false,
             'http_accept'    => false,
         );
         $format = $this->server->negotiateFormat($c);
@@ -84,7 +84,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $c = array(
             'default'        => 'json',
             'controller_ext' => true,
-            'request_chain'  => false, #isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
+            'override'       => false, #isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
             'http_accept'    => false,
         );
 

@@ -192,7 +192,7 @@ class Response
      */
     public function setHeader($key, $value, $replace=true)
     {
-        if(!$replace && isset($this->headers[$key])) {
+        if (!$replace && isset($this->headers[$key])) {
             return;
         }
         $this->headers[$key] = $value;
