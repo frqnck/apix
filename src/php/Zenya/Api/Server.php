@@ -49,16 +49,13 @@ class Server extends Listener
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
     }
 
-    public function run()
+    public function setRouting()
     {
-        $c = &$this->config;
-
         // Get path without the route prefix
-        $path = preg_replace($c['route_prefix'], '', $this->request->getUri());
+        $path = preg_replace($this->config['route_prefix'], '', $this->request->getUri());
 
-        // Routing
         $this->route = new Router(
-            $c['routes'],
+            $this->config['routes'],
             array(
                 'method'        => $this->request->getMethod(),
                 'path'          => $path,
@@ -66,20 +63,29 @@ class Server extends Listener
                 'class_args'    => &$this, // temp!
             )
         );
+        $this->route->map($path, $this->request->getParams());
+    }
+
+    public function run()
+    {
+        $c = &$this->config;
 
         try {
-
-            $this->route->map($path, $this->request->getParams());
     
+            // Routing
+            $this->setRouting();
+
             // add the resources
             foreach($c['resources']+$c['resources_default'] as $key => $values) {
                 $this->addResource($key, $values);
             }
 
             // Set and sanittize the format of the response...
-            $this->response->setFormat(
-                $this->getNegotiatedFormat($c['format_negotiation'])
-            );
+            $this->negotiateFormat($c['format_negotiation']);
+
+            // if($c['format_negotiation']['http_accept']) {
+            //     // $this->response->setHeader('Vary', 'Accept');
+            // }
 
             // attach the early listeners @ pre-processing stage
             $this->addAllListeners('server', 'early');
@@ -139,52 +145,81 @@ class Server extends Listener
     }
 
     /**
-     * get the output format from the request chain.
+     * Returns the output format from the request chain.
      * Options are:
-     *  - [default] => json
+     *  - [default] => value e.g. json
      *  - [controller_ext] => boolean
-     *  - [request_chain] => e.g. $_REQUEST['format'] or false
+     *  - [request_chain] => such as $_REQUEST['format'] or false
      *  - [http_accept] => boolean
      * @param array $config
      * @return string
      */
-    public function getNegotiatedFormat(array $opts)
+    public function negotiateFormat(array $opts)
     {
-        // extracting from the controller name
-        if($opts['controller_ext']) {
-            $name = explode('.', $this->route->getControllerName());
-            $this->route->setControllerName($name[0]);
+        switch(true) {
+            case $opts['controller_ext']
+                && $extract = $this->extractExtension($this->route->getControllerName()):
+                    $this->route->setControllerName($extract[0]);
+                    $format = $extract[1];
+            break;
+
+            case false !== $opts['request_chain']
+                && $format = $opts['request_chain']:
+            break;
+
+            case $opts['http_accept']
+                && $format = $this->getFormatFromHttpAccept(
+                        $this->request
+                    ):
+                $this->response->setHeader('Vary', 'Accept');
+            break;
+
+            default:
+                $format = $opts['default'];
         }
 
-        // try controller extension
-        if ( $opts['controller_ext'] && count($name)>1 && end($name)!=null) {
-            $format = end($name);
-        } else if ( false !== $opts['request_chain']) {
-            $format = $opts['request_chain'];
-        } else if ( $opts['http_accept'] ) {
-            // try HTTP_ACCEPT
-           $format = null;
-            if ($this->request->hasHeader('HTTP_ACCEPT')) {
-                $this->response->setHeader('Vary', 'Accept');
-                $accept = $this->request->getHeader('HTTP_ACCEPT');
-                
-                switch (true) {
-                    // 'application/json'
-                    case (strstr($accept, '/json')):
-                        $format = 'json';
-                    break;
+        $this->response->setFormat($format, $opts['default']);
+    }
 
-                    // 'text/xml', 'application/xml'
-                    case (strstr($accept, '/xml')
-                        && (!strstr($accept, 'html'))):
-                        $format = 'xml';
-                    break;
+    /**
+     * Returns the output format from controller.
+     *
+     * @param string A string ending wiht an extension
+     * @return string|false The output format
+     */
+    public function extractExtension($name)
+    {
+        $name = explode('.', $name);
 
-                }
+        return count($name)>1 && end($name)!=null
+            ? array($name[0], end($name))
+            : false;
+    }
 
+    /**
+     * Returns the output format from an HTTP Accept.
+     *
+     * @param Request $request
+     * @return string The output format
+     */
+    public function getFormatFromHttpAccept(Request $request)
+    {
+        if ($request->hasHeader('HTTP_ACCEPT')) {
+            $accept = $request->getHeader('HTTP_ACCEPT');
+            
+            switch (true) {
+                // 'application/json'
+                case (strstr($accept, '/json')):
+                    $format ='json';
+                break;
+
+                // 'text/xml', 'application/xml'
+                case (strstr($accept, '/xml')
+                    && (!strstr($accept, 'html'))):
+                    $format = 'xml';
             }
         }
-        return is_null($format) ? $opts['default'] : $format;
+        return isset($format) ? $format : false;
     }
 
     /**
