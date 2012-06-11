@@ -52,7 +52,8 @@ class Config #extends Pimple
                 //     'controller' => 'Category',
                 // ),
 
-                '/:controller/:resource/:param2' => array(
+                '/:controller/:param1/:param2' => array(
+                    #function() {echo '------ss';},
                     #'controller' => 'BlankResource',
                     #'class_name' => 'Zenya\Api\Fixtures\BlankResource',
                     #'class_args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
