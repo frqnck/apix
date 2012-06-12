@@ -34,12 +34,11 @@ class Html extends Adapter
      */
     public function encode(array $data, $rootNode='root')
     {
-        $out = $this->_recursivelyAppend(array($rootNode=>$data));
-        if (extension_loaded('tidy')) {
-            return $this->validate($out);
-        } else {
-            return $out;
-        }
+        return $this->validate(
+            $this->_recursivelyAppend(
+                array($rootNode => $data)
+            )
+        );
     }
 
     protected function _recursivelyAppend(array $results)
@@ -57,22 +56,25 @@ class Html extends Adapter
 
     protected function validate($html)
     {
-        $tidy = new \tidy();
-        $conf = array(
-            // PHP Bug: commenting out 'indent' (with true or false)
-            // for some weird reason does chnage the Transfer-Encoding!
-            'indent'			=> true,
-            'tidy-mark'			=> false,
-            'clean'				=> true,
-            'output-xhtml'		=> false,
-            'show-body-only'	=> true,
-        );
-        $tidy->parseString($html, $conf, 'UTF8');
-        $tidy->cleanRepair();
+        if (extension_loaded('tidy')) {
+            $tidy = new \tidy();
+            $conf = array(
+                // PHP Bug: commenting out 'indent' (with true or false)
+                // for some weird reason does chnage the Transfer-Encoding!
+                'indent'			=> true,
+                'tidy-mark'			=> false,
+                'clean'				=> true,
+                'output-xhtml'		=> false,
+                'show-body-only'	=> true,
+            );
+            $tidy->parseString($html, $conf, 'UTF8');
+            $tidy->cleanRepair();
 
-        return $tidy->value; // with DOCTYPE
-        #return $tidy->html()->value;
-        #return tidy_get_output($tidy);
+            $html = $tidy->value; // with DOCTYPE
+            #return $tidy->html()->value;
+            #return tidy_get_output($tidy);
+        }
+        return $html;
     }
 
 }
