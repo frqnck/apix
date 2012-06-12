@@ -160,8 +160,27 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->response->setFormat('html', 'default');
         $results = array('results');
+
+        // maybe use Zenya\Api\Output\Html::validate($str);
+        if (extension_loaded('tidy')) {
+            $html = "<ul>
+  <li>root:
+    <ul>
+      <li>resource:
+        <ul>
+          <li>0: results
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>";
+        } else {
+            $html = '<ul><li>root: <ul><li>resource: <ul><li>0: results</li></ul></li></ul></li></ul>';
+        }
+
         $this->assertSame(
-            '<ul><li>root: <ul><li>resource: <ul><li>0: results</li></ul></li></ul></li></ul>',
+            $html,
             $this->response->generate('resource', $results)
         );
     }
@@ -180,7 +199,16 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->response->setFormat('xml', 'default');
         $results = array('results');
-        $this->assertSame('<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL . '<root><resource><item>results</item></resource></root>' . PHP_EOL,
+
+        // maybe use Zenya\Api\Output\Xml::validate($str);
+        if (extension_loaded('tidy')) {
+            $xml = "<root>\n  <resource>\n    <item>results</item>\n  </resource>\n</root>";
+        } else {
+            $xml = '<root><resource><item>results</item></resource></root>' . PHP_EOL;
+        }
+
+        $this->assertSame(
+            '<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL . $xml,
             $this->response->generate('resource', $results)
         );
     }

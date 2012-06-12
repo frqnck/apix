@@ -54,7 +54,9 @@ class Xml extends Adapter
         $Xml = new \SimpleXMLElement($str);
         $this->arrayToXml($Xml, $data);
 
-        return $this->validate($Xml->asXML());
+        return $this->validate(
+            $Xml->asXML()
+        );
     }
 
     /**

@@ -74,7 +74,7 @@ class Resource extends Listener
         $this->actions = $refClass->getActionsMethods($route->getActions());
 
 // TODO: merge with TEST & OPTIONS ???
-Server::d( $this->actions );
+###Server::d( $this->actions );
 
         // if( !in_array($route->getMethod(), array('OPTIONS')) )
         // {

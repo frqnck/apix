@@ -130,7 +130,6 @@ class Router
             $params = $this->ruleMatch($k, $uri);
             if ($params) {
                 $this->setMainProperties($rules, $params);
-
                 return;
             }
         }
@@ -148,14 +147,14 @@ class Router
         $ruleItems = explode('/', $rule);
         $paths = explode('/', $url);
         $result = array();
-        foreach ($ruleItems as $k => $v) {
-            if (preg_match('/^:[\w]{1,}$/', $v)) {
-                $v = substr($v,1);
-                if (isset($paths[$k])) {
-                    $result[$v] = $paths[$k];
+        foreach ($ruleItems as $key => $value) {
+            if (preg_match('/^:[\w]{1,}$/', $value)) {
+                $value = substr($value, 1);
+                if (isset($paths[$key])) {
+                    $result[$value] = $paths[$key];
                 }
             } else {
-                if (strcmp($v, $paths[$k]) != 0) {
+                if (strcmp($value, $paths[$key]) != 0) {
                     return false;
                 }
             }
