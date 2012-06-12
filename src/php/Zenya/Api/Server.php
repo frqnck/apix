@@ -9,6 +9,8 @@ class Server extends Listener
     private $config = array();
     private $resources = array();
 
+    public $route = null;
+
     public function __construct(array $resources=null, array $config=array())
     {
 
@@ -49,39 +51,24 @@ class Server extends Listener
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
     }
 
-    public function setRouting(Request $request)
-    {
-        // Get path without the route prefix
-        $path = preg_replace($this->config['route_prefix'], '', $request->getUri());
-
-        $this->route = new Router(
-            $this->config['routes'],
-            array(
-                'method'        => $request->getMethod(),
-                'path'          => $path,
-                'class_name'    => null,
-                'class_args'    => &$this, // temp!
-            )
-        );
-        $this->route->map($path, $request->getParams());
-    }
-
     public function run()
     {
         $c = &$this->config;
 
+        // Routing
+        $this->setRouting($this->request);
+
+        $defaultRoute = array(
+            'class_name'=>'\stdClass',
+            'class_args' => $this->route->class_args
+        );
+
+        // add the resources
+        foreach ($c['resources']+$c['resources_default'] as $key => $values) {
+            $this->addResource($key, $values, $defaultRoute);
+        }
+
         try {
-
-            // Routing
-           $this->setRouting($this->request);
-
-            // add the resources
-            foreach ($c['resources']+$c['resources_default'] as $key => $values) {
-                $this->addResource($key, $values);
-            }
-
-            // TODO: review!!! Set and sanittize the format of the response...
-            $this->negotiateFormat($c['format_negotiation']);
 
             // if ($c['format_negotiation']['http_accept']) {
             //     // $this->response->setHeader('Vary', 'Accept');
@@ -145,6 +132,44 @@ class Server extends Listener
     }
 
     /**
+     * Set the route.
+     *
+     * @param  Request $request
+     * @return void
+     */
+    public function setRouting(Request $request)
+    {
+
+        echo 'dd' . $request->getUri() . 'dd';exit;
+        // Get path without the route prefix
+        $path = preg_replace($this->config['route_prefix'], '', $request->getUri());
+
+        $this->route = new Router(
+            $this->config['routes'],
+            array(
+                'method'        => $request->getMethod(),
+                'path'          => $path,
+                'class_name'    => null,
+                'class_args'    => &$this, // temp!
+            )
+        );
+
+        // check extension
+        if($this->config['format_negotiation']['controller_ext']) {
+            $parts = explode('/', $path);
+            $ext = pathinfo($parts[1], PATHINFO_EXTENSION);
+            if($ext != null) {
+                $path = preg_replace('/\.' . $ext . '/', '', $path, 1);
+            }
+        }
+
+        // Set the response format...
+        $this->negotiateFormat($this->config['format_negotiation'], $ext);
+
+        $this->route->map($path, $request->getParams());
+    }
+
+    /**
      * Returns the output format from the request chain.
      * @param array $opts Options are:
      *                      - [default] => string e.g. 'json',
@@ -153,13 +178,11 @@ class Server extends Listener
      *                      - [http_accept] => boolean.
      * @return string
      */
-    public function negotiateFormat(array $opts)
+    public function negotiateFormat(array $opts, $extension=false)
     {
         switch (true) {
             case $opts['controller_ext']
-                && $extract = $this->extractExtension($this->route->getControllerName()):
-                    $this->route->setControllerName($extract[0]);
-                    $format = $extract[1];
+                && $format = $extension:
             break;
 
             case false !== $opts['override']
@@ -178,21 +201,6 @@ class Server extends Listener
         }
 
         $this->response->setFormat($format, $opts['default']);
-    }
-
-    /**
-     * Returns the output format from controller.
-     *
-     * @param string A string ending wiht an extension
-     * @return array|false An array with name and extension
-     */
-    public function extractExtension($name)
-    {
-        $name = explode('.', $name);
-
-        return count($name)>1 && end($name)!=null
-            ? array($name[0], end($name))
-            : false;
     }
 
     /**
@@ -255,10 +263,10 @@ class Server extends Listener
      * @param  array  $resource the resource array
      * @return void
      */
-    public function addResource($name, array $resource)
+    public function addResource($name, array $resource, array $defaultClass=null)
     {
         if (! isset($resource['class_name']) ) {
-            $resource['class_name'] = '\stdClass';
+            $resource['class_name'] = $defaultClass['class_name'];
             //throw new \InvalidArgumentException("todo: Resource missing a class name.", 500);
         }
 
@@ -267,7 +275,7 @@ class Server extends Listener
 
         $class->args = isset($resource['class_args'])
             ? $resource['class_args']    // use provided
-            : $this->route->class_args;  // use route's default
+            : $defaultClass['class_args']; // use route's default
 
         $this->resources[$name] = $class;
     }
