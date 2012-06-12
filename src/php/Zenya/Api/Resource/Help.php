@@ -69,7 +69,7 @@ class Help
      */
     public function onHelp($resource, $http_method=null, array $filters=null)
     {
-        echo "onHelp";Server::d(func_get_args());
+        #echo "onHelp";Server::d(func_get_args());
 
         // apply to the whole server
         if ($this->server->route->path == '/*') {

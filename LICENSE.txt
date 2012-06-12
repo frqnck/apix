@@ -1,10 +1,7 @@
-(We recommend that all PHP components are released under the BSD license
-for maximum re-use. Replace this file if you want to use an alternative license)
-
 New BSD License
 ===============
 
-Copyright (c) <year>, <your name>
+Copyright (c) 2012, Franck Cassedanne
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

@@ -22,14 +22,40 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->markTestIncomplete(
             'This test has not been implemented yet.'
         );
+        #$this->server->run();
+    }
+
+    public function testRun()
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
         $this->server->run();
     }
 
-    public function testExtractExtension()
+    public function testSetRouting()
     {
-        $this->assertSame(array('foo', 'bar'), $this->server->extractExtension('foo.bar'));
-        $this->assertSame(array('f', 'bar'), $this->server->extractExtension('f.o.o.bar'));
-        $this->assertSame(false, $this->server->extractExtension('foobar'));
+        $m = $this->getMock('Zenya\Api\Request');
+
+        $m->expects($this->any())
+            ->method('getUri')
+            ->will($this->returnValue('/test.php'));
+
+        $m->expects($this->any())
+            ->method('getMethod')
+            ->will($this->onConsecutiveCalls('GET', 'POST', 'PUT', 'OPTIONS' ));
+
+        $this->assertObjectHasAttribute('route', $this->server);
+        $this->assertSame(null, $this->server->route);
+
+        $this->server->setRouting(new $m);
+        $this->assertInstanceOf('Zenya\Api\Router', $this->server->route);
+
+       # $this->assertSame('Zenya\Api\Router', $this->server->path);
+
+        #$this->assertSame(array('foo', 'bar'), $this->server->extractExtension('foo.bar'));
+        #$this->assertSame(array('f', 'bar'), $this->server->extractExtension('f.o.o.bar'));
+        #$this->assertSame(false, $this->server->extractExtension('foobar'));
     }
 
     public function testGetFormatFromHttpAccept()
