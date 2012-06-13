@@ -71,6 +71,9 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->response->setHeader('Vary', 'Accept-Encoding', false);
         $this->response->setHeader('X-HTTP-Method-Override', 'PUT');
+
+        $this->assertSame('PUT', $this->response->getHeader('X-HTTP-Method-Override'));
+
         $this->assertSame(
             $headers,
             $this->response->getHeaders()
