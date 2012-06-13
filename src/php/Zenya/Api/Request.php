@@ -38,13 +38,12 @@ class Request
         #print_r($request->get());
         #exit;
 
-        $this->setUri();
         $this->setHeaders();
         $this->setParams();
-        $this->setBody();
+        #$this->setBody();
     }
 
-    private function __clone() {}
+    //private function __clone() {}
 
     public function getUri()
     {
@@ -204,7 +203,7 @@ class Request
     public function setHeaders(array $headers = null)
     {
         if (null === $headers) {
-            #$params = http_get_request_headers();
+            #$headers = http_get_request_headers();
             $headers = $_SERVER;
         }
         $this->headers = $headers;
@@ -225,11 +224,14 @@ class Request
         return empty($ip) ? $this->getHeader('REMOTE_ADDR') : $ip;
     }
 
+    public $_fileIn = 'php://input';
+
     public function setBody($body = null)
     {
         if (null === $body) {
-            #$body = http_get_request_body();
-            $body = @file_get_contents('php://input');
+            echo $this->_fileIn;
+            echo $body = file_get_contents($this->_fileIn);
+            //$body = $this->getRawBody();
         }
         $this->body = $body;
     }
@@ -237,6 +239,8 @@ class Request
     public function getRawBody()
     {
         return $this->body;
+        #$body = http_get_request_body();
+        return file_get_contents($this->_fileIn);
     }
 
     public function getBody()

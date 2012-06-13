@@ -33,14 +33,39 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetUri()
     {
-#        $this->request->setUri();
         $this->assertSame('/', $this->request->getUri() );
         $this->request->setUri('/qwerty/');
         $this->assertSame('/qwerty', $this->request->getUri() );
-        // todo: $_SERVER['HTTP_X_REWRITE_URL']
+    }        
 
-        $this->request->setHeader('X-HTTP-Method-Override', 'head');
+    /**
+     * @dataProvider headersProvider
+    */
+    public function testGetUriWithHttpHeaders($str)
+    {
+        $_SERVER[$str] = "/$str";
+        $this->request->setUri();
+        $this->assertSame($_SERVER[$str], $this->request->getUri());
+        $_SERVER[$str] = null;
+    }
 
+    public function headersProvider()
+    {
+        return array(
+            array('HTTP_X_REWRITE_URL'),
+            array('REQUEST_URI'),
+            array('PATH_INFO'),
+            array('ORIG_PATH_INFO')
+        );
+    }
+
+    public function testGetUriWithIIS_WasUrlRewritten()
+    {
+        $_SERVER['IIS_WasUrlRewritten'] = '1';
+        $_SERVER['UNENCODED_URL'] = '/IIS_WasUrlRewritten';
+        $this->request->setUri();
+        $this->assertSame('/IIS_WasUrlRewritten', $this->request->getUri());
+        $_SERVER['UNENCODED_URL'] = null;
     }
 
     public function testGetSetParam()
@@ -101,6 +126,21 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->request->setHeader('HTTP_CLIENT_IP', '3.');
         $this->assertSame('3.', $this->request->getIp() );
+    }
+
+    public function testSetBody()
+    {
+        //$this->request->setBody();
+        //$this->assertSame('', $this->request->getBody());
+        
+        $this->request->_fileIn = APP_TESTDIR . '/Zenya/Api/Fixtures/body.txt';
+        //$this->request->setBody();
+       // $this->assertSame('hello', $this->request->getBody());
+
+/// here!!!!!
+            echo $body = file_get_contents(APP_TESTDIR . '/Zenya/Api/Fixtures/body.txt');
+
+
     }
 
         protected $data = <<<DATA

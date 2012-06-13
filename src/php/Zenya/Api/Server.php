@@ -49,8 +49,6 @@ class Server extends Listener
         // to be passed thru the constructor!!!
         $this->setconfig['resources'] = array(
 
-
-
         );
 #d($config->getResources());
         // add the resources
@@ -153,9 +151,9 @@ class Server extends Listener
         $path = preg_replace($opts['route_prefix'], '', $request->getUri());
 
         // check controller_ext
-        if($opts['controller_ext']) {
+        if ($opts['controller_ext']) {
             $parts = explode('/', $path);
-            if($ext = pathinfo(isset($parts[1])?$parts[1]:$parts[0], PATHINFO_EXTENSION)) {
+            if ($ext = pathinfo(isset($parts[1])?$parts[1]:$parts[0], PATHINFO_EXTENSION)) {
                 $path = preg_replace('/\.' . $ext . '/', '', $path, 1);
             }
         } else {
