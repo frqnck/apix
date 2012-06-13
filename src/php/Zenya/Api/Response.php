@@ -201,14 +201,12 @@ class Response
     /**
      * Gets a specified header.
      *
-     * @param string $key
+     * @param  string $key
      * @return string
      */
     public function getHeader($key)
     {
-        if (isset($this->headers[$key])) {
-            return $this->headers[$key];
-        }
+        return isset($this->headers[$key]) ? $this->headers[$key] : null;
     }
 
     /**
