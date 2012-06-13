@@ -106,9 +106,16 @@ class Router
     public function setMainProperties(array $rules, array $params)
     {
         foreach (array_keys($this->_defaults) as $k) {
-            $this->$k = isset($rules[$k])?$rules[$k]	// rules
-                : (isset($params[$k])?$params[$k]		// params
-                : $this->_defaults[$k]);				// defaults
+            $value = isset($rules[$k]) ? $rules[$k]	// rules
+                : (isset($params[$k]) ? $params[$k]	// params
+                : $this->_defaults[$k]);			// defaults
+
+            if(property_exists($this, $k)) {
+                $this->$k = $value;
+            } else {
+                echo 'TEMP';
+                $this->temp->$k = $value;
+            }
         }
         $this->params = $params;
     }
@@ -154,7 +161,7 @@ class Router
                     $result[$value] = $paths[$key];
                 }
             } else {
-                if (strcmp($value, $paths[$key]) != 0) {
+                if (!isset($paths[$key]) || strcmp($value, $paths[$key]) != 0) {
                     return false;
                 }
             }
