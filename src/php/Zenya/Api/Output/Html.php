@@ -74,6 +74,7 @@ class Html extends Adapter
             #return $tidy->html()->value;
             #return tidy_get_output($tidy);
         }
+
         return $html;
     }
 

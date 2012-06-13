@@ -110,7 +110,7 @@ class Router
                 : (isset($params[$k]) ? $params[$k]	// params
                 : $this->_defaults[$k]);			// defaults
 
-            if(property_exists($this, $k)) {
+            if (property_exists($this, $k)) {
                 $this->$k = $value;
             } else {
                 echo 'TEMP';
@@ -137,6 +137,7 @@ class Router
             $params = $this->ruleMatch($k, $uri);
             if ($params) {
                 $this->setMainProperties($rules, $params);
+
                 return;
             }
         }
