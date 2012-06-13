@@ -149,7 +149,7 @@ class Response
     }
 
     /**
-     * Set the current format
+     * Sets the output format.
      *
      * @param  string                    $format
      * @throws \InvalidArgumentException 406
@@ -165,7 +165,7 @@ class Response
     }
 
     /**
-     * Get all the response formats available.
+     * Returns all the response formats available.
      *
      * @return array
      */
@@ -175,7 +175,7 @@ class Response
     }
 
     /**
-     * Set all the response formats available.
+     * Sets all the response formats available.
      *
      * @return void
      */
@@ -185,7 +185,7 @@ class Response
     }
 
     /**
-     * Set/store a HTTP header.
+     * Sets a header.
      *
      * @param string $key
      * @param string $value
@@ -199,7 +199,20 @@ class Response
     }
 
     /**
-     * Set/store a HTTP header.
+     * Gets a specified header.
+     *
+     * @param string $key
+     * @return string
+     */
+    public function getHeader($key)
+    {
+        if (isset($this->headers[$key])) {
+            return $this->headers[$key];
+        }
+    }
+
+    /**
+     * Returns the header array.
      *
      * @param string $key
      * @param string $value
@@ -210,7 +223,7 @@ class Response
     }
 
     /**
-     * Set all the HTTP headers
+     * Sends the headers thru HTTP.
      *
      * header('Cache-Control: no-cache, must-revalidate');    // HTTP/1.1
      * header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');  // Date in the past
@@ -232,6 +245,10 @@ class Response
         return $out;
     }
 
+    /**
+     * Sends one header thru HTTP
+     * @param vary
+     */
     public function sendHeader()
     {
         $args = func_get_args();
@@ -242,7 +259,7 @@ class Response
     }
 
     /**
-     * Get all the response formats available.
+     * Returns all the response formats available.
      *
      * @return array
      */
@@ -252,7 +269,7 @@ class Response
     }
 
     /**
-     * Set the current HTTP code.
+     * Sets the current HTTP code.
      *
      * @param  integer $int
      * @return void
@@ -263,7 +280,7 @@ class Response
     }
 
     /**
-     * Get the current HTTP code.
+     * Gets the current HTTP code.
      *
      * @return intger
      */
@@ -273,7 +290,7 @@ class Response
     }
 
     /**
-     * Get an HTTP status phrase.
+     * Returns an HTTP status phrase.
      *
      * @param  integer $httpCode
      * @param  bolean  $long
@@ -338,7 +355,7 @@ class Response
     }
 
     /**
-     * Generate the response & send the headers...
+     * Generates the response & send the headers...
      *
      * @param  array  $results
      * @param  string $versionString

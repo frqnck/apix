@@ -44,6 +44,8 @@ class Request
         $this->setBody();
     }
 
+    private function __clone() {}
+
     public function getUri()
     {
         if (null === $this->uri) {
@@ -97,7 +99,11 @@ class Request
     }
 
     /**
-     * alnum, alpha, digit
+     * Gets a pspecified param.
+     *
+     * @param  string $key
+     * @param  string $filter POSIX character classes e.g. alnum, alpha, digit.
+     * @return mixed
      */
     public function getParam($key, $filter=null)
     {

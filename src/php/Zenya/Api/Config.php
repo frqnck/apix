@@ -2,7 +2,7 @@
 
 namespace Zenya\Api;
 
-class Config #extends Pimple
+class Config #extends \Pimple
 {
 
     private $config = array();
@@ -12,6 +12,31 @@ class Config #extends Pimple
     {
         $this->config = $config+$this->getDefaults();
         #Server::d($this->config);
+
+        #print_r($this->config['resources']);
+
+    }
+
+    public function getConfig($key=null)
+    {
+        if(is_null($key)) {
+            return $this->config;
+        } else if(isset($this->config[$key])) {
+            return $this->config[$key];
+        } else {
+            throw new \InvalidArgumentException(sprintf('Config for "%s" does not exists.', $key));
+        }
+    }
+
+    public function getResources()
+    {
+        #$this->config['resources_default']['help']['class_args'] = $this->injected['server'];
+        return $this->config['resources']+$this->config['resources_default'];
+    }
+
+    public function getRoutes()
+    {
+        return $this->config['routes']+$this->config['routes_default'];
     }
 
     public function injet($key, $mixed)
@@ -19,12 +44,8 @@ class Config #extends Pimple
         return $this->injected[$key] = $mixed;
     }
 
-    public function getConfig()
-    {
-        #$this->config['resources_default']['help']['class_args'] = $this->injected['server'];
 
-        return $this->config;
-    }
+
 
     public function getDefaults()
     {
@@ -33,12 +54,19 @@ class Config #extends Pimple
             'version'   => '1.0',
 
             // output
-            'rootNode' => 'zenya',
-            'sign'  => true,
-            'debug' => true,
+            'rootNode'  => 'zenya',
+            'sign'      => true,
+            'debug'     => true,
 
-            // routes
-            'route_prefix' => '@^(/index.php)?/api/v(\d*)@i', // regex
+            // routing
+            'options' => array(
+                'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+                'default_format'    => 'json',
+                // following is use for output format negociation
+                'controller_ext'    => true, // true or false (e.g. resource.json)
+                'format_override'   => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
+                'http_accept'       => true, // true or false
+            ),
 
             'routes' => array(
                 #/:controller/paramName/:paramName/:id' => array(),
@@ -59,13 +87,7 @@ class Config #extends Pimple
                     #'class_args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
                 )
             ),
-            // format negociation
-            'format_negotiation' => array(
-                'default'        => 'json',
-                'controller_ext' => true, // true or false (e.g. resource.json)
-                'override'       => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
-                'http_accept'    => true, // true or false
-            ),
+            'routes_default' => array(),
 
             // listeners
             'listeners' => array(
@@ -90,7 +112,19 @@ class Config #extends Pimple
                 ),
 
             // resources definition
-            'resources' => null, // user defined
+            'resources' => array(            // 'test' => array(
+            //     'class_args'=>array('arg1'=>'value1', 'arg2'=>'string')
+            // ),
+
+            'resourceName' => array(
+                'class_name' => 'Zenya\Api\Fixtures\BlankResource',
+                'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
+            ),
+
+            'someName' => array(
+                'class_name' => 'Zenya\Api\Fixtures\BlankResource',
+                #'class_args' => array('test')
+            )), // user defined
 
             'resources_default' => array(
                 // OPTIONS
