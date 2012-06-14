@@ -14,56 +14,10 @@ class Authorization_HTTP_Digest extends Authorization
     public $secretKey = 'secretKey--&@72';
 
     /**
-     * @var string The authentication realm.
-     */
-    public $realm = null;
-
-    /**
-     * The digest opaque value
-     *
-     * @var string The opaque value
-     */
-    public $opaque = 'opaque';
-
-    /**
-     * The base url of the application to authenticate against.
-     *
-     * @var string The base url for the authentication of the application.
-     */
-    public $baseUrl = '/';
-
-    /**
-     * The life length of the nonce value.
-     *
-     * @var integer The nonce life length.
-     */
-    public $nonceLife = 300;
-
-    /**
-     * This variable is used to define whether or not the passwords
-     * should be A1 hashed.
-     *
-     * @var boolean True or False.
-     */
-    public $passwordsHashed = true;
-
-    /**
      * This variable contains the parsed digest data
      */
     protected $digest = null;
 
-    /**
-     * Constructor
-     *
-     * The constructor that sets the $this->realm
-     *
-     * @param string $realm Perhaps a custom realm. Default is null so the
-     *                      realm will be $_SERVER['SERVER_NAME']
-     */
-    public function __construct($realm = null)
-    {
-        $this->realm = $realm !== null ? $realm : $_SERVER['SERVER_NAME'];
-    }
 
     /**
      * Use a custom secret key.
@@ -80,40 +34,8 @@ class Authorization_HTTP_Digest extends Authorization
          $this->secretKey = $secretKey;
     }
 
-    /**
-     * Get the nonce
-     *
-     * This method returns the hashed value of a mix of the nonce
-     * with the lifetime, the user remote addr and the secret key.
-     *
-     * @return string A hashed md5 value of the noncelife+remoteaddr+secretKey
-     */
-    public function getNonce()
-    {
-        $time = ceil(time() / $this->nonceLife) * $this->nonceLife;
-        $remoteAddress = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ?
-            $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
-        return hash(
-            'md5',
-            date('Y-m-d H:i', $time) . ':' .
-                $remoteAddress . ':' .
-                $this->secretKey
-        );
-    }
 
-    /**
-     * Get the opaque
-     *
-     * This method returns the opaque value hashed in
-     * an md5.
-     *
-     * @return string $this->opaque hashed in md5.
-     */
-    public function getOpaque()
-    {
-        return hash('md5', $this->opaque);
-    }
 
     /**
      * Authorize the request
@@ -156,23 +78,23 @@ class Authorization_HTTP_Digest extends Authorization
         return $this->send();
     }
 
-    protected function _parseDigest($string)
+    protected function _parseDigest($digest)
     {
         // username="test", realm="test.dev", nonce="e8ae165a8fa2a10bb09303012556952c", uri="/", response="dcfe5fb7a2e3160155dc46f5eb590035", opaque="94619f8a70068b2591c2eed622525b0e", algorithm="MD5", cnonce="f976912c5322bfc760a13155b254d5b3", nc=00000001, qop="auth"
         /*
-        echo $string;
-        preg_match('/username="([^"]+)", realm="([^"]+)", nonce="([^"]+)"/', $string, $m);
+        echo $digest;
+        preg_match('/username="([^"]+)", realm="([^"]+)", nonce="([^"]+)"/', $digest, $m);
         echo '<hr>';
         echo "<pre>";
         print_r($m);
         exit;
         */
 
-        if (preg_match('/username="([^"]+)"/', $string, $username)
-            && preg_match('/[,| ]nonce="([^"]+)"/', $string, $nonce)
-            && preg_match('/response="([^"]+)"/', $string, $response)
-            && preg_match('/opaque="([^"]+)"/', $string, $opaque)
-            && preg_match('/uri="([^"]+)"/', $string, $uri))
+        if (preg_match('/username="([^"]+)"/', $digest, $username)
+            && preg_match('/[,| ]nonce="([^"]+)"/', $digest, $nonce)
+            && preg_match('/response="([^"]+)"/', $digest, $response)
+            && preg_match('/opaque="([^"]+)"/', $digest, $opaque)
+            && preg_match('/uri="([^"]+)"/', $digest, $uri))
         {
             $this->digest = compact('username', 'nonce', 'response', 'opaque', 'uri');
             $this->digest['username'] = $this->digest['username'][1];
@@ -188,6 +110,7 @@ class Authorization_HTTP_Digest extends Authorization
         echo $requestURI = $_SERVER['REQUEST_URI'];
         #$_SERVER['X_FRAPI_AUTH_USER'] = $this->digest['username'];
 
+        // hack for IE which does not pass querystring in URI element of Digest string or in response hash
         if (strpos($requestURI, '?') !== false) {
             $requestURI = substr($requestURI, 0, strlen($this->digest['uri'][1]));
         }
@@ -225,33 +148,11 @@ class Authorization_HTTP_Digest extends Authorization
         return $this->send();
     }
 
-    /**
-     * Send the Authentication digest
-     *
-     * This method is used to send the authentication
-     * negotiation and request the authentication headers
-     * from the clients.
-     *
-     * @return void
-     */
-    public function send()
-    {
-        header(
-            'WWW-Authenticate: Digest ' .
-            'realm="' . $this->realm . '", ' .
-            'domain="' . $this->baseUrl . '", ' .
-            'qop=auth, '.
-            'algorithm=MD5, ' .
-            'nonce="' . $this->getNonce() . '", ' .
-            'opaque="' . $this->getOpaque() . '"'
-        );
 
-        header('HTTP/1.1 401 Unauthorized');
-        echo 'HTTP Digest Authentication required for "' . $this->realm . '"';
-        exit(0);
-    }
 
 }
+
+
 
 ////////////////////////////////////////////
 

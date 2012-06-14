@@ -53,7 +53,7 @@ class BlankResource #extends ResourceAbstract
      * @param  mixed  $optional
      * @return array
      */
-    public function onRead($param1, $param2, $optional=null)
+    public function onRead($param1, $param2=null, $optional=null)
     {
         return array(
             'class' 			=> __CLASS__,

@@ -8,6 +8,27 @@ class Config #extends \Pimple
     private $config = array();
     private $injected = array();
 
+    /**
+     * The singleton instance
+     * @var ExtensionGuesser
+     */
+    static private $instance = null;
+
+    /**
+     * Returns as a singleton instance
+     *
+     * @return ExtensionGuesser
+     */
+    static public function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+
     public function __construct(array $config=array())
     {
         $this->config = $config+$this->getDefaults();
@@ -23,9 +44,8 @@ class Config #extends \Pimple
             return $this->config;
         } elseif (isset($this->config[$key])) {
             return $this->config[$key];
-        } else {
-            throw new \InvalidArgumentException(sprintf('Config for "%s" does not exists.', $key));
         }
+       throw new \InvalidArgumentException( sprintf('Config for "%s" does not exists.', $key) );
     }
 
     public function getResources()
@@ -89,18 +109,40 @@ class Config #extends \Pimple
 
             // listeners
             'listeners' => array(
-                // pre-processing stage
-                'early' => array(
-                    'new Listener\Auth',
-                    'new Listener\Acl',
-                    'new Listener\Log',
-                    'new Listener\Mock'
+                'server' => array(
+                    // pre-processing stage
+                    'early' => array(
+                        #'Zenya\Api\Listener\Mock',
+                    ),
+                    // post-processing stage
+                    'late'=>array(),
+                    // errors and exceptions
+                    'exception' => array(
+                        #'Zenya\Api\Listener\Log' => array('php://output'),
+                    )
                 ),
+                'request' => array(
+                    #'Zenya\Api\Listener\Log',
+                ),
+                'resource' => array(
+                    'early' => array(
+                        'Zenya\Api\Listener\Auth' => function()
+                        {
+                            return new \Zenya\Api\Listener\Auth\Digest;
+                        },
 
-                // post-processing stage
-                'late'=>array(
-                    'new Listener\Log',
+                        #'Zenya\Api\Listener\CheckIp' => null,
+                        #'Zenya\Api\Listener\Acl',
+                        #'Zenya\Api\Listener\Log',
+                        #'Listener\Log',
+                    ),
+                    // post-processing stage
+                    'late'=>array(
+                        #'Zenya\Api\Listener\Mock',
+                        #'Zenya\Api\Listener\Log' => array('php://output'),
+                    ),
                 ),
+                'response' => array(),
             ),
 
             // auth shoud be in listeners (todo: DIC)
@@ -109,10 +151,8 @@ class Config #extends \Pimple
                     #'type'=>'Digest',
                 ),
 
-            // resources definition
-            'resources' => array(),
-
-            'resourcesOff' => array(
+            // resources user defined (move out)
+            'resources' => array(
                 // 'test' => array(
                 //     'class_args'=>array('arg1'=>'value1', 'arg2'=>'string')
                 // ),
@@ -127,6 +167,10 @@ class Config #extends \Pimple
                 )
             ),
 
+            // resources minimal
+            #'resources' => array(),
+
+            // default
             'resources_default' => array(
                 // OPTIONS
                 'help' => array(

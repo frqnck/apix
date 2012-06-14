@@ -11,14 +11,23 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
-    public function testGetConfig()
+    public function testGetConfigStartsAsAnEmptyArray()
     {
         $this->config = new Config;
-        $this->assertSame(array(), $this->config->getConfig('resources'));
+        $this->assertEquals(array(), $this->config->getConfig('resources'));
+    }
+
+    public function testGetConfigStartsHasDefaultResource()
+    {
+        $this->config = new Config;
         $this->assertArrayHasKey('resources_default', $this->config->getConfig());
+    }
+
+    /**
+     * @expectedException   InvalidArgumentException
+     */
+    public function testGetConfigThrowsInvalidArgumentException()
+    {
         $this->config->getConfig('non-existant');
     }
 

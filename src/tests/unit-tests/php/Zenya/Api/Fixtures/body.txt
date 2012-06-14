@@ -1,1 +1,1 @@
-test-bofy
+body1=value1&body2=value2
