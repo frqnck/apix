@@ -112,10 +112,11 @@ class Router
 
             if (property_exists($this, $k)) {
                 $this->$k = $value;
-            } else {
-                echo 'TEMP';
-                $this->temp->$k = $value;
             }
+            // else {
+            //     echo 'TEMP';
+            //     $this->temp->$k = $value;
+            // }
         }
         $this->params = $params;
     }

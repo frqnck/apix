@@ -15,10 +15,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->request = new Request;
     }
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
     protected function tearDown()
     {
         unset($this->request);
@@ -36,7 +32,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('/', $this->request->getUri() );
         $this->request->setUri('/qwerty/');
         $this->assertSame('/qwerty', $this->request->getUri() );
-    }        
+    }
 
     /**
      * @dataProvider headersProvider
@@ -91,23 +87,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetMethod()
     {
-        $this->request->setMethod(null);
         $this->assertSame('GET', $this->request->getMethod() );
 
+
         $_SERVER['REQUEST_METHOD'] = 'REQUEST_METHOD';
-        $this->request->setMethod(null);
+        $this->request->setMethod();
         $this->assertSame('REQUEST_METHOD', $this->request->getMethod() );
 
         $this->request->setParam('_method', 'qs');
-        $this->request->setMethod(null);
+        $this->request->setMethod();
         $this->assertSame('QS', $this->request->getMethod() );
 
         $this->request->setHeader('X-HTTP-Method-Override', 'head');
-        $this->request->setMethod(null);
+        $this->request->setMethod();
         $this->assertSame('HEAD', $this->request->getMethod() );
 
         $this->request->setMethod('methd');
-        $this->assertSame('METHD', $this->request->getMethod() );
+        $this->assertSame('METHD', $this->request->getMethod(), 'Should go all uppercase');
     }
 
     public function testGetSetHeaders()
@@ -128,19 +124,14 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('3.', $this->request->getIp() );
     }
 
-    public function testSetBody()
+    public function testSetBodyStream()
     {
-        //$this->request->setBody();
-        //$this->assertSame('', $this->request->getBody());
-        
-        $this->request->_fileIn = APP_TESTDIR . '/Zenya/Api/Fixtures/body.txt';
-        //$this->request->setBody();
-       // $this->assertSame('hello', $this->request->getBody());
+        $this->request->setBody();
+        $this->assertSame('', $this->request->getBody());
 
-/// here!!!!!
-            echo $body = file_get_contents(APP_TESTDIR . '/Zenya/Api/Fixtures/body.txt');
-
-
+       $this->request->setBodyStream(APP_TESTDIR . '/Zenya/Api/Fixtures/body.txt');
+       $this->request->setBody();
+       $this->assertSame('body1=value1&body2=value2', $this->request->getBody());
     }
 
         protected $data = <<<DATA
@@ -153,7 +144,6 @@ DATA;
     public function testGetSetBodyDeflate()
     {
         $raw = gzdeflate($this->data);
-
         $this->request->setHeader('content-encoding', 'deflate');
         $this->request->setBody($raw);
         $this->assertSame($this->data, $this->request->getBody());

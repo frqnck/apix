@@ -224,14 +224,17 @@ class Request
         return empty($ip) ? $this->getHeader('REMOTE_ADDR') : $ip;
     }
 
-    public $_fileIn = 'php://input';
+    protected $bodyStream = 'php://input';
+
+    public function setBodyStream($string)
+    {
+        $this->bodyStream = $string;
+    }
 
     public function setBody($body = null)
     {
         if (null === $body) {
-            echo $this->_fileIn;
-            echo $body = file_get_contents($this->_fileIn);
-            //$body = $this->getRawBody();
+            $body = file_get_contents($this->bodyStream);
         }
         $this->body = $body;
     }
@@ -239,8 +242,8 @@ class Request
     public function getRawBody()
     {
         return $this->body;
-        #$body = http_get_request_body();
-        return file_get_contents($this->_fileIn);
+        #return = http_get_request_body();
+        #return file_get_contents($this->bodyStream);
     }
 
     public function getBody()
