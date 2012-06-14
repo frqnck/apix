@@ -73,8 +73,8 @@ class Resource extends Listener
         $refClass = new ReflectionClass($class->name);
         $this->actions = $refClass->getActionsMethods($route->getActions());
 
-// TODO: merge with TEST & OPTIONS ???
-###Server::d( $this->actions );
+        // TODO: merge with TEST & OPTIONS ???
+        ###Server::d( $this->actions );
 
         // if( !in_array($route->getMethod(), array('OPTIONS')) )
         // {
@@ -106,6 +106,11 @@ class Resource extends Listener
         $this->addAllListeners('resource', 'early');
 
         return call_user_func_array(array(new $class->name($class->args), $route->getAction()), $params);
+    }
+
+    public function isPublic()
+    {
+        return false;
     }
 
     public function getRequiredParams($method, $refMethod, array $routeParams)

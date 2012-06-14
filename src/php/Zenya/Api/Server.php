@@ -14,7 +14,7 @@ function d($mix)
 
 class Server extends Listener
 {
-    const VERSION = 'Sleepover/0.2.12';
+    const VERSION = '@package_version@'; //'Sleepover/0.2.12';
 
     private $config = array();
     private $resources = array();
@@ -28,6 +28,7 @@ class Server extends Listener
 
         $this->request = $request === null ? new Request : $request;
 
+        // Response
         $this->response = new Response(
             $this->request,
             $this->config['sign'],
@@ -50,7 +51,9 @@ class Server extends Listener
         $this->setconfig['resources'] = array(
 
         );
-#d($config->getResources());
+
+        #d( $config->getResources() );
+
         // add the resources
         foreach ($config->getResources() as $key => $values) {
             $this->addResource($key, $values, $defaultRoute);
@@ -70,7 +73,7 @@ class Server extends Listener
             // }
 
             // attach the early listeners @ pre-processing stage
-            $this->addAllListeners('server', 'early');
+            $this->addAllListeners('server', 'early', $this->config);
 
             // Process with the requested resource
             $this->resource = new Resource($this->route);
@@ -140,6 +143,17 @@ class Server extends Listener
     }
 
     /**
+     * Get the output/results.
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+
+    /**
      * Set the route.
      *
      * @param  Request $request
@@ -169,6 +183,7 @@ class Server extends Listener
                 'class_args'    => &$this, // temp!
             )
         );
+        $this->route->request = $request;
 
         // Set the response format...
         $this->negotiateFormat($opts, $ext);
