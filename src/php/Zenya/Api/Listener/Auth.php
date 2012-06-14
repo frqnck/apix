@@ -12,53 +12,69 @@ class Auth implements \SplObserver
      * @param array $events Array of events to listen to (default: all events)
      *
      * @return void
+     * @throws
      */
-    public function __construct($target = 'Basic')
+    public function __construct(Auth\Adapter $auth=null)
     {
         //user => password
         #$this->users = array('admin' => 'mypass', 'guest' => 'guest');
 
-        switch ($target) {
-            case $target instanceof \Zend_Auth:
+        switch (true) {
 
-               # print_r($target);
-               # echo "TODO: ZEND";exit;
-            break;
+            case ($auth instanceof \Zend_Auth):
+              echo "TODO: ZEND";
+              exit;
 
-            case 'Digest':
-                echo "TODO: Digest";exit;
-            break;
 
-            case 'Basic':
-                echo "TODO: Basic";exit;
+            case ($auth instanceof Auth\Digest):
+              $this->adapter = $auth;
             break;
 
             default:
-                throw new \Exception("Unable to open '{$target}'", 500);
+                throw new \InvalidArgumentException("Unable to open the AUTH adapter", 500);
         }
 
     }
 
-    public function update(\SplSubject $subject)
+    public function update(\SplSubject $resource)
     {
+        // skip if public
+        if($resource->isPublic()) {
+          return;
+        }
 
-        $action = $subject->server->route->getAction();
-        $request = $subject->server->request;
+        $action = $resource->route->getAction();
+
+        $request = $resource->route->request;
         $method = $request->getMethod();
 
-        // skip for user login, testing & help!
-        switch (true):
-            case $action === 'session' && $method === 'GET': // list
-            case $action === 'session' && $method === 'POST': // login
-            case $action === 'session' && $method === 'OPTIONS': // testing
+        #echo '<pre>'; print_r($request->getHeaders());exit;
 
-            case $action === 'help':
-                return;
-        endswitch;
+        $users = array(
+          array(
+            'username' => 'franck',
+            'password' => 'pass'
+          )
+        );
+
+
+        if($this->adapter->authenticate($users)) {
+          echo 'auth ;-)';
+
+          echo '<pre>';
+          print_r($_SERVER['PHP_AUTH_DIGEST']);
+          #print_r($this->digest);
+
+
+
+        } else {
+            throw new Exception('This resource required authentification', 401);
+        }
+
+
 
         // temp
         // Authorization: Basic ZnJhbmNrOnRlc3Q=";
-        # print_r($request->getHeaders());
 /*
         $username = 'franck';#$pass = 'pass';
 
@@ -79,6 +95,7 @@ class Auth implements \SplObserver
 
         print_r($identity);exit;
 */
+        return;
         $s = new \Zend_Session;
 
         $s = new \Zenya_Model_Session;
