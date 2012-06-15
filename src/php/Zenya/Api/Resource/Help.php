@@ -147,7 +147,7 @@ class Help
                 throw new Exception("TODO: Invalid method ({$method}) specified for \"{$name}\".", 405);
             }
         } else {
-            foreach ( $actions as $method) {
+            foreach($actions as $method) {
                 $doc->parseMethodDoc($method);
             }
         }

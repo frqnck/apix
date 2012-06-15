@@ -16,6 +16,9 @@ class Resource extends Listener
      */
     protected $methods = array();
 
+    private $refClass, $refMethod;
+
+
     /**
      * Import given objects
      *
@@ -70,8 +73,8 @@ class Resource extends Listener
         $this->setRouteOverrides($route);
 
         // Relection
-        $refClass = new ReflectionClass($class->name);
-        $this->actions = $refClass->getActionsMethods($route->getActions());
+        $this->refClass = new ReflectionClass($class->name);
+        $this->actions = $this->refClass->getActionsMethods($route->getActions());
 
         // TODO: merge with TEST & OPTIONS ???
         ###Server::d( $this->actions );
@@ -80,12 +83,12 @@ class Resource extends Listener
         // {
 
             try {
-                $refMethod = $refClass->getMethod($route->getAction());
+                $this->refMethod = $this->refClass->getMethod($route->getAction());
             } catch (\Exception $e) {
                 throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
             }
 
-            $params = $this->getRequiredParams($route->getMethod(), $refMethod, $route->getParams());
+            $params = $this->getRequiredParams($route->getMethod(), $this->refMethod, $route->getParams());
 
         // } else {
         //     $refMethod = $refClass->getMethod($route->getAction());
@@ -108,8 +111,34 @@ class Resource extends Listener
         return call_user_func_array(array(new $class->name($class->args), $route->getAction()), $params);
     }
 
+    public function getDocs($action=null)
+    {
+        $this->refClass->parseClassDoc();
+
+        if( isset($action)) {
+          $this->refClass->parseMethodDoc($action);
+        } else {
+          foreach ($this->actions as $method) {
+             $this->refClass->parseMethodDoc($method);
+          }
+        }
+
+        return $this->refClass->getDocs();
+    }
+
     public function isPublic()
     {
+        $action = $this->route->getAction();
+        $docs = $this->getDocs();
+
+        $role = isset($docs['methods'][$action]['api_role'])
+          ? $docs['methods'][$action]['api_role']
+          : false;
+
+        if( !$role || $role == 'public') {
+          return true;
+        }
+
         return false;
     }
 

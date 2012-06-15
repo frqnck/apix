@@ -74,12 +74,11 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
 
     public function addAllListeners($level, $type=null)
     {
-        $c = Config::getInstance();
-        $config = $c->getConfig();
+        $listeners = Config::getInstance()->getListeners($level);
 
         $stage = is_null($type)
-            ? $config['listeners'][$level]
-            : $config['listeners'][$level][$type];
+            ? $listeners
+            : $listeners[$type];
 
         if (isset($stage)) {
             foreach ($stage as $listener => $args) {
