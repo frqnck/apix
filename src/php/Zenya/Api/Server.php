@@ -23,23 +23,23 @@ class Server extends Listener
 
     public function __construct(Config $config=null, Request $request=null)
     {
-        $config = $config === null ? new Config : $config;
-        $this->config = $config->getConfig();
+        $c = $config === null ? new Config : $config;
 
+        $this->config = $c->getConfig();
         $this->request = $request === null ? new Request : $request;
 
         // Response
         $this->response = new Response(
             $this->request,
-            $this->config['sign'],
-            $this->config['debug']
+            $this->config['output_sign'],
+            $this->config['output_debug']
         );
 
         // Routing
         $this->setRouting(
             $this->request,
-            $config->getRoutes(),
-            $this->config['options']
+            $c->getRoutes(),
+            $this->config['routing']
         );
 
         $defaultRoute = array(
@@ -48,14 +48,13 @@ class Server extends Listener
         );
 
         // to be passed thru the constructor!!!
-        $this->setconfig['resources'] = array(
-
-        );
+        #$this->setconfig['resources'] = array(
+#        );
 
         #d( $config->getResources() );
 
         // add the resources
-        foreach ($config->getResources() as $key => $values) {
+        foreach ($c->getResources() as $key => $values) {
             $this->addResource($key, $values, $defaultRoute);
         }
 
@@ -122,14 +121,19 @@ class Server extends Listener
         $output = $this->response->generate(
                 $this->route->getControllerName(),
                 $this->results,
-                sprintf("%s/%s #%s", $this->config['org'], $this->config['version'], self::VERSION),
-                $this->config['rootNode']
+                $this->getServerVersion(),
+                $this->config['output_rootNode']
             );
 
         // attach the late listeners @ post-processing stage
         $this->addAllListeners('server', 'late');
 
         return $this->route->getMethod() != 'HEAD' ? $output : null;
+    }
+
+    private function getServerVersion()
+    {
+        return sprintf("%s/%s #%s", $this->config['api_realm'], $this->config['api_version'], Server::VERSION);
     }
 
     /**
@@ -142,16 +146,15 @@ class Server extends Listener
         return $this->results;
     }
 
-    /**
-     * Get the output/results.
-     *
-     * @return array
-     */
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
+    // /**
+    //  * Get the output/results.
+    //  *
+    //  * @return array
+    //  */
+    // public function getConfig()
+    // {
+    //     return $this->config;
+    // }
 
     /**
      * Set the route.

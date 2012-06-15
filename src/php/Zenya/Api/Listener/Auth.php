@@ -26,7 +26,7 @@ class Auth implements \SplObserver
               exit;
 
 
-            case ($auth instanceof Auth\Digest):
+            case ($auth instanceof Auth\HttpDigest):
               $this->adapter = $auth;
             break;
 
@@ -42,36 +42,16 @@ class Auth implements \SplObserver
         if($resource->isPublic()) {
           return;
         }
-
+/*
         $action = $resource->route->getAction();
 
         $request = $resource->route->request;
         $method = $request->getMethod();
+ */
 
-        #echo '<pre>'; print_r($request->getHeaders());exit;
-
-        $users = array(
-          array(
-            'username' => 'franck',
-            'password' => 'pass'
-          )
-        );
-
-
-        if($this->adapter->authenticate($users)) {
-          echo 'auth ;-)';
-
-          echo '<pre>';
-          print_r($_SERVER['PHP_AUTH_DIGEST']);
-          #print_r($this->digest);
-
-
-
-        } else {
+        if(!$this->adapter->authenticate()) {
             throw new Exception('This resource required authentification', 401);
         }
-
-
 
         // temp
         // Authorization: Basic ZnJhbmNrOnRlc3Q=";

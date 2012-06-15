@@ -79,8 +79,8 @@ class HttpDigest implements Adapter
     {
         // username:realm:sharedSecret
         $users = array(
-            0=>array('username'=>'franck', 'realm'=>'sleepover.dev', 'sharedSecret'=>'pass1', 'role'=>'admin'),
-            1=>array('username'=>'bob', 'realm'=>'sleepover.dev', 'sharedSecret'=>'pass1', 'role'=>'guest')
+            0=>array('username'=>'franck', 'realm'=>'sleepover.dev', 'sharedSecret'=>'pass', 'role'=>'admin'),
+            1=>array('username'=>'bob', 'realm'=>'sleepover.dev', 'sharedSecret'=>'pass', 'role'=>'guest')
         );
         foreach($users as $id => $user)
         {
