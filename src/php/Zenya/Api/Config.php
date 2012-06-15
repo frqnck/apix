@@ -2,10 +2,10 @@
 
 namespace Zenya\Api;
 
-class Config #extends \Pimple
+class Config extends \Pimple
 {
 
-    private $config = array();
+    public $config = array();
     private $injected = array();
 
     /**
@@ -28,14 +28,64 @@ class Config #extends \Pimple
         return self::$instance;
     }
 
-
-    public function __construct(array $config=array())
+    public function __construct()
     {
-        $this->config = $config+$this->getDefaults();
-        #Server::d($this->config);
+        $app = $this;
 
-        #print_r($this->config['resources']);
+        $app['config_file'] = getenv('HOME') . '/.zenya/config.php';
 
+        $this['test'] = 'test';
+
+        $this['server_debug'] = 'test';
+        #$this['server_config'] = $config+$this->getDefaults();
+
+        #$this['server_version'] = function($app) {};
+        #sprintf("%s/%s #%s", $this->config['server_realm'], $this->config['server_version'], self::VERSION),
+
+        $this->config = $this->getConfigurations();
+
+        $this->services = $this->getServices();
+print_r(
+    $this->services['users']('franck', 'sleepover.dev')
+);
+
+echo '_Construct Once';
+
+    }
+
+    public function getConfigurations()
+    {
+        if (is_file($this['config_file'])) {
+            $config = require $this['config_file'];
+            if (null === $config || !is_array($config)) {
+                throw new \RuntimeException(sprintf('The "%s" configuration file must return an array.', $app['config_file']));
+            }
+        }
+
+        // merge
+        return $config+$this->getConfigDefaults();
+    }
+
+    public function getServices($key=null)
+    {
+        $config = $this->config['services'];
+        if (is_null($key)) {
+            return $config;
+        } elseif (isset($config[$key])) {
+            return $config[$key];
+        }
+       throw new \InvalidArgumentException( sprintf('Services for "%s" does not exists.', $key) );
+    }
+
+    public function getListeners($key=null)
+    {
+        $config = $this->config['listeners'];
+        if (is_null($key)) {
+            return $config;
+        } elseif (isset($config[$key])) {
+            return $config[$key];
+        }
+       throw new \InvalidArgumentException( sprintf('Listeners for "%s" does not exists.', $key) );
     }
 
     public function getConfig($key=null)
@@ -65,19 +115,23 @@ class Config #extends \Pimple
         return $this->injected[$key] = $mixed;
     }
 
-    public function getDefaults()
+    public function getConfigDefaults()
     {
         return array(
-            'org' => 'Zenya',
-            'version'   => '1.0',
+            'test' => 'test',
+            'api_realm'     => 'Zenya',
+            'api_version'   => '1.0',
+
+            #return sprintf("%s/%s #%s", $app->config['realm'], $app->config['version'], Server::VERSION);
+            #'test'=> $this['debug'],
 
             // output
-            'rootNode'  => 'zenya',
-            'sign'      => true,
-            'debug'     => true,
+            'output_rootNode'  => 'zenya',
+            'output_sign'      => true,
+            'output_debug'     => true,
 
             // routing
-            'options' => array(
+            'routing' => array(
                 'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
                 'default_format'    => 'json',
                 // following is use for output format negociation
@@ -97,6 +151,10 @@ class Config #extends \Pimple
                 // '/category/:param1/:param2/:param3' => array(
                 //     'controller' => 'Category',
                 // ),
+
+                '/auth/:param1' => array(
+                    'controller' => 'AuthResource'
+                ),
 
                 '/:controller/:param1/:param2' => array(
                     #function() {echo '------ss';},
@@ -128,7 +186,10 @@ class Config #extends \Pimple
                     'early' => array(
                         'Zenya\Api\Listener\Auth' => function()
                         {
-                            return new \Zenya\Api\Listener\Auth\Digest;
+
+
+
+                            return new \Zenya\Api\Listener\Auth\HttpDigest();
                         },
 
                         #'Zenya\Api\Listener\CheckIp' => null,
@@ -158,6 +219,10 @@ class Config #extends \Pimple
                 // ),
                 'resourceName' => array(
                     'class_name' => 'Zenya\Api\Fixtures\BlankResource',
+                    'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
+                ),
+                'AuthResource' => array(
+                    'class_name' => 'Zenya\Api\Fixtures\AuthResource',
                     'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
                 ),
 
