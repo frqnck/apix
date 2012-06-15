@@ -118,7 +118,6 @@ echo '_Construct Once';
     public function getConfigDefaults()
     {
         return array(
-            'test' => 'test',
             'api_realm'     => 'Zenya',
             'api_version'   => '1.0',
 
