@@ -30,27 +30,20 @@ class Config extends \Pimple
 
     public function __construct()
     {
-        $app = $this;
-
-        $app['config_file'] = getenv('HOME') . '/.zenya/config.php';
-
-        $this['test'] = 'test';
+        $c = $this;
 
         $this['server_debug'] = 'test';
-        #$this['server_config'] = $config+$this->getDefaults();
+        #$this['api_realm'] = 'test';
 
-        #$this['server_version'] = function($app) {};
-        #sprintf("%s/%s #%s", $this->config['server_realm'], $this->config['server_version'], self::VERSION),
+        $this['config_file'] = realpath(__DIR__ . '/../../../data/config.dist.php');
+            //getenv('HOME') . '/.zenya/config.php';
 
         $this->config = $this->getConfigurations();
 
-        $this->services = $this->getServices();
-print_r(
-    $this->services['users']('franck', 'sleepover.dev')
-);
+        #echo '<pre>'; print_r($this->getListeners()); exit;
 
-echo '_Construct Once';
-
+        // TODO: debug
+        //echo ' [construct] ';
     }
 
     public function getConfigurations()
@@ -58,35 +51,36 @@ echo '_Construct Once';
         if (is_file($this['config_file'])) {
             $config = require $this['config_file'];
             if (null === $config || !is_array($config)) {
-                throw new \RuntimeException(sprintf('The "%s" configuration file must return an array.', $app['config_file']));
+                throw new \RuntimeException(sprintf('The "%s" configuration file must return an array.', $this['config_file']));
             }
+            // merge
+            return $config+$this->getConfigDefaults();
+        } else {
+            throw new \RuntimeException(sprintf('The "%s" configuration file does not exist.', $this['config_file']));
         }
-
-        // merge
-        return $config+$this->getConfigDefaults();
     }
 
     public function getServices($key=null)
     {
-        $config = $this->config['services'];
-        if (is_null($key)) {
-            return $config;
-        } elseif (isset($config[$key])) {
-            return $config[$key];
-        }
-       throw new \InvalidArgumentException( sprintf('Services for "%s" does not exists.', $key) );
+        return $this->retrieve('services', $key);
     }
 
     public function getListeners($key=null)
     {
-        $config = $this->config['listeners'];
+        return $this->retrieve('listeners', $key);
+    }
+
+    protected function retrieve($kind, $key=null)
+    {
+        $config = $this->config[$kind]+$this->config[$kind .'_default'];
         if (is_null($key)) {
             return $config;
         } elseif (isset($config[$key])) {
             return $config[$key];
         }
-       throw new \InvalidArgumentException( sprintf('Listeners for "%s" does not exists.', $key) );
+       throw new \RuntimeException( sprintf('%s for "%s" does not exists.', ucfirst($kind), $key) );
     }
+
 
     public function getConfig($key=null)
     {
@@ -117,8 +111,8 @@ echo '_Construct Once';
 
     public function getConfigDefaults()
     {
+        $c = $this;
         return array(
-            'test' => 'test',
             'api_realm'     => 'Zenya',
             'api_version'   => '1.0',
 
@@ -140,6 +134,11 @@ echo '_Construct Once';
                 'http_accept'       => true, // true or false
             ),
 
+            //  routes
+            'routes' => array(),
+            'routes_default' => array(),
+
+/*
             'routes' => array(
                 #/:controller/paramName/:paramName/:id' => array(),
                 #'/:controller/test' => array('class_name'=>'test'),
@@ -163,10 +162,14 @@ echo '_Construct Once';
                     #'class_args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
                 )
             ),
-            'routes_default' => array(),
+*/
+            // services
+            'services' => array(),
+            'services_default' => array(),
 
             // listeners
-            'listeners' => array(
+            'listeners' => array(),
+            'listeners_default' => array(
                 'server' => array(
                     // pre-processing stage
                     'early' => array(
@@ -184,14 +187,15 @@ echo '_Construct Once';
                 ),
                 'resource' => array(
                     'early' => array(
+                        // todo
+                        /*
                         'Zenya\Api\Listener\Auth' => function()
                         {
-
-
-
+                            #echo $c['api_realm'];
+                            #"$c['api_realm']"
                             return new \Zenya\Api\Listener\Auth\HttpDigest();
                         },
-
+*/
                         #'Zenya\Api\Listener\CheckIp' => null,
                         #'Zenya\Api\Listener\Acl',
                         #'Zenya\Api\Listener\Log',
@@ -206,36 +210,8 @@ echo '_Construct Once';
                 'response' => array(),
             ),
 
-            // auth shoud be in listeners (todo: DIC)
-            'auth' => array(
-                    'type'=>'Basic',
-                    #'type'=>'Digest',
-                ),
-
-            // resources user defined (move out)
-            'resources' => array(
-                // 'test' => array(
-                //     'class_args'=>array('arg1'=>'value1', 'arg2'=>'string')
-                // ),
-                'resourceName' => array(
-                    'class_name' => 'Zenya\Api\Fixtures\BlankResource',
-                    'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
-                ),
-                'AuthResource' => array(
-                    'class_name' => 'Zenya\Api\Fixtures\AuthResource',
-                    'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
-                ),
-
-                'someName' => array(
-                    'class_name' => 'Zenya\Api\Fixtures\BlankResource',
-                    #'class_args' => array('test')
-                )
-            ),
-
-            // resources minimal
-            #'resources' => array(),
-
-            // default
+            // resources
+            'resources' => array(),
             'resources_default' => array(
                 // OPTIONS
                 'help' => array(

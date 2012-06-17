@@ -26,7 +26,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * @expectedException   InvalidArgumentException
      */
-    public function testGetConfigThrowsInvalidArgumentException()
+    public function tesInexistantThrowsInvalidArgumentException()
     {
         $this->config->getConfig('non-existant');
     }

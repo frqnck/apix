@@ -23,7 +23,7 @@ class Server extends Listener
 
     public function __construct(Config $config=null, Request $request=null)
     {
-        $c = $config === null ? new Config : $config;
+        $c = $config === null ? Config::getInstance() : $config;
 
         $this->config = $c->getConfig();
         $this->request = $request === null ? new Request : $request;
@@ -133,7 +133,7 @@ class Server extends Listener
 
     private function getServerVersion()
     {
-        return sprintf("%s/%s #%s", $this->config['api_realm'], $this->config['api_version'], Server::VERSION);
+        return sprintf("%s/%s (%s)", $this->config['api_realm'], $this->config['api_version'], Server::VERSION);
     }
 
     /**

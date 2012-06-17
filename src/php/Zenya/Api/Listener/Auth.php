@@ -12,7 +12,7 @@ class Auth implements \SplObserver
      * @param array $events Array of events to listen to (default: all events)
      *
      * @return void
-     * @throws
+     * @throws \RuntimeException
      */
     public function __construct(Auth\Adapter $auth=null)
     {
@@ -31,7 +31,7 @@ class Auth implements \SplObserver
             break;
 
             default:
-                throw new \InvalidArgumentException("Unable to open the AUTH adapter", 500);
+                throw new \RuntimeException('Unable to open the Authentication adapter');
         }
 
     }
@@ -50,7 +50,7 @@ class Auth implements \SplObserver
  */
 
         if(!$this->adapter->authenticate()) {
-            throw new Exception('This resource required authentification', 401);
+            throw new Exception('Authentication has failed or has not yet been provided', 401);
         }
 
         // temp
