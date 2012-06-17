@@ -66,6 +66,13 @@ ${contents}
         <min>2.0.0</min>
         <max>2.999.9999</max>
       </package>
+      <package>
+        <name>pimple/pimple</name>
+        <channel>packages.zendframework.com</channel>
+        <min>1.0.0</min>
+        <max>1.999.9999</max>
+      </package>
+
 	</required>
   </dependencies>
   <phprelease />
