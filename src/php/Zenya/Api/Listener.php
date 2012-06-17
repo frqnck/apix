@@ -72,21 +72,27 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
         return count($this->observers);
     }
 
+    public function __construct()
+    {
+    }
+
     public function addAllListeners($level, $type=null)
     {
-        $listeners = Config::getInstance()->getListeners($level);
+        static $listeners = null;
+        if($listeners === null) {
+            $listeners = Config::getInstance()->getListeners($level);
+        }
 
         $stage = is_null($type)
             ? $listeners
             : $listeners[$type];
-
         if (isset($stage)) {
             foreach ($stage as $listener => $args) {
                 if (is_int($listener)) {
-                    $call = new $args();
+                    $call = $args instanceof \Closure ? $args() : new $args();
                 } else {
-                     $args = $args instanceof \Closure ? $args() : $args[0];
-                     $call = new $listener($args);
+                    $args = $args instanceof \Closure ? $args() : $args[0];
+                    $call = new $listener($args);
                 }
                 $this->attach($call);
             }
