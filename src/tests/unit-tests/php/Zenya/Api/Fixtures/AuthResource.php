@@ -62,7 +62,7 @@ class AuthResource #extends ResourceAbstract
      *
      * @api_role admin
     */
-    public function onUpdate($param1)
+    public function onUpdate($params)
     {
         return array('method'=>__METHOD__, 'params' => $params);
     }
