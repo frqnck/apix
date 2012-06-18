@@ -13,7 +13,7 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 # Test server
 try {
     $config = new Zenya\Api\Config;
-    $server = new Zenya\Api\Server($config);
+    $server = new Zenya\Api\Server();
     echo $server->run();
 } catch (\Exception $e) {
     header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);

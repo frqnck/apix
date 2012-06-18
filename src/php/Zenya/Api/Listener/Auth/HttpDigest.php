@@ -59,6 +59,11 @@ class HttpDigest implements Adapter
     var $nonceLife = 300;
 
     /**
+     * @var string The token to macth with the digest password
+     */
+    public $token = null;
+
+    /**
      * Constructor
      *
      * The constructor that sets the $this->realm
@@ -74,25 +79,18 @@ class HttpDigest implements Adapter
         $this->opaque = $opaque;
     }
 
-
-    function getToken($digest)
+    /**
+     * Returns the token
+     *
+     * @param array Teh digest array
+     * @return string The token to macth with the digest password
+     */
+    function getToken(array $digest)
     {
-        // username:realm:sharedSecret
-        $users = array(
-            0=>array('username'=>'franck', 'realm'=>'sleepover.dev', 'sharedSecret'=>'pass', 'role'=>'admin'),
-            1=>array('username'=>'bob', 'realm'=>'sleepover.dev', 'sharedSecret'=>'pass', 'role'=>'guest')
-        );
-        foreach($users as $id => $user)
-        {
-            if(
-                $user['username'] == $digest['username']
-                && $user['realm'] == $this->realm
-            ) {
-              return $user['sharedSecret'];
-            }
-        }
-
-        return false;
+      if(is_null($this->token)) {
+        call_user_func_array($this->setToken, array($digest));
+      }
+      return $this->token;
     }
 
     /**
@@ -118,9 +116,10 @@ class HttpDigest implements Adapter
         // exit(0);
     }
 
-    /** TORM? Get the HTTP Auth header
+    /** TODO: RM? Get the HTTP Auth header
      * @return str
      */
+/*
     function getAuthHeader()
     {
         if (isset($_SERVER['Authorization'])) {
@@ -133,7 +132,7 @@ class HttpDigest implements Adapter
         }
         return NULL;
     }
-
+*/
     /**
      * Authenticate the user and return username on success.
      *
@@ -150,14 +149,11 @@ class HttpDigest implements Adapter
             isset($_SERVER['PHP_AUTH_DIGEST'])
             && $this->parseDigest($_SERVER['PHP_AUTH_DIGEST'])
         ) {
-
-            #$users = Frapi_Model_Partner::isPartnerHandle( $this->digest['username'] );
             $token = $this->getToken($this->digest);
             if (!isset($token)) {
                 return $this->send();
             }
 
-            #$_SERVER['X_FRAPI_AUTH_USER'] = $this->digest['username'];
             return $this->validate($token);
         }
 
@@ -173,11 +169,11 @@ class HttpDigest implements Adapter
     {
         $time = ceil(time() / $this->nonceLife) * $this->nonceLife;
 
-        $ip = $remoteAddress = isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+        $remoteAddress = isset($_SERVER['HTTP_X_FORWARDED_FOR'])
               ? $_SERVER['HTTP_X_FORWARDED_FOR']
               : $_SERVER['REMOTE_ADDR'];
 
-        return md5(date('Y-m-d H:i', $time) . ':' . $ip . ':' . $this->privateKey);
+        return md5(date('Y-m-d H:i', $time) . ':' . $remoteAddress . ':' . $this->privateKey);
     }
 
     protected function parseDigest($digest)
