@@ -28,10 +28,13 @@ class UploadResource
     }
 
     /**
-     * Poast
+     * Post
      *
      * @param  string $type
      * @return array
+     *
+     * @api_role admin
+     *
      */
     public function onCreate($type, $debug=false, Request $request=null)
     {
