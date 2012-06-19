@@ -25,7 +25,7 @@ if (
  *
  * @link http://www.peej.co.uk/files/httpdigest.phps
  */
-class HttpDigest implements Adapter
+class Digest implements Adapter
 {
 
     /**
@@ -80,7 +80,7 @@ class HttpDigest implements Adapter
     }
 
     /**
-     * Returns the token
+     * Returns the token to match
      *
      * @param array Teh digest array
      * @return string The token to macth with the digest password
