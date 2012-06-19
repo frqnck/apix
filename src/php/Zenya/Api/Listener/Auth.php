@@ -7,31 +7,29 @@ class Auth implements \SplObserver
     /**
      * Constructor.
      *
-     * @param mixed $target Can be a file path (default: php://output), a resource,
+     * @param object $adapter Can be a file path (default: php://output), a resource,
      *                      or an instance of the PEAR Log class.
      * @param array $events Array of events to listen to (default: all events)
      *
      * @return void
      * @throws \RuntimeException
      */
-    public function __construct(Auth\Adapter $auth=null)
+    public function __construct($auth=null)
     {
         //user => password
         #$this->users = array('admin' => 'mypass', 'guest' => 'guest');
 
         switch (true) {
-
-            case ($auth instanceof \Zend_Auth):
-              echo "TODO: ZEND";
-              exit;
-
-
-            case ($auth instanceof Auth\HttpDigest):
+            case ($auth instanceof Auth\Adapter):
               $this->adapter = $auth;
             break;
 
+            case ($auth instanceof \Zend_Auth):
+              echo "TODO: Zend_Auth";
+              exit;
+
             default:
-                throw new \RuntimeException('Unable to open the Authentication adapter');
+                throw new \RuntimeException("Unable to open the Authentication adapter");
         }
 
     }
@@ -49,9 +47,15 @@ class Auth implements \SplObserver
         $method = $request->getMethod();
  */
 
-        if(!$this->adapter->authenticate()) {
+        $username = $this->adapter->authenticate();
+        if(!$username) {
             throw new Exception('Authentication has failed or has not yet been provided', 401);
         }
+        
+        $resource->response->setHeader('X_AUTH_USER', $username );
+
+        #$_SERVER['X_AUTH_USER'] = $username;
+
 
         // temp
         // Authorization: Basic ZnJhbmNrOnRlc3Q=";
