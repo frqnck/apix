@@ -51,8 +51,9 @@ class Auth implements \SplObserver
         if(!$username) {
             throw new Exception('Authentication has failed or has not yet been provided', 401);
         }
-        
-        $resource->response->setHeader('X_AUTH_USER', $username );
+
+        // todo set X_REMOTE_USER or X_AUTH_USER
+        #$resource->response->setHeader('X_REMOTE_USER', $username);
 
         #$_SERVER['X_AUTH_USER'] = $username;
 
