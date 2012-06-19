@@ -38,6 +38,11 @@ $c['routes'] = array(
     //     'controller' => 'Category',
     // ),
 
+    '/upload/:type/:debug' => array(
+        'controller' => 'UploadResource'
+    ),
+
+
     '/auth/:param1' => array(
         'controller' => 'AuthResource'
     ),
@@ -63,7 +68,10 @@ $c['resources'] = array(
         'class_name' => 'Zenya\Api\Fixtures\AuthResource',
         'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
     ),
-
+    'UploadResource' => array(
+        'class_name' => 'Zenya\Api\Fixtures\UploadResource',
+        #'class_args' => array()
+    ),
     'someName' => array(
         'class_name' => 'Zenya\Api\Fixtures\BlankResource',
         #'class_args' => array('test')
@@ -102,7 +110,6 @@ $c['listeners'] = array(
     )
 );
 
-
 /* Prototype:
 
 function onRead($route, $call) {
@@ -135,7 +142,5 @@ $c['routes'] = array(
 //     'class_name' => 'Zenya\Api\Fixtures\AuthResource',
 //     'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
 // ),
-
-
 
 return $c;
