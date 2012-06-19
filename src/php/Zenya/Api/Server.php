@@ -26,7 +26,7 @@ class Server extends Listener
         $c = $config === null ? Config::getInstance() : $config;
 
         $this->config = $c->getConfig();
-        $this->request = $request === null ? new Request : $request;
+        $this->request = $request === null ? Request::getInstance() : $request;
 
         // Response
         $this->response = new Response(
@@ -77,6 +77,8 @@ class Server extends Listener
             // Process with the requested resource
             $this->resource = new Resource($this->route);
 
+            #d($this->request->getBody());
+
             $this->results = $this->resource->call(
                 $this->getResource(
                     $this->route->getControllerName()
@@ -93,7 +95,7 @@ class Server extends Listener
                 'code'      => $httpCode
             );
 
-            // set controller to error!
+            // set the error controller!
             if ( !in_array($this->route->getControllerName(), array_keys($this->getResources())) ) {
                 $this->route->setControllerName('error');
                 $this->results = $this->results['error'];
@@ -119,7 +121,7 @@ class Server extends Listener
         }
 
         $output = $this->response->generate(
-                $this->route->getControllerName(),
+                $this->rawControllerName, #$this->route->getControllerName(),
                 $this->results,
                 $this->getServerVersion(),
                 $this->config['output_rootNode']
@@ -170,12 +172,16 @@ class Server extends Listener
         // check controller_ext
         if ($opts['controller_ext']) {
             $parts = explode('/', $path);
-            if ($ext = pathinfo(isset($parts[1])?$parts[1]:$parts[0], PATHINFO_EXTENSION)) {
+            $info = pathinfo(isset($parts[1]) ? $parts[1] : $parts[0] );
+            $ext = isset($info['extension'])?$info['extension']:null;
+            if ($ext) {
                 $path = preg_replace('/\.' . $ext . '/', '', $path, 1);
             }
         } else {
             $ext = null;
         }
+
+        $this->rawControllerName = $info['filename'];
 
         $this->route = new Router(
             $routes,
@@ -265,6 +271,7 @@ class Server extends Listener
     public function getResource($name)
     {
         if (!isset($this->resources[$name])) {
+            $name = $this->rawControllerName;
             throw new \InvalidArgumentException(sprintf("Invalid resource's name specified (%s).", $name), 404);
         }
 

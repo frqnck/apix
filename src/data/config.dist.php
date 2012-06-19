@@ -18,7 +18,7 @@ $c['services'] = array(
         // TODO: retrive the users from somewhere?
         $users = array(
             // username:realm:sharedSecret:role
-            0=>array('username'=>'franck', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey', 'role'=>'admin'),
+            0=>array('username'=>'franck', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey1', 'role'=>'admin'),
             1=>array('username'=>'bob', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'pass', 'role'=>'guest')
         );
         return $users;
@@ -37,6 +37,11 @@ $c['routes'] = array(
     // '/category/:param1/:param2/:param3' => array(
     //     'controller' => 'Category',
     // ),
+
+    '/upload/:type/:debug' => array(
+        'controller' => 'UploadResource'
+    ),
+
 
     '/auth/:param1' => array(
         'controller' => 'AuthResource'
@@ -63,7 +68,10 @@ $c['resources'] = array(
         'class_name' => 'Zenya\Api\Fixtures\AuthResource',
         'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
     ),
-
+    'UploadResource' => array(
+        'class_name' => 'Zenya\Api\Fixtures\UploadResource',
+        #'class_args' => array()
+    ),
     'someName' => array(
         'class_name' => 'Zenya\Api\Fixtures\BlankResource',
         #'class_args' => array('test')
@@ -74,34 +82,52 @@ $c['resources'] = array(
 $c['listeners'] = array(
     'resource' => array(
         'early' => array(
+            // Basic Auth
             function() use ($c) {
-                $adapter = new Listener\Auth\HttpDigest($c['api_realm']);
-                $adapter->setToken = function(array $digest) use ($c, $adapter)
+                $adapter = new Listener\Auth\Basic($c['api_realm']);
+                $adapter->setToken = function(array $basic) use ($c, $adapter)
                 { 
                     $users = $c['services']['users']();
                     foreach($users as $user)
                     {
-                        if( // this should be altered accordingly!
-                            $user['username'] == $digest['username']
-                            && $user['realm'] == $c['api_realm']
+                        if(
+                            $user['username'] == $basic['username']
+                            && $user['sharedSecret'] == $basic['password']
                         ) {
-                            #$_SERVER['X_AUTH_USER'] = $digest['username'];
-
-                            // Could be set to password, apiKey or hashed mixture... 
-                            $adapter->token = $user['sharedSecret'];
-                            #return $user['sharedSecret'];
+                            return $adapter->token = true;
                         }
                     }
-
-                    #return false;
+                    return $adapter->token = false;
                 };
 
                 return new Listener\Auth($adapter);
             },
+            // Digest Auth
+            // function() use ($c) {
+            //     $adapter = new Listener\Auth\Digest($c['api_realm']);
+            //     $adapter->setToken = function(array $digest) use ($c, $adapter)
+            //     { 
+            //         $users = $c['services']['users']();
+            //         foreach($users as $user)
+            //         {
+            //             if( // this should be altered accordingly!
+            //                 $user['username'] == $digest['username']
+            //                 && $user['realm'] == $c['api_realm']
+            //             ) {
+            //                 // Could be set to password, apiKey or hashed mixture... 
+            //                 $adapter->token = $user['sharedSecret'];
+            //                 #return $user['sharedSecret'];
+            //             }
+            //         }
+
+            //         #return false;
+            //     };
+
+            //     return new Listener\Auth($adapter);
+            // },
         )
     )
 );
-
 
 /* Prototype:
 
@@ -135,7 +161,5 @@ $c['routes'] = array(
 //     'class_name' => 'Zenya\Api\Fixtures\AuthResource',
 //     'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
 // ),
-
-
 
 return $c;

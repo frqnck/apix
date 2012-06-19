@@ -10,14 +10,14 @@ class Config extends \Pimple
 
     /**
      * The singleton instance
-     * @var ExtensionGuesser
+     * @var Config
      */
     static private $instance = null;
 
     /**
      * Returns as a singleton instance
      *
-     * @return ExtensionGuesser
+     * @return Config
      */
     static public function getInstance()
     {
