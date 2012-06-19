@@ -1,6 +1,8 @@
 <?php
 
 namespace Zenya\Api;
+#$app = Config::getInstance();
+
 
 $c = array(
     'api_realm'     => 'api.zenya.com',
@@ -15,11 +17,11 @@ $c = array(
 // services
 $c['services'] = array(
     'users' => function() {
-        // TODO: retrive the users from somewhere?
+        // TODO: retrieve the users from somewhere, caching strategy?
         $users = array(
             // username:realm:sharedSecret:role
-            0=>array('username'=>'franck', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey1', 'role'=>'admin'),
-            1=>array('username'=>'bob', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'pass', 'role'=>'guest')
+            0=>array('username'=>'franck', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey', 'role'=>'admin'),
+            1=>array('username'=>'bob', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'sesame', 'role'=>'guest')
         );
         return $users;
     }
@@ -39,7 +41,9 @@ $c['routes'] = array(
     // ),
 
     '/upload/:type/:debug' => array(
-        'controller' => 'UploadResource'
+        'controller' => 'UploadResource',
+        'type'  => null,
+        'debug'  => null,
     ),
 
 
@@ -81,13 +85,16 @@ $c['resources'] = array(
 // listeners
 $c['listeners'] = array(
     'resource' => array(
-        'early' => array(
+
+        // fires early @ resource discovery stage
+        'early_off' => array(
             // Basic Auth
-            function() use ($c) {
+            function() use ($c)
+            {
                 $adapter = new Listener\Auth\Basic($c['api_realm']);
                 $adapter->setToken = function(array $basic) use ($c, $adapter)
-                { 
-                    $users = $c['services']['users']();
+                {
+                    $users = Services::get('users');
                     foreach($users as $user)
                     {
                         if(
@@ -97,34 +104,38 @@ $c['listeners'] = array(
                             return $adapter->token = true;
                         }
                     }
-                    return $adapter->token = false;
+                    $adapter->token = false;
                 };
 
                 return new Listener\Auth($adapter);
             },
+
+        ),
+
+       // fires early @ resource discovery stage
+        'early' => array(
             // Digest Auth
-            // function() use ($c) {
-            //     $adapter = new Listener\Auth\Digest($c['api_realm']);
-            //     $adapter->setToken = function(array $digest) use ($c, $adapter)
-            //     { 
-            //         $users = $c['services']['users']();
-            //         foreach($users as $user)
-            //         {
-            //             if( // this should be altered accordingly!
-            //                 $user['username'] == $digest['username']
-            //                 && $user['realm'] == $c['api_realm']
-            //             ) {
-            //                 // Could be set to password, apiKey or hashed mixture... 
-            //                 $adapter->token = $user['sharedSecret'];
-            //                 #return $user['sharedSecret'];
-            //             }
-            //         }
-
-            //         #return false;
-            //     };
-
-            //     return new Listener\Auth($adapter);
-            // },
+            function() use ($c)
+            {
+                $adapter = new Listener\Auth\Digest($c['api_realm']);
+                $adapter->setToken = function(array $digest) use ($c, $adapter)
+                {
+                    print_r($digest);
+                    $users = Services::get('users');
+                    foreach($users as $user)
+                    {
+                        if( // this should be altered accordingly!
+                            $user['username'] == $digest['username']
+                            && $user['realm'] == $c['api_realm']
+                        ) {
+                            // Can be set to password, apiKey, or hashed mixture...
+                            return $adapter->token = $user['sharedSecret'];
+                        }
+                    }
+                    $adapter->token = false;
+                };
+                return new Listener\Auth($adapter);
+            },
         )
     )
 );

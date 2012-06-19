@@ -33,12 +33,14 @@ class Config extends \Pimple
         $c = $this;
 
         $this['server_debug'] = 'test';
-        #$this['api_realm'] = 'test';
 
         $this['config_file'] = realpath(__DIR__ . '/../../../data/config.dist.php');
             //getenv('HOME') . '/.zenya/config.php';
 
         $this->config = $this->getConfigurations();
+
+#$users = $this->getServices('users');
+#print_r($users);exit;
 
         #echo '<pre>'; print_r($this->getListeners()); exit;
 
@@ -62,7 +64,10 @@ class Config extends \Pimple
 
     public function getServices($key=null)
     {
-        return $this->retrieve('services', $key);
+        $cb = $this->retrieve('services', $key);
+        #$shared = $this->share($cb);
+
+        return $cb();
     }
 
     public function getListeners($key=null)

@@ -27,6 +27,21 @@ class UploadResource
     {
     }
 
+
+    /**
+     * Post
+     *
+     * @param  string $type
+     * @return array
+     *
+     * @api_role public
+     *
+     */
+    public function onRead($type, $debug=false, Request $request=null)
+    {
+        return array('GET');
+    }
+
     /**
      * Post
      *
@@ -39,7 +54,7 @@ class UploadResource
     public function onCreate($type, $debug=false, Request $request=null)
     {
         $request = $request === null ? Request::getInstance() : $request;
-        
+
         $results = array(
             'body'          => $request->getBody(),
             'params'        => $request->getParams()
@@ -50,12 +65,12 @@ class UploadResource
         }
 
         if ( $request->hasHeader('CONTENT_TYPE') ) {
-            
+
             $ct = $request->getHeader('CONTENT_TYPE');
             $results['ct'] = $ct;
 
             switch (true) {
-                
+
                 // application/x-www-form-urlencoded
                 case (strstr($ct, '/x-www-form-urlencoded')):
                 break;
