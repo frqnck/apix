@@ -1,9 +1,31 @@
-(This template is based on the README.md file used by Phix and its own components. Edit / replace to suit).
+Zenya Api Server (roadmap)
+================
 
-ComponentName
-==============
+<?php
+$api = new Zenya/Api/Server();
 
-**ComponentName** is a simple-to-use PHP component that provides ...?
+$api->onRead('/keywords/id', function($id) {
+    return results;
+});
+
+
+$api->onCreate('/keywords/map', function($keyword) {
+    // thbit
+    return results;
+});
+?>
+
+Zenya Api Client (roadmap)
+================
+
+<?php
+$api = new Zenya/Api/Client();
+$api->read('/keywords/id');
+
+$api->addK
+?>
+
+
 
 System-Wide Installation
 ------------------------
