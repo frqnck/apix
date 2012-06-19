@@ -4,6 +4,27 @@ namespace Zenya\Api;
 
 class Request
 {
+
+    /**
+     * The singleton instance
+     * @var Request
+     */
+    static private $instance = null;
+
+    /**
+     * Returns as a singleton instance
+     *
+     * @return Request
+     */
+    static public function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
     /**
      * Holds the URI string
      * @var string
@@ -32,7 +53,7 @@ class Request
      * Constructor
      * return void
      */
-    public function __construct()
+    private function __construct()
     {
         #$request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
         #print_r($request->get());
@@ -40,7 +61,7 @@ class Request
 
         $this->setHeaders();
         $this->setParams();
-        #$this->setBody();
+        $this->setBody();
     }
 
     //private function __clone() {}
@@ -214,7 +235,7 @@ class Request
         return $this->headers;
     }
 
-    public function getIP()
+    public function getIp()
     {
         $ip = $this->getHeader('HTTP_CLIENT_IP');
         if (empty($ip)) {
