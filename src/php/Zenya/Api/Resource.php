@@ -72,9 +72,12 @@ class Resource extends Listener
 
         $this->setRouteOverrides($route);
 
-        // Relection
-        $this->refClass = new ReflectionClass($class->name);
-        $this->actions = $this->refClass->getActionsMethods($route->getActions());
+        try {
+          $this->refClass = new ReflectionClass($class->name);
+          $this->actions = $this->refClass->getActionsMethods($route->getActions());
+        } catch (\Exception $e) {
+          throw new \RuntimeException("Resource entity not yet implemented.");
+        }
 
         // TODO: merge with TEST & OPTIONS ???
         ###Server::d( $this->actions );
