@@ -19,16 +19,16 @@ class Config extends \Pimple
      *
      * @return Config
      */
-    static public function getInstance()
+    static public function getInstance($skip=false)
     {
         if (null === self::$instance) {
-            self::$instance = new self();
+            self::$instance = new self($skip);
         }
 
         return self::$instance;
     }
 
-    public function __construct()
+    public function __construct($skip=false)
     {
         $c = $this;
 
@@ -37,13 +37,11 @@ class Config extends \Pimple
         $this['config_file'] = realpath(__DIR__ . '/../../../data/config.dist.php');
             //getenv('HOME') . '/.zenya/config.php';
 
-        $this->config = $this->getConfigurations();
-
-#$users = $this->getServices('users');
-#print_r($users);exit;
-
-        #echo '<pre>'; print_r($this->getListeners()); exit;
-
+        if( $skip !== true ) {
+            $this->config = $this->getConfigurations();
+        } else {
+            $this->config = $this->getConfigDefaults();
+        }
         // TODO: debug
         //echo ' [construct] ';
     }
@@ -86,8 +84,7 @@ class Config extends \Pimple
        throw new \RuntimeException( sprintf('%s for "%s" does not exists.', ucfirst($kind), $key) );
     }
 
-
-    public function getConfig($key=null)
+    public function get($key=null)
     {
         if (is_null($key)) {
             return $this->config;
@@ -114,6 +111,19 @@ class Config extends \Pimple
         return $this->injected[$key] = $mixed;
     }
 
+    // New: closure
+    public function addRoute($route, $action, $method='GET')
+    {
+        if($action instanceOf \Closure) {
+            return $this->config['routes'][$route] = array(
+                'controller' => $route,
+            );
+        }
+
+        throw RuntimeException('Route could not be imported');
+    }
+
+
     public function getConfigDefaults()
     {
         $c = $this;
@@ -131,7 +141,7 @@ class Config extends \Pimple
 
             // routing
             'routing' => array(
-                'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+                'route_prefix'      => '@^(/index(\d)?.php)?/api/v(\d*)@i', // regex
                 'default_format'    => 'json',
                 // following is use for output format negociation
                 'controller_ext'    => true, // true or false (e.g. resource.json)

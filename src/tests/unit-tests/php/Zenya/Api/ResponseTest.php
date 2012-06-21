@@ -12,7 +12,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $request = new Request();
+        $request = Request::getInstance();
         $this->response = new Response($request);
         $this->response->unit_test = true;
     }

@@ -20,7 +20,7 @@ $c['services'] = array(
         // TODO: retrieve the users from somewhere, caching strategy?
         $users = array(
             // username:realm:sharedSecret:role
-            0=>array('username'=>'franck', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey', 'role'=>'admin'),
+            0=>array('username'=>'franck', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey1', 'role'=>'admin'),
             1=>array('username'=>'bob', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'sesame', 'role'=>'guest')
         );
         return $users;
@@ -42,21 +42,21 @@ $c['routes'] = array(
 
     '/upload/:type/:debug' => array(
         'controller' => 'UploadResource',
-        'type'  => null,
-        'debug'  => null,
+        // 'type'  => null,
+        // 'debug'  => null,
     ),
-
 
     '/auth/:param1' => array(
-        'controller' => 'AuthResource'
+        'controller' => 'AuthResource',
+        //'param1'=>'hh'
     ),
 
-    '/:controller/:param1/:param2' => array(
-        #function() {echo '------ss';},
-        #'controller' => 'BlankResource',
-        #'class_name' => 'Zenya\Api\Fixtures\BlankResource',
-        #'class_args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
-    )
+    // '/:controller/:param1/:param2' => array(
+    //     #function() {echo '------ss';},
+    //     #'controller' => 'BlankResource',
+    //     #'class_name' => 'Zenya\Api\Fixtures\BlankResource',
+    //     #'class_args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
+    // )
 );
 
 // resources
@@ -120,8 +120,8 @@ $c['listeners'] = array(
                 $adapter = new Listener\Auth\Digest($c['api_realm']);
                 $adapter->setToken = function(array $digest) use ($c, $adapter)
                 {
-                    print_r($digest);
-                    $users = Services::get('users');
+                    $config = Config::getInstance();
+                    $users = $config->getServices('users');
                     foreach($users as $user)
                     {
                         if( // this should be altered accordingly!
