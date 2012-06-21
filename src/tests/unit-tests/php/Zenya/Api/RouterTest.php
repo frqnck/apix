@@ -38,8 +38,30 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $route->getParams());
     }
 
+    public function testBasicRouting1Step($url='/voila')
+    {
+        $rules = array($url => array('controller'=>'implyController', 'action'=>'implyAction'));
 
-    public function testBasicRouting()
+        $route = new Router( $rules );
+        $route->map($url);
+
+        $this->assertSame('implyController', $route->getControllerName());
+        $this->assertSame('implyAction', $route->getAction());
+    }
+
+    public function testBasicRouting2Step($url='/voila')
+    {
+        $rules = array($url . '/:someparams' => array('controller'=>'implyController', 'action'=>'implyAction'));
+
+        $route = new Router( $rules );
+        $route->map($url);
+
+        $this->assertSame('implyController', $route->getControllerName());
+        $this->assertSame('implyAction', $route->getAction());
+    }
+
+
+    public function testBasicRoutingThreeSteps()
     {
         $rules = array('/:one/:two/:three' => array('controller'=>'implyController', 'action'=>'implyAction'));
         $route = new Router( $rules );
@@ -193,11 +215,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase
    /**
      * @dataProvider propertiesProvider
      */
-    public function testSetMainProperties($r)
+    public function testsetAsProperties($r)
     {
         extract($r);
         $route = new Router(array(), $defaults);
-        $route->setMainProperties($rules, $params);
+        $route->setAsProperties($rules, $params);
 
         $this->assertSame($results['controller'], $route->getControllerName());
         $this->assertSame($results['action'], $route->getAction());
@@ -253,16 +275,16 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider ruleProvider
+     * @dataProvider routeParamsProvider
      */
-    public function testRuleMatch($rule, $url, $expected)
+    public function testRouteToParamsMatcher($route, $url, $expected)
     {
         $router = new Router(array(), array('controller'=>'home'));
-        $results = $router->ruleMatch($rule, $url);
+        $results = $router->routeToParamsMatcher($route, $url);
         $this->assertSame($expected, $results);
     }
 
-    public function ruleProvider()
+    public function routeParamsProvider()
     {
         return array(
              array('/:a/:b/:c', '/a/b/c', array('a'=>'a','b'=>'b','c'=>'c')),

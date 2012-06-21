@@ -12,7 +12,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->request = new Request;
+        $this->request = Request::getInstance();
     }
 
     protected function tearDown()

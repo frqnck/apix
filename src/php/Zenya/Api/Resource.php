@@ -66,12 +66,23 @@ class Resource extends Listener
      * @return array
      * @throws Zenya\Api\Exception
      */
-    public function call(\stdClass $class)
+    public function call($resource)
     {
         $route = $this->route;
 
-        $this->setRouteOverrides($route);
+        $this->setRouteOverrides($this->route);
 
+        if(is_array($resource)) {
+          #echo 'CLOSURE';exit;
+          return $this->_closure($resource, $this->route);
+        } else {
+          #echo 'CLASS';exit;
+          return $this->_class($resource, $this->route);
+        }
+    }
+ 
+     protected function _class(\stdClass $class, $route)
+     {
         try {
           $this->refClass = new ReflectionClass($class->name);
           $this->actions = $this->refClass->getActionsMethods($route->getActions());
@@ -114,6 +125,36 @@ class Resource extends Listener
         return call_user_func_array(array(new $class->name($class->args), $route->getAction()), $params);
     }
 
+    protected function _closure($resource, $route)
+    {
+        
+        $res = $resource[$route->getMethod()];
+
+        try {
+          $this->refMethod = new ReflectionFunc($res['action']);
+          
+print_r($this->refMethod->getDocComment());
+          #$this->actions = $this->refMethod->getActionsMethods($route->getActions());
+        } catch (\Exception $e) {
+          throw new \RuntimeException("Resource entity not yet implemented.");
+        }
+
+        // TODO: merge with TEST & OPTIONS ???
+        ###Server::d( $this->actions );
+
+        // try {
+        //     $this->refMethod = $this->ref->getMethod($route->getAction());
+        // } catch (\Exception $e) {
+        //     throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
+        // }
+
+        $params = $this->getRequiredParams($route->getMethod(), $this->refMethod, $route->getParams());
+        $this->addAllListeners('resource', 'early');
+
+        return call_user_func_array($res['action'], $params);
+    }
+
+
     public function getDocs($action=null)
     {
         $this->refClass->parseClassDoc();
@@ -131,6 +172,7 @@ class Resource extends Listener
 
     public function isPublic()
     {
+      return;
         $action = $this->route->getAction();
         $docs = $this->getDocs();
 
