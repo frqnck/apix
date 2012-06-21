@@ -32,6 +32,7 @@ class UploadResource
      * Post
      *
      * @param  string $type
+     * @param  string $debug
      * @return array
      *
      * @api_role public
