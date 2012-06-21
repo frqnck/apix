@@ -38,7 +38,7 @@ class Router
     protected $action = null;
 
     /**
-     * Holds all the actions (HTTP methods => CRUD verbs)
+     * Holds all the actions (HTTP methods to CRUD verbs)
      * @var array
      */
     protected $actions = array(
@@ -57,14 +57,7 @@ class Router
      */
     protected $params = array();
 
-    /**
-     * @var	array
-     */
     private $_rules = array();
-
-    /**
-     * @var	array
-     */
     private $_defaults = array();
 
     /**
@@ -103,7 +96,7 @@ class Router
      * @param  array $params
      * @return void
      */
-    public function setMainProperties(array $rules, array $params)
+    public function setAsProperties(array $rules, array $params)
     {
         foreach (array_keys($this->_defaults) as $k) {
             $value = isset($rules[$k]) ? $rules[$k]	// rules
@@ -122,50 +115,56 @@ class Router
     }
 
     /**
-     * Url mapper
+     * Maps an URI to the routing/rules table
      *
      * @param  string $uri
-     * @param  array  $params Additional params to merge with the current set(optional)
+     * @param  array  $params Additional params to merge with the current set (optional)
      * @return void
      */
     public function map($uri, array $params=null)
     {
         if (!is_null($params)) {
-            // merge with exisitin, precedence!
+            // merge with existing, precedence!
             $this->setParams( $this->params+$params );
         }
-        foreach ($this->_rules as $k => $rules) {
-            $params = $this->ruleMatch($k, $uri);
-            if ($params) {
-                $this->setMainProperties($rules, $params);
 
-                return;
+        foreach ($this->_rules as $route => $rules) {
+            $params = $this->routeToParamsMatcher($route, $uri);
+            if ($uri == $route || $params) {
+                return $this->setAsProperties($rules, $params);
             }
         }
     }
 
     /**
-     * Rule matcher...
+     * Tries to match a route to an URI params
      *
-     * @param  string $rule
-     * @param  string $url
+     * @param  string $route
+     * @param  string $uri
      * @return array
      */
-    public function ruleMatch($rule, $url)
+    public function routeToParamsMatcher($route, $uri)
     {
-        $ruleItems = explode('/', $rule);
-        $paths = explode('/', $url);
+        $bits = explode('/', $route);
+        $paths = explode('/', $uri);
         $result = array();
-        foreach ($ruleItems as $key => $value) {
-            if (preg_match('/^:[\w]{1,}$/', $value)) {
-                $value = substr($value, 1);
+
+        // match 1st URI element not a param
+        if(count($paths) == 2 && count($bits) >2 ) {
+            if($paths[1] == $bits[1]) {
+                return array($paths[1]);
+            }
+        }
+
+        // params
+        foreach ($bits as $key => $value) {
+            if (preg_match('/^:[\w]+$/', $value)) {
                 if (isset($paths[$key])) {
+                    $value = substr($value, 1); // rm ':'
                     $result[$value] = $paths[$key];
                 }
-            } else {
-                if (!isset($paths[$key]) || strcmp($value, $paths[$key]) != 0) {
-                    return false;
-                }
+            } else if (!isset($paths[$key]) || strcmp($value, $paths[$key]) != 0) {
+                return false;
             }
         }
 
@@ -173,7 +172,8 @@ class Router
     }
 
     /**
-     * Sets the current action using the current or a specified method
+     * Sets the current action from a specified method
+     * or use the method in the current scope
      *
      * @param  string $method The method to set the action (optional)
      * @return void

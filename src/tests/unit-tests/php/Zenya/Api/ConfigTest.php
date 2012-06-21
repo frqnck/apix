@@ -9,18 +9,17 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->config = new Config(true);
     }
 
     public function testGetConfigStartsAsAnEmptyArray()
     {
-        $this->config = new Config;
-        $this->assertEquals(array(), $this->config->getConfig('resources'));
+        $this->assertEquals(array(), $this->config->get('resources'));
     }
 
     public function testGetConfigStartsHasDefaultResource()
     {
-        $this->config = new Config;
-        $this->assertArrayHasKey('resources_default', $this->config->getConfig());
+        $this->assertArrayHasKey('resources_default', $this->config->get());
     }
 
     /**
@@ -28,16 +27,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function tesInexistantThrowsInvalidArgumentException()
     {
-        $this->config->getConfig('non-existant');
+        $this->config->get('non-existant');
     }
 
     public function testGetResources()
     {
-        $this->config = new Config;
-        $this->assertSame($this->config->getConfig('resources_default'), $this->config->getResources());
+        $this->assertSame($this->config->get('resources_default'), $this->config->getResources());
 
         $this->config = new Config(array('resources'=>array('resourceName'=>array())));
-        $this->assertSame($this->config->getConfig('resources')+$this->config->getConfig('resources_default'), $this->config->getResources());
+        $this->assertSame($this->config->get('resources')+$this->config->get('resources_default'), $this->config->getResources());
     }
 
     // public function setUp()

@@ -11,7 +11,7 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 
 # Test server
 try {
-    $config = new Zenya\Api\Config;
+    //$config = new Zenya\Api\Config;
     $server = new Zenya\Api\Server();
     echo $server->run();
 } catch (\Exception $e) {
