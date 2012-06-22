@@ -2,11 +2,7 @@
 
 namespace Zenya\Api\Util;
 
-/*
-use Symfony\Component\Finder\Finder;
-use Symfony\Component\HttpKernel\Kernel;
-use Symfony\Component\Process\Process;
-*/
+use Zenya\Api;
 
 class Compile
 {
@@ -34,6 +30,7 @@ class Compile
 
         $phar->startBuffering();
 
+        // all the files
         $root = __DIR__.'/../../../../..';
         foreach ( array('src/php', 'vendor/php') as $dir) {
             $it = new \RecursiveDirectoryIterator("$root/$dir");
@@ -65,6 +62,7 @@ class Compile
         echo 'The new phar has ' . $phar->count() . " entries\n";
 
         unset($phar);
+        chmod($pharFile, 0777);
     }
 
     protected function addFile($phar, $path, $strip = true)
@@ -88,12 +86,13 @@ class Compile
 
         $content = preg_replace("/const VERSION = '.*?';/", "const VERSION = '".$this->version."';", $content);
 
-        $phar->addFromString($localPath, $content);
+        $phar->addFromString('/'.$localPath, $content);
     }
 
     protected function getStub()
     {
         return <<<'EOF'
+#!/usr/bin/env php
 <?php
 /**
  * Sleepover.phar
@@ -101,19 +100,22 @@ class Compile
 
 Phar::mapPhar('sleepover.phar');
 
+#require 'phar://sleepover.phar/';
+
 // set_include_path(get_include_path()
 //     .PATH_SEPARATOR.'phar://'.__FILE__.'/src/php'
 //     .PATH_SEPARATOR.'phar://'.__FILE__.'/vendor/php'
 //     );
 // spl_autoload_register();
 
-#require_once 'phar://sleepover.phar/vendor/php/psr0.autoloader.php';
+require 'phar://sleepover.phar/vendor/php/psr0.autoloader.php';
+
 /*
 define('APP_TOPDIR', 'phar://sleepover.phar/src/php');
 define('APP_LIBDIR', 'phar://sleepover.phar/vendor/php');
 #define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
 
-require_once APP_LIBDIR . '/psr0.autoloader.php';
+require APP_LIBDIR . '/psr0.autoloader.php';
 
 psr0_autoloader_searchFirst(APP_LIBDIR);
 psr0_autoloader_searchFirst(APP_TOPDIR);
@@ -146,7 +148,7 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
         case 'check':
             $latest = trim(file_get_contents('http://sleepover.dev/get/version'));
 
-            if ($latest != Silex\Application::VERSION) {
+            if ($latest != Server::VERSION) {
                 printf("A newer Sleepover version is available (%s).\n", $latest);
             } else {
                 print("You are using the latest Sleepover version.\n");
