@@ -127,8 +127,11 @@ class Help
         // $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
         // $this->_output = $help->toArray();
 
+echo 'TODO: Help reflection';
+
         $resource = $this->server->resource;
         $class = $this->server->getResource($name);
+
 
         $doc = new ReflectionClass($class->name);
         $doc->parseClassDoc();

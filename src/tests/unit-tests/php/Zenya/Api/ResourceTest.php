@@ -35,7 +35,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     public function testSetRouteOverridesOnGet()
     {
         $this->resource->setRouteOverrides($this->route);
-        $this->assertEquals('controller', $this->route->getControllerName());
+        $this->assertEquals('controller', $this->route->getController());
     }
 
     /**
@@ -51,7 +51,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $route->setMethod('HEAD');
         $this->resource->setRouteOverrides($route);
 
-        $this->assertEquals('test', $route->getControllerName());
+        $this->assertEquals('test', $route->getController());
 
 /* todo review        
         $params = $route->getParams(); // TODO: review!
@@ -74,7 +74,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $route->setMethod('OPTIONS');
         $this->resource->setRouteOverrides($route);
 
-        $this->assertEquals('help', $route->getControllerName());
+        $this->assertEquals('help', $route->getController());
 
         $params = $route->getParams(); // TODO: review!
         #$this->assertSame('resourceName', $params['name']);
@@ -98,10 +98,13 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
     public function testCall()
     {
-        $class = new \stdClass;
-        $class->name = 'Zenya\Api\Fixtures\CrudClass';
+        $resource = array(
+            'controller' => array(
+                'name' => 'Zenya\Api\Fixtures\CrudClass'
+            )
+        );
 
-        $results = $this->resource->call($class);
+        $results = $this->resource->call($resource);
         $this->assertSame(array('123'), $results );
     }
 
@@ -117,10 +120,13 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $route->setMethod('XXX');
         $resource = new Resource($route);
 
-        $class = new \stdClass;
-        $class->name = 'Zenya\Api\Fixtures\CrudClass';
+        $r = array(
+            'controller' => array(
+                'name' => 'Zenya\Api\Fixtures\CrudClass'
+            )
+        );
 
-        $results = $resource->call($class);
+        $results = $resource->call($r);
     }
 
     /**
@@ -135,9 +141,12 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
         $route->setMethod('GET');
         $resource = new Resource($route);
 
-        $class = new \stdClass;
-        $class->name = 'Zenya\Api\Fixtures\CrudClass';
+        $r = array(
+            'controller' => array(
+                'name' => 'Zenya\Api\Fixtures\CrudClass'
+            )
+        );
 
-        $results = $resource->call($class);
+        $results = $resource->call($r);
     }
 }

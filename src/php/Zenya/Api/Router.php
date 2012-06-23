@@ -71,7 +71,7 @@ class Router
     {
         foreach ($rules as $key => $rule) {
             if ( is_int($key) ) {
-                throw new \InvalidArgumentException("Invalid rules array specified (not associative)", 500);
+                throw new \InvalidArgumentException("Invalid rules array specified (not associative)");
             }
             $this->_rules[$key] = $rule;
         }
@@ -92,6 +92,8 @@ class Router
      *      - router params,
      *      - then router defauls.
      *
+
+     * @param  string $route
      * @param  array $rules
      * @param  array $params
      * @return void
@@ -131,6 +133,7 @@ class Router
         foreach ($this->_rules as $route => $rules) {
             $params = $this->routeToParamsMatcher($route, $uri);
             if ($uri == $route || $params) {
+                $this->name = $route;
                 return $this->setAsProperties($rules, $params);
             }
         }
@@ -272,7 +275,7 @@ class Router
     }
 
     /**
-     * Sets the controller name
+     * Sets the controller
      *
      * @param  string $controller
      * @return void
@@ -283,11 +286,11 @@ class Router
     }
 
     /**
-     * Returns the controller name
+     * Returns the current controller
      *
      * @return string
      */
-    public function getControllerName()
+    public function getController()
     {
         return $this->controller;
     }
@@ -304,7 +307,7 @@ class Router
     }
 
     /**
-     * Returns the method
+     * Returns the current method
      *
      * @return string
      */
