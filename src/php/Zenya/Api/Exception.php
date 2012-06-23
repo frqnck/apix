@@ -82,9 +82,8 @@ class Exception extends \Exception {
      */
     public static function shutdownHandler()
     {
-        #echo __CLASS__;
         $error = error_get_last();
-        if ($error !== NULL) {
+        if ($error !== null) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
             echo "<h1>500 Internal Server Error</h1>";
             $info = sprintf(
@@ -96,6 +95,20 @@ class Exception extends \Exception {
             die( $info );
         }
 
+    }
+
+    public static function startupException(\Exception $e)
+    {
+        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+        echo "<h1>500 Internal Server Error</h1>";
+        $info = sprintf(
+                "[%s]\n %s:%d %s",
+                'Startup',
+                $e->getFile(),
+                $e->getLine(),
+                $e->getMessage()
+            );
+        die( $info );        
     }
 
 }

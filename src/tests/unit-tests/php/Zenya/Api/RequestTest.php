@@ -20,11 +20,22 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         unset($this->request);
     }
 
-    /**
-     * @covers Zenya\Api\Server::__construct
-     */
-    public function testConstructor()
+    public function testIsSingleton()
     {
+        $req = Request::getInstance();
+        $req2 = Request::getInstance();
+
+        $this->assertSame($req, $req2);
+    }
+    /**
+     * @covers Zenya\Api\Request::__clone
+     */
+    public function Off___testIsSingletonIsNotClonable()
+    {
+        // $r = clone $this->request;
+        $r = new \ReflectionClass($this->request);
+        $p = $r->getMethods(\ReflectionMethod::IS_PRIVATE|\ReflectionMethod::IS_FINAL);
+        $this->assertSame('__clone', $p[0]->name);
     }
 
     public function testGetSetUri()
@@ -83,6 +94,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $this->request->setParams(array('a', 'b', 'c'));
         $this->assertSame(array('a', 'b', 'c'), $this->request->getParams() );
+
+        $this->request->setParams();
+        $this->assertSame($_REQUEST, $this->request->getParams() );
     }
 
     public function testGetSetMethod()
@@ -110,6 +124,10 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $this->request->setHeaders(array('a', 'b', 'c'));
         $this->assertSame(array('a', 'b', 'c'), $this->request->getHeaders() );
+
+        $this->request->setHeaders();
+        $this->assertSame($_SERVER, $this->request->getHeaders() );
+
     }
 
     public function testGetIp()
