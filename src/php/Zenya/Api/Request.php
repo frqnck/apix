@@ -53,7 +53,7 @@ class Request
      * Constructor
      * return void
      */
-    private function __construct()
+    protected function __construct()
     {
         #$request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
         #print_r($request->get());
@@ -64,7 +64,7 @@ class Request
         $this->setBody();
     }
 
-    //private function __clone() {}
+    // private final function __clone() {}
 
     public function getUri()
     {
@@ -271,7 +271,7 @@ class Request
     {
 /*
         static $decodedBody = null;
-        if (!is_null($decodedBody)) {
+        if (null !== $decodedBody) {
             return $decodedBody;
         }
 */

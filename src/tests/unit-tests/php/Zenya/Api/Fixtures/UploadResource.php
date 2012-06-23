@@ -49,7 +49,7 @@ class UploadResource
      * @param  string $type
      * @return array
      *
-     * @api_role admin
+     * @api_role public
      *
      */
     public function onCreate($type, $debug=false, Request $request=null)
