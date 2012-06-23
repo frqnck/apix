@@ -47,7 +47,7 @@ class Resource extends Listener
 
                 $route->setParams(
                     array(
-                      'resource'     => $route->getControllerName(),
+                      'resource'     => $route->getController(),
                       'http_method'  => $route->hasParam('http_method') ? $route->getParam('http_method') : null,
                       #'optionals'   => new Request,
                       #'filters'     => 'itest'
@@ -67,31 +67,35 @@ class Resource extends Listener
      * @throws Zenya\Api\Exception
      */
     public function call($resource)
-    {
-        $route = $this->route;
-
+    {      
         $this->setRouteOverrides($this->route);
 
-        if(is_array($resource)) {
-          #echo 'CLOSURE';exit;
+        // TODO: check for aliases!
+
+        if(!isset($resource['controller'])) {
+          // assume closure based
           return $this->_closure($resource, $this->route);
         } else {
-          #echo 'CLASS';exit;
-          return $this->_class($resource, $this->route);
+          // must be class based
+          return $this->_class($resource['controller'], $this->route);
         }
+
+        throw new Exception('Could not load that resoruce (todo)');
     }
  
-     protected function _class(\stdClass $class, $route)
-     {
+    protected function _class(array $controller, $route)
+    {
+        $name = $controller['name'];
+        $args = isset($controller['args']) ? $controller['args'] :null;
+
         try {
-          $this->refClass = new ReflectionClass($class->name);
+          $this->refClass = new ReflectionClass($name);
           $this->actions = $this->refClass->getActionsMethods($route->getActions());
         } catch (\Exception $e) {
           throw new \RuntimeException("Resource entity not yet implemented.");
         }
 
         // TODO: merge with TEST & OPTIONS ???
-        ###Server::d( $this->actions );
 
         // if( !in_array($route->getMethod(), array('OPTIONS')) )
         // {
@@ -122,18 +126,22 @@ class Resource extends Listener
 
         $this->addAllListeners('resource', 'early');
 
-        return call_user_func_array(array(new $class->name($class->args), $route->getAction()), $params);
+        return call_user_func_array(
+          array(
+            new $name($args),
+            $route->getAction()),
+            $params
+          );
     }
 
     protected function _closure($resource, $route)
     {
-        
-        $res = $resource[$route->getMethod()];
-
-        try {
-          $this->refMethod = new ReflectionFunc($res['action']);
+      $res = $resource['actions'][$route->getMethod()];
+      try {
+        $this->refMethod = new ReflectionFunc($res['action']);
           
-print_r($this->refMethod->getDocComment());
+          $func = new \ReflectionFunction($res['action']);
+
           #$this->actions = $this->refMethod->getActionsMethods($route->getActions());
         } catch (\Exception $e) {
           throw new \RuntimeException("Resource entity not yet implemented.");
@@ -157,22 +165,23 @@ print_r($this->refMethod->getDocComment());
 
     public function getDocs($action=null)
     {
-        $this->refClass->parseClassDoc();
+        $ref = isset($this->refClass) ? $this->refClass : $this->refMethod;
+        
+        $ref->parseClassDoc();
 
         if( isset($action)) {
-          $this->refClass->parseMethodDoc($action);
-        } else {
+          $ref->parseMethodDoc($action);
+        } elseif(isset($this->actions)) {
           foreach ($this->actions as $method) {
-             $this->refClass->parseMethodDoc($method);
+             $ref->parseMethodDoc($method);
           }
         }
 
-        return $this->refClass->getDocs();
+        return $ref->getDocs();
     }
 
     public function isPublic()
     {
-      return;
         $action = $this->route->getAction();
         $docs = $this->getDocs();
 

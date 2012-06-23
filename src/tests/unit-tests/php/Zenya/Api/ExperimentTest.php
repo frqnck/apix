@@ -46,10 +46,9 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
         });
 
         $this->request->expects($this->once())->method('getUri')->will($this->returnValue('/keywords/keywordToTest'));
-        
         $this->request->expects($this->any())->method('getMethod')->will($this->returnValue('GET'));
 
-        $this->api->setRouting($this->request, $this->config->getRoutes(), $this->config->get('routing'));
+        $this->api->setRouting($this->request, $this->api->getResources(), $this->config->get('routing'));
 
         echo $this->api->run();
 
