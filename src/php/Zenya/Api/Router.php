@@ -46,6 +46,7 @@ class Router
         'GET'       => 'onRead',
         'PUT'       => 'onUpdate',
         'DELETE'    => 'onDelete',
+        'PATCH'     => 'onModify',
         'OPTIONS'   => 'onHelp',
         'HEAD'      => 'onTest',
         'TRACE'     => 'onTrace'
@@ -280,7 +281,7 @@ class Router
      * @param  string $controller
      * @return void
      */
-    public function setControllerName($controller)
+    public function setController($controller)
     {
         $this->controller = $controller;
     }

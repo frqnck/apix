@@ -95,7 +95,7 @@ class Server extends Listener
 
             // set the error controller!
             if ( !in_array($this->route->getController(), array_keys($this->getResources())) ) {
-                $this->route->setControllerName('error');
+                $this->route->setController('error');
                 $this->results = $this->results['error'];
             }
 
@@ -113,7 +113,7 @@ class Server extends Listener
 
             case 405:
                 $this->response->setHeader('Allow',
-                    implode(', ', array_keys($this->resource->actions)),
+                    implode(', ', array_keys($this->resource->getActions())),
                     false // preserve existing
                 );
         }
@@ -162,7 +162,7 @@ class Server extends Listener
      * @param  Request $request
      * @return void
      */
-    public function setRouting(Request $request, array $routes, array $opts)
+    public function setRouting(Request $request, array $resources, array $opts)
     {
         // Get path without the route prefix
         $path = preg_replace($opts['route_prefix'], '', $request->getUri());
@@ -181,7 +181,7 @@ class Server extends Listener
         }
 
         $this->route = new Router(
-            $routes,
+            $resources,
             array(
                 'method'        => $request->getMethod(),
                 'path'          => $path,
@@ -336,13 +336,12 @@ class Server extends Listener
 
     protected function proxy($route, \Closure $to, $method)
     {
-        #$values = Config::getInstance()->addRoute($route, $to);
-
         $this->addResource($route, array(
-                'action'     => $to,
-                'method'     => $method,
+                'action'    => $to,
+                'method'    => $method,
                 'doc'       => null
-            ));
+            )
+        );
     }
 
 

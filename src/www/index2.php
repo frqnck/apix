@@ -13,7 +13,17 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     $api = new Zenya\Api\Server;
 
-    $api->onRead('/keywords', function()
+    $api->onRead('/keywords',
+        
+    /**
+     * Doc about the func/closure.
+     *
+     * @param  string $keyword
+     * @return array  The return array
+     * @check https://github.com/jeremeamia
+     * @api_role admin
+     */
+    function()
     {
         return array('List keywords');
     });
@@ -30,7 +40,7 @@ try {
 		 */
 		function($keyword, $optional=null)
 		{
-		    return array('keyword' => $keyword, 'optional'=>$optional);
+		    return array('keyword' => $keyword, 'optional'=>$optional, 'from'=>__FUNCTION__);
 		}
 	);
 
