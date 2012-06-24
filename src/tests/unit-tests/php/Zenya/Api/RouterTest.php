@@ -334,10 +334,10 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('onUpdate', $router->getAction() );
     }
 
-    public function testGetsetControllerName()
+    public function testGetsetController()
     {
         $router = new Router(array());
-        $router->setControllerName('resourceName');
+        $router->setController('resourceName');
         $this->assertSame('resourceName', $router->getController() );
     }
 
