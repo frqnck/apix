@@ -48,11 +48,9 @@ class ReflectionFunc extends \ReflectionFunction
      */
     public function parseMethodDoc($name)
     {
-        $method = parent::getMethod($name);
-
-        return $this->docs['methods'][ $method->getShortName() ] =
+        return $this->docs['methods'][ $name ] =
             self::parseDocBook(
-                $method->getDocComment()
+                $this->getDocComment()
             );
     }
 

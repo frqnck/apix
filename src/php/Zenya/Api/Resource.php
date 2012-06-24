@@ -33,6 +33,18 @@ class Resource extends Listener
     }
 
     /**
+     * Adds Method Overrides
+     *
+     * @param  Router $route
+     * @return string
+     */
+    public function getActions()
+    {
+        $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
+        return $this->actions+$overrides;
+    }
+
+    /**
      * Return the classname for a resource (long and private)
      *
      * @param  Router $route
@@ -40,22 +52,21 @@ class Resource extends Listener
      */
     public function setRouteOverrides(Router $route)
     {
-        switch ($route->getMethod()) {
-            case 'OPTIONS': // resource's help
-            case 'HEAD':    // resource's test
-                $route->setControllerName($route->getMethod()=='OPTIONS' ? 'help' : 'test');
+        $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
+        $method = $route->getMethod();
+        if(!isset($resource['actions'][$method]) && array_key_exists($method, $overrides))
+        {
+          $resource['actions'][$method]['alias'] = $overrides[$route->getMethod()];
+         //d($resource);exit;
 
-                $route->setParams(
-                    array(
-                      'resource'     => $route->getController(),
-                      'http_method'  => $route->hasParam('http_method') ? $route->getParam('http_method') : null,
-                      #'optionals'   => new Request,
-                      #'filters'     => 'itest'
-                    )
-                );
-                #Server::d($route->getParams());
-
-            break;
+          $route->setParams(
+              array(
+                'resource'     => 'todo-path-to-res?', //todo path? $route->getController(),
+                'http_method'  => $route->hasParam('http_method')
+                                  ? $route->getParam('http_method')
+                                  : null,
+              )
+          );
         }
     }
 
@@ -68,19 +79,23 @@ class Resource extends Listener
      */
     public function call($resource)
     {      
-        $this->setRouteOverrides($this->route);
+        // TODO: add to actions!!! if not implemented.
+        // use actions as the standad mean (Refactor).
+       // $this->setRouteOverrides($this->route);
 
-        // TODO: check for aliases!
-
-        if(!isset($resource['controller'])) {
-          // assume closure based
-          return $this->_closure($resource, $this->route);
-        } else {
+        if( isset($resource['controller']['name'])
+           # && is_callable( addslashes($resource['controller']['name']) )
+        ) {
           // must be class based
           return $this->_class($resource['controller'], $this->route);
         }
 
-        throw new Exception('Could not load that resoruce (todo)');
+        // if($action instanceOf \Closure) { //is_callable( $action )) {
+          // assume closure based
+          return $this->_closure($resource, $this->route);
+        // }
+
+      throw new \RuntimeException("Resource entity missing an implementation.");
     }
  
     protected function _class(array $controller, $route)
@@ -92,7 +107,7 @@ class Resource extends Listener
           $this->refClass = new ReflectionClass($name);
           $this->actions = $this->refClass->getActionsMethods($route->getActions());
         } catch (\Exception $e) {
-          throw new \RuntimeException("Resource entity not yet implemented.");
+          throw new \RuntimeException("Resource entity not yet implemented (class)");
         }
 
         // TODO: merge with TEST & OPTIONS ???
@@ -136,37 +151,33 @@ class Resource extends Listener
 
     protected function _closure($resource, $route)
     {
-      $res = $resource['actions'][$route->getMethod()];
-      try {
-        $this->refMethod = new ReflectionFunc($res['action']);
-          
-          $func = new \ReflectionFunction($res['action']);
+      $this->actions = $resource['actions'];
 
-          #$this->actions = $this->refMethod->getActionsMethods($route->getActions());
+      if(!isset($this->actions[$route->getMethod()])) {
+          throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified!", 405);
+      }
+
+      try {
+          $action = $resource['actions'][$this->route->getMethod()]['action'];
+          $this->refMethod = new ReflectionFunc($action);
         } catch (\Exception $e) {
-          throw new \RuntimeException("Resource entity not yet implemented.");
+          throw new \RuntimeException("Resource entity not implemented.");
         }
 
         // TODO: merge with TEST & OPTIONS ???
         ###Server::d( $this->actions );
 
-        // try {
-        //     $this->refMethod = $this->ref->getMethod($route->getAction());
-        // } catch (\Exception $e) {
-        //     throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
-        // }
 
         $params = $this->getRequiredParams($route->getMethod(), $this->refMethod, $route->getParams());
         $this->addAllListeners('resource', 'early');
 
-        return call_user_func_array($res['action'], $params);
+        return call_user_func_array($action, $params);
     }
 
 
     public function getDocs($action=null)
     {
         $ref = isset($this->refClass) ? $this->refClass : $this->refMethod;
-        
         $ref->parseClassDoc();
 
         if( isset($action)) {
@@ -182,11 +193,12 @@ class Resource extends Listener
 
     public function isPublic()
     {
-        $action = $this->route->getAction();
-        $docs = $this->getDocs();
+        $verb = isset($this->refClass) ? $this->route->getAction() : $this->route->getMethod();
+        
+        $docs = $this->getDocs($verb);
 
-        $role = isset($docs['methods'][$action]['api_role'])
-          ? $docs['methods'][$action]['api_role']
+        $role = isset($docs['methods'][$verb]['api_role'])
+          ? $docs['methods'][$verb]['api_role']
           : false;
 
         if( !$role || $role == 'public') {

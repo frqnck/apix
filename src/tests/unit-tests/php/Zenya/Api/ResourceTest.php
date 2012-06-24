@@ -23,10 +23,14 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Zenya\Api\Resource::__construct
+     * @expectedException           \PHPUnit_Framework_Error
      */
     public function testConstructor()
     {
-        // TODO: test listeners!
+        // need Router object
+        $resource = new Resource();
+        $resource = new Resource($this->route);
+        $this->assertSame($resource->route, $this->route);
     }
 
     /**
