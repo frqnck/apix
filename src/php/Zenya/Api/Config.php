@@ -133,9 +133,6 @@ class Config extends \Pimple
             'api_realm'     => 'Zenya',
             'api_version'   => '1.0',
 
-            #return sprintf("%s/%s #%s", $app->config['realm'], $app->config['version'], Server::VERSION);
-            #'test'=> $this['debug'],
-
             // output
             'output_rootNode'  => 'zenya',
             'output_sign'      => true,
@@ -145,7 +142,7 @@ class Config extends \Pimple
             'routing' => array(
                 'route_prefix'      => '@^(/index(\d)?.php)?/api/v(\d*)@i', // regex
                 'default_format'    => 'json',
-                // following is use for output format negociation
+                // output format negociations
                 'controller_ext'    => true, // true or false (e.g. resource.json)
                 'format_override'   => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
                 'http_accept'       => true, // true or false
