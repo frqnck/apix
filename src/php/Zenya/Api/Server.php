@@ -17,7 +17,6 @@ class Server extends Listener
     const VERSION = '@package_version@';
 
     private $config = array();
-    private $resources = array();
 
     public $route = null;
 
@@ -26,44 +25,46 @@ class Server extends Listener
         $c = $config === null ? Config::getInstance() : $config;
 
         $this->config = $c->get();
+
+        $c->inject('Server', $this);
+
         $this->request = $request === null ? Request::getInstance() : $request;
 
         // Init response object
-        $this->response = $response !== null
-        ? $response
-        : new Response(
-            $this->request,
-            $this->config['output_sign'],
-            $this->config['output_debug']
-        );
+        $this->response =
+            $response !== null
+                ? $response
+                : new Response(
+                    $this->request,
+                    $this->config['output_sign'],
+                    $this->config['output_debug']
+                );
+
+        // Init response object
+        $this->resources = new Resources;
 
         set_error_handler(array('Zenya\Api\Exception', 'errorHandler'));
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
     }
-        
+
     public function run()
     {
         $c = Config::getInstance();
 
         // add all the resources from config.
         foreach ($c->getResources() as $key => $values) {
-            $this->addResource($key, $values);
+            $this->resources->add(
+                $key, $values
+            );
         }
-
-        // to be passed thru the constructor!!!
-        #$this->setconfig['resources'] = array(
-#        );
-
-        #d( $c->getResources() );
 
         // Routing
         $this->setRouting(
             $this->request,
-            $this->getResources(),
+            $this->resources->toArray(),
             $this->config['routing']
         );
-#    }
-
+ #   }
  ##   public function run()
  #   {
 
@@ -77,10 +78,9 @@ class Server extends Listener
             $this->addAllListeners('server', 'early', $this->config);
 
             // Process with the requested resource
-            $this->resource = new Resource($this->route);
-
-            $this->results = $this->resource->call(
-                $this->getResource($this->route)
+            $resource = new Resource($this->route);
+            $this->results = $resource->call(
+                $this->resources->get($this->route)
             );
 
         } catch (\Exception $e) {
@@ -94,10 +94,10 @@ class Server extends Listener
             );
 
             // set the error controller!
-            if ( !in_array($this->route->getController(), array_keys($this->getResources())) ) {
-                $this->route->setController('error');
-                $this->results = $this->results['error'];
-            }
+            if ( !in_array($this->route->getController(), array_keys( $this->resources->toArray() )) ) {
+               $this->route->setController('error');
+               $this->results = $this->results['error'];
+           }
 
             // attach the listeners @ exception stage
             $this->addAllListeners('server', 'exception');
@@ -113,7 +113,7 @@ class Server extends Listener
 
             case 405:
                 $this->response->setHeader('Allow',
-                    implode(', ', array_keys($this->resource->getActions())),
+                    implode(', ', array_keys($resource->getActions())),
                     false // preserve existing
                 );
         }
@@ -131,13 +131,18 @@ class Server extends Listener
         return $this->route->getMethod() != 'HEAD' ? $output : null;
     }
 
+    /**
+     * Gets the server version string.
+     *
+     * @return string
+     */
     private function getServerVersion()
     {
         return sprintf("%s/%s (%s)", $this->config['api_realm'], $this->config['api_version'], Server::VERSION);
     }
 
     /**
-     * Get the output/results.
+     * Gets the results array.
      *
      * @return array
      */
@@ -146,18 +151,8 @@ class Server extends Listener
         return $this->results;
     }
 
-    // /**
-    //  * Get the output/results.
-    //  *
-    //  * @return array
-    //  */
-    // public function get()
-    // {
-    //     return $this->config;
-    // }
-
     /**
-     * Set the route.
+     * Sets the router.
      *
      * @param  Request $request
      * @return void
@@ -183,10 +178,10 @@ class Server extends Listener
         $this->route = new Router(
             $resources,
             array(
-                'method'        => $request->getMethod(),
-                'path'          => $path,
-                'controller_name'    => null,
-                'controller_args'    => &$this, // TODO: temp!'
+                'method'            => $request->getMethod(),
+                'path'              => $path,
+                'controller_name'   => null,
+                'controller_args'   => &$this, // TODO: temp!'
             )
         );
 
@@ -260,112 +255,49 @@ class Server extends Listener
         $this->response->setFormat($format, $opts['default_format']);
     }
 
-    /**
-     * Gets a ressource.
-     *
-     * @param  string   $name A resource name
-     * @return string
-     * @throws \InvalidArgumentException 404
-     */
-    public function getResource($route)
+    protected function proxy($path, \Closure $to, $method)
     {
-        $name = $route instanceOf Router
-            ? $route->name
-            : $route;
-
-        if (!isset($this->resources[$name])) {
-            //$name = $this->rawControllerName;
-            throw new \InvalidArgumentException(sprintf("Invalid resource's name specified (%s).", $name), 404);
-        }
-
-        $ref = $this->resources[$name];
-
-        if(isset($ref['alias'])) {
-            $ref = $this->resources[$ref['alias']];
-        }
-
-        if( !$this->isClosure($ref) ) {
-
-            $ref['controller']['name'] = isset($ref['controller']['name'])
-                    ? $ref['controller']['name']
-                    : $route->controller_name;
-
-            $ref['controller']['args'] = isset($ref['controller']['args'])
-                    ? $ref['controller']['args']
-                    : $route->controller_args;
-        }
-
-        #d($ref);exit;
-
-        return $ref;
-    }
-
-    public function isClosure($resource)
-    {
-        return isset($resource['action'])
-            && $resource['action'] instanceOf \Closure;
-    }
-
-    /**
-     * Adds a resource, sanitize, etc...
-     *
-     * @param  string $name     The resource name
-     * @param  array  $resource the resource array
-     * @return void
-     */
-    public function addResource($name, array $resource)
-    {
-        if( $this->isClosure($resource) ) { // closure based
-            $this->resources[$name]['actions'][$resource['method']] = $resource;
-
-        } else { // class based.
-            $this->resources[$name] = $resource;
-        }
-
-    }
-
-    /**
-     * Gets all the resources.
-     *
-     * @return array An array of resources
-     */
-    public function getResources()
-    {
-        return $this->resources;
-    }
-
-    protected function proxy($route, \Closure $to, $method)
-    {
-        $this->addResource($route, array(
-                'action'    => $to,
-                'method'    => $method,
-                'doc'       => null
+        $this->resources->add($path, array(
+                'action' => $to,
+                'method' => $method,
+                'doc'    => null
             )
         );
     }
 
-
-
-
-    public function onCreate($route, $to)
+    public function onCreate($path, $to)
     {
-        $this->proxy($route, $to, 'POST');
+        $this->proxy($path, $to, 'POST');
     }
 
-    public function onRead($route, $to)
+    public function onRead($path, $to)
     {
-        $this->proxy($route, $to, 'GET');
+        $this->proxy($path, $to, 'GET');
     }
 
-    public function onUpdate($route, $to)
+    public function onUpdate($path, $to)
     {
-        $this->proxy($route, $to, 'PUT');
+        $this->proxy($path, $to, 'PUT');
     }
 
-    public function onDelete($route, $to)
+    public function onModify($path, $to)
     {
-        $this->proxy($route, $to, 'DELETE');
+        $this->proxy($path, $to, 'PATCH');
     }
 
+    public function onDelete($path, $to)
+    {
+        $this->proxy($path, $to, 'DELETE');
+    }
+
+    public function onHelp($path, $to)
+    {
+        $this->proxy($path, $to, 'OPTIONS');
+    }
+
+    public function onTest($path, $to)
+    {
+        $this->proxy($path, $to, 'HEAD');
+    }
 
 }

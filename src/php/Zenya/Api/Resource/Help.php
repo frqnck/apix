@@ -4,6 +4,7 @@ namespace Zenya\Api\Resource;
 
 use Zenya\Api\ReflectionClass as ReflectionClass;
 use Zenya\Api\Server as Server;
+use Zenya\Api\Router as Router;
 
 /**
  * Help
@@ -40,8 +41,6 @@ class Help
      */
     public function onRead($resource, $http_method=null, array $filters=null)
     {
-        #echo "onRead";Server::d(func_get_args());
-
         return array(
             $resource => $this->_getHelp($resource, $http_method, $filters)
         );
@@ -91,11 +90,20 @@ class Help
 
         } else {
 
+            $doc = $this->_getHelp($this->server->route, $http_method, $filters);
+            return $doc;
+
+
             // specific to just one resource.
             if ($resource == 'help') {
-                $doc = $this->_getHelp($resource, $http_method, $filters);
+                // helps help itslef
+                $doc = $this->_getHelp($this->server->route, $http_method, $filters);
             } else {
-                $doc = array($resource => $this->_getHelp($resource, $http_method, $filters));
+                // helps specified resource
+
+
+
+                $doc = array($resource => $this->_getHelp($this->server->route, $http_method, $filters));
             }
 
             // // A server that does not support such an extension MAY discard the request body.
@@ -120,20 +128,19 @@ class Help
      * @return mixed  array or string on error
      * @access  private
      */
-    private function _getHelp($name, $method=null, array $filters=null)
+    private function _getHelp(Router $route, $method=null, array $filters=null)
     {
         // $man = $this->getParam('resource');
         // $resource = Zenya_Api_Resource::getInternalAppelation($man);
         // $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
         // $this->_output = $help->toArray();
 
-echo 'TODO: Help reflection';
+        #$resource = $this->server->resources;
+        $class = $this->server->resources->get($route);
 
-        $resource = $this->server->resource;
-        $class = $this->server->getResource($name);
+        #echo 'TODO: Help reflection: <pre>'; print_r( $class );exit;
 
-
-        $doc = new ReflectionClass($class->name);
+        $doc = new ReflectionClass($class['controller']['name']);
         $doc->parseClassDoc();
 
         $actions = $doc->getActionsMethods($this->server->route->getActions());

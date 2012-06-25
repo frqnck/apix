@@ -94,18 +94,20 @@ class Config extends \Pimple
        throw new \InvalidArgumentException( sprintf('Config for "%s" does not exists.', $key) );
     }
 
-    public function getResources()
+    public function getResources($key=null)
     {
-        #$this->config['resources_default']['help']['controller_args'] = $this->injected['server'];
-
-        return $this->config['resources']+$this->config['resources_default'];
+        return $this->retrieve('resources', $key);
     }
 
 
-
-    public function injet($key, $mixed)
+    public function inject($key, $mixed)
     {
         return $this->injected[$key] = $mixed;
+    }
+
+    public function getInjected($key)
+    {
+        return $this->injected[$key];
     }
 
     // public function getRoutes()
@@ -128,7 +130,7 @@ class Config extends \Pimple
 
     public function getConfigDefaults()
     {
-        $c = $this;
+        #$c = $this;
         return array(
             'api_realm'     => 'Zenya',
             'api_version'   => '1.0',
@@ -202,20 +204,20 @@ class Config extends \Pimple
                 'help' => array(
                     'controller' => array(
                         'name' => __NAMESPACE__ . '\Resource\Help',
-                        //'args' => null #array( &$this ), # 
+                        'args' => null,
+                        // 'args'          => array(
+                        //     'method'    => 'GET',
+                        //     'name'      => $this->route->getControllerName(),
+                        //     'resource'  => $this->server->getResource( $route->getControllerName() ),
+                        //     'params'    => $route->getParams(),
+                        // )
                     ),
-                    // 'args'          => array(
-                    //     # 'method'  => 'GET',
-                    //     # 'name'    => $this->route->getControllerName(),
-                    //     # 'resource'  => $this->server->getResource( $route->getControllerName() ),
-                    //     # 'params'    => $route->getParams(),
-                    // )
                 ),
                 // HEAD
                 'test' => array(
                     'controller' => array(
                         'name' => __NAMESPACE__ . '\Resource\Test',
-                        'args' => null #array( &$this ), # 
+                        'args' => null #array( &$this ), #
                     ),
                     // 'args' => array()
                 )
