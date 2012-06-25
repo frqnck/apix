@@ -54,10 +54,19 @@ class Resource extends Listener
     {
         $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
         $method = $route->getMethod();
-        if(!isset($resource['actions'][$method]) && array_key_exists($method, $overrides))
+
+        // use override if not set.
+        if(!isset($this->resource['actions'][$method]) && array_key_exists($method, $overrides))
         {
-          $resource['actions'][$method]['alias'] = $overrides[$route->getMethod()];
-         //d($resource);exit;
+          // set as action alias
+          #$this->resource['actions'][$method]['alias'] = $overrides[$route->getMethod()];
+
+          $c = Config::getInstance();
+          $c->getResources($overrides[$route->getMethod()]);
+          $this->resource['actions'][$method] = $c->getResources($overrides[$route->getMethod()]);
+
+        # d( $this->resource);exit;
+
 
           $route->setParams(
               array(
@@ -78,26 +87,36 @@ class Resource extends Listener
      * @throws Zenya\Api\Exception
      */
     public function call($resource)
-    {      
-        // TODO: add to actions!!! if not implemented.
-        // use actions as the standad mean (Refactor).
-       // $this->setRouteOverrides($this->route);
+    {
+      $this->resource = $resource;
 
-        if( isset($resource['controller']['name'])
-           # && is_callable( addslashes($resource['controller']['name']) )
-        ) {
-          // must be class based
-          return $this->_class($resource['controller'], $this->route);
-        }
+      // TODO: add to actions!!! if not implemented.
+      // use actions as the standad mean (Refactor).
+      $this->setRouteOverrides($this->route);
 
-        // if($action instanceOf \Closure) { //is_callable( $action )) {
-          // assume closure based
-          return $this->_closure($resource, $this->route);
-        // }
+      // check wether current action has controller
+      $action = $this->resource['actions'][$this->route->getMethod()];
+      if(isset($action['controller'])) {
+        $this->resource['controller'] = $action['controller'];
+        d($resource->server);
+      }
+
+      // Delegate calls to instance methods
+      if( isset($this->resource['controller']['name'])
+         # && is_callable( addslashes($resource['controller']['name']) )
+      ) {
+        // must be class based
+        return $this->_class($this->resource['controller'], $this->route);
+      }
+
+      // if($action instanceOf \Closure) { //is_callable( $action )) {
+        // assume closure based
+        return $this->_closure($this->resource, $this->route);
+      // }
 
       throw new \RuntimeException("Resource entity missing an implementation.");
     }
- 
+
     protected function _class(array $controller, $route)
     {
         $name = $controller['name'];
@@ -154,11 +173,11 @@ class Resource extends Listener
       $this->actions = $resource['actions'];
 
       if(!isset($this->actions[$route->getMethod()])) {
-          throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified!", 405);
+          throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
       }
 
       try {
-          $action = $resource['actions'][$this->route->getMethod()]['action'];
+          $action = $this->actions[$this->route->getMethod()]['action'];
           $this->refMethod = new ReflectionFunc($action);
         } catch (\Exception $e) {
           throw new \RuntimeException("Resource entity not implemented.");
@@ -194,7 +213,7 @@ class Resource extends Listener
     public function isPublic()
     {
         $verb = isset($this->refClass) ? $this->route->getAction() : $this->route->getMethod();
-        
+
         $docs = $this->getDocs($verb);
 
         $role = isset($docs['methods'][$verb]['api_role'])
