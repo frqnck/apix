@@ -10,7 +10,7 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->config = Config::getInstance(true);
- 
+
         $this->request = $this->getMockBuilder('Zenya\Api\Request')->disableOriginalConstructor()->getMock();
 
         $this->response = $this->getMockBuilder('Zenya\Api\Response')->setConstructorArgs(array('request'=>$this->request))->getMock();
@@ -48,7 +48,7 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
         $this->request->expects($this->once())->method('getUri')->will($this->returnValue('/keywords/keywordToTest'));
         $this->request->expects($this->any())->method('getMethod')->will($this->returnValue('GET'));
 
-        $this->api->setRouting($this->request, $this->api->getResources(), $this->config->get('routing'));
+        $this->api->setRouting($this->request, $this->api->resources->toArray(), $this->config->get('routing'));
 
         echo $this->api->run();
 
