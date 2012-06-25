@@ -161,9 +161,7 @@ class ReflectionClassTest extends \PHPUnit_Framework_TestCase
 
     public function testSpecialCharacteres()
     {
-        $this->markTestIncomplete(
-            'TODO: maybe fix signle *s'
-        );
+        $this->markTestIncomplete('TODO: maybe fix signle *s');
         $this->assertSame('OPTIONS /*/etc...', $this->method['api_link']);
     }
 

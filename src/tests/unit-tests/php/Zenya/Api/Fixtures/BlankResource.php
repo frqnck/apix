@@ -48,12 +48,12 @@ class BlankResource #extends ResourceAbstract
     /**
      * GET method
      *
-     * @param  string $param1
+     * @param  string $keyword
      * @param  string $param2   with comments
      * @param  mixed  $optional
      * @return array
      */
-    public function onRead($param1, $param2=null, $optional=null)
+    public function onRead($keyword, $param2=null, $optional=null)
     {
         return array(
             'class' 			=> __CLASS__,

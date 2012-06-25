@@ -19,16 +19,16 @@ class Config extends \Pimple
      *
      * @return Config
      */
-    static public function getInstance()
+    static public function getInstance($skip=false)
     {
         if (null === self::$instance) {
-            self::$instance = new self();
+            self::$instance = new self($skip);
         }
 
         return self::$instance;
     }
 
-    public function __construct()
+    public function __construct($skip=false)
     {
         $c = $this;
 
@@ -37,13 +37,11 @@ class Config extends \Pimple
         $this['config_file'] = realpath(__DIR__ . '/../../../data/config.dist.php');
             //getenv('HOME') . '/.zenya/config.php';
 
-        $this->config = $this->getConfigurations();
-
-#$users = $this->getServices('users');
-#print_r($users);exit;
-
-        #echo '<pre>'; print_r($this->getListeners()); exit;
-
+        if( $skip !== true ) {
+            $this->config = $this->getConfigurations();
+        } else {
+            $this->config = $this->getConfigDefaults();
+        }
         // TODO: debug
         //echo ' [construct] ';
     }
@@ -86,8 +84,7 @@ class Config extends \Pimple
        throw new \RuntimeException( sprintf('%s for "%s" does not exists.', ucfirst($kind), $key) );
     }
 
-
-    public function getConfig($key=null)
+    public function get($key=null)
     {
         if (is_null($key)) {
             return $this->config;
@@ -99,20 +96,35 @@ class Config extends \Pimple
 
     public function getResources()
     {
-        #$this->config['resources_default']['help']['class_args'] = $this->injected['server'];
+        #$this->config['resources_default']['help']['controller_args'] = $this->injected['server'];
 
         return $this->config['resources']+$this->config['resources_default'];
     }
 
-    public function getRoutes()
-    {
-        return $this->config['routes']+$this->config['routes_default'];
-    }
+
 
     public function injet($key, $mixed)
     {
         return $this->injected[$key] = $mixed;
     }
+
+    // public function getRoutes()
+    // {
+    //     return $this->config['routes']+$this->config['routes_default'];
+    // }
+
+    // New: closure
+    public function addRoute($route, $action)
+    {
+        if($action instanceOf \Closure) {
+            return $this->config['routes'][$route] = array(
+                'controller' => $route,
+            );
+        }
+
+        throw RuntimeException('Route could not be imported');
+    }
+
 
     public function getConfigDefaults()
     {
@@ -121,9 +133,6 @@ class Config extends \Pimple
             'api_realm'     => 'Zenya',
             'api_version'   => '1.0',
 
-            #return sprintf("%s/%s #%s", $app->config['realm'], $app->config['version'], Server::VERSION);
-            #'test'=> $this['debug'],
-
             // output
             'output_rootNode'  => 'zenya',
             'output_sign'      => true,
@@ -131,43 +140,14 @@ class Config extends \Pimple
 
             // routing
             'routing' => array(
-                'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+                'route_prefix'      => '@^(/index(\d)?.php)?/api/v(\d*)@i', // regex
                 'default_format'    => 'json',
-                // following is use for output format negociation
+                // output format negociations
                 'controller_ext'    => true, // true or false (e.g. resource.json)
                 'format_override'   => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
                 'http_accept'       => true, // true or false
             ),
 
-            //  routes
-            'routes' => array(),
-            'routes_default' => array(),
-
-/*
-            'routes' => array(
-                #/:controller/paramName/:paramName/:id' => array(),
-                #'/:controller/test' => array('class_name'=>'test'),
-
-                '/help/:resource/:http_method/:filters' => array(
-                     'controller' => 'help',
-                ),
-
-                // '/category/:param1/:param2/:param3' => array(
-                //     'controller' => 'Category',
-                // ),
-
-                '/auth/:param1' => array(
-                    'controller' => 'AuthResource'
-                ),
-
-                '/:controller/:param1/:param2' => array(
-                    #function() {echo '------ss';},
-                    #'controller' => 'BlankResource',
-                    #'class_name' => 'Zenya\Api\Fixtures\BlankResource',
-                    #'class_args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
-                )
-            ),
-*/
             // services
             'services' => array(),
             'services_default' => array(),
@@ -220,21 +200,25 @@ class Config extends \Pimple
             'resources_default' => array(
                 // OPTIONS
                 'help' => array(
-                        'class_name'    => __NAMESPACE__ . '\Resource\Help',
-                        'class_args'    => null, //&$this
-                        'args'          => array(
-                            # 'method'  => 'GET',
-                            # 'name'    => $this->route->getControllerName(),
-                            # 'resource'  => $this->server->getResource( $route->getControllerName() ),
-                            # 'params'    => $route->getParams(),
-                        )
+                    'controller' => array(
+                        'name' => __NAMESPACE__ . '\Resource\Help',
+                        //'args' => null #array( &$this ), # 
                     ),
+                    // 'args'          => array(
+                    //     # 'method'  => 'GET',
+                    //     # 'name'    => $this->route->getControllerName(),
+                    //     # 'resource'  => $this->server->getResource( $route->getControllerName() ),
+                    //     # 'params'    => $route->getParams(),
+                    // )
+                ),
                 // HEAD
                 'test' => array(
-                        'class_name'    => 'Zenya\Api\Resource\Test',
-                        'class_args'    => null,
-                        'args'          => array()
-                    )
+                    'controller' => array(
+                        'name' => __NAMESPACE__ . '\Resource\Test',
+                        'args' => null #array( &$this ), # 
+                    ),
+                    // 'args' => array()
+                )
             )
         );
     }
