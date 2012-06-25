@@ -312,6 +312,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             'GET'       => 'onRead',
             'PUT'       => 'onUpdate',
             'DELETE'    => 'onDelete',
+            'PATCH'     => 'onModify',
             'OPTIONS'   => 'onHelp',
             'HEAD'      => 'onTest',
             'TRACE'     => 'onTrace'
