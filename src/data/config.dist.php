@@ -27,59 +27,49 @@ $c['services'] = array(
     }
 );
 
-// routes
-$c['routes'] = array(
-    #/:controller/paramName/:paramName/:id' => array(),
-    #'/:controller/test' => array('class_name'=>'test'),
-
-    '/help/:resource/:http_method/:filters' => array(
-         'controller' => 'help',
-    ),
-
-    // '/category/:param1/:param2/:param3' => array(
-    //     'controller' => 'Category',
-    // ),
-
-    '/upload/:type/:debug' => array(
-        'controller' => 'UploadResource',
-        'type'  => null,
-        'debug'  => null,
-    ),
-
-
-    '/auth/:param1' => array(
-        'controller' => 'AuthResource'
-    ),
-
-    '/:controller/:param1/:param2' => array(
-        #function() {echo '------ss';},
-        #'controller' => 'BlankResource',
-        #'class_name' => 'Zenya\Api\Fixtures\BlankResource',
-        #'class_args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
-    )
-);
-
 // resources
 $c['resources'] = array(
-    // 'test' => array(
-    //     'class_args'=>array('arg1'=>'value1', 'arg2'=>'string')
+    
+    // '/:controller/:param1/:param2' => array(
+    //     'controller' => array(
+    //         'name' => 'Zenya\Api\Fixtures\BlankResource',
+    //         'args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
+    //     )
     // ),
-    'resourceName' => array(
-        'class_name' => 'Zenya\Api\Fixtures\BlankResource',
-        'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
+
+    '/keywords/:keyword' => array(
+        'controller' => array(
+            'name' => 'Zenya\Api\Fixtures\BlankResource',
+            'args' => array('arg1'=>'value1', 'arg2'=>'string')
+        )
     ),
-    'AuthResource' => array(
-        'class_name' => 'Zenya\Api\Fixtures\AuthResource',
-        'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
+
+    '/auth/:param1' => array(
+        'controller' => array(
+            'name' => 'Zenya\Api\Fixtures\AuthResource',
+            'args' => array('arg1'=>'value1', 'arg2'=>'string')
+        )
     ),
-    'UploadResource' => array(
-        'class_name' => 'Zenya\Api\Fixtures\UploadResource',
-        #'class_args' => array()
+
+    '/upload/:type/:debug' => array(
+        'controller' => array(
+            'name'  => 'Zenya\Api\Fixtures\UploadResource',
+            //'args'  => null,
+        )
     ),
-    'someName' => array(
-        'class_name' => 'Zenya\Api\Fixtures\BlankResource',
-        #'class_args' => array('test')
-    )
+
+    '/help/:resource/:http_method/:filters' => array(
+        'alias' => 'help',
+    ),
+
+    '*' => array(
+        'alias' => 'help',
+    ),
+
+    '/test/:resource/:http_method/:filters' => array(
+        'alias' => 'test',
+    ),
+
 );
 
 // listeners
@@ -120,8 +110,8 @@ $c['listeners'] = array(
                 $adapter = new Listener\Auth\Digest($c['api_realm']);
                 $adapter->setToken = function(array $digest) use ($c, $adapter)
                 {
-                    print_r($digest);
-                    $users = Services::get('users');
+                    $config = Config::getInstance();
+                    $users = $config->getServices('users');
                     foreach($users as $user)
                     {
                         if( // this should be altered accordingly!
@@ -162,15 +152,15 @@ function onRead($route, $call) {
 $c['routes'] = array(
     // roue =>
     '/auth/:param1' => array(
-        'class_name' => 'Zenya\Api\Fixtures\AuthResource',
-        'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
+        'controller_name' => 'Zenya\Api\Fixtures\AuthResource',
+        'controller_args' => array('arg1'=>'value1', 'arg2'=>'string')
     ),
 
 );
 */
 // 'AuthResource' => array(
-//     'class_name' => 'Zenya\Api\Fixtures\AuthResource',
-//     'class_args' => array('arg1'=>'value1', 'arg2'=>'string')
+//     'controller_name' => 'Zenya\Api\Fixtures\AuthResource',
+//     'controller_args' => array('arg1'=>'value1', 'arg2'=>'string')
 // ),
 
 return $c;

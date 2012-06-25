@@ -1,3 +1,86 @@
+Use route only!
+
+[/route2] => Array
+    (
+        [controller] => array(className, args, doc)
+        [actions] => array(
+            [GET] => Array(
+                [doc]
+            )
+
+
+        )
+    )
+
+[/route2] => Array
+    (
+        [controller] => null
+        [actions] => array(
+            [GET] => Array
+                (
+                    [action] => Closure Object
+                        (
+                        )
+                    [methd]
+                    [doc]
+
+                )
+        )
+    )
+
+
+
+
+
+    [resourceName] => stdClass Object
+        (
+            [name] => Zenya\Api\Fixtures\BlankResource
+            [args] => Array
+                (
+                    [arg1] => value1
+                    [arg2] => string
+                )
+
+        )
+
+
+
+
+
+[/keywords] => Array
+        (
+            [GET] => Array
+                (
+                    [action] => Closure Object
+                        (
+                        )
+
+                )
+
+        )
+
+
+
+[resourceName] => stdClass Object
+        (
+            [name] => Zenya\Api\Fixtures\BlankResource
+            [args] => Array
+                (
+                    [arg1] => value1
+                    [arg2] => string
+                )
+
+        )
+
+
+
+
+
+
+
+
+
+
 Your src/ folder
 ================
 

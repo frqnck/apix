@@ -6,7 +6,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @expectedException           \InvalidArgumentException
-     * @expectedExceptionCode       500
      */
     public function testConstructorThrowsExceptionWhenNotAssociative()
     {
@@ -33,19 +32,41 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $rules = array();
         $route = new Router( $rules );
         $route->map('/');
-        $this->assertSame(null, $route->getControllerName());
+        $this->assertSame(null, $route->getController());
         $this->assertSame(null, $route->getAction());
         $this->assertEquals(array(), $route->getParams());
     }
 
-
-    public function testBasicRouting()
+    public function testBasicRouting1Step($url='/voila')
     {
-        $rules = array('/:one/:two/:three' => array('controller'=>'implyController', 'action'=>'implyAction'));
+        $rules = array($url => array('controller'=>'impliedController', 'action'=>'impliedAction'));
+
+        $route = new Router( $rules );
+        $route->map($url);
+
+        $this->assertSame('impliedController', $route->getController());
+        $this->assertSame('impliedAction', $route->getAction());
+    }
+
+    public function testBasicRouting2Step($url='/voila')
+    {
+        $rules = array($url . '/:someparams' => array('controller'=>'impliedController', 'action'=>'impliedAction'));
+
+        $route = new Router( $rules );
+        $route->map($url);
+
+        $this->assertSame('impliedController', $route->getController());
+        $this->assertSame('impliedAction', $route->getAction());
+    }
+
+
+    public function testBasicRoutingThreeSteps()
+    {
+        $rules = array('/:one/:two/:three' => array('controller'=>'impliedController', 'action'=>'impliedAction'));
         $route = new Router( $rules );
         $route->map('/controller/action/123');
-        $this->assertSame('implyController', $route->getControllerName());
-        $this->assertSame('implyAction', $route->getAction());
+        $this->assertSame('impliedController', $route->getController());
+        $this->assertSame('impliedAction', $route->getAction());
         $this->assertEquals(123, $route->getParam('three'));
 
         $this->assertTrue($route->hasParam('three'));
@@ -72,7 +93,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $route = new Router($routes['rules'], $routes['defaults']);
         $route->map($url);
 
-        $this->assertSame($expected['controller'], $route->getControllerName());
+        $this->assertSame($expected['controller'], $route->getController());
         $this->assertSame($expected['action'], $route->getAction());
         $this->assertEquals($expected['params'], $route->getParams());
 
@@ -119,7 +140,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         extract($r);
         $route = new Router($rules, $defaults);
         $route->map($url);
-        $this->assertSame($results['controller'], $route->getControllerName());
+        $this->assertSame($results['controller'], $route->getController());
         $this->assertSame($results['action'], $route->getAction());
         $this->assertEquals($results['params'], $route->getParams());
 
@@ -193,13 +214,13 @@ class RouterTest extends \PHPUnit_Framework_TestCase
    /**
      * @dataProvider propertiesProvider
      */
-    public function testSetMainProperties($r)
+    public function testsetAsProperties($r)
     {
         extract($r);
         $route = new Router(array(), $defaults);
-        $route->setMainProperties($rules, $params);
+        $route->setAsProperties($rules, $params);
 
-        $this->assertSame($results['controller'], $route->getControllerName());
+        $this->assertSame($results['controller'], $route->getController());
         $this->assertSame($results['action'], $route->getAction());
         $this->assertEquals($results['params'], $route->getParams());
 
@@ -253,16 +274,16 @@ class RouterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider ruleProvider
+     * @dataProvider routeParamsProvider
      */
-    public function testRuleMatch($rule, $url, $expected)
+    public function testRouteToParamsMatcher($route, $url, $expected)
     {
         $router = new Router(array(), array('controller'=>'home'));
-        $results = $router->ruleMatch($rule, $url);
+        $results = $router->routeToParamsMatcher($route, $url);
         $this->assertSame($expected, $results);
     }
 
-    public function ruleProvider()
+    public function routeParamsProvider()
     {
         return array(
              array('/:a/:b/:c', '/a/b/c', array('a'=>'a','b'=>'b','c'=>'c')),
@@ -313,11 +334,11 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('onUpdate', $router->getAction() );
     }
 
-    public function testGetsetControllerName()
+    public function testGetsetController()
     {
         $router = new Router(array());
-        $router->setControllerName('resourceName');
-        $this->assertSame('resourceName', $router->getControllerName() );
+        $router->setController('resourceName');
+        $this->assertSame('resourceName', $router->getController() );
     }
 
     public function testGetSetMethodGoesUppercase()
