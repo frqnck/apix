@@ -6,14 +6,16 @@ use Zenya\Api;
 
 class Compile
 {
+    const DEFAULT_PHAR_FILE = 'sleepover.phar';
+
     protected $version;
 
     /**
-     * Compiles the Silex source code into one single Phar file.
+     * Compiles the source code into one single Phar file.
      *
      * @param string $pharFile Name of the output Phar file
      */
-    public function compile($pharFile = 'sleepover.phar')
+    public function compile($pharFile = self::DEFAULT_PHAR_FILE)
     {
         if (file_exists($pharFile)) {
             unlink($pharFile);
