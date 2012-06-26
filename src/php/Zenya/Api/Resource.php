@@ -14,6 +14,9 @@ class Resource extends Listener
 
   protected $actions=array();
 
+  protected $route=null;
+
+
   // protected $action;
   // protected $method;
   // protected $doc;

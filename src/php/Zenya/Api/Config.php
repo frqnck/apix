@@ -201,7 +201,7 @@ class Config extends \Pimple
             'resources' => array(),
             'resources_default' => array(
                 // OPTIONS
-                'onHelp' => array(
+                'help' => array(
                     'controller' => array(
                         'name' => __NAMESPACE__ . '\Resource\Help',
                         'args' => null,
@@ -214,7 +214,7 @@ class Config extends \Pimple
                     ),
                 ),
                 // HEAD
-                'onTest' => array(
+                'test' => array(
                     'controller' => array(
                         'name' => __NAMESPACE__ . '\Resource\Test',
                         'args' => null #array( &$this ), #
