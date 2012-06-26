@@ -43,7 +43,10 @@
 
 namespace Zenya\Api;
 
-class Exception extends \Exception {
+class Exception extends \Exception
+{
+
+    const DEBUG = false;
 
     /**
      *  E_RECOVERABLE_ERROR handler
@@ -59,13 +62,13 @@ class Exception extends \Exception {
      */
     public static function errorHandler($errno, $errstr, $errfile, $errline)
     {
-      if ( E_RECOVERABLE_ERROR===$errno ) {
-        echo __CLASS__;
-        $errstr = preg_replace('@to\s.*::\w+\(\)@', '', $errstr, 1);
-        throw new \ErrorException($errstr, 400, 0, $errfile, $errline);
-      }
+        if(self::DEBUG) return false;
 
-      return false;
+        if ( E_RECOVERABLE_ERROR === $errno ) {
+            $errstr = preg_replace('@to\s.*::\w+\(\)@', '', $errstr, 1);
+            throw new \ErrorException($errstr, 400, 0, $errfile, $errline);
+        }
+        return false;
     }
 
     /**
@@ -82,8 +85,7 @@ class Exception extends \Exception {
      */
     public static function shutdownHandler()
     {
-        $error = error_get_last();
-        if ($error !== null) {
+        if ($error = error_get_last()) {
             header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
             echo "<h1>500 Internal Server Error</h1>";
             $info = sprintf(
@@ -94,7 +96,6 @@ class Exception extends \Exception {
                 );
             die( $info );
         }
-
     }
 
     public static function startupException(\Exception $e)
@@ -108,7 +109,7 @@ class Exception extends \Exception {
                 $e->getLine(),
                 $e->getMessage()
             );
-        die( $info );        
+        die( $info );
     }
 
 }

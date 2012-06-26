@@ -29,7 +29,7 @@ $c['services'] = array(
 
 // resources
 $c['resources'] = array(
-    
+
     // '/:controller/:param1/:param2' => array(
     //     'controller' => array(
     //         'name' => 'Zenya\Api\Fixtures\BlankResource',
@@ -62,7 +62,7 @@ $c['resources'] = array(
         'alias' => 'help',
     ),
 
-    '*' => array(
+    '/*' => array(
         'alias' => 'help',
     ),
 
