@@ -59,23 +59,21 @@ class Resource extends Listener
      */
     public function setRouteOverrides()
     {
-        $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
+        $overrides = array('OPTIONS', 'HEAD');
         $method = $this->route->getMethod();
 
         // use override if not set.
         if(
           !isset($this->resource['actions'][$method])
-          && array_key_exists($method, $overrides)
+          && in_array($method, $overrides)
         ) {
 
           $c = Config::getInstance();
-          $res = $c->getResources($overrides[$this->route->getMethod()]);
+          $res = $c->getResources($this->route->getAction());
           $res['controller']['args'] = $c->getInjected('Server');
 
-          $this->resource['actions'][$method]['alias'] = $res;
-
           // set as action alias (TEMP)
-         # $this->resource['actions'][$method]['alias'] = $overrides[$this->route->getMethod()];
+          $this->resource['actions'][$method]['alias'] = $res;
 
           $this->route->setParams(
               array(
@@ -101,7 +99,7 @@ class Resource extends Listener
 
       // TODO: add to actions!!! if not implemented.
       // use actions as the standad mean (Refactor).
-      $this->setRouteOverrides($this->route);
+      $this->setRouteOverrides();
 
 
       // Alias: current action has an aliased controller
@@ -115,11 +113,8 @@ class Resource extends Listener
           #$this->resource['controller'][]
       }
 
-
-
-
       // Delegate calls to a controller
-      if(isset($this->resource['controller'])
+      if(isset($this->resource['controller']['name'])
           #&& is_callable( addslashes($resource['controller']['name']) )
       ) {
         return $this->_class($this->resource, $this->route);
@@ -136,7 +131,15 @@ class Resource extends Listener
     protected function _class($resource, $route)
     {
         $name = $resource['controller']['name'];
-        $args = isset($resource['controller']['args']) ? $resource['controller']['args'] :null;
+        $args = $resource['controller']['args']; //) ? $resource['controller']['args'] :null;
+
+        // inject server object in the constructor!
+
+//           $c = Config::getInstance();
+//           $res = $c->getResources($this->route->getAction());
+//           $res['controller']['args'] = $c->getInjected('Server');
+//           $this->resource['actions'][$method]['alias'] = $res;
+// print_r($args);
 
         try {
           $this->refClass = new ReflectionClass($name);
