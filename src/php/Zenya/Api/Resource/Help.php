@@ -2,9 +2,10 @@
 
 namespace Zenya\Api\Resource;
 
-use Zenya\Api\ReflectionClass as ReflectionClass;
-use Zenya\Api\Server as Server;
-use Zenya\Api\Router as Router;
+use Zenya\Api\Reflection;
+use Zenya\Api\Entity;
+use Zenya\Api\Server;
+use Zenya\Api\Router;
 
 /**
  * Help
@@ -47,7 +48,7 @@ class Help
     }
 
     /**
-     * Help (proxy OPTIONS to GET)
+     * Help
      *
      * The OPTIONS method represents a request for information about the
      * communication options available on the request/response chain
@@ -66,17 +67,15 @@ class Help
      * @api_links OPTIONS /resource/method/filters
      * @api_links OPTIONS /\*\/method/filters
      */
-    public function onHelp($resource, $http_method=null, array $filters=null)
+    public function onHelp(Entity $entity, array $filters=null)
     {
-        #echo "onHelp";Server::d(func_get_args());
-
         // apply to the whole server
-        if ($this->server->route->path == '/*') {
+        if ($entity->route->path == '/*') {
 
-            // return all the full api doc
+            // return the whole api doc
             $doc = array();
-            foreach ($this->server->getResources() as $key => $class) {
-                $doc[$resource] =  $this->_getHelp($key, null, $filters);
+            foreach ($this->server->getResources() as $key => $entity) {
+                $doc[$resource] =  $this->_getHelp($entity, $filters);
             }
 
             // // set Content-Type (negotiate or default)
@@ -90,7 +89,7 @@ class Help
 
         } else {
 
-            $doc = $this->_getHelp($this->server->route, $http_method, $filters);
+            $doc = $this->_getHelp($entity, $filters);
             return $doc;
 
 
@@ -128,41 +127,17 @@ class Help
      * @return mixed  array or string on error
      * @access  private
      */
-    private function _getHelp(Router $route, $method=null, array $filters=null)
+    private function _getHelp(Entity $entity, array $filters=null)
     {
         // $man = $this->getParam('resource');
         // $resource = Zenya_Api_Resource::getInternalAppelation($man);
         // $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
         // $this->_output = $help->toArray();
 
-        #$resource = $this->server->resources;
-        $class = $this->server->resources->get($route);
+        $actions = $entity->getActionsMethods();
 
-        #echo 'TODO: Help reflection: <pre>'; print_r( $class );exit;
-
-        $doc = new ReflectionClass($class['controller']['name']);
-        $doc->parseClassDoc();
-
-        $actions = $doc->getActionsMethods($this->server->route->getActions());
-
-        if (isset($method)) {
-            try {
-                $action = $this->server->route->getAction($method);
-                $doc->parseMethodDoc($action);
-            } catch (\Exception $e) {
-                $this->server->response->setHeader('Allow',
-                    implode(', ', array_keys($actions))
-                );
-
-                throw new Exception("TODO: Invalid method ({$method}) specified for \"{$name}\".", 405);
-            }
-        } else {
-            foreach($actions as $method) {
-                $doc->parseMethodDoc($method);
-            }
-        }
-
-        return $doc->getDocs();
+        $reflection = new Reflection($entity);
+        return $reflection->getDocs($actions);
     }
 
 }
