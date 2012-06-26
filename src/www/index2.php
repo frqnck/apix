@@ -14,9 +14,9 @@ try {
     $api = new Zenya\Api\Server;
 
     $api->onRead('/keywords',
-        
+
     /**
-     * Doc about the func/closure.
+     * list.
      *
      * @param  string $keyword
      * @return array  The return array
@@ -31,7 +31,7 @@ try {
 	$api->onRead('/keywords/:keyword/:optional',
 
 	    /**
-	     * Doc about the func/closure.
+	     * Read doc about the func/closure.
 	     *
 	     * @param  string $keyword
 	     * @return array  The return array
@@ -43,6 +43,27 @@ try {
 		    return array('keyword' => $keyword, 'optional'=>$optional, 'from'=>__FUNCTION__);
 		}
 	);
+
+
+    $api->onCreate('/keywords/:keyword/:optional',
+
+        /**
+         * Create doc about the func/closure.
+         *
+         * @param  string $keyword
+         * @return array  The return array
+         * @check https://github.com/jeremeamia
+         * @api_role admin
+         */
+        function($keyword, $optional=null)
+        {
+            return array('keyword' => $keyword, 'optional'=>$optional, 'from'=>__FUNCTION__);
+        }
+    );
+
+
+
+
 
     $api->onUpdate('/keywords/:id', function($id) {
         return array('PUT some keywordsddd', 'ffffff', 'dsadsdasd', 'dasdasda');

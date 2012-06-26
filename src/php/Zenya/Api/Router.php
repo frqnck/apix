@@ -135,6 +135,8 @@ class Router
             $params = $this->routeToParamsMatcher($route, $uri);
             if ($uri == $route || $params) {
                 $this->name = $route;
+
+                if(is_object($rules)) $rules = $rules->toArray();
                 return $this->setAsProperties($rules, $params);
             }
         }

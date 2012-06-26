@@ -78,10 +78,14 @@ class Server extends Listener
             $this->addAllListeners('server', 'early', $this->config);
 
             // Process with the requested resource
-            $resource = new Resource($this->route);
-            $this->results = $resource->call(
-                $this->resources->get($this->route)
-            );
+            // $resource = new Resource($this->route);
+            // $this->results = $resource->call(
+            //     $this->resources->get($this->route)
+            // );
+
+            // Process with the requested resource
+            $resource =  $this->resources->get($this->route);
+            $this->results = $resource->call($this->route);
 
         } catch (\Exception $e) {
 

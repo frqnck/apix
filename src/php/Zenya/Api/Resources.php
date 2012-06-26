@@ -20,32 +20,14 @@ class Resources
      */
     public function add($name, array $resource)
     {
-        /* Refactoring
-        $entity = new Resource();
-        if( $this->isClosure($resource) ) {
-            $entity->actions[$resource['method']] = $resource;
-        } else {
-            // assume class based
-            $entity->controller = $resource;
+        if(!isset($this->resources[$name])) {
+            $this->resources[$name] = new Entity();
         }
-        $this->resources[$name] = $entity;
-         */
-        if( $this->isClosure($resource) ) {
-            $this->resources[$name]['actions'][$resource['method']] = $resource;
-
-        } else { // assume class based
-            $this->resources[$name] = $resource;
-        }
-    }
-
-    public function isClosure($entity)
-    {
-        return isset($entity['action'])
-            && $entity['action'] instanceOf \Closure;
+        $this->resources[$name]->append($resource);
     }
 
     /**
-     * Gets a sanitized ressource from a route object.
+     * Gets a ressource entity from a Router object.
      *
      * @param  string   $name A resource name
      * @return string
@@ -53,35 +35,39 @@ class Resources
      */
     public function get(Router $route)
     {
-        $name = $route->name;
+        $name = isset($route->name) ? $route->name : $route->path;
+        try {
+            if (isset($this->resources[$name])) {
+                $entity = $this->resources[$name];
 
-        if (!isset($this->resources[$name])) {
-            //$name = $this->rawControllerName;
+                // swap if aliased
+                if(isset($entity->alias)) {
+                    $name = $entity->alias;
+                    $entity = $this->resources[$name];
+                }
+
+                /*
+                if( !$entity->isClosure() ) {
+
+                    // TODO: review $route->controller_*!
+                    $entity->controller->name = isset($entity->controller->name)
+                            ? $entity->controller->name
+                            : $route->controller_name;
+
+                    $entity->controller->args = isset($entity->controller->args)
+                            ? $entity->controller->args
+                            : $route->controller_args;
+                }
+                */
+
+                return $entity;
+            }
+        } catch(\Exception $e) {
+            // $name = $this->rawControllerName;
             throw new \InvalidArgumentException(
                 sprintf("Invalid resource's name specified (%s).", $name), 404
             );
         }
-        $entity = $this->resources[$name];
-
-        // retrieve from controller alias
-        if(isset($entity['alias'])) {
-            $entity = $this->resources[$entity['alias']];
-        }
-
-        if( !$this->isClosure($entity) ) {
-
-            // TODO: review $route->controller_*!
-            $entity['controller']['name'] = isset($entity['controller']['name'])
-                    ? $entity['controller']['name']
-                    : $route->controller_name;
-
-            $entity['controller']['args'] = isset($entity['controller']['args'])
-                    ? $entity['controller']['args']
-                    : $route->controller_args;
-        }
-
-        #d($resource);exit;
-        return $entity;
     }
 
     /**
