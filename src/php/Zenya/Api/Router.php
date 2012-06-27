@@ -38,6 +38,12 @@ class Router
     protected $action = null;
 
     /**
+     * Holds the current action
+     * @var string
+     */
+    protected $name = null;
+
+    /**
      * Holds all the actions (HTTP methods to CRUD verbs)
      * @var array
      */
@@ -266,8 +272,8 @@ class Router
         return $this->params[$key];
     }
 
-   /**
-     * Checks if specified router param exist
+    /**
+     * Checks a specified router param exists.
      *
      * @param  string $key A key to check
      * @return bolean
@@ -317,6 +323,16 @@ class Router
     public function getMethod()
     {
         return $this->method;
+    }
+
+    /**
+     * Returns the path name
+     *
+     * @return string
+     */
+    public function getPathName()
+    {
+        return isset($this->name) ? $this->name : $this->path;
     }
 
 }

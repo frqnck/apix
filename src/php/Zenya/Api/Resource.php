@@ -16,10 +16,10 @@ class Resource extends Listener
 
   protected $route=null;
 
+  // protected $doc;
 
   // protected $action;
   // protected $method;
-  // protected $doc;
 
 
   // protected $commits = array();
@@ -177,8 +177,8 @@ class Resource extends Listener
         // attach late listeners @ post-processing
 
         // TODO: docs
-        #$classDoc = RefDoc::parseDocBook($refClass);
-        #$methodDoc = RefDoc::parseDocBook($refMethod);
+        #$classDoc = RefDoc::parsePhpDoc($refClass);
+        #$methodDoc = RefDoc::parsePhpDoc($refMethod);
 
         $this->addAllListeners('resource', 'early');
 
