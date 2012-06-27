@@ -5,7 +5,7 @@ namespace Zenya\Api;
 class Reflection
 {
     /**
-     * @var string|null
+     * @var string
      */
     protected $prefix;
 
@@ -21,7 +21,6 @@ class Reflection
      */
     protected $ref = array();
 
-
     /**
      * Constructor
      *
@@ -34,18 +33,13 @@ class Reflection
 
         if( $entity->isClosure() ) {
 
-            // TODO finish go thru all mewthod here!
-            $actions = $entity->getActions();
-            #echo '<pre>'; print_r($actions);
+            $this->ref['{group}'] = $entity->group;
 
-            #$this->ref = new \ReflectionFunction($action);
-
-            foreach($actions as $key => $func) {
-                $this->ref[] = new \ReflectionFunction($func['action']);
+            foreach($entity->getActions() as $key => $func) {
+                if($func['action'] InstanceOf \Closure) {
+                    $this->ref[$key] = new \ReflectionFunction($func['action']);
+                }
             }
-echo 'TODO: HERE!!!!!!!!!!!!!!!!';
-print_r($this->ref);exit;
-
 
         } else {
             // assume class based
@@ -54,9 +48,40 @@ print_r($this->ref);exit;
         }
     }
 
-    public function setDocs()
+    /**
+     * Parse class documentation
+     *
+     * @return array
+     */
+    public function parseDoc()
     {
-        $this->parseDoc();
+        if($this->ref instanceOf \ReflectionClass) {
+            $doc = $this->ref->getDocComment();
+        } else {
+            $doc = $this->ref['{group}']['doc'];
+        }
+        $this->docs = self::parsePhpDoc( $doc );
+    }
+
+    /**
+     * parse a method documentation
+     *
+     * @param string $name A string containing the name of a method to reflect (todo: start from an object).
+     */
+    public function parseMethodDoc($name, $key=null)
+    {
+        if( $this->ref instanceOf \ReflectionClass ) {
+            $method = $this->ref->getMethod($name);
+            $key = null === $key ? $method->getShortName() : $key;
+            $doc = $method->getDocComment();
+        } else if( $this->ref[$key] instanceOf \ReflectionFunction ){
+            $doc = $this->ref[$key]->getDocComment();
+        } else {
+          $doc = $this->ref[$key];
+        }
+
+        $this->docs['methods'][$key] =
+            self::parsePhpDoc( $doc );
     }
 
     /**
@@ -67,13 +92,13 @@ print_r($this->ref);exit;
     public function getDocs($actions=null)
     {
         if(null === $this->docs) {
-            $this->setDocs();
+            $this->parseDoc();
         }
 
-        if( isset($actions) && $this->ref instanceOf \ReflectionClass ) {
+        if( isset($actions) ) {
             $actions = !is_array($actions) ? array($actions): $actions;
             foreach ($actions as $key => $method) {
-                $this->parseClassMethodDoc($method, $key);
+                $this->parseMethodDoc($method, $key);
             }
         }
 
@@ -93,41 +118,12 @@ print_r($this->ref);exit;
     }
 
     /**
-     * Parse class documentation
-     *
-     * @return array
-     */
-    public function parseDoc()
-    {
-        $this->docs =
-            self::parseDocBook(
-                $this->ref->getDocComment()
-            );
-    }
-
-    /**
-     * parse a method documentation
-     *
-     * @param string $name A string containing the name of a method to reflect (todo: start from an object).
-     */
-    public function parseClassMethodDoc($name, $key=null)
-    {
-        $method = $this->ref->getMethod($name);
-        $key = null !== $key ? $key : $method->getShortName();
-
-        $this->docs['methods'][$key] =
-            self::parseDocBook(
-                $method->getDocComment()
-            );
-    }
-
-    /**
-     * Extract docbook
+     * Extract PHPDOCs
      *
      * @param  string $classname
      * @return array
      */
-    public static function parseDocBook($str)
+    public static function parsePhpDoc($str)
     {
         $docs = array();
         // 1. Remove /*, *, */ from the lines

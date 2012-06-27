@@ -16,20 +16,12 @@ class Entity extends Listener
 
   protected $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
 
+  #protected $route=null;
 
- #protected $route=null;
-
-
+  // protected $doc;
   // protected $action;
   // protected $method;
-  // protected $doc;
-
-
-  // protected $commits = array();
-  // protected $building = false;
-  // protected $notifiers = array();
-  #protected $methods = array();
-
+  // protected $methods = array();
 
     public function debug($data=null)
     {
@@ -42,11 +34,29 @@ class Entity extends Listener
      *
      * @param array $resources
      */
-    public function __construct()
+    public function __construct(array $group=null)
     {
         #$this->route = $route;
         // attach late listeners @ post-processing
         #$this->addAllListeners('resource', 'early');
+
+        // group test
+        $this->group = $group; //'/* TODO: string from group!! */';
+    }
+
+    /**
+     * Adds a resource entity.
+     *
+     * @param  string $name     The resource name
+     * @param  array  $resource The resource definition array
+     * @return void
+     */
+    public function group($name)
+    {
+        // group test
+        $this->group = $name; //'/* TODO: string from group!! */';
+
+        return $this;
     }
 
     public function append(array $defs=null)
@@ -56,6 +66,7 @@ class Entity extends Listener
           && $defs['action'] instanceOf \Closure
         ) {
           $this->isClosure = true;
+
           $this->actions[$defs['method']] = $defs;
 
         } else if(isset($defs['controller'])) {
@@ -131,7 +142,6 @@ class Entity extends Listener
         }
     }
 
-
     /**
      * Returns an array of method => action/func
      *
@@ -147,16 +157,13 @@ class Entity extends Listener
                 $funcs[] = $ref->name;
             }
 
-           $routes = $this->route->getActions();
-
+            $routes = $this->route->getActions();
 
             return array_intersect($routes, $funcs);
         } else {
             return $this->actions;
         }
-
     }
-
 
     /**
      * Call a resource from route
@@ -173,6 +180,7 @@ class Entity extends Listener
         $this->ref = new Reflection($this);
         $this->actions = $this->getActionsMethods();
       } catch (\Exception $e) {
+        echo $e->getMessage();
         throw new \RuntimeException("Resource entity has no implementation.", 500);
       }
 
@@ -250,8 +258,6 @@ class Entity extends Listener
         }
 
         // TODO: merge with TEST & OPTIONS ???
-        ###Server::d( $this->actions );
-
 
         $params = $this->getRequiredParams($route->getMethod(), $method, $route->getParams());
         $this->addAllListeners('resource', 'early');
@@ -268,7 +274,6 @@ class Entity extends Listener
         $docs = $this->ref->getDocs($verb);
 
         #print_r($docs);exit;
-
         #$docs = $this->getDocs($verb);
 
         $role = isset($docs['methods'][$verb]['api_role'])

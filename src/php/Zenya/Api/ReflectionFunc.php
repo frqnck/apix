@@ -36,7 +36,7 @@ class ReflectionFunc extends \ReflectionFunction
     public function parseClassDoc()
     {
         return $this->docs =
-            self::parseDocBook(
+            self::parsePhpDoc(
                 $this->getDocComment()
             );
     }
@@ -49,7 +49,7 @@ class ReflectionFunc extends \ReflectionFunction
     public function parseMethodDoc($name)
     {
         return $this->docs['methods'][ $name ] =
-            self::parseDocBook(
+            self::parsePhpDoc(
                 $this->getDocComment()
             );
     }
@@ -70,7 +70,7 @@ class ReflectionFunc extends \ReflectionFunction
      * @param  string $classname
      * @return array
      */
-    public static function parseDocBook($str)
+    public static function parsePhpDoc($str)
     {
         $docs = array();
         // 1. Remove /*, *, */ from the lines

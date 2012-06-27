@@ -13,34 +13,42 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     $api = new Zenya\Api\Server;
 
-    $api->onRead('/keywords',
-
     /**
-     * list.
+     * group.
      *
      * @param  string $keyword
      * @return array  The return array
      * @check https://github.com/jeremeamia
      * @api_role admin
      */
-    function()
-    {
-        return array('List keywords');
-    });
+    //$api->setGroup('first');
 
-	$api->onRead('/keywords/:keyword/:optional',
+    $api->onRead('/keywords',
+        /**
+         * List all the keywords...
+         *
+         * @return array  The return array
+         * @api_role admin
+         */
+        function()
+        {
+            return array('List keywords');
+        }
+    )->group('testme');
+
+	$api->onRead('/keywords/:cat_id/:optional',
 
 	    /**
-	     * Read doc about the func/closure.
+	     * List the keywords under a categoy id.
 	     *
-	     * @param  string $keyword
+	     * @param  string $cat_id blahblah
 	     * @return array  The return array
 	     * @check https://github.com/jeremeamia
 	     * @api_role admin
 		 */
-		function($keyword, $optional=null)
+		function($cat_id, $optional=null)
 		{
-		    return array('keyword' => $keyword, 'optional'=>$optional, 'from'=>__FUNCTION__);
+		    return array('cat_id' => $cat_id, 'optional'=>$optional, 'from'=>__FUNCTION__);
 		}
 	);
 

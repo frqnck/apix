@@ -36,7 +36,7 @@ class ReflectionClass extends \ReflectionClass
     public function parseClassDoc()
     {
         return $this->docs =
-            self::parseDocBook(
+            self::parsePhpDoc(
                 $this->getDocComment()
             );
     }
@@ -51,7 +51,7 @@ class ReflectionClass extends \ReflectionClass
         $method = parent::getMethod($name);
 
         return $this->docs['methods'][ $method->getShortName() ] =
-            self::parseDocBook(
+            self::parsePhpDoc(
                 $method->getDocComment()
             );
     }
@@ -72,7 +72,7 @@ class ReflectionClass extends \ReflectionClass
      * @param  string $classname
      * @return array
      */
-    public static function parseDocBook($str)
+    public static function parsePhpDoc($str)
     {
         $docs = array();
         // 1. Remove /*, *, */ from the lines
