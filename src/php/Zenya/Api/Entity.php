@@ -267,13 +267,15 @@ class Entity extends Listener
 
     public function isPublic()
     {
-        $verb = isset($this->ref)
-          ? $this->route->getAction()   // closure
-          : $this->route->getMethod();
+        #$verb = isset($this->ref)
+        #  ? $this->route->getAction()   // closure
+        #  : $this->route->getMethod();
 
-        $docs = $this->ref->getDocs($verb);
+        $verb = $this->route->getMethod();
 
-        #print_r($docs);exit;
+        $docs = $this->ref->getDocs( $verb );
+
+       # echo '<pre>'; print_r($docs['methods']);#exit;
         #$docs = $this->getDocs($verb);
 
         $role = isset($docs['methods'][$verb]['api_role'])
