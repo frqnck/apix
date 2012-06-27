@@ -20,7 +20,7 @@ $c['services'] = array(
         // TODO: retrieve the users from somewhere, caching strategy?
         $users = array(
             // username:realm:sharedSecret:role
-            0=>array('username'=>'franck', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey', 'role'=>'admin'),
+            0=>array('username'=>'franck@info', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey', 'role'=>'admin'),
             1=>array('username'=>'bob', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'sesame', 'role'=>'guest')
         );
         return $users;

@@ -33,11 +33,14 @@ class Reflection
 
         if( $entity->isClosure() ) {
 
-            $this->ref['{group}'] = $entity->group;
+            // group doc
+            $this->parseGroupDoc( $entity->group );
 
             foreach($entity->getActions() as $key => $func) {
                 if($func['action'] InstanceOf \Closure) {
                     $this->ref[$key] = new \ReflectionFunction($func['action']);
+                    // method docs
+                    $this->parseMethodDoc($func, $key);
                 }
             }
 
@@ -45,22 +48,32 @@ class Reflection
             // assume class based
             $name = $entity->getController('name');
             $this->ref = new \ReflectionClass($name);
+
+            $doc = $this->ref->getDocComment();
+            $this->parseGroupDoc( $doc );
+
+            // parse all methods
+            foreach($this->ref->getMethods() as $key => $method)
+            {
+
+                // remove roote dependence here!!!!
+                $key = $entity->route->getMethod($method);
+
+                $doc = $method->getDocComment();
+                $this->docs['methods'][$key] =
+                    self::parsePhpDoc( $doc );
+            }
         }
     }
 
     /**
-     * Parse class documentation
+     * Parse group documentation
      *
      * @return array
      */
-    public function parseDoc()
+    public function parseGroupDoc($doc)
     {
-        if($this->ref instanceOf \ReflectionClass) {
-            $doc = $this->ref->getDocComment();
-        } else {
-            $doc = $this->ref['{group}']['doc'];
-        }
-        $this->docs = self::parsePhpDoc( $doc );
+        return $this->docs = self::parsePhpDoc( $doc );
     }
 
     /**
@@ -71,10 +84,14 @@ class Reflection
     public function parseMethodDoc($name, $key=null)
     {
         if( $this->ref instanceOf \ReflectionClass ) {
-            $method = $this->ref->getMethod($name);
-            $key = null === $key ? $method->getShortName() : $key;
+            $method = $this->ref->hasMethod($name)
+                ? $this->ref->getMethod($name)
+                : 'nn';
+
+           echo $key = null === $key ? $method->getShortName() : $key;
             $doc = $method->getDocComment();
-        } else if( $this->ref[$key] instanceOf \ReflectionFunction ){
+
+        } else if( isset($this->ref[$key]) && $this->ref[$key] instanceOf \ReflectionFunction ){
             $doc = $this->ref[$key]->getDocComment();
         } else {
           $doc = $this->ref[$key];
@@ -91,17 +108,6 @@ class Reflection
      */
     public function getDocs($actions=null)
     {
-        if(null === $this->docs) {
-            $this->parseDoc();
-        }
-
-        if( isset($actions) ) {
-            $actions = !is_array($actions) ? array($actions): $actions;
-            foreach ($actions as $key => $method) {
-                $this->parseMethodDoc($method, $key);
-            }
-        }
-
         return $this->docs;
     }
 

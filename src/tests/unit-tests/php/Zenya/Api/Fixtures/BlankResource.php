@@ -52,6 +52,7 @@ class BlankResource #extends ResourceAbstract
      * @param  string $param2   with comments
      * @param  mixed  $optional
      * @return array
+     * @api_role admin
      */
     public function onRead($keyword, $param2=null, $optional=null)
     {
