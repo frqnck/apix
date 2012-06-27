@@ -2,72 +2,72 @@
 
 namespace Zenya\Api;
 
+use Zenya\Api\Entity;
+
 /**
  * Represents a collection of resources.
- *
  */
 class Resources
 {
 
-    private $resources = array();
+    protected $resources = array();
 
     /**
-     * Adds a resource entity
+     * Adds a resource entity.
      *
      * @param  string $name     The resource name
      * @param  array  $resource The resource definition array
      * @return void
      */
-    public function add($name, array $resource)
+    public function add($name, array $resource, $group=null)
     {
         if(!isset($this->resources[$name])) {
-            $this->resources[$name] = new Entity();
+            $this->resources[$name] = new Entity($group);
         }
         $this->resources[$name]->append($resource);
+        return $this->resources[$name];
     }
 
     /**
-     * Gets a ressource entity from a Router object.
+     * Checks a specified resource name exists.
+     *
+     * @param  string $name     The resource name to check
+     * @return boolean
+     */
+    public function has($name)
+    {
+        return isset($this->resources[$name]);
+    }
+
+    /**
+     * Gets the specified ressource entity.
      *
      * @param  string   $name A resource name
-     * @return string
-     * @throws \InvalidArgumentException 404
+     * @return Zenya\Api\Entity\Entity
      */
-    public function get(Router $route)
+    public function get($name)
     {
-        $name = isset($route->name) ? $route->name : $route->path;
-        try {
-            if (isset($this->resources[$name])) {
-                $entity = $this->resources[$name];
+        $entity = $this->resources[$name];
 
-                // swap if aliased
-                if(isset($entity->alias)) {
-                    $name = $entity->alias;
-                    $entity = $this->resources[$name];
-                }
-
-                /*
-                if( !$entity->isClosure() ) {
-
-                    // TODO: review $route->controller_*!
-                    $entity->controller->name = isset($entity->controller->name)
-                            ? $entity->controller->name
-                            : $route->controller_name;
-
-                    $entity->controller->args = isset($entity->controller->args)
-                            ? $entity->controller->args
-                            : $route->controller_args;
-                }
-                */
-
-                return $entity;
-            }
-        } catch(\Exception $e) {
-            // $name = $this->rawControllerName;
-            throw new \InvalidArgumentException(
-                sprintf("Invalid resource's name specified (%s).", $name), 404
-            );
+        // swap if aliased
+        if(isset($entity->alias)) {
+            $name = $entity->alias;
+            $entity = $this->resources[$name];
         }
+
+        /*
+        if( !$entity->isClosure() ) {
+            if(!isset($entity->controller['name'])) {
+                $entity->controller['name'] = $route->controller_name;
+            }
+
+            if(!isset($entity->controller['args'])) {
+                $entity->controller['args'] = $route->controller_args;
+            }
+        }
+        */
+
+        return $entity;
     }
 
     /**

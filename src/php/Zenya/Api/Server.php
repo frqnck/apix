@@ -47,6 +47,9 @@ class Server extends Listener
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
     }
 
+    /**
+    * @throws \InvalidArgumentException 404
+    */
     public function run()
     {
         $c = Config::getInstance();
@@ -71,20 +74,21 @@ class Server extends Listener
         try {
 
             // if ($c['format_negotiation']['http_accept']) {
-            //     // $this->response->setHeader('Vary', 'Accept');
+            //  $this->response->setHeader('Vary', 'Accept');
             // }
 
             // attach the early listeners @ pre-processing stage
             $this->addAllListeners('server', 'early', $this->config);
 
-            // Process with the requested resource
-            // $resource = new Resource($this->route);
-            // $this->results = $resource->call(
-            //     $this->resources->get($this->route)
-            // );
+            $name = $this->route->getPathName();
+            if (!$this->resources->has($name)) {
+                throw new \InvalidArgumentException(
+                    sprintf("Invalid resource's name specified (%s).", $name), 404
+                );
+            }
 
-            // Process with the requested resource
-            $resource =  $this->resources->get($this->route);
+            // Process the requested resource
+            $resource = $this->resources->get($name);
             $this->results = $resource->call($this->route);
 
         } catch (\Exception $e) {
@@ -261,11 +265,37 @@ class Server extends Listener
 
     protected function proxy($path, \Closure $to, $method)
     {
-        $this->resources->add($path, array(
+        return $this->resources->add($path, array(
                 'action' => $to,
                 'method' => $method,
                 'doc'    => null
-            )
+            ),
+            isset($this->group)?$this->group:null
+        );
+    }
+
+    /**
+     * test chain.
+     * @param array $opts Options are:
+     *
+     * @return string
+     */
+    public function setGroup($name)
+    {
+        $class = new \ReflectionClass($this);
+        $method = $class->getMethod('setGroup');
+var_dump($class);
+
+        $class = new \ReflectionFunction();
+        //$method = $class->getMethod('setGroup');
+var_dump($class);
+
+
+        $doc = $method->getDocComment();
+
+        $this->group = array(
+            'name'  => $name,
+            'doc'   => $doc
         );
     }
 
@@ -276,7 +306,7 @@ class Server extends Listener
 
     public function onRead($path, $to)
     {
-        $this->proxy($path, $to, 'GET');
+        return $this->proxy($path, $to, 'GET');
     }
 
     public function onUpdate($path, $to)
