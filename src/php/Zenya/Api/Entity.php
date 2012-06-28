@@ -6,13 +6,15 @@ namespace Zenya\Api;
  * Represents a resource.
  *
  */
-class Entity extends Listener
+class Entity extends Listener implements Entity\EntityInterface
 {
 
   protected $name;
   protected $controller;
   protected $actions = array();
-  protected $alias;
+  protected $redirect = null;
+
+  protected $group;
 
   protected $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
 
@@ -34,18 +36,15 @@ class Entity extends Listener
      *
      * @param array $resources
      */
-    public function __construct(array $group=null)
+    public function __construct()
     {
         #$this->route = $route;
         // attach late listeners @ post-processing
         #$this->addAllListeners('resource', 'early');
-
-        // group test
-        $this->group = $group; //'/* TODO: string from group!! */';
     }
 
     /**
-     * Adds a resource entity.
+     * Group a resource entity.
      *
      * @param  string $name     The resource name
      * @param  array  $resource The resource definition array
@@ -57,6 +56,41 @@ class Entity extends Listener
         $this->group = $name; //'/* TODO: string from group!! */';
 
         return $this;
+    }
+
+    /**
+     * Adds a redirect.
+     *
+     * @param  string $location   A  name
+     * @param  array  $resource The resource definition array
+     * @return void
+     */
+    public function redirect($location)
+    {
+        $this->redirect = $location;
+
+        return $this;
+    }
+
+    /**
+     * Check for a redirect.
+     *
+     * @param  array  $resource The resource definition array
+     * @return void
+     */
+    // public function hasRedirect()
+    // {
+    //     return isset($this->redirect);
+    // }
+
+    /**
+     * Returns the redirect location.
+     *
+     * @return string
+     */
+    public function getRedirect()
+    {
+        return $this->redirect;
     }
 
     public function append(array $defs=null)
