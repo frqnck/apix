@@ -3,6 +3,7 @@
 namespace Zenya\Api;
 
 use Zenya\Api\Entity;
+use Zenya\Api\Entity\EntityInterface;
 
 /**
  * Represents a collection of resources.
@@ -10,19 +11,52 @@ use Zenya\Api\Entity;
 class Resources
 {
 
+    /**
+     * @var array
+     */
     protected $resources = array();
+
+    /**
+     * @var EntityInterface
+     */
+    protected $entity = null;
+
+    /**
+     * Sets an entity object.
+     *
+     * @param EntityInterface $entity An entity object 
+     */
+    public function setEntity(EntityInterface $entity)
+    {
+        $this->entity = $entity;
+    }
+
+    /**
+     * Gets the current entity object.
+     *
+     * @return EntityInterface
+     */
+    public function getEntity()
+    {
+        return $this->entity;
+    }
 
     /**
      * Adds a resource entity.
      *
-     * @param  string $name     The resource name
-     * @param  array  $resource The resource definition array
+     * @param  string $name         A resource name
+     * @param  array  $resource     A resource definition array
      * @return void
      */
-    public function add($name, array $resource, $group=null)
+    public function add($name, array $resource)
     {
+        if(null === $this->entity) {
+            $this->setEntity(new Entity);
+        }
+    
         if(!isset($this->resources[$name])) {
-            $this->resources[$name] = new Entity($group);
+            $entity = $this->getEntity();
+            $this->resources[$name] = new $entity; //new Entity($group);
         }
         $this->resources[$name]->append($resource);
         return $this->resources[$name];
@@ -40,19 +74,29 @@ class Resources
     }
 
     /**
+     * Returns all the resources.
+     *
+     * @return array The array of resources
+     */
+    public function toArray()
+    {
+        return $this->resources;
+    }
+
+    /**
      * Gets the specified ressource entity.
      *
      * @param  string   $name A resource name
-     * @return Zenya\Api\Entity\Entity
+     * @return Zenya/Api/Entity/EntityInterface
      */
     public function get($name)
     {
         $entity = $this->resources[$name];
 
-        // swap if aliased
-        if(isset($entity->alias)) {
-            $name = $entity->alias;
-            $entity = $this->resources[$name];
+        // TODO: swap if aliased
+        if($redirect = $entity->getRedirect()) {
+            //$name = $entity->getRedirect();
+            $entity = $this->resources[$redirect];
         }
 
         /*
@@ -68,16 +112,6 @@ class Resources
         */
 
         return $entity;
-    }
-
-    /**
-     * Returns all the resources.
-     *
-     * @return array The array of resources
-     */
-    public function toArray()
-    {
-        return $this->resources;
     }
 
 }
