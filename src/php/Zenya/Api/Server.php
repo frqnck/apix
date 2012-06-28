@@ -2,6 +2,8 @@
 
 namespace Zenya\Api;
 
+use Zenya\Api\Entity;
+
 /**
  * Temp Debug
  */
@@ -42,6 +44,7 @@ class Server extends Listener
 
         // Init response object
         $this->resources = new Resources;
+        #$this->resources->setEntity(new Entity());
 
         set_error_handler(array('Zenya\Api\Exception', 'errorHandler'));
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
@@ -265,37 +268,11 @@ class Server extends Listener
 
     protected function proxy($path, \Closure $to, $method)
     {
-        return $this->resources->add($path, array(
+        return $this->resources->add($path,
+            array(
                 'action' => $to,
-                'method' => $method,
-                'doc'    => null
-            ),
-            isset($this->group)?$this->group:null
-        );
-    }
-
-    /**
-     * test chain.
-     * @param array $opts Options are:
-     *
-     * @return string
-     */
-    public function setGroup($name)
-    {
-        $class = new \ReflectionClass($this);
-        $method = $class->getMethod('setGroup');
-var_dump($class);
-
-        $class = new \ReflectionFunction();
-        //$method = $class->getMethod('setGroup');
-var_dump($class);
-
-
-        $doc = $method->getDocComment();
-
-        $this->group = array(
-            'name'  => $name,
-            'doc'   => $doc
+                'method' => $method
+            )
         );
     }
 
@@ -332,6 +309,32 @@ var_dump($class);
     public function onTest($path, $to)
     {
         $this->proxy($path, $to, 'HEAD');
+    }
+
+
+    /**
+     * test chain.
+     * @param array $opts Options are:
+     *
+     * @return string
+     */
+    public function setGroup($name)
+    {
+        $class = new \ReflectionClass($this);
+        $method = $class->getMethod('setGroup');
+var_dump($class);
+
+        $class = new \ReflectionFunction();
+        //$method = $class->getMethod('setGroup');
+var_dump($class);
+
+
+        $doc = $method->getDocComment();
+
+        $this->group = array(
+            'name'  => $name,
+            'doc'   => $doc
+        );
     }
 
 }
