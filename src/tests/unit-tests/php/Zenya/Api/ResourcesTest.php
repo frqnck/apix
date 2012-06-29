@@ -12,8 +12,8 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->mockEntity = $this->getMock('Zenya\Api\Entity\EntityInterface');
-        $this->mockEntity->expects($this->any())->method('append')->will($this->returnValue(0));
-        $this->mockEntity->expects($this->any())->method('getRedirect')->will($this->returnValue("test"));
+        $this->mockEntity->expects($this->any())->method('append')->will($this->returnValue(array('test')));
+        $this->mockEntity->expects($this->any())->method('getRedirect')->will($this->returnValue('paul'));
         
         $resources = new Resources;
         $resources->setEntity($this->mockEntity);
@@ -33,6 +33,12 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
     public function testSetEntity()
     {
         $this->resources->setEntity($this->mockEntity);
+
+        // check the fixers order
+        $r = new \ReflectionObject($this->resources);
+        $p = $r->getProperty('entity');
+        $p->setAccessible(true);
+
         $this->assertSame($this->mockEntity, $this->resources->getEntity());
     }
 
@@ -75,24 +81,21 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
      */
     public function testGet()
     {
-        $this->resources->add('name', array('test'));
+        $this->resources->add('name', array());
         $this->assertInstanceOf('Zenya\Api\Entity\EntityInterface', $this->resources->get('name'));
     }
 
-    public function testGetFollowsAliases()
+    public function testGetFollowsRedirect()
     {
-        $this->assertEquals('test', $this->mockEntity->getRedirect());
-
-        $this->markTestIncomplete(
-            'Not working - test has not been implemented yet.'
-        );
-
-
         $this->resources->add('paul', array());
         $this->resources->add('pierre', array());
-
-
+        $this->resources->add('bob', array());
+        
         $this->assertEquals($this->resources->get('paul'), $this->resources->get('pierre'));
+
+        $this->markTestIncomplete('TODO: not implemented yet.');
+
+        $this->assertNotEquals($this->resources->get('bob'), $this->resources->get('pierre'));
     }
 
 }
