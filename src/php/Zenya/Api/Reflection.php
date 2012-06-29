@@ -2,6 +2,9 @@
 
 namespace Zenya\Api;
 
+use Zenya\Api\Entity;
+use Zenya\Api\Entity\EntityInterface;
+
 class Reflection
 {
     /**
@@ -10,123 +13,20 @@ class Reflection
     protected $prefix;
 
     /**
-     * Holds the help entries.
-     * @var array
-     */
-    protected $docs;
-
-    /**
-     * Holds the reflection of an entity.
-     * @var array
-     */
-    protected $ref = array();
-
-    /**
      * Constructor
      *
      * @param mixed       $reflected Either a string containing the name of the class to reflect, or an object.
      * @param string|null $prefix    [optional default:null]
      */
-    public function __construct(Entity $entity, $prefix='null')
+    public function __construct($prefix='null')
     {
         $this->prefix = $prefix;
-
-        if( $entity->isClosure() ) {
-
-            // group doc
-            $this->parseGroupDoc( $entity->group );
-
-            foreach($entity->getActions() as $key => $func) {
-                if($func['action'] InstanceOf \Closure) {
-                    $this->ref[$key] = new \ReflectionFunction($func['action']);
-                    // method docs
-                    $this->parseMethodDoc($func, $key);
-                }
-            }
-
-        } else {
-            // assume class based
-            $name = $entity->getController('name');
-            $this->ref = new \ReflectionClass($name);
-
-            $doc = $this->ref->getDocComment();
-            $this->parseGroupDoc( $doc );
-
-            // parse all methods
-            foreach($this->ref->getMethods() as $key => $method)
-            {
-
-                // remove roote dependence here!!!!
-                $key = $entity->route->getMethod($method);
-
-                $doc = $method->getDocComment();
-                $this->docs['methods'][$key] =
-                    self::parsePhpDoc( $doc );
-            }
-        }
-    }
-
-    /**
-     * Parse group documentation
-     *
-     * @return array
-     */
-    public function parseGroupDoc($doc)
-    {
-        return $this->docs = self::parsePhpDoc( $doc );
-    }
-
-    /**
-     * parse a method documentation
-     *
-     * @param string $name A string containing the name of a method to reflect (todo: start from an object).
-     */
-    public function parseMethodDoc($name, $key=null)
-    {
-        if( $this->ref instanceOf \ReflectionClass ) {
-            $method = $this->ref->hasMethod($name)
-                ? $this->ref->getMethod($name)
-                : 'nn';
-
-           echo $key = null === $key ? $method->getShortName() : $key;
-            $doc = $method->getDocComment();
-
-        } else if( isset($this->ref[$key]) && $this->ref[$key] instanceOf \ReflectionFunction ){
-            $doc = $this->ref[$key]->getDocComment();
-        } else {
-          $doc = $this->ref[$key];
-        }
-
-        $this->docs['methods'][$key] =
-            self::parsePhpDoc( $doc );
-    }
-
-    /**
-     * Gets the documentation array
-     *
-     * @return array
-     */
-    public function getDocs($actions=null)
-    {
-        return $this->docs;
-    }
-
-    public function getMethod($name)
-    {
-        return $this->ref->getMethod($name);
-    }
-
-    public function getMethods()
-    {
-        return $this->ref->getMethods(
-            \ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC
-        );
     }
 
     /**
      * Extract PHPDOCs
      *
-     * @param  string $classname
+     * @param  string $str
      * @return array
      */
     public static function parsePhpDoc($str)
@@ -198,21 +98,20 @@ class Reflection
     }
 
     /**
-     * Extract source code
+     * Extract source code.
      *
-     * @param  string $classname
      * @return array
      */
-    public function getSource()
+    public function getSource(\Reflector $ref)
     {
-        if( !file_exists( $this->getFileName() ) ) return false;
+        if( !file_exists( $ref->getFileName() ) ) return false;
 
-        $start_offset = $this->getStartLine();
-        $end_offset   = $this->getEndLine()-$this->getStartLine();
+        $start_offset = $ref->getStartLine();
+        $end_offset   = $ref->getEndLine()-$ref->getStartLine();
 
         return join('',
             array_slice(
-                file($this->getFileName()),
+                file($ref->getFileName()),
                 $start_offset-1,
                 $end_offset+1
             )

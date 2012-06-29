@@ -2,19 +2,22 @@
 
 namespace Zenya\Api;
 
+use Zenya\Api\Listener;
+use Zenya\Api\Router;
+use Zenya\Api\Entity\EntityInterface;
+
 /**
  * Represents a resource.
  *
  */
-class Entity extends Listener implements Entity\EntityInterface
+class Entity extends Listener #implements EntityInterface
 {
-
   protected $name;
   protected $controller;
   protected $actions = array();
   protected $redirect = null;
 
-  protected $group;
+  public $group = '/* -- todo group */';
 
   protected $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
 
@@ -25,6 +28,8 @@ class Entity extends Listener implements Entity\EntityInterface
   // protected $method;
   // protected $methods = array();
 
+    private $_ref = null;
+
     public function debug($data=null)
     {
           echo '<pre>';
@@ -32,16 +37,13 @@ class Entity extends Listener implements Entity\EntityInterface
     }
 
     /**
-     * Import given objects
-     *
-     * @param array $resources
+     * {@inheritdoc}
      */
-    public function __construct()
+    public function append(array $defs=null)
     {
-        #$this->route = $route;
-        // attach late listeners @ post-processing
-        #$this->addAllListeners('resource', 'early');
+        $this->_append($defs);
     }
+
 
     /**
      * Group a resource entity.
@@ -93,110 +95,9 @@ class Entity extends Listener implements Entity\EntityInterface
         return $this->redirect;
     }
 
-    public function append(array $defs=null)
-    {
-
-      if( isset($defs['action'])
-          && $defs['action'] instanceOf \Closure
-        ) {
-          $this->isClosure = true;
-
-          $this->actions[$defs['method']] = $defs;
-
-        } else if(isset($defs['controller'])) {
-          $this->isClosure = false;
-
-          // assume class based
-          $this->controller = $defs['controller'];
-        } else if(isset($defs['alias'])) {
-          $this->alias = $defs['alias'];
-        } else {
-          echo '<pre>ERROR';
-          $this->debug($defs);
-        }
-
-        #$this->route = $route;
-
-        // attach late listeners @ post-processing
-        #$this->addAllListeners('resource', 'early');
-    }
-
-
-    public function isClosure($action=null)
-    {
-      if($action === null)
-        return $this->isClosure;
-      else
-        return $action instanceOf \Closure;
-    }
-
     public function toArray()
     {
       return get_object_vars($this);
-    }
-
-    /**
-     * Returns all the actions available.
-     *
-     * @param  Router $route
-     * @return string
-     */
-    public function getActions()
-    {
-        return $this->actions+$this->overrides;
-    }
-
-    /**
-     * Return the classname for a resource (long and private)
-     *
-     * @param  Router $route
-     * @return string
-     */
-    public function doOverrides($method)
-    {
-        if(
-            !isset($this->actions[$method])
-            && in_array($method, array_keys($this->overrides))
-        ) {
-
-          $this->route->setParams(
-            array('entity' => clone $this)
-          );
-
-          // TODO: review this
-          $c = Config::getInstance();
-          $alt = $c->getResources($this->overrides[$method]);
-          // TODO: auto inject here!!
-          $alt['controller']['args'] = $c->getInjected('Server');
-
-          $this->controller = $alt['controller'];
-          $this->isClosure = false;
-
-          $this->ref = new Reflection($this);
-        }
-    }
-
-    /**
-     * Returns an array of method => action/func
-     *
-     * @param  array $array
-     * @return array
-     */
-    public function getActionsMethods(array $routes=array())
-    {
-        if(!$this->isClosure()) {
-            $refs = $this->ref->getMethods();
-            $funcs = array();
-            foreach ($refs as $ref) {
-                $funcs[] = $ref->name;
-            }
-
-            $routes = $this->route->getActions();
-
-            return array_intersect($routes, $funcs);
-        } else {
-            return $this->actions;
-        }
     }
 
     /**
@@ -209,53 +110,24 @@ class Entity extends Listener implements Entity\EntityInterface
     public function call(Router $route)
     {
       $this->route = $route;
-
+      
       try {
-        $this->ref = new Reflection($this);
-        $this->actions = $this->getActionsMethods();
+        
+        // cache?!
+        $this->_parseDocs();
+        
+        //$this->actions = $this->getActions();
+
       } catch (\Exception $e) {
-        echo $e->getMessage();
-        throw new \RuntimeException("Resource entity has no implementation.", 500);
+        throw new \RuntimeException("Resource entity without implementation.", 500);
       }
 
-      // check for a method override;
-      $this->doOverrides( $route->getMethod() );
-
-      // Delegate calls to a controller
-      if(!$this->isClosure()) {
-        return $this->_class($route);
-      } else {
-        // assume closure based
-        return $this->_closure($route);
+      if($route->getMethod() == 'OPTIONS') {
+          return $this->getDocs();
       }
 
-      throw new \RuntimeException("Resource entity missing an implementation.");
-    }
-
-    protected function _class($route)
-    {
-        $name = $this->controller['name'];
-        $args = $this->controller['args'];
-
-        try {
-          $method = $this->ref->getMethod( $route->getAction() );
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified (class).", 405);
-        }
-
-        $params = $this->getRequiredParams($route->getMethod(), $method, $route->getParams());
-
-        // attach late listeners @ post-processing
-
-        $this->addAllListeners('resource', 'early');
-
-        return call_user_func_array(
-          array(
-            new $name($args),
-            $route->getAction()),
-            $params
-          );
-    }
+      return $this->_call($route);
+   }
 
     public function getController($key=null)
     {
@@ -264,7 +136,6 @@ class Entity extends Listener implements Entity\EntityInterface
       }
       return $this->controller;
     }
-
 
     public function getAction($method)
     {
@@ -277,43 +148,18 @@ class Entity extends Listener implements Entity\EntityInterface
       return $this->getAction($method);
     }
 
-    protected function _closure($route)
-    {
-      if(!isset($this->actions[$route->getMethod()])) {
-          throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
-      }
-
-      try {
-          $action = $this->getAction($route->getMethod());
-
-          $method = new ReflectionFunc($action);
-        } catch (\Exception $e) {
-          throw new \RuntimeException("Resource entity not implemented.");
-        }
-
-        // TODO: merge with TEST & OPTIONS ???
-
-        $params = $this->getRequiredParams($route->getMethod(), $method, $route->getParams());
-        $this->addAllListeners('resource', 'early');
-
-        return call_user_func_array($action, $params);
-    }
-
     public function isPublic()
     {
-        #$verb = isset($this->ref)
-        #  ? $this->route->getAction()   // closure
-        #  : $this->route->getMethod();
+        // $verb = isset($this->_ref)
+        //   ? $this->route->getAction()   // closure
+        //   : $this->route->getMethod();
 
-        $verb = $this->route->getMethod();
+        $method = $this->route->getMethod();
 
-        $docs = $this->ref->getDocs( $verb );
+        $doc = $this->getDocs($method);
 
-       # echo '<pre>'; print_r($docs['methods']);#exit;
-        #$docs = $this->getDocs($verb);
-
-        $role = isset($docs['methods'][$verb]['api_role'])
-          ? $docs['methods'][$verb]['api_role']
+        $role = isset($doc['api_role'])
+          ? $doc['api_role']
           : false;
 
         if( !$role || $role == 'public') {
@@ -341,6 +187,36 @@ class Entity extends Listener implements Entity\EntityInterface
         // TODO: maybe we need to check the order of params key match the method?
         // TODO: maybe add a type casting handler here
         return $params;
+    }
+
+    /**
+     * Returns the full Documentatins or specified method. 
+     *
+     * @param  string  $method
+     * @return array
+     */
+    public function getDocs($method=null)
+    {
+      if(null !== $method) {
+        return isset($this->docs['methods'][$method]) ? $this->docs['methods'][$method] : 'false';
+      }
+      return $this->docs;
+
+      /*
+        $this->route->setParams(
+          array('entity' => clone $this)
+        );
+
+        // TODO: review this
+        $c = Config::getInstance();
+        $alt = $c->getResources($this->overrides[$method]);
+        // TODO: auto inject here!!
+        $alt['controller']['args'] = $c->getInjected('Server');
+
+        $this->controller = $alt['controller'];
+
+        #$this->ref = new Reflection( $this->parseDocs() );
+      */
     }
 
 }

@@ -86,7 +86,7 @@ class Server extends Listener
             $name = $this->route->getPathName();
             if (!$this->resources->has($name)) {
                 throw new \InvalidArgumentException(
-                    sprintf("Invalid resource's name specified (%s).", $name), 404
+                    sprintf("Invalid resource entity specified (%s).", $name), 404
                 );
             }
 
