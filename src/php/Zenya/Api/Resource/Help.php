@@ -134,9 +134,9 @@ class Help
         // $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
         // $this->_output = $help->toArray();
 
-        $actions = $entity->getActionsMethods();
+        $actions = $entity->getActions();
 
-        $reflection = new Reflection($entity);
+        $reflection = new Reflection($entity->parseDocs());
         return $reflection->getDocs($actions);
     }
 
