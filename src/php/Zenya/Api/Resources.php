@@ -50,12 +50,17 @@ class Resources
      */
     public function add($name, array $resource)
     {
-        if(null === $this->entity) {
-            $this->setEntity(new Entity);
+        // factory
+        if( isset($resource['action'])
+          && $resource['action'] instanceOf \Closure
+        ) {
+            $this->setEntity(new Entity\EntityClosure);
+        } else { //if(isset($resource['controller'])) {
+            $this->setEntity(new Entity\EntityClass);
         }
     
         if(!isset($this->resources[$name])) {
-            $entity = $this->getEntity();
+            $entity = get_class($this->getEntity());
             $this->resources[$name] = new $entity; //new Entity($group);
         }
         $this->resources[$name]->append($resource);
@@ -95,7 +100,6 @@ class Resources
 
         // TODO: swap if aliased
         if($redirect = $entity->getRedirect()) {
-            //$name = $entity->getRedirect();
             $entity = $this->resources[$redirect];
         }
 
