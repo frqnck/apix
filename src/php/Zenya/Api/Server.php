@@ -42,7 +42,7 @@ class Server extends Listener
                     $this->config['output_debug']
                 );
 
-        // Init response object
+        // Resources
         $this->resources = new Resources;
         #$this->resources->setEntity(new Entity());
 
@@ -81,7 +81,7 @@ class Server extends Listener
             // }
 
             // attach the early listeners @ pre-processing stage
-            $this->addAllListeners('server', 'early', $this->config);
+            $this->addAllListeners('server', 'early');
 
             $name = $this->route->getPathName();
             if (!$this->resources->has($name)) {
@@ -149,7 +149,7 @@ class Server extends Listener
      */
     private function getServerVersion()
     {
-        return sprintf("%s/%s (%s)", $this->config['api_realm'], $this->config['api_version'], Server::VERSION);
+        return sprintf('%s/%s (%s)', $this->config['api_realm'], $this->config['api_version'], Server::VERSION);
     }
 
     /**

@@ -11,7 +11,7 @@ use Zenya\Api\Router;
  * Represents a resource.
  *
  */
-class EntityClosure extends Entity implements EntityInterface 
+class EntityClosure extends Entity implements EntityInterface
 {
 
     /**
@@ -27,21 +27,23 @@ class EntityClosure extends Entity implements EntityInterface
      */
      function _call(Router $route)
     {
-      if(!isset($this->actions[$route->getMethod()])) {
-          throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
-      }
+      #if(!isset($this->actions[$route->getMethod()])) {
+#          throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.!!", 405);
+#      }
 
-      try {
+      #try {
+            $method = $this->getMethod( $route->getMethod() );
             $action = $this->getAction($route->getMethod());
-            $refMethod = $this->getMethod( $route->getMethod() );
-        } catch (\Exception $e) {
-          throw new \RuntimeException("Resource entity not implemented.");
-        }
+
+       # } catch (\Exception $e) {
+       #   throw new \RuntimeException("Resource entity not implemented.");
+      #  }
 
         // TODO: merge with TEST & OPTIONS ???
 
-        $params = $this->getRequiredParams($route->getMethod(), $refMethod, $route->getParams());
-        $this->addAllListeners('resource', 'early');
+        $params = $this->getRequiredParams($route->getMethod(), $method, $route->getParams());
+
+        #$this->addAllListeners('resource', 'early');
 
         return call_user_func_array($action, $params);
     }
@@ -76,7 +78,7 @@ class EntityClosure extends Entity implements EntityInterface
           return $this->_ref[$name];
         }
 
-        throw new \Exception('todo');
+        throw new \InvalidArgumentException("Invalid resource's method ({$name}) specified.!!", 405);
     }
 
     /**
@@ -86,5 +88,16 @@ class EntityClosure extends Entity implements EntityInterface
     {
         return $this->actions;
     }
+
+    private function getAction($method)
+    {
+      return $this->actions[$method]['action'];
+    }
+
+    // private function getCurrentAction()
+    // {
+    //   $method = $this->route->getMethod();
+    //   return $this->getAction($method);
+    // }
 
 }

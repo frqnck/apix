@@ -54,7 +54,7 @@ $c['resources'] = array(
     '/upload/:type/:debug' => array(
         'controller' => array(
             'name'  => 'Zenya\Api\Fixtures\UploadResource',
-            //'args'  => null,
+            'args'  => null,
         )
     ),
 
@@ -99,7 +99,6 @@ $c['listeners'] = array(
 
                 return new Listener\Auth($adapter);
             },
-
         ),
 
        // fires early @ resource discovery stage
@@ -126,6 +125,7 @@ $c['listeners'] = array(
                 };
                 return new Listener\Auth($adapter);
             },
+            #'Zenya\Api\Listener\BodyData',
         )
     )
 );
