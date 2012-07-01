@@ -37,26 +37,26 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
 
     public function testJsonAsString()
     {
-        $array = array('param1'=>'value1', 'param2'=>'value2');
-        $r = $this->post(json_encode($array), 'json');
+        $values = array('param1'=>'value1', 'param2'=>'value2');
+        $r = $this->post(json_encode($values), 'json');
 
         $this->assertEquals('{"param1":"value1","param2":"value2"}', $r->zenya->upload->body);
     }
 
     public function testJsonAsArray()
     {
-        $array = array('param1'=>'value1', 'param2'=>'value2');
-        $r = $this->post(json_encode($array), 'json');
+        $values = array('param1'=>'value1', 'param2'=>'value2');
+        $r = $this->post(json_encode($values), 'json');
 
-        $this->assertSame($array, (array)$r->zenya->upload->params);
+        $this->assertSame($values, (array)$r->zenya->upload->params);
     }
 
     public function testXmlAsString()
     {
-        $array = array('param1'=>'value1', 'param2'=>'value2');
+        $values = array('param1'=>'value1', 'param2'=>'value2');
 
         $xml = new Zenya\Api\Output\Xml;
-        $r = $this->post($xml->encode($array), 'xml');
+        $r = $this->post($xml->encode($values), 'xml');
 
         $this->assertEquals(
             '<?xml version="1.0" encoding="utf-8"?><root><param1>value1</param1><param2>value2</param2></root>',
@@ -66,12 +66,12 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
 
    public function testXmlAsArray()
     {
-        $array = array('param1'=>'value1', 'param2'=>'value2');
+        $values = array('param1'=>'value1', 'param2'=>'value2');
 
         $xml = new Zenya\Api\Output\Xml;
-        $r = $this->post($xml->encode($array), 'xml');
+        $r = $this->post($xml->encode($values), 'xml');
 
-        $this->assertSame($array, (array)$r->zenya->upload->params);
+        $this->assertSame($values, (array)$r->zenya->upload->params);
     }
 
 
