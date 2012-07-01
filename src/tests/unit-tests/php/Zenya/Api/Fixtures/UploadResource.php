@@ -56,11 +56,6 @@ class UploadResource
     {
         $request = $request === null ? Request::getInstance() : $request;
 
-        $results = array(
-            'body'          => $request->getBody(),
-            'params'        => $request->getParams()
-        );
-
         if($debug==true) {
             $results['debug'] = $request->getHeaders();
         }
@@ -79,19 +74,24 @@ class UploadResource
                 // 'application/json'
                 case (strstr($ct, '/json')):
                     $input = new Input\Json;
-                    $results['paramsBody'] = $input->decode($request->getBody());
+                    $r = $input->decode($request->getBody(), true);
+                    $request->setParams($r);
                 break;
 
                 // 'text/xml', 'application/xml'
                 case (strstr($ct, '/xml')
                     && (!strstr($ct, 'html'))):
                     $input = new Input\Xml;
-                    $results['paramsBody'] = $input->decode($request->getBody());
+                    $r = $input->decode($request->getBody(), true);
+                    $request->setParams($r);
             }
 
         }
 
-        return $results;
+        return array(
+            'body'      => $request->getBody(),
+            'params'    => $request->getParams()
+        );
     }
 
 }
