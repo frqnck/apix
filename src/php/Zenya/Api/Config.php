@@ -161,7 +161,7 @@ class Config extends \Pimple
                     // pre-processing stage
                     'early' => array(
                         #'Zenya\Api\Listener\Mock',
-                       'Zenya\Api\Listener\BodyData',
+                       #'Zenya\Api\Listener\BodyData',
                     ),
                     // post-processing stage
                     'late'=>array(
