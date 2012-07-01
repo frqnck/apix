@@ -36,6 +36,8 @@ class Auth implements \SplObserver
 
     public function update(\SplSubject $resource)
     {
+        echo ' *AUTH* ';
+
         // skip if public
         if($resource->isPublic()) {
           return;

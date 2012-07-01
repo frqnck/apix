@@ -11,7 +11,7 @@ use Zenya\Api\Router;
  * Represents a resource.
  *
  */
-class EntityClass extends Entity implements EntityInterface 
+class EntityClass extends Entity implements EntityInterface
 {
 
     /**
@@ -44,17 +44,12 @@ class EntityClass extends Entity implements EntityInterface
         $name = $this->controller['name'];
         $args = $this->controller['args'];
 
-        try {
-            $method = $this->_ref->getMethod( $route->getAction() );
-        } catch (\Exception $e) {
-            throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
-        }
+        $method = $this->getMethod($route->getAction());
 
         $params = $this->getRequiredParams($route->getMethod(), $method, $route->getParams());
 
         // attach late listeners @ post-processing
-
-        $this->addAllListeners('resource', 'early');
+        #$this->addAllListeners('resource', 'early');
 
         return call_user_func_array(
           array(
@@ -85,7 +80,7 @@ class EntityClass extends Entity implements EntityInterface
         {
           if( $key = array_search($method->name, $actions) ) {
             $doc = $method->getDocComment();
-            $this->docs['methods'][$key] = 
+            $this->docs['methods'][$key] =
                 Reflection::parsePhpDoc( $doc );
           }
         }
@@ -98,11 +93,12 @@ class EntityClass extends Entity implements EntityInterface
      */
     public function getMethod($name)
     {
+        // TODO HERE $name shodulbe getMethod instead of Action!!!!
         if($this->_ref->hasMethod($name)) {
-            return $this->ref->getMethod($name);
+            return $this->_ref->getMethod($name);
         }
 
-        throw new \Exception('todo');
+        throw new \InvalidArgumentException("Invalid resource's method ({$name}) specified.", 405);
     }
 
     /**
@@ -115,7 +111,7 @@ class EntityClass extends Entity implements EntityInterface
             $funcs[] = $ref->name;
         }
         $routes = $this->route->getActions();
-        
+
         return array_intersect($routes, $funcs);
 
         $all= array_intersect($routes, $funcs);

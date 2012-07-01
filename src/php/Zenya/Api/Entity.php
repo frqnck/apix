@@ -10,7 +10,7 @@ use Zenya\Api\Entity\EntityInterface;
  * Represents a resource.
  *
  */
-class Entity extends Listener #implements EntityInterface
+class Entity #implements EntityInterface
 {
   protected $name;
   protected $controller;
@@ -28,7 +28,7 @@ class Entity extends Listener #implements EntityInterface
   // protected $method;
   // protected $methods = array();
 
-    private $_ref = null;
+    protected $_ref = null;
 
     public function debug($data=null)
     {
@@ -110,12 +110,12 @@ class Entity extends Listener #implements EntityInterface
     public function call(Router $route)
     {
       $this->route = $route;
-      
+
       try {
-        
+
         // cache?!
         $this->_parseDocs();
-        
+
         //$this->actions = $this->getActions();
 
       } catch (\Exception $e) {
@@ -135,17 +135,6 @@ class Entity extends Listener #implements EntityInterface
         return isset($this->controller[$key]) ? $this->controller[$key] : null;
       }
       return $this->controller;
-    }
-
-    public function getAction($method)
-    {
-      return $this->actions[$method]['action'];
-    }
-
-    public function getCurrentAction()
-    {
-      $method = $this->route->getMethod();
-      return $this->getAction($method);
     }
 
     public function isPublic()
@@ -190,7 +179,7 @@ class Entity extends Listener #implements EntityInterface
     }
 
     /**
-     * Returns the full Documentatins or specified method. 
+     * Returns the full Documentatins or specified method.
      *
      * @param  string  $method
      * @return array

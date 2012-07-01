@@ -161,17 +161,22 @@ class Config extends \Pimple
                     // pre-processing stage
                     'early' => array(
                         #'Zenya\Api\Listener\Mock',
+                       'Zenya\Api\Listener\BodyData',
                     ),
                     // post-processing stage
-                    'late'=>array(),
+                    'late'=>array(
+                    ),
                     // errors and exceptions
                     'exception' => array(
                         #'Zenya\Api\Listener\Log' => array('php://output'),
                     )
                 ),
-                'request' => array(
-                    #'Zenya\Api\Listener\Log',
-                ),
+                // 'request' => array(
+                //     'early'=>array(
+                //         'Zenya\Api\Listener\BodyData',
+                //     ),
+                //     #'Zenya\Api\Listener\Log',
+                // ),
                 'resource' => array(
                     'early' => array(
                         // todo
@@ -190,6 +195,7 @@ class Config extends \Pimple
                     ),
                     // post-processing stage
                     'late'=>array(
+
                         #'Zenya\Api\Listener\Mock',
                         #'Zenya\Api\Listener\Log' => array('php://output'),
                     ),
