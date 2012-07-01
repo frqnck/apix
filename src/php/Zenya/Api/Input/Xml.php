@@ -20,6 +20,7 @@ class Xml implements Adapter
      */
     public function decode($xmlStr, $assoc=true)
     {
+
         /*
             $array = json_decode(json_encode($xmlStr), true);
 

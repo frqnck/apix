@@ -24,7 +24,7 @@ class Resources
     /**
      * Sets an entity object.
      *
-     * @param EntityInterface $entity An entity object 
+     * @param EntityInterface $entity An entity object
      */
     public function setEntity(EntityInterface $entity)
     {
@@ -58,7 +58,7 @@ class Resources
         } else { //if(isset($resource['controller'])) {
             $this->setEntity(new Entity\EntityClass);
         }
-    
+
         if(!isset($this->resources[$name])) {
             $entity = get_class($this->getEntity());
             $this->resources[$name] = new $entity; //new Entity($group);
@@ -103,8 +103,11 @@ class Resources
             $entity = $this->resources[$redirect];
         }
 
-        /*
-        if( !$entity->isClosure() ) {
+/*
+        if( $entity instanceOf Entity\EntityClass ) {
+
+var_dump($entity->getController());
+
             if(!isset($entity->controller['name'])) {
                 $entity->controller['name'] = $route->controller_name;
             }
@@ -113,7 +116,7 @@ class Resources
                 $entity->controller['args'] = $route->controller_args;
             }
         }
-        */
+ */
 
         return $entity;
     }
