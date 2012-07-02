@@ -1,5 +1,4 @@
 <?php
-
 namespace Zenya\Api\Util;
 
 use Zenya\Api;
@@ -33,7 +32,7 @@ class Compile
         $phar->startBuffering();
 
         // all the files
-        $root = __DIR__.'/../../../../..';
+        $root = __DIR__ . '/../../../../..';
         foreach ( array('src/php', 'vendor/php') as $dir) {
             $it = new \RecursiveDirectoryIterator("$root/$dir");
             foreach(new \RecursiveIteratorIterator($it) as $file) {
@@ -43,7 +42,6 @@ class Compile
                 ) {
                     $path = $file->getPathName();
                     $this->addFile($phar, $path);
-                    #echo $file->getPathName() . "\n";
                 }
             }
         }
@@ -54,16 +52,19 @@ class Compile
         #$this->addFile($phar, new \SplFileInfo($root.'/vendor/composer/autoload_namespaces.php'));
         #$this->addFile($phar, new \SplFileInfo($root.'/vendor/composer/autoload_classmap.php'));
 
-        // Stubs
-        $phar->setStub($this->getStub());
+        // Stub
+        $phar->setStub(
+            $this->getStub()
+        );
 
         $phar->stopBuffering();
 
-        // $phar->compressFiles(\Phar::GZ);
+        #$phar->compressFiles(\Phar::GZ);
 
         echo 'The new phar has ' . $phar->count() . " entries\n";
 
         unset($phar);
+
         chmod($pharFile, 0777);
     }
 
@@ -79,30 +80,80 @@ class Compile
         );
         #$localPath = str_replace('src/php'.DIRECTORY_SEPARATOR, '', $localPath);
 
-        echo $localPath . " ($path)" . PHP_EOL;
+        #echo $localPath . " ($path)" . PHP_EOL;
 
         $content = file_get_contents($path);
         if ($strip) {
             $content = self::stripWhitespace($content);
         }
 
-        $content = preg_replace("/const VERSION = '.*?';/", "const VERSION = '".$this->version."';", $content);
+        #$content = preg_replace("/const VERSION = '.*?';/", "const VERSION = '".$this->version."';", $content);
 
-        $phar->addFromString('/'.$localPath, $content);
+        #$localPath = strtolower($localPath);
+        $phar->addFromString('/' . $localPath, $content);
     }
+
+/*
+
+desc('Build the Phar archive');
+    task('build', 'tests', function($args) {
+        if (!is_dir('build')) {
+            mkdir('build');
+        }
+        chdir('lib');
+        $phar = new Phar('proem.phar');
+        $phar->buildFromDirectory('.');
+        $phar->setStub("<?php
+        
+        Phar::mapPhar('proem.phar');
+        require_once 'phar://proem.phar/Proem/Autoloader.php';
+        
+        (new Proem\Autoloader())->attachNamespaces(['Proem' => 'phar://proem.phar'])->register();
+        __HALT_COMPILER();
+        ?>");
+        rename('proem.phar', '../build/proem.phar');
+        chdir('../');
+        if (isset($args['runtests'])) {
+            system('phpunit --colors tests/phar-test.php');
+        }
+    });
+
+*/
 
     protected function getStub()
     {
-        return <<<'EOF'
+        return <<<'STUB'
 #!/usr/bin/env php
 <?php
 /**
- * Sleepover.phar
+ * Sleepover.phar (DIRECTORY_SEPARATOR)
  */
+function __autoload($class)
+{
+    include 'phar://sleepover.phar/' . str_replace('\\', '/', $class) . '.php';
+}
+try {
+    Phar::mapPhar('sleepover.phar');
 
-Phar::mapPhar('sleepover.phar');
+//set_include_path('phar://' . realpath('sleepover.phar') . PATH_SEPARATOR . get_include_path());
 
-#require 'phar://sleepover.phar/';
+$loc = 'phar://sleepover.phar';
+define('APP_LIBDIR', $loc . '/vendor/php');
+define('APP_TOPDIR', $loc . '/src/php');
+//define('APP_TESTDIR', $loc . '/tests/unit-tests/php');
+
+require_once APP_LIBDIR . '/psr0.autoloader.php';
+#require_once APP_TOPDIR . '/Zenya/Api/Server.php';
+
+psr0_autoloader_searchFirst(APP_LIBDIR);
+psr0_autoloader_searchFirst(APP_TOPDIR);
+//psr0_autoloader_searchFirst(APP_TESTDIR);
+
+// test version!
+$version = Zenya\Api\Server::VERSION;
+printf("Sleepover version %s\n", $version);
+
+//require_once 'phar://sleepover.phar/vendor/php/psr0.autoloader.php';
 
 // set_include_path(get_include_path()
 //     .PATH_SEPARATOR.'phar://'.__FILE__.'/src/php'
@@ -110,33 +161,12 @@ Phar::mapPhar('sleepover.phar');
 //     );
 // spl_autoload_register();
 
-require 'phar://sleepover.phar/vendor/php/psr0.autoloader.php';
 
-/*
-define('APP_TOPDIR', 'phar://sleepover.phar/src/php');
-define('APP_LIBDIR', 'phar://sleepover.phar/vendor/php');
-#define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
-
-require APP_LIBDIR . '/psr0.autoloader.php';
-
-psr0_autoloader_searchFirst(APP_LIBDIR);
-psr0_autoloader_searchFirst(APP_TOPDIR);
-#psr0_autoloader_searchFirst(APP_TESTDIR);
-*/
-
-/*
-function __autoload($class)
-{
-    include 'phar://sleepover.phar/' . str_replace('_', '/', $class) . '.php';
-}
-try {
-    Phar::mapPhar('me.phar');
-    include 'phar://me.phar/startup.php';
 } catch (PharException $e) {
     echo $e->getMessage();
     die('Cannot initialize Phar');
 }
-*/
+
 
 if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'][0]) && isset($_SERVER['argv'][1])) {
     switch ($_SERVER['argv'][1]) {
@@ -193,7 +223,7 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
 }
 
 __HALT_COMPILER();
-EOF;
+STUB;
     }
 
     /**
