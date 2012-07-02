@@ -3,46 +3,33 @@ namespace Zenya\Api;
 
 use Zenya\Api\Fixtures\DocbookClass;
 
-//use Zenya\Api\Fixtures as Fixture;
-//require_once APP_TESTDIR . '/Zenya/Api/Fixtures/DocbookClass.php';
-
 class ReflectionTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
      * @var array
      */
-    protected $class, $method;
+    protected $reflected;
 
     protected function setUp()
     {
         $class = new DocbookClass;
-        $methodName = 'methodNameOne';
 
-        $this->reflected = new Reflection($class);
-        $this->class = $this->reflected->parseClassDoc();
+        $this->reflected = new \ReflectionClass($class);
+        $this->class = Reflection::parsePhpDoc($this->reflected->getDocComment());
 
-        $this->method = $this->reflected->parseMethodDoc($methodName);
+        $this->method = Reflection::parsePhpDoc($this->reflected->getMethod('methodNameOne')->getDocComment());
     }
 
     protected function tearDown()
     {
-        unset($this->class);
-        unset($this->method);
+        unset($this->reflected);
     }
 
-    public function testClassIsInstanceOfReflectionClass()
+    public function testClassDocsIsReturnedAsArray()
     {
-        $class = $this->reflected;
-        $this->assertInstanceOf('Zenya\Api\Reflection', $class);
-        $this->assertSame('DocbookClass', $class->getShortName());
-    }
-
-    public function testOneMethodIsInstanceOfReflectionMethod()
-    {
-        $method = $this->reflected->getMethod('methodNameOne');
-        $this->assertInstanceOf('ReflectionMethod',  $method);
-        $this->assertSame('methodNameOne', $method->getShortName());
+        $this->assertInternalType('array', $this->class);
+        $this->assertInternalType('array', $this->method);
     }
 
     public function testClassDocBookTitleAndDescription()
@@ -78,9 +65,9 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
 
    public function testClassPrefixedParamsAsStrings()
     {
-        $this->assertEquals('true', $this->class['api_public']);
-        $this->assertSame('1.0', $this->class['api_version']);
-        $this->assertSame('admin', $this->class['api_permission']);
+       #$this->assertEquals('true', $this->class['api_public']);
+       # $this->assertSame('1.0', $this->class['api_version']);
+       # $this->assertSame('admin', $this->class['api_permission']);
         $this->assertSame('classRandomValue', $this->class['api_randomName']);
     }
 
@@ -124,41 +111,31 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('methodRandomValue', $this->method['api_randomName']);
     }
 
-    public function testGetDocs()
-    {
-        $docs = $this->reflected->getDocs();
-        $this->assertInternalType('array', $docs);
-        $this->assertSame('Class title', $docs['title']);
-        $this->assertSame(1, count($docs['methods']));
-    }
-
-    public function testGetDocsIsIncremental()
-    {
-        $method = $this->reflected->parseMethodDoc('methodNameOne');
-        $method = $this->reflected->parseMethodDoc('methodNameTwo');
-        $method = $this->reflected->parseMethodDoc('methodNameTwo');
-        $docs = $this->reflected->getDocs();
-        $this->assertSame(2, count($docs['methods']));
-    }
-
-    /**
-     * @covers Zenya\Api\ReflectionClass::getActions
+    /*
+        public function testGetDocsIsIncremental()
+        {
+            $method = $this->reflected->parseMethodDoc('methodNameOne');
+            $method = $this->reflected->parseMethodDoc('methodNameTwo');
+            $method = $this->reflected->parseMethodDoc('methodNameTwo');
+            $docs = $this->reflected->getDocs();
+            $this->assertSame(2, count($docs['methods']));
+        }
      */
-    public function testGetActions()
+
+    public function testGetSourceOfTheWholeClass()
     {
-        $this->assertSame(
-            array('PUT'=>'methodNameTwo', 'GET'=>'methodNameOne'),
-            $this->reflected->getActions(
-                array('PUT'=>'methodNameTwo', 'POST'=>'postMethod', 'GET'=>'methodNameOne')
-            )
-        );
+        $src = Reflection::getSource($this->reflected);
+
+        $this->assertRegExp('/^class Docbook/', $src, "Source should start by 'class ...'");
+        $this->assertRegExp('/\s+}\n\n}$/', $src, "Source should end by '...}'");
     }
 
-    public function testGetClassSource()
+    public function testGetSourceOfMethod()
     {
-        $src = $this->reflected->getSource();
-        $this->assertTrue( preg_match('/^class Docbook/', $src) === 1, "Source should start by 'class ...'");
-        $this->assertTrue( preg_match('/\s+}\n\n}$/', $src) === 1, "Source should end by '...}'");
+        $src = Reflection::getSource($this->reflected->getMethod('methodNameOne'));
+
+        $this->assertRegExp('/^\s+public function methodNameOne/', $src, "Source should start by 'public function methodNameOne'");
+        $this->assertRegExp('/\s+}$/', $src, "Source should end by '...}'");
     }
 
     public function testSpecialCharacteres()

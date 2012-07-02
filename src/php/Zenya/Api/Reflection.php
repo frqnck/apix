@@ -15,8 +15,8 @@ class Reflection
     /**
      * Constructor
      *
-     * @param mixed       $reflected Either a string containing the name of the class to reflect, or an object.
-     * @param string|null $prefix    [optional default:null]
+     * @param mixed                 $reflected Either a string containing the name of the class to reflect, or an object.
+     * @param string|null $prefix   [optional default:null]
      */
     public function __construct($prefix='null')
     {
@@ -102,7 +102,7 @@ class Reflection
      *
      * @return array
      */
-    public function getSource(\Reflector $ref)
+    static public function getSource(\Reflector $ref)
     {
         if( !file_exists( $ref->getFileName() ) ) return false;
 

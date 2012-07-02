@@ -3,6 +3,8 @@
 class PostBodyTest extends \PHPUnit_Framework_TestCase
 {
 
+    protected $debug = null;
+
     public function post($body, $format=null, $url='http://zenya.dev/index.php/api/v1/upload.json/keyword')
     {
         $cmd = "curl -s -X POST -d '${body}' '${url}'";
@@ -60,7 +62,7 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             '<?xml version="1.0" encoding="utf-8"?><root><param1>value1</param1><param2>value2</param2></root>',
-            preg_replace('/[\r\n]+/', '', $r->zenya->upload->body)
+            preg_replace('/[\r\n]+|[\s]{2,}/', '', $r->zenya->upload->body)
         );
     }
 

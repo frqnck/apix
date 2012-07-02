@@ -2,6 +2,7 @@
 
 namespace Zenya\Api\Fixtures;
 
+use Zenya\Api\Server;
 use Zenya\Api\Request as Request;
 use Zenya\Api\Input as Input;
 
@@ -23,8 +24,9 @@ class UploadResource
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(Server $server)
     {
+        $this->server = $server;
     }
 
 
@@ -52,7 +54,17 @@ class UploadResource
      * @api_role public
      *
      */
-    public function onCreate($type, $debug=false, Request $request=null)
+    public function onCreate($type, $debug=false)
+    {
+        #$request = $request === null ? Request::getInstance() : $request;
+
+        return array(
+            'body'      => $this->server->request->getBody(),
+            'params'    => $this->server->getBodyData()
+        );
+    }
+
+    public function OffonCreate($type, $debug=false, Request $request=null)
     {
         $request = $request === null ? Request::getInstance() : $request;
 
@@ -60,10 +72,9 @@ class UploadResource
             $results['debug'] = $request->getHeaders();
         }
 
-        if ( $request->hasHeader('CONTENT_TYPE') ) {
+        if ( $request->hasHeader('CONTENT_TYPE') && $request->hasBody() ) {
 
             $ct = $request->getHeader('CONTENT_TYPE');
-            $results['ct'] = $ct;
 
             switch (true) {
 
@@ -89,6 +100,7 @@ class UploadResource
         }
 
         return array(
+            'ct' => $ct,
             'body'      => $request->getBody(),
             'params'    => $request->getParams()
         );

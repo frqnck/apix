@@ -14,10 +14,10 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         $this->mockEntity = $this->getMock('Zenya\Api\Entity\EntityInterface');
         $this->mockEntity->expects($this->any())->method('append')->will($this->returnValue(array('test')));
         $this->mockEntity->expects($this->any())->method('getRedirect')->will($this->returnValue('paul'));
-        
+
         $resources = new Resources;
         $resources->setEntity($this->mockEntity);
-    
+
         $this->resources = $resources;
     }
 
@@ -34,21 +34,11 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
     {
         $this->resources->setEntity($this->mockEntity);
 
-        // check the fixers order
         $r = new \ReflectionObject($this->resources);
         $p = $r->getProperty('entity');
         $p->setAccessible(true);
 
         $this->assertSame($this->mockEntity, $this->resources->getEntity());
-    }
-
-    /**
-     * @covers Zenya\Api\Resources::add
-     */
-    public function testAddReturnAnEntityObject()
-    {
-        $entity = $this->resources->add('name', array());
-        $this->assertInstanceOf('Zenya\Api\Entity\EntityInterface', $entity);
     }
 
     /**
@@ -60,7 +50,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->resources->has($name));
         $this->assertFalse($this->resources->has('non-existant'));
     }
-    
+
     /**
      * @covers Zenya\Api\Resources::toArray
      */
@@ -87,15 +77,47 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFollowsRedirect()
     {
-        $this->resources->add('paul', array());
-        $this->resources->add('pierre', array());
+        $this->resources->add('paul', array('redirect'=>'pierre'));
+        $this->resources->add('pierre', array('redirect'=>'bob'));
         $this->resources->add('bob', array());
-        
-        $this->assertEquals($this->resources->get('paul'), $this->resources->get('pierre'));
 
-        $this->markTestIncomplete('TODO: not implemented yet.');
+        $this->assertEquals('bob', $this->resources->get('paul')->getRedirect());
 
-        $this->assertNotEquals($this->resources->get('bob'), $this->resources->get('pierre'));
+        $this->assertEquals($this->resources->get('bob'), $this->resources->get('pierre'));
+        $this->assertNotEquals($this->resources->get('bob'), $this->resources->get('paul'));
     }
+
+/* ---------- TODO: review below when we refactor --- */
+
+    /**
+     * @covers Zenya\Api\Resources::add
+     */
+    public function testAddReturnAnEntityObject()
+    {
+        $entity = $this->resources->add('name', array());
+        $this->assertInstanceOf('Zenya\Api\Entity\EntityInterface', $entity);
+    }
+
+    public function testAddClosureObject()
+    {
+        $this->resources->add('closure', array('action'=>function(){return 'string';}, 'method'=>'some'));
+        $this->assertInstanceOf('Zenya\Api\Entity\EntityClosure', $this->resources->get('closure'));
+    }
+
+    public function testAddClassObject()
+    {
+        // TODO: use 'controller' instead of default to class...
+        $this->resources->add('class', array());
+        $this->assertInstanceOf('Zenya\Api\Entity\EntityClass', $this->resources->get('class'));
+    }
+
+    public function testAddGroupObject()
+    {
+        $this->markTestIncomplete('TODO: group objcts!');
+
+        // $this->resources->add('group', array('group'=>function(){return 'string';}, 'method'=>'some'));
+        // $this->assertInstanceOf('Zenya\Api\Entity\EntityClosure', $this->resources->get('closure'));
+    }
+
 
 }
