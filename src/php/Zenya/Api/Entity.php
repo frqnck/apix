@@ -28,8 +28,6 @@ class Entity #implements EntityInterface
   // protected $method;
   // protected $methods = array();
 
-    protected $_ref = null;
-
     /**
      * {@inheritdoc}
      */
@@ -115,6 +113,7 @@ class Entity #implements EntityInterface
         throw new \RuntimeException("Resource entity without implementation.", 500);
       }
 
+      // return the help...
       if($route->getMethod() == 'OPTIONS') {
           return $this->getDocs();
       }
@@ -127,6 +126,10 @@ class Entity #implements EntityInterface
       if(null !== $key) {
         return isset($this->controller[$key]) ? $this->controller[$key] : null;
       }
+
+print_r($this->controller);
+exit;
+
       return $this->controller;
     }
 

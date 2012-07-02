@@ -8,7 +8,7 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Zenya_Api_Request
      */
-    protected $request;
+    protected $request = null;
 
     protected function setUp()
     {
@@ -142,17 +142,32 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('3.', $this->request->getIp() );
     }
 
-    public function testSetBodyStream()
+    public function testSetBodyFromStream()
     {
         $this->request->setBody();
         $this->assertSame('', $this->request->getBody());
 
-       $this->request->setBodyStream(APP_TESTDIR . '/Zenya/Api/Fixtures/body.txt');
-       $this->request->setBody();
-       $this->assertSame('body1=value1&body2=value2', $this->request->getBody());
+        $this->request->setBodyStream(APP_TESTDIR . '/Zenya/Api/Fixtures/body.txt');
+
+        $this->request->setBody();
+
+        $this->assertSame('body1=value1&body2=value2', $this->request->getBody());
     }
 
-        protected $data = <<<DATA
+    public function testHasBody()
+    {
+        $this->request->setBody('');
+        $this->assertSame('', $this->request->getBody());
+
+        $this->assertFalse($this->request->hasBody());
+
+        $this->request->setBody('body-data');
+
+        $this->assertTrue($this->request->hasBody());
+
+    }
+
+    protected $data = <<<DATA
 // RFC 2616 defines 'deflate' encoding as zlib format from RFC 1950,
 // while many applications send raw deflate stream from RFC 1951.
 // We should check for presence of zlib header and use gzuncompress() or
@@ -164,7 +179,7 @@ DATA;
         $raw = gzdeflate($this->data);
         $this->request->setHeader('content-encoding', 'deflate');
         $this->request->setBody($raw);
-        $this->assertSame($this->data, $this->request->getBody());
+        $this->assertSame($this->data, $this->request->getBody(false));
         $this->assertSame($raw, $this->request->getRawBody());
     }
 
@@ -173,7 +188,7 @@ DATA;
         $raw = gzencode($this->data);
         $this->request->setHeader('content-encoding', 'gzip');
         $this->request->setBody($raw);
-        $this->assertSame($this->data, $this->request->getBody());
+        $this->assertSame($this->data, $this->request->getBody(false));
         $this->assertSame($raw, $this->request->getRawBody());
     }
 
@@ -181,6 +196,14 @@ DATA;
     {
         $raw = $this->data;
         $this->request->setHeader('content-encoding', 'hashed');
+        $this->request->setBody($raw);
+        $this->assertSame($this->data, $this->request->getBody(false));
+        $this->assertSame($raw, $this->request->getRawBody());
+    }
+
+    public function testGetSetBodyCache()
+    {
+        $raw = gzencode($this->data);
         $this->request->setBody($raw);
         $this->assertSame($this->data, $this->request->getBody());
         $this->assertSame($raw, $this->request->getRawBody());

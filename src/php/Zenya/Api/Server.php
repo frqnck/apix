@@ -3,15 +3,14 @@
 namespace Zenya\Api;
 
 use Zenya\Api\Entity;
+use Zenya\Api\Input;
 
 /**
  * Temp Debug
  */
 function d($mix)
 {
-    echo '<pre>';
-    print_r($mix);
-    echo '</pre>';
+    echo '<pre>' . $mix . '</pre>';
 }
 
 class Server extends Listener
@@ -41,10 +40,10 @@ class Server extends Listener
                     $this->config['output_sign'],
                     $this->config['output_debug']
                 );
+        $this->response->setFormats( $this->config['output_formats']);
 
         // Resources
         $this->resources = new Resources;
-        #$this->resources->setEntity(new Entity());
 
         set_error_handler(array('Zenya\Api\Exception', 'errorHandler'));
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
@@ -100,15 +99,15 @@ class Server extends Listener
             $this->response->setHttpCode($httpCode);
 
             $this->results['error'] = array(
-                'message'   => $e->getMessage(),
+                'message'   => '..'.$e->getMessage(),
                 'code'      => $httpCode
             );
 
             // set the error controller!
-            if ( !in_array($this->route->getController(), array_keys( $this->resources->toArray() )) ) {
+            #if ( !in_array($this->route->getController(), array_keys( $this->resources->toArray() )) ) {
                $this->route->setController('error');
                $this->results = $this->results['error'];
-           }
+            #}
 
             // attach the listeners @ exception stage
             $this->addAllListeners('server', 'exception');
@@ -193,17 +192,56 @@ class Server extends Listener
                 'method'            => $request->getMethod(),
                 'path'              => $path,
                 'controller_name'   => null,
-                'controller_args'   => &$this, // TODO: temp!'
+                'controller_args'   => &$this, // TODO: temp!?'
             )
         );
 
         // TODO: modify this!!
-        $this->route->request = $request;
+        #$this->route->request = $request;
 
         // Set the response format...
         $this->negotiateFormat($opts, $ext);
 
         $this->route->map($path, $request->getParams());
+    }
+
+    /**
+     * Get (& parse) body-data (refactor)
+     *
+     * @return array
+     */
+    public function getBodyData()
+    {
+        if ( $this->request->hasHeader('CONTENT_TYPE') && $this->request->hasBody() ) {
+            $ct = $this->request->getHeader('CONTENT_TYPE');
+            switch (true) {
+                // application/x-www-form-urlencoded
+                case (strstr($ct, '/x-www-form-urlencoded')):
+                    $params = $this->request->getParams();
+                break;
+
+                // 'application/json'
+                case (strstr($ct, '/json')):
+                    $input = new Input\Json;
+                    $params = $input->decode($this->request->getBody(), true);
+                    #$this->request->setParams($r);
+                break;
+
+                // 'text/xml', 'application/xml'
+                case (strstr($ct, '/xml')
+                    && (!strstr($ct, 'html'))):
+                    $input = new Input\Xml;
+                    $params = $input->decode($this->request->getBody(), true);
+                    #$this->request->setParams($r);
+                break;
+
+                default:
+                    $params = null;
+            }
+
+            return $params;
+        }
+        throw(new Exception('no body-data', 404));
     }
 
     /**
@@ -277,9 +315,17 @@ class Server extends Listener
         );
     }
 
+    /**
+     * POST request handler
+     *
+     * @param string $path  Matched route pattern
+     * @param mixed  $to    Callback that returns the response when matched
+     *
+     * @return Controller
+     */
     public function onCreate($path, $to)
     {
-        $this->proxy($path, $to, 'POST');
+        return $this->proxy($path, $to, 'POST');
     }
 
     public function onRead($path, $to)
@@ -289,27 +335,27 @@ class Server extends Listener
 
     public function onUpdate($path, $to)
     {
-        $this->proxy($path, $to, 'PUT');
+        return $this->proxy($path, $to, 'PUT');
     }
 
     public function onModify($path, $to)
     {
-        $this->proxy($path, $to, 'PATCH');
+        return $this->proxy($path, $to, 'PATCH');
     }
 
     public function onDelete($path, $to)
     {
-        $this->proxy($path, $to, 'DELETE');
+        return $this->proxy($path, $to, 'DELETE');
     }
 
     public function onHelp($path, $to)
     {
-        $this->proxy($path, $to, 'OPTIONS');
+        return $this->proxy($path, $to, 'OPTIONS');
     }
 
     public function onTest($path, $to)
     {
-        $this->proxy($path, $to, 'HEAD');
+        return $this->proxy($path, $to, 'HEAD');
     }
 
 

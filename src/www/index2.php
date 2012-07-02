@@ -13,6 +13,27 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     $api = new Zenya\Api\Server;
 
+    $api->onRead('/upload/:what',
+
+        /**
+         * List all the keywords...
+         *
+         * @return array  The array to return to the client
+         * @api_role admin
+         */
+        function() use ($api)
+        {
+            $params = $api->request->getBody();
+            return array(
+                'body'      => $api->request->getBody(),
+                'params'    => $api->getBodyData()
+            );
+        }
+    )->group('testme');
+
+
+
+
     /**
      * group.
      *
@@ -68,8 +89,6 @@ try {
             return array('keyword' => $keyword, 'optional'=>$optional, 'from'=>__FUNCTION__);
         }
     );
-
-
 
 
 

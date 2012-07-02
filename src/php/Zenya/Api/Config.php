@@ -139,6 +139,7 @@ class Config extends \Pimple
             'output_rootNode'  => 'zenya',
             'output_sign'      => true,
             'output_debug'     => true,
+            'output_formats'    => array('json', 'xml', 'html', 'php', 'csv'),
 
             // routing
             'routing' => array(
