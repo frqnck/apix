@@ -127,6 +127,7 @@ class Server extends Listener
                     implode(', ', array_keys($resource->getActions())),
                     false // preserve existing
                 );
+
         }
 
         $output = $this->response->generate(

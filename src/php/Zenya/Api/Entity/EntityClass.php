@@ -44,7 +44,7 @@ class EntityClass extends Entity implements EntityInterface
         $name = $this->controller['name'];
         $args = $this->controller['args'];
 
-        $method = $this->getMethod($route->getAction());
+        $method = $this->getMethod($route);
 
         $params = $this->getRequiredParams($route->getMethod(), $method, $route->getParams());
 
@@ -91,14 +91,14 @@ class EntityClass extends Entity implements EntityInterface
     /**
      * {@inheritdoc}
      */
-    public function getMethod($name)
+    public function getMethod(Router $route)
     {
-        // TODO HERE $name shodulbe getMethod instead of Action!!!!
+        $name = $route->getAction();
         if($this->_ref->hasMethod($name)) {
             return $this->_ref->getMethod($name);
         }
 
-        throw new \InvalidArgumentException("Invalid resource's method ({$name}) specified.", 405);
+        throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
     }
 
     /**
