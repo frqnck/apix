@@ -46,7 +46,7 @@ namespace Zenya\Api;
 class Exception extends \Exception
 {
 
-    const DEBUG = false;
+    const DEBUG = true;
 
     /**
      *  E_RECOVERABLE_ERROR handler

@@ -260,6 +260,11 @@ class Request
         $this->body = $body;
     }
 
+    public function hasBody()
+    {
+        return !empty($this->body);
+    }
+
     public function getRawBody()
     {
         return $this->body;
@@ -267,14 +272,13 @@ class Request
         #return file_get_contents($this->bodyStream);
     }
 
-    public function getBody()
+    public function getBody($cache=true)
     {
-/*
         static $decodedBody = null;
-        if (null !== $decodedBody) {
+        if ($cache && null !== $decodedBody) {
             return $decodedBody;
         }
-*/
+
         // Decode any content-encoding (gzip or deflate) if needed
         switch (strtolower($this->getHeader('content-encoding'))) {
 

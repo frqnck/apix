@@ -14,6 +14,8 @@ use Zenya\Api\Router;
 class EntityClass extends Entity implements EntityInterface
 {
 
+    private $reflection;
+
     /**
      * {@inheritdoc}
      */
@@ -26,12 +28,12 @@ class EntityClass extends Entity implements EntityInterface
         } else if(isset($defs['redirect'])) {
           //echo 'redirect';
           $this->redirect = $defs['redirect'];
-
-        } else {
-          # TODO  throw(new \RunTimeException('ddd'))
-          echo '<pre>ERROR';
-          $this->debug($defs);
         }
+        // } else {
+        //   # TODO  throw(new \RunTimeException('ddd'))
+        //   echo '<pre>ERROR';
+        //   print_r ($defs);
+        // }
 
         //$this->controller = $defs['controller'];
     }
@@ -43,6 +45,15 @@ class EntityClass extends Entity implements EntityInterface
     {
         $name = $this->controller['name'];
         $args = $this->controller['args'];
+
+        // if(!isset($entity->controller['name'])) {
+        //     $entity->controller['name'] = $route->controller_name;
+        // }
+
+        // just created ta deependency here!!!!!
+        if(!isset($args)) {
+            $args = $route->controller_args;
+        }
 
         $method = $this->getMethod($route);
 
@@ -64,13 +75,13 @@ class EntityClass extends Entity implements EntityInterface
      */
     public function _parseDocs()
     {
-        $this->_ref = new \ReflectionClass(
+        $this->reflection = new \ReflectionClass(
             $this->getController('name')
         );
 
         // class doc
         $this->docs = Reflection::parsePhpDoc(
-            $this->_ref->getDocComment()
+            $this->reflection->getDocComment()
         );
 
         $actions = $this->getActions();
@@ -85,7 +96,6 @@ class EntityClass extends Entity implements EntityInterface
           }
         }
 
-        #return $this->_ref;
     }
 
     /**
@@ -94,8 +104,8 @@ class EntityClass extends Entity implements EntityInterface
     public function getMethod(Router $route)
     {
         $name = $route->getAction();
-        if($this->_ref->hasMethod($name)) {
-            return $this->_ref->getMethod($name);
+        if($this->reflection->hasMethod($name)) {
+            return $this->reflection->getMethod($name);
         }
 
         throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
@@ -120,7 +130,7 @@ class EntityClass extends Entity implements EntityInterface
 
     private function getMethods()
     {
-        return $this->_ref->getMethods(
+        return $this->reflection->getMethods(
             \ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC
         );
     }

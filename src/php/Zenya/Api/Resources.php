@@ -48,11 +48,11 @@ class Resources
      * @param  array  $resource     A resource definition array
      * @return void
      */
-    public function add($name, array $resource)
+    public function add($name, array $resources)
     {
         // factory
-        if( isset($resource['action'])
-          && $resource['action'] instanceOf \Closure
+        if( isset($resources['action'])
+          && $resources['action'] instanceOf \Closure
         ) {
             $this->setEntity(new Entity\EntityClosure);
         } else { //if(isset($resource['controller'])) {
@@ -63,7 +63,7 @@ class Resources
             $entity = get_class($this->getEntity());
             $this->resources[$name] = new $entity; //new Entity($group);
         }
-        $this->resources[$name]->append($resource);
+        $this->resources[$name]->append($resources);
         return $this->resources[$name];
     }
 
@@ -98,16 +98,14 @@ class Resources
     {
         $entity = $this->resources[$name];
 
-        // TODO: swap if aliased
+        // swap if aliased/redirected
         if($redirect = $entity->getRedirect()) {
             $entity = $this->resources[$redirect];
         }
 
-/*
+        /*
         if( $entity instanceOf Entity\EntityClass ) {
-
-var_dump($entity->getController());
-
+            // var_dump($entity->getController());
             if(!isset($entity->controller['name'])) {
                 $entity->controller['name'] = $route->controller_name;
             }
@@ -116,7 +114,7 @@ var_dump($entity->getController());
                 $entity->controller['args'] = $route->controller_args;
             }
         }
- */
+        */
 
         return $entity;
     }
