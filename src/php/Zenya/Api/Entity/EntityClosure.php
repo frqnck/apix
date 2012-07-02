@@ -14,6 +14,8 @@ use Zenya\Api\Router;
 class EntityClosure extends Entity implements EntityInterface
 {
 
+    private $reflection;
+
     /**
      * {@inheritdoc}
      */
@@ -61,22 +63,21 @@ class EntityClosure extends Entity implements EntityInterface
       // doc for all methods
       foreach($this->getActions() as $key => $func) {
           if($func['action'] InstanceOf \Closure) {
-              $this->_ref[$key] = new \ReflectionFunction($func['action']);
-              $doc = $this->_ref[$key]->getDocComment();
+              $this->reflection[$key] = new \ReflectionFunction($func['action']);
+              $doc = $this->reflection[$key]->getDocComment();
               $this->docs['methods'][$key] = Reflection::parsePhpDoc( $doc );
           }
       }
-      //return $this->_ref;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getMethod($route)
+    public function getMethod(Router $route)
     {
         $name = $route->getMethod();
-        if(isset($this->_ref[$name])) {
-          return $this->_ref[$name];
+        if(isset($this->reflection[$name])) {
+          return $this->reflection[$name];
         }
 
         throw new \InvalidArgumentException("Invalid resource's method ({$name}) specified.!!", 405);
