@@ -6,7 +6,7 @@ use Zenya\Api\Router;
 
 interface EntityInterface
 {
-    
+
     /**
  	 * Import given array/object.
 	 *
@@ -37,7 +37,7 @@ interface EntityInterface
 	 * @param string $name
 	 * @return
 	 */
-    function getMethod($name);
+    function getMethod(Router $route);
 
     /**
      * Returns an array of method keys and action values.

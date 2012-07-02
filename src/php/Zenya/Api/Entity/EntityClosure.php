@@ -32,7 +32,7 @@ class EntityClosure extends Entity implements EntityInterface
 #      }
 
       #try {
-            $method = $this->getMethod( $route->getMethod() );
+            $method = $this->getMethod($route);
             $action = $this->getAction($route->getMethod());
 
        # } catch (\Exception $e) {
@@ -72,8 +72,9 @@ class EntityClosure extends Entity implements EntityInterface
     /**
      * {@inheritdoc}
      */
-    public function getMethod($name)
+    public function getMethod($route)
     {
+        $name = $route->getMethod();
         if(isset($this->_ref[$name])) {
           return $this->_ref[$name];
         }

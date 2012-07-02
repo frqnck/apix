@@ -30,12 +30,6 @@ class Entity #implements EntityInterface
 
     protected $_ref = null;
 
-    public function debug($data=null)
-    {
-          echo '<pre>';
-          print_r($data!==null?$data:$this);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -43,7 +37,6 @@ class Entity #implements EntityInterface
     {
         $this->_append($defs);
     }
-
 
     /**
      * Group a resource entity.
