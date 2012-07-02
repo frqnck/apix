@@ -2,16 +2,11 @@
 
 namespace Zenya\Api;
 
+use Zenya\Api\Listener;
 use Zenya\Api\Entity;
 use Zenya\Api\Input;
-
-/**
- * Temp Debug
- */
-function d($mix)
-{
-    echo '<pre>' . $mix . '</pre>';
-}
+use Zenya\Api\Request;
+use Zenya\Api\Response;
 
 class Server extends Listener
 {
@@ -384,4 +379,12 @@ var_dump($class);
         );
     }
 
+}
+
+/**
+ * Temp Debug
+ */
+function d($mix)
+{
+    echo '<pre>' . $mix . '</pre>';
 }
