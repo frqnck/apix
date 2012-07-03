@@ -76,11 +76,11 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
 
     public function addAllListeners($level, $type=null)
     {
-        static $listeners = null;
+#        static $listeners = array();
 
-        if($listeners === null) {
+#        if($listeners[] === null) {
             $listeners = Config::getInstance()->getListeners($level);
-        }
+#        }
 
         $stage = is_null($type)
             ? $listeners
