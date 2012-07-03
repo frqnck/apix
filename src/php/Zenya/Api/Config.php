@@ -146,7 +146,7 @@ class Config extends \Pimple
             'routing' => array(
                 'route_prefix'      => '@^(/index(\d)?.php)?/api/v(\d*)@i', // regex
                 'default_format'    => 'json',
-                'formats'           => array('json', 'xml', 'html', 'php', 'csv', 'jsonp'),
+                'formats'           => array('json', 'xml', 'html', 'php', 'jsonp'),
                 // output format negociations
                 'controller_ext'    => true, // true or false (e.g. resource.json)
                 'format_override'   => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
@@ -164,7 +164,7 @@ class Config extends \Pimple
                     // pre-processing stage
                     'early' => array(
                         #'Zenya\Api\Listener\Mock',
-                       #'Zenya\Api\Listener\BodyData',
+                        #'Zenya\Api\Listener\BodyData',
                     ),
                     // post-processing stage
                     'late'=>array(
@@ -180,7 +180,7 @@ class Config extends \Pimple
                 //     ),
                 //     #'Zenya\Api\Listener\Log',
                 // ),
-                'resource' => array(
+                'entity' => array(
                     'early' => array(
                         // todo
                         /*

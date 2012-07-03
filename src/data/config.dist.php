@@ -3,7 +3,6 @@
 namespace Zenya\Api;
 #$app = Config::getInstance();
 
-
 $c = array(
     'api_realm'     => 'api.zenya.com',
     'api_version'   => '1.0',
@@ -58,7 +57,7 @@ $c['resources'] = array(
         )
     ),
 
-    '/help/:resource/:http_method/:filters' => array(
+    '/help/:path' => array(
         'redirect' => 'help',
     ),
 
@@ -74,7 +73,7 @@ $c['resources'] = array(
 
 // listeners
 $c['listeners'] = array(
-    'resource' => array(
+    'entity' => array(
 
         // fires early @ resource discovery stage
         'early_off' => array(
@@ -125,8 +124,10 @@ $c['listeners'] = array(
                 };
                 return new Listener\Auth($adapter);
             },
-            #'Zenya\Api\Listener\BodyData',
-        )
+            //'Zenya\Api\Listener\BodyData',
+        ),
+
+        'late' => array()
     )
 );
 

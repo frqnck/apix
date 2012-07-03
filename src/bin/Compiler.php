@@ -68,7 +68,7 @@ class Compiler
 
         unset($phar);
         chmod($pharFile, 0777);
-        rename($pharFile, __DIR__ . '/../../build/' . $pharFile);
+        rename($pharFile, __DIR__ . '/../../dist/' . $pharFile);
     }
 
     protected function addFile($phar, $path, $strip = true)

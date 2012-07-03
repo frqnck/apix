@@ -2,10 +2,10 @@
 
 namespace Zenya\Api\Entity;
 
-use Zenya\Api\Entity;
-use Zenya\Api\Entity\EntityInterface;
-use Zenya\Api\Reflection;
-use Zenya\Api\Router;
+use Zenya\Api\Entity,
+    Zenya\Api\Entity\EntityInterface,
+    Zenya\Api\Reflection,
+    Zenya\Api\Router;
 
 /**
  * Represents a resource.
@@ -19,7 +19,7 @@ class EntityClass extends Entity implements EntityInterface
     /**
      * {@inheritdoc}
      */
-    public function _append(array $defs=null)
+    public function _append(array $defs)
     {
         if(isset($defs['controller'])) {
           // assume class based
@@ -120,7 +120,7 @@ class EntityClass extends Entity implements EntityInterface
         foreach ($this->getMethods() as $ref) {
             $funcs[] = $ref->name;
         }
-        $routes = $this->route->getActions();
+        $routes = Router::$actions;
 
         return array_intersect($routes, $funcs);
 
