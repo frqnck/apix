@@ -18,6 +18,8 @@ class Entity extends Listener #implements EntityInterface
     protected $redirect = null;
     protected $docs = null;
 
+    protected $route = null;
+
     public $group = '/* -- todo group -- */';
 
     protected $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
