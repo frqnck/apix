@@ -60,6 +60,7 @@ class Server extends Listener
             );
         }
 
+        try {
         // Routing
         $this->setRouting(
             $this->request,
@@ -70,7 +71,6 @@ class Server extends Listener
  ##   public function run()
  #   {
 
-        try {
 
             // if ($c['format_negotiation']['http_accept']) {
             //  $this->response->setHeader('Vary', 'Accept');
@@ -96,15 +96,15 @@ class Server extends Listener
             $this->response->setHttpCode($httpCode);
 
             $this->results['error'] = array(
-                'message'   => '..'.$e->getMessage(),
+                'message'   => $e->getMessage(),
                 'code'      => $httpCode
             );
 
             // set the error controller!
-            #if ( !in_array($this->route->getController(), array_keys( $this->resources->toArray() )) ) {
+            if ( !in_array($this->route->getController(), array_keys( $this->resources->toArray() )) ) {
                $this->route->setController('error');
-               $this->results = $this->results['error'];
-            #}
+               #$this->results = $this->results['error'];
+            }
 
             // attach the listeners @ exception stage
             $this->addAllListeners('server', 'exception');
@@ -127,7 +127,8 @@ class Server extends Listener
         }
 
         $output = $this->response->generate(
-                $this->rawControllerName, #$this->route->getController(),
+                $this->rawControllerName,
+                #$this->route->getController(),
                 $this->results,
                 $this->getServerVersion(),
                 $this->config['output_rootNode']

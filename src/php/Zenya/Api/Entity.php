@@ -110,7 +110,7 @@ class Entity #implements EntityInterface
         //$this->actions = $this->getActions();
 
       } catch (\Exception $e) {
-        throw new \RuntimeException("Resource entity without implementation.", 500);
+        throw new \RuntimeException("Call to a resource entity unimplemented.", 500);
       }
 
       // return the help...
