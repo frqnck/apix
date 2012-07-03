@@ -2,10 +2,21 @@
 
 namespace Zenya\Api\Output;
 
+use Zenya\Api\Output\Adapter;
+
 class Json extends Adapter
 {
+
+    /**
+     * Holds the media type for the output.
+     * @var string
+     * @see http://www.ietf.org/rfc/rfc4627.txt
+     */
     public $contentType = 'application/json';
 
+    /**
+     * {@inheritdoc}
+     */
     public function encode(array $data, $rootNode='root')
     {
         if (isset($_REQUEST['indent']) && $_REQUEST['indent'] == '1') {
