@@ -1,8 +1,18 @@
 <?php
 namespace Zenya\Api\Output;
 
+/**
+ * Interface for response output.
+ *
+ * @author Franck Cassedanne <fcassedanne@info.com>
+ */
 abstract class Adapter
 {
+
+    /**
+     * Holds the media type for the output.
+     * @var string
+     */
     protected $contentType = null;
 
     /**
@@ -15,14 +25,14 @@ abstract class Adapter
     abstract public function encode(array $data, $rootNode='root');
 
     /**
-     * Get the ContentType
+     * Returns the current mime/media/content type.
      *
      * @return string
      */
     public function getContentType()
     {
-        if (is_null($this->contentType)) {
-            throw new \Exception('Content-Type is missing from this implementation.');
+        if (null === $this->contentType) {
+            throw new \RuntimeException('Content-Type missing from this implementation.');
         }
 
         return $this->contentType;
