@@ -2,11 +2,13 @@
 
 namespace Zenya\Api;
 
-use Zenya\Api\Listener;
-use Zenya\Api\Entity;
-use Zenya\Api\Input;
-use Zenya\Api\Request;
-use Zenya\Api\Response;
+use Zenya\Api\Listener,
+    Zenya\Api\Config,
+    Zenya\Api\Resources,
+    Zenya\Api\Entity,
+    Zenya\Api\Input,
+    Zenya\Api\Request,
+    Zenya\Api\Response;
 
 class Server extends Listener
 {
@@ -35,7 +37,7 @@ class Server extends Listener
                     $this->config['output_sign'],
                     $this->config['output_debug']
                 );
-        $this->response->setFormats( $this->config['output_formats']);
+        $this->response->setFormats($this->config['routing']['formats']);
 
         // Resources
         $this->resources = new Resources;
@@ -247,6 +249,7 @@ class Server extends Listener
      */
     public function getFormatFromHttpAccept(Request $request)
     {
+
         if ($request->hasHeader('HTTP_ACCEPT')) {
             $accept = $request->getHeader('HTTP_ACCEPT');
 
@@ -254,6 +257,11 @@ class Server extends Listener
                 // 'application/json'
                 case (strstr($accept, '/json')):
                     $format ='json';
+                break;
+
+                // 'application/javascript'
+                case (strstr($accept, '/javascript')):
+                    $format ='jsonp';
                 break;
 
                 // 'text/xml', 'application/xml'
