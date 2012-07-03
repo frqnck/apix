@@ -61,20 +61,16 @@ class Server extends Listener
         }
 
         try {
-        // Routing
-        $this->setRouting(
-            $this->request,
-            $this->resources->toArray(),
-            $this->config['routing']
-        );
- #   }
- ##   public function run()
- #   {
+            // Routing
+            $this->setRouting(
+                $this->request,
+                $this->resources->toArray(),
+                $this->config['routing']
+            );
 
-
-            // if ($c['format_negotiation']['http_accept']) {
-            //  $this->response->setHeader('Vary', 'Accept');
-            // }
+            if ($this->config['routing']['http_accept']) {
+                $this->response->setHeader('Vary', 'Accept');
+            }
 
             // attach the early listeners @ pre-processing stage
             $this->addAllListeners('server', 'early');
