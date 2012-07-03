@@ -2,10 +2,10 @@
 
 namespace Zenya\Api\Entity;
 
-use Zenya\Api\Entity;
-use Zenya\Api\Entity\EntityInterface;
-use Zenya\Api\Reflection;
-use Zenya\Api\Router;
+use Zenya\Api\Entity,
+    Zenya\Api\Entity\EntityInterface,
+    Zenya\Api\Reflection,
+    Zenya\Api\Router;
 
 /**
  * Represents a resource.
@@ -19,7 +19,7 @@ class EntityClosure extends Entity implements EntityInterface
     /**
      * {@inheritdoc}
      */
-    public function _append(array $defs=null)
+    public function _append(array $defs)
     {
       $this->actions[$defs['method']] = $defs;
     }
@@ -88,6 +88,7 @@ class EntityClosure extends Entity implements EntityInterface
      */
     public function getActions()
     {
+        return $this->actions+$this->overrides;
         return $this->actions;
     }
 

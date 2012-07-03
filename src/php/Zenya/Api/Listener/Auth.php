@@ -16,8 +16,6 @@ class Auth implements \SplObserver
      */
     public function __construct($auth=null)
     {
-        //user => password
-        #$this->users = array('admin' => 'mypass', 'guest' => 'guest');
 
         switch (true) {
             case ($auth instanceof Auth\Adapter):
@@ -29,66 +27,32 @@ class Auth implements \SplObserver
               exit;
 
             default:
-                throw new \RuntimeException("Unable to open the Authentication adapter");
+                throw new \RuntimeException('Unable to open the Authentication adapter');
         }
 
     }
 
-    public function update(\SplSubject $resource)
+    public function update(\SplSubject $entity)
     {
-        echo ' *AUTH* ';
-
         // skip if public
-        if($resource->isPublic()) {
+        if($entity->isPublic()) {
           return;
         }
-/*
-        $action = $resource->route->getAction();
-
-        $request = $resource->route->request;
-        $method = $request->getMethod();
- */
 
         $username = $this->adapter->authenticate();
         if(!$username) {
-            throw new Exception('Authentication has failed or has not yet been provided', 401);
+            throw new Exception('Authentication Required', 401);
         }
 
         // todo set X_REMOTE_USER or X_AUTH_USER
-        #$resource->response->setHeader('X_REMOTE_USER', $username);
+        #$entity->response->setHeader('X_REMOTE_USER', $username);
+        $_SERVER['X_AUTH_USER'] = $username;
 
-        #$_SERVER['X_AUTH_USER'] = $username;
-
-
-        // temp
-        // Authorization: Basic ZnJhbmNrOnRlc3Q=";
-/*
-        $username = 'franck';#$pass = 'pass';
-
-        $conf = array(
-            'accept_schemes'    => 'digest',
-            'realm'             =>  'ZenyaApi',
-            #'digest_domains'    => <string> Space-delimited list of URIs
-            #'nonce_timeout'     => <int>
-            #'use_opaque'        => <bool> Whether to send the opaque value in the header
-            #'alogrithm'         => <string> See $_supportedAlgos. Default: MD5
-            #'proxy_auth'        => <bool> Whether to do authentication as a Proxy
-        );
-
-        $adapter = new \Zend_Auth_Adapter_Http($conf);
-
-        $result = $adapter->authenticate();
-        $identity = $result->getIdentity();
-
-        print_r($identity);exit;
-*/
         return;
-        $s = new \Zend_Session;
 
         $s = new \Zenya_Model_Session;
 
         if ($request->hasHeader('X-session_id')) {
-            //$_POST['session_id'] = $headers['X-session_id']; // temp!
             \Zend_Session::setId( $request->getHeader('X-session_id') );
         }
 
@@ -106,14 +70,12 @@ class Auth implements \SplObserver
             throw new Exception('Session\'s IP invalid.', 401);
         }
 
-        /*
-          // useless security wise but helpful for testing...
-          $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
-          if ($user->session->ua != $ua) {
-          Zend_Session::destroy();
-          throw new Zenya_Api_Exception('Session\'s UA invalid.', 401);
-          }
-         */
+        // check UA string
+        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
+        if ($user->session->ua != $ua) {
+        Zend_Session::destroy();
+        throw new Zenya_Api_Exception('Session\'s UA invalid.', 401);
+        }
     }
 
 }

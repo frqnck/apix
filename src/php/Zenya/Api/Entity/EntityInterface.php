@@ -8,12 +8,12 @@ interface EntityInterface
 {
 
     /**
- 	 * Import given array/object.
+ 	 * Append the given array definitions.
 	 *
 	 * @param array $definitions
 	 * @return void
 	 */
-	public function _append(array $definitions=null);
+	public function _append(array $defs);
 
     /**
  	 * Calls the underline entity.

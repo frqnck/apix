@@ -2,8 +2,8 @@
 
 namespace Zenya\Api;
 
-use Zenya\Api\Entity;
-use Zenya\Api\Entity\EntityInterface;
+use Zenya\Api\Entity,
+    Zenya\Api\Entity\EntityInterface;
 
 /**
  * Represents a collection of resources.
@@ -68,7 +68,7 @@ class Resources
     }
 
     /**
-     * Checks a specified resource name exists.
+     * Checks wether a specified resource name exists.
      *
      * @param  string $name     The resource name to check
      * @return boolean
@@ -94,15 +94,21 @@ class Resources
      * @param  string   $name A resource name
      * @return Zenya/Api/Entity/EntityInterface
      */
-    public function get($name)
+    public function get(Router $route)
     {
+        $name = $route->getPathName();
+        if (!isset($this->resources[$name])) {
+            throw new \InvalidArgumentException(
+                sprintf("Invalid resource entity specified (%s).", $name), 404
+            );
+        }
         $entity = $this->resources[$name];
 
         // swap if aliased/redirected
         if($redirect = $entity->getRedirect()) {
             $entity = $this->resources[$redirect];
         }
-
+        $entity->setRoute($route);
         /*
         if( $entity instanceOf Entity\EntityClass ) {
             // var_dump($entity->getController());

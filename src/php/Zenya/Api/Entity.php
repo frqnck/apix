@@ -2,31 +2,25 @@
 
 namespace Zenya\Api;
 
-use Zenya\Api\Listener;
-use Zenya\Api\Router;
-use Zenya\Api\Entity\EntityInterface;
+use Zenya\Api\Listener,
+    Zenya\Api\Router,
+    Zenya\Api\Entity\EntityInterface;
 
 /**
  * Represents a resource.
  *
  */
-class Entity #implements EntityInterface
+class Entity extends Listener #implements EntityInterface
 {
-  protected $name;
-  protected $controller;
-  protected $actions = array();
-  protected $redirect = null;
+    protected $name;
+    protected $controller;
+    protected $actions = array();
+    protected $redirect = null;
+    protected $docs = null;
 
-  public $group = '/* -- todo group */';
+    public $group = '/* -- todo group -- */';
 
-  protected $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
-
-  #protected $route=null;
-
-  // protected $doc;
-  // protected $action;
-  // protected $method;
-  // protected $methods = array();
+    protected $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
 
     /**
      * {@inheritdoc}
@@ -39,14 +33,13 @@ class Entity #implements EntityInterface
     /**
      * Group a resource entity.
      *
-     * @param  string $name     The resource name
-     * @param  array  $resource The resource definition array
+     * @param  string $name     The group name
      * @return void
      */
     public function group($name)
     {
         // group test
-        $this->group = $name; //'/* TODO: string from group!! */';
+        $this->group = $name;
 
         return $this;
     }
@@ -66,17 +59,6 @@ class Entity #implements EntityInterface
     }
 
     /**
-     * Check for a redirect.
-     *
-     * @param  array  $resource The resource definition array
-     * @return void
-     */
-    // public function hasRedirect()
-    // {
-    //     return isset($this->redirect);
-    // }
-
-    /**
      * Returns the redirect location.
      *
      * @return string
@@ -86,39 +68,54 @@ class Entity #implements EntityInterface
         return $this->redirect;
     }
 
+    /**
+     * To array...
+     *
+     */
     public function toArray()
     {
       return get_object_vars($this);
     }
 
     /**
-     * Call a resource from route
+     * Sets router object.
      *
-     * @params Router   $route  Route object
+     * @param Router $route 
+     * @return void
+     */
+    public function setRoute(Router $route)
+    {
+        $this->route = $route;
+    }
+
+    /**
+     * Call the resource entity from route
+     *
      * @return array
      * @throws Zenya\Api\Exception
      */
-    public function call(Router $route)
+    public function call()
     {
-      $this->route = $route;
+        try {
 
-      try {
+            // cache?!
+            $this->_parseDocs();
 
-        // cache?!
-        $this->_parseDocs();
+            //$this->actions = $this->getActions();
 
-        //$this->actions = $this->getActions();
+        } catch (\Exception $e) {
+            throw new \RuntimeException("Call to a unimplemented resource entity.", 500);
+        }
 
-      } catch (\Exception $e) {
-        throw new \RuntimeException("Call to a resource entity unimplemented.", 500);
-      }
+        // return the help...
+        if($this->route->getMethod() == 'OPTIONS') {
+          //return $this->getDocs();
+        }
 
-      // return the help...
-      if($route->getMethod() == 'OPTIONS') {
-          return $this->getDocs();
-      }
+        // attach the early listeners @ pre-processing stage
+        #$this->addAllListeners('entity', 'early');
 
-      return $this->_call($route);
+        return $this->_call($this->route);
    }
 
     public function getController($key=null)
@@ -175,17 +172,22 @@ exit;
     }
 
     /**
-     * Returns the full Documentatins or specified method.
+     * Returns the full Documentations or specified method.
      *
      * @param  string  $method
      * @return array
      */
     public function getDocs($method=null)
     {
-      if(null !== $method) {
-        return isset($this->docs['methods'][$method]) ? $this->docs['methods'][$method] : 'false';
-      }
-      return $this->docs;
+        if(null === $this->docs) {
+            $this->_parseDocs();
+        }
+
+        if(null !== $method) {
+            return isset($this->docs['methods'][$method]) ? $this->docs['methods'][$method] : 'false';
+        }
+
+        return $this->docs;
 
       /*
         $this->route->setParams(
