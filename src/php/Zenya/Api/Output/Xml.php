@@ -20,10 +20,15 @@
 
 namespace Zenya\Api\Output;
 
+use Zenya\Api\Output\Adapter;
+
 class Xml extends Adapter
 {
+
     /**
+     * Holds the media type for the output.
      * @var string
+     * @see http://www.ietf.org/rfc/rfc3023.txt
      */
     public $contentType = 'text/xml';
 
@@ -38,11 +43,7 @@ class Xml extends Adapter
     protected $xml;
 
     /**
-     * Convert
-     *
-     * @param array  $data
-     * @param string $rootNode The root node
-      * @return	string
+     * {@inheritdoc}
      */
     public function encode(array $data, $rootNode="root")
     {

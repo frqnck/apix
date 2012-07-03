@@ -139,12 +139,12 @@ class Config extends \Pimple
             'output_rootNode'  => 'zenya',
             'output_sign'      => true,
             'output_debug'     => true,
-            'output_formats'    => array('json', 'xml', 'html', 'php', 'csv'),
 
             // routing
             'routing' => array(
                 'route_prefix'      => '@^(/index(\d)?.php)?/api/v(\d*)@i', // regex
                 'default_format'    => 'json',
+                'formats'           => array('json', 'xml', 'html', 'php', 'csv', 'jsonp'),
                 // output format negociations
                 'controller_ext'    => true, // true or false (e.g. resource.json)
                 'format_override'   => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
