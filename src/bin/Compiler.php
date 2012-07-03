@@ -29,6 +29,7 @@ class Compiler
         $phar = new \Phar($pharFile, 0, $pharFile);
         $phar->setSignatureAlgorithm(\Phar::SHA1);
 
+        // start buffering. Mandatory to modify stub.
         $phar->startBuffering();
 
         // all the files
@@ -50,12 +51,13 @@ class Compiler
         $this->addFile($phar, new \SplFileInfo($root . '/README.md'), false);
         $this->addFile($phar, new \SplFileInfo($root . '/src/data/config.dist.php'), false);
 
-        // Stub
+        // get the stub
         $stub = preg_replace("@{VERSION}@", $this->version, $this->getStub());
         $stub = preg_replace("@{PHAR}@", $pharFile, $stub);
         $stub = preg_replace("@{URL}@", 'http://zenya.dev/get', $stub);
         $stub = preg_replace("@{BUILD}@", gmdate("Y-m-d\TH:i:s\Z"), $stub);
 
+        // Add the stub
         $phar->setStub( $stub );
 
         $phar->stopBuffering();
@@ -79,7 +81,7 @@ class Compiler
             realpath($path)
         );
         #$localPath = str_replace('src/php'.DIRECTORY_SEPARATOR, '', $localPath);
-        echo $localPath . " ($path)" . PHP_EOL;
+        #echo $localPath . " ($path)" . PHP_EOL;
 
         $content = file_get_contents($path);
         if ($strip) {
@@ -93,10 +95,13 @@ class Compiler
         $phar->addFromString('/' . $localPath, $content);
     }
 
+    /*
+     * Returns the stub
+     */
     protected function getStub()
     {
+        // #!/usr/bin/env php
         return <<<'STUB'
-#!/usr/bin/env php
 <?php
 /**
  * Zenya Api Server
