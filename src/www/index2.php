@@ -9,10 +9,6 @@ psr0_autoloader_searchFirst(APP_LIBDIR);
 psr0_autoloader_searchFirst(APP_TESTDIR);
 psr0_autoloader_searchFirst(APP_TOPDIR);
 
-$version = Zenya\Api\Server::VERSION;
-printf("Sleepover version %s\n", $version);
-
-
 # Test server
 try {
     $api = new Zenya\Api\Server;

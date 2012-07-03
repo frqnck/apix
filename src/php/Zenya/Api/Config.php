@@ -34,11 +34,13 @@ class Config extends \Pimple
 
         $this['server_debug'] = 'test';
 
-        $this['config_file'] = realpath(__DIR__ . '/../../../data/config.dist.php');
-            //getenv('HOME') . '/.zenya/config.php';
+        // $file = realpath(__DIR__ . '/../../../data/config.dist.php');
+        // echo $file = realpath('../data/config.dist.php');
+        //getenv('HOME') . '/.zenya/config.php';
+        $file = ('../data/config.dist.php');
 
         if( $skip !== true ) {
-            $this->config = $this->getConfigurations();
+            $this->config = $this->getConfigurations($file);
         } else {
             $this->config = $this->getConfigDefaults();
         }
@@ -46,17 +48,17 @@ class Config extends \Pimple
         //echo ' [construct] ';
     }
 
-    public function getConfigurations()
+    public function getConfigurations($file)
     {
-        if (is_file($this['config_file'])) {
-            $config = require $this['config_file'];
+        if (is_file($file)) {
+            $config = require $file;
             if (null === $config || !is_array($config)) {
-                throw new \RuntimeException(sprintf('The "%s" configuration file must return an array.', $this['config_file']));
+                throw new \RuntimeException(sprintf('The "%s" configuration file must return an array.', $file));
             }
             // merge
             return $config+$this->getConfigDefaults();
         } else {
-            throw new \RuntimeException(sprintf('The "%s" configuration file does not exist.', $this['config_file']));
+            throw new \RuntimeException(sprintf('The "%s" configuration file does not exist.', $file));
         }
     }
 
