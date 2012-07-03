@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '../../../build/zenya-api-server.phar';
+require_once __DIR__ . '../../../dist/zenya-api-server.phar';
 
 #echo $_SERVER["SCRIPT_FILENAME"];
 #exit;

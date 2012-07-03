@@ -2,16 +2,16 @@
 
 namespace Zenya\Api\Resource;
 
-use Zenya\Api\Reflection;
-use Zenya\Api\Entity;
-use Zenya\Api\Server;
-use Zenya\Api\Router;
+use Zenya\Api\Reflection,
+    Zenya\Api\Entity,
+    Zenya\Api\Server,
+    Zenya\Api\Router;
 
 /**
- * Help
+ * Help resource
  *
  * The Help resource provides in-line referencial to the API resources and methods.
- * By specify a resource and/or method you can narrow down to specific section.
+ * By specify a resource and method you can narrow down to specific section.
  *
  * @api_version 1
  */
@@ -20,35 +20,35 @@ class Help
     /**
      * Constructor
      *
-     * @param  Server $server The resource's to retrieve
      * @return void
      */
     public function __construct(Server $server)
     {
         $this->server = $server;
+        $this->verbose = isset($_REQUEST['verbose'])?:false;
     }
 
     /**
-     * Help (GET)
+     * Outputs help info for a resource entity (GET request).
+     * Filters can be use to narrow down to a specified method.
      *
-     * Retrieve help for a specified resource/method.
-     *
-     * @param  string $resource The resource's to retrieve
-     * @param  string $method   The resource's method to focus upon (optional)
+     * @param  string $path     A path to a resource entity to retrieve
      * @param  array  $filters  An array of filters (optional)
      * @return array
      *
-     * @api_link GET /help/resource/method/filters
+     * @api_link GET /help/path/to/entity
      */
-    public function onRead($resource, $http_method=null, array $filters=null)
+    public function onRead($path, array $filters=null)
     {
+        $path = preg_replace('@^.*help(\.\w+)?@i', '', $this->server->request->getUri());
+        $entity = $this->server->resources->get($path);
         return array(
-            $resource => $this->_getHelp($resource, $http_method, $filters)
+            $path => $this->_getHelp($entity, $filters)
         );
     }
 
     /**
-     * Help
+     * Outputs help info for a resource entity (OPTIONS request).
      *
      * The OPTIONS method represents a request for information about the
      * communication options available on the request/response chain
@@ -59,19 +59,19 @@ class Help
      *
      * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
      *
-     * @param  string $resource The resource's to retrieve
-     * @param  string $method   The resource's method to focus upon (optional)
+     * @param  string $path     A path to a resource entity to retrieve
      * @param  array  $filters  An array of filters (optional)
      * @return array
      *
-     * @api_links OPTIONS /resource/method/filters
-     * @api_links OPTIONS /\*\/method/filters
+     * @api_links OPTIONS /path/to/entity
+     * @api_links OPTIONS /*
      */
     public function onHelp(Entity $entity, array $filters=null)
     {
+        echo 'qwertyuio';
         // apply to the whole server
         if ($entity->route->path == '/*') {
-
+            
             // return the whole api doc
             $doc = array();
             foreach ($this->server->getResources() as $key => $entity) {
@@ -119,13 +119,11 @@ class Help
     }
 
     /**
-     * Retrieve help for a resource
+     * Get an entity documentaion.
      *
-     * @param  string $resource
-     * @param  string $method
+     * @param  string $entity
      * @param  array  $filters
-     * @return mixed  array or string on error
-     * @access  private
+     * @return array  array
      */
     private function _getHelp(Entity $entity, array $filters=null)
     {
@@ -134,10 +132,13 @@ class Help
         // $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
         // $this->_output = $help->toArray();
 
-        $actions = $entity->getActions();
-
-        $reflection = new Reflection($entity->parseDocs());
-        return $reflection->getDocs($actions);
+        if($this->verbose) {
+            return array(
+                'TODO'          => 'Verbose mode',
+                'end-user-doc'  => $entity->getDocs()
+            );
+        } 
+        return $entity->getDocs();
     }
 
 }

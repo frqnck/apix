@@ -61,13 +61,14 @@ class Server extends Listener
         }
 
         try {
-            // Routing
+            // set the routing
             $this->setRouting(
                 $this->request,
                 $this->resources->toArray(),
                 $this->config['routing']
             );
 
+            // set http accept
             if ($this->config['routing']['http_accept']) {
                 $this->response->setHeader('Vary', 'Accept');
             }
@@ -75,16 +76,18 @@ class Server extends Listener
             // attach the early listeners @ pre-processing stage
             $this->addAllListeners('server', 'early');
 
-            $name = $this->route->getPathName();
-            if (!$this->resources->has($name)) {
-                throw new \InvalidArgumentException(
-                    sprintf("Invalid resource entity specified (%s).", $name), 404
-                );
-            }
+            // get the entity object
+            $entity = $this->resources->get(
+                $this->route
+            );
 
-            // Process the requested resource
-            $resource = $this->resources->get($name);
-            $this->results = $resource->call($this->route);
+            // attach the early listeners @ pre-processing stage
+            $entity->addAllListeners('entity', 'early');
+
+            $this->results = $entity->call();
+
+            // attach the late listeners @ post-processing stage
+            $entity->addAllListeners('entity', 'late');
 
         } catch (\Exception $e) {
 
@@ -99,7 +102,7 @@ class Server extends Listener
             // set the error controller!
             if ( !in_array($this->route->getController(), array_keys( $this->resources->toArray() )) ) {
                $this->route->setController('error');
-               #$this->results = $this->results['error'];
+               $this->results = $this->results['error'];
             }
 
             // attach the listeners @ exception stage
@@ -116,15 +119,14 @@ class Server extends Listener
 
             case 405:
                 $this->response->setHeader('Allow',
-                    implode(', ', array_keys($resource->getActions())),
+                    implode(', ', array_keys($entity->getActions())),
                     false // preserve existing
                 );
 
         }
 
         $output = $this->response->generate(
-                $this->rawControllerName,
-                #$this->route->getController(),
+                $this->route->getController(),
                 $this->results,
                 $this->getServerVersion(),
                 $this->config['output_rootNode']
@@ -175,9 +177,7 @@ class Server extends Listener
             if ($ext) {
                 $path = preg_replace('/\.' . $ext . '/', '', $path, 1);
             }
-            $this->rawControllerName = $info['filename'];
-        } else {
-            $ext = null;
+            $rawController = $info['filename'];
         }
 
         $this->route = new Router(
@@ -190,13 +190,14 @@ class Server extends Listener
             )
         );
 
-        // TODO: modify this!!
-        #$this->route->request = $request;
-
         // Set the response format...
-        $this->negotiateFormat($opts, $ext);
+        $this->negotiateFormat($opts, $ext?:null);
 
         $this->route->map($path, $request->getParams());
+        
+        if(isset($rawController)) {
+            $this->route->setController($rawController);
+        }
     }
 
     /**

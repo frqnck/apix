@@ -47,7 +47,7 @@ class Router
      * Holds all the actions (HTTP methods to CRUD verbs)
      * @var array
      */
-    protected $actions = array(
+    static public $actions = array(
         'POST'      => 'onCreate',
         'GET'       => 'onRead',
         'PUT'       => 'onUpdate',
@@ -195,8 +195,8 @@ class Router
         if (!is_null($method)) {
             $this->setMethod($method);
         }
-        $this->action = isset($this->actions[$this->method])
-            ? $this->actions[$this->method]
+        $this->action = isset(self::$actions[$this->method])
+            ? self::$actions[$this->method]
             : null;
     }
 
@@ -209,7 +209,7 @@ class Router
     public function getAction($method=null)
     {
         if (isset($method)) {
-            return isset($this->actions[$method]) ? $this->actions[$method] : null;
+            return isset(self::$actions[$method]) ? self::$actions[$method] : null;
         }
         if (null === $this->action) {
             $this->setAction();
@@ -225,7 +225,7 @@ class Router
      */
     public function getActions()
     {
-        return $this->actions;
+        return self::$actions;
     }
 
     /**

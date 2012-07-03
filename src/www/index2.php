@@ -16,7 +16,7 @@ try {
     $api->onRead('/upload/:what',
 
         /**
-         * List all the keywords...
+         * Upload something...
          *
          * @return array  The array to return to the client
          * @api_role admin
@@ -29,10 +29,7 @@ try {
                 'params'    => $api->getBodyData()
             );
         }
-    )->group('testme');
-
-
-
+    )->group('atestme');
 
     /**
      * group.
@@ -55,9 +52,9 @@ try {
         {
             return array('List keywords');
         }
-    )->group('testme');
+    )->group('tesftme');
 
-	$api->onRead('/keywords/:cat_id/:optional',
+	$api->onRead('/keywordoos/:cat_id/:optional',
 
 	    /**
 	     * List the keywords under a categoy id.
@@ -74,7 +71,7 @@ try {
 	);
 
 
-    $api->onCreate('/keywords/:keyword/:optional',
+    $api->onCreate('/keywords/:id',
 
         /**
          * Create doc about the func/closure.
@@ -89,7 +86,6 @@ try {
             return array('keyword' => $keyword, 'optional'=>$optional, 'from'=>__FUNCTION__);
         }
     );
-
 
 
     $api->onUpdate('/keywords/:id', function($id) {
