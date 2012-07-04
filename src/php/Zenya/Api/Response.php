@@ -366,6 +366,7 @@ class Response
         $output = new $renderer($this->encoding);
         $this->setHeader('Content-Type', $output->getContentType());
         $this->sendAllHttpHeaders($this->getHttpCode(), $versionString);
+
         return $output->encode($this->collate($name, $results), $rootNode);
     }
 

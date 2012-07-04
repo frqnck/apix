@@ -19,9 +19,7 @@ try {
 
     // Zenya\Api\d( Zenya\Api\Config::getInstance()->getRoutes() );
 
-
-
 } catch (\Exception $e) {
-	Zenya\Api\Exception::startupException($e);
+    Zenya\Api\Exception::startupException($e);
 }
 exit;

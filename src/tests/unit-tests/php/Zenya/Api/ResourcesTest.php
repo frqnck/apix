@@ -117,7 +117,6 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Jacques', $this->resources->get($route)->getRedirect(), 'Paul follows a redirect from Pierre, and equals to Jacques');
     }
 
-
     public function testGetDoNotRedirect()
     {
         $this->resources->add('Paul', array('redirect'=>'Pierre'));
@@ -164,6 +163,5 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         // $this->resources->add('group', array('group'=>function(){return 'string';}, 'method'=>'some'));
         // $this->assertInstanceOf('Zenya\Api\Entity\EntityClosure', $this->resources->get('closure'));
     }
-
 
 }

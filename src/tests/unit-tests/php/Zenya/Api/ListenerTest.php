@@ -75,7 +75,6 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue(count($this->listener->getIterator()) == 2);
     }
 
-
     /**
      * @covers Observer::update
      * @covers Subject::setValue

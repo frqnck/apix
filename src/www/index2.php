@@ -21,9 +21,9 @@ try {
          * @return array  The array to return to the client
          * @api_role admin
          */
-        function() use ($api)
-        {
+        function() use ($api) {
             $params = $api->request->getBody();
+
             return array(
                 'body'      => $api->request->getBody(),
                 'params'    => $api->getBodyData()
@@ -48,28 +48,25 @@ try {
          * @return array  The return array
          * @api_role admin
          */
-        function()
-        {
+        function() {
             return array('List keywords');
         }
     )->group('tesftme');
 
-	$api->onRead('/keywordoos/:cat_id/:optional',
+    $api->onRead('/keywordoos/:cat_id/:optional',
 
-	    /**
-	     * List the keywords under a categoy id.
-	     *
-	     * @param  string $cat_id blahblah
-	     * @return array  The return array
-	     * @check https://github.com/jeremeamia
-	     * @api_role admin
-		 */
-		function($cat_id, $optional=null)
-		{
-		    return array('cat_id' => $cat_id, 'optional'=>$optional, 'from'=>__FUNCTION__);
-		}
-	);
-
+        /**
+         * List the keywords under a categoy id.
+         *
+         * @param  string $cat_id blahblah
+         * @return array  The return array
+         * @check https://github.com/jeremeamia
+         * @api_role admin
+         */
+        function($cat_id, $optional=null) {
+            return array('cat_id' => $cat_id, 'optional'=>$optional, 'from'=>__FUNCTION__);
+        }
+    );
 
     $api->onCreate('/keywords/:id',
 
@@ -81,12 +78,10 @@ try {
          * @check https://github.com/jeremeamia
          * @api_role admin
          */
-        function($keyword, $optional=null)
-        {
+        function($keyword, $optional=null) {
             return array('keyword' => $keyword, 'optional'=>$optional, 'from'=>__FUNCTION__);
         }
     );
-
 
     $api->onUpdate('/keywords/:id', function($id) {
         return array('PUT some keywordsddd', 'ffffff', 'dsadsdasd', 'dasdasda');
@@ -96,13 +91,11 @@ try {
         return array('DELETE some keywordsddd', 'ffffff', 'dsadsdasd', 'dasdasda');
     });
 
-
     echo $api->run();
 
     // Zenya\Api\d( $api->getResources() );
 
     // Zenya\Api\d( Zenya\Api\Config::getInstance()->getRoutes() );
-
 
 } catch (\Exception $e) {
     header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);

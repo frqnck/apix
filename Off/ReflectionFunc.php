@@ -146,7 +146,7 @@ class ReflectionFunc extends \ReflectionFunction
      */
     public function getActionsMethods(array $array=array())
     {
-        
+
         //$actions = $this->getMethods(\ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC);
         // TODO: grab from group under same controller?
         $actions = array();

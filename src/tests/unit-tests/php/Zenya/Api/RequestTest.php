@@ -103,7 +103,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame('GET', $this->request->getMethod() );
 
-
         $_SERVER['REQUEST_METHOD'] = 'REQUEST_METHOD';
         $this->request->setMethod();
         $this->assertSame('REQUEST_METHOD', $this->request->getMethod() );

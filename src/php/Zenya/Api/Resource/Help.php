@@ -32,8 +32,8 @@ class Help
      * Outputs help info for a resource entity (GET request).
      * Filters can be use to narrow down to a specified method.
      *
-     * @param  string $path     A path to a resource entity to retrieve
-     * @param  array  $filters  An array of filters (optional)
+     * @param  string $path    A path to a resource entity to retrieve
+     * @param  array  $filters An array of filters (optional)
      * @return array
      *
      * @api_link GET /help/path/to/entity
@@ -42,6 +42,7 @@ class Help
     {
         $path = preg_replace('@^.*help(\.\w+)?@i', '', $this->server->request->getUri());
         $entity = $this->server->resources->get($path);
+
         return array(
             $path => $this->_getHelp($entity, $filters)
         );
@@ -59,8 +60,8 @@ class Help
      *
      * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
      *
-     * @param  string $path     A path to a resource entity to retrieve
-     * @param  array  $filters  An array of filters (optional)
+     * @param  string $path    A path to a resource entity to retrieve
+     * @param  array  $filters An array of filters (optional)
      * @return array
      *
      * @api_links OPTIONS /path/to/entity
@@ -71,7 +72,7 @@ class Help
         echo 'qwertyuio';
         // apply to the whole server
         if ($entity->route->path == '/*') {
-            
+
             // return the whole api doc
             $doc = array();
             foreach ($this->server->getResources() as $key => $entity) {
@@ -90,6 +91,7 @@ class Help
         } else {
 
             $doc = $this->_getHelp($entity, $filters);
+
             return $doc;
 
 
@@ -132,12 +134,13 @@ class Help
         // $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
         // $this->_output = $help->toArray();
 
-        if($this->verbose) {
+        if ($this->verbose) {
             return array(
                 'TODO'          => 'Verbose mode',
                 'end-user-doc'  => $entity->getDocs()
             );
-        } 
+        }
+
         return $entity->getDocs();
     }
 

@@ -13,8 +13,8 @@ class CrudClass
     /**
      * Create a new entity
      *
-     * @param  string    $data
-     * @param  array     $optional
+     * @param  string $data
+     * @param  array  $optional
      * @return array
      */
     public function onCreate($data, array $optional=null)
@@ -25,21 +25,22 @@ class CrudClass
     /**
      * Read an entity, or list many
      *
-     * @param  integer   $id an integer
-     * @param  array     $optional
+     * @param  integer $id       an integer
+     * @param  array   $optional
      * @return array
      */
     public function onRead($id, array $optional=null)
     {
         #echo $id, $optional;
+
         return func_get_args();
     }
 
     /**
      * Update an entity
      *
-     * @param  string    $name
-     * @param  array     $optional
+     * @param  string $name
+     * @param  array  $optional
      * @return array
      */
     public function onUpdate($id, array $optional=null)
@@ -50,8 +51,8 @@ class CrudClass
     /**
      * Delete an entity
      *
-     * @param  string    $name
-     * @param  array     $optional
+     * @param  string $name
+     * @param  array  $optional
      * @return array
      */
     public function onDelete($id, array $optional=null)

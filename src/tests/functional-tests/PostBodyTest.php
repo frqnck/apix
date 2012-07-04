@@ -9,9 +9,9 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
     {
         $cmd = "curl -s -X POST -d '${body}' '${url}'";
 
-        if($format == 'json') {
+        if ($format == 'json') {
             $cmd .= ' --header "Content-Type:application/json"';
-        } else if($format == 'xml') {
+        } elseif ($format == 'xml') {
             $cmd .= ' --header "Content-Type:text/xml"';
         } else {
             $cmd .= ' --header "Content-Type:application/x-www-form-urlencoded"';
@@ -21,7 +21,6 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
 
         return json_decode($json);
     }
-
 
     public function testFormPostAsString()
     {
@@ -34,7 +33,7 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
     {
         $r = $this->post('param1=value1&param2=value2');
 
-        $this->assertSame(array('param1'=>'value1', 'param2'=>'value2'), (array)$r->zenya->upload->params);
+        $this->assertSame(array('param1'=>'value1', 'param2'=>'value2'), (array) $r->zenya->upload->params);
     }
 
     public function testJsonAsString()
@@ -50,7 +49,7 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
         $values = array('param1'=>'value1', 'param2'=>'value2');
         $r = $this->post(json_encode($values), 'json');
 
-        $this->assertSame($values, (array)$r->zenya->upload->params);
+        $this->assertSame($values, (array) $r->zenya->upload->params);
     }
 
     public function testXmlAsString()
@@ -73,8 +72,7 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
         $xml = new Zenya\Api\Output\Xml;
         $r = $this->post($xml->encode($values), 'xml');
 
-        $this->assertSame($values, (array)$r->zenya->upload->params);
+        $this->assertSame($values, (array) $r->zenya->upload->params);
     }
-
 
 }

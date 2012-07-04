@@ -47,7 +47,7 @@ class Router
      * Holds all the actions (HTTP methods to CRUD verbs)
      * @var array
      */
-    static public $actions = array(
+    public static $actions = array(
         'POST'      => 'onCreate',
         'GET'       => 'onRead',
         'PUT'       => 'onUpdate',
@@ -100,8 +100,8 @@ class Router
      *      - then router defauls.
      *
      * @param  string $route
-     * @param  array $rules
-     * @param  array $params
+     * @param  array  $rules
+     * @param  array  $params
      * @return void
      */
     public function setAsProperties(array $rules, array $params)
@@ -142,6 +142,7 @@ class Router
                 $this->name = $route;
 
                 if(is_object($rules)) $rules = $rules->toArray();
+
                 return $this->setAsProperties($rules, $params);
             }
         }
@@ -161,8 +162,8 @@ class Router
         $result = array();
 
         // match 1st URI element not a param
-        if(count($paths) == 2 && count($bits) >2 ) {
-            if($paths[1] == $bits[1]) {
+        if (count($paths) == 2 && count($bits) >2 ) {
+            if ($paths[1] == $bits[1]) {
                 return array($paths[1]);
             }
         }
@@ -174,7 +175,7 @@ class Router
                     $value = substr($value, 1); // rm ':'
                     $result[$value] = $paths[$key];
                 }
-            } else if (!isset($paths[$key]) || strcmp($value, $paths[$key]) != 0) {
+            } elseif (!isset($paths[$key]) || strcmp($value, $paths[$key]) != 0) {
                 return false;
             }
         }
