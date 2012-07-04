@@ -52,9 +52,9 @@ class EntityClass extends Entity implements EntityInterface
         // }
 
         // just created a deependency here!!!!!
-        if(!isset($args)) {
-            $args = $route->controller_args;
-        }
+        // if(!isset($args)) {
+        //     $args = $route->controller_args;
+        // }
 
         $method = $this->getMethod($route);
 
