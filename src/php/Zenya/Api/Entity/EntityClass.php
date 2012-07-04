@@ -8,40 +8,41 @@ use Zenya\Api\Entity,
     Zenya\Api\Router;
 
 /**
- * Represents a resource.
- *
+ * Represents a class based entity resource.
  */
 class EntityClass extends Entity implements EntityInterface
 {
+    protected $controller;
 
     private $reflection;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function _append(array $defs)
+    public function getReflection()
     {
-        if(isset($defs['controller'])) {
-          // assume class based
-          $this->controller = $defs['controller'];
-
-        } else if(isset($defs['redirect'])) {
-          //echo 'redirect';
-          $this->redirect = $defs['redirect'];
+        if(null == $this->reflection) {
+            $this->reflection = new \ReflectionClass(
+                $this->controller['name']
+            );
         }
-        // } else {
-        //   # TODO  throw(new \RunTimeException('ddd'))
-        //   echo '<pre>ERROR';
-        //   print_r ($defs);
-        // }
 
-        //$this->controller = $defs['controller'];
+        return $this->reflection;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function _call(Router $route)
+    public function append(array $defs)
+    {
+        parent::_append($defs);
+
+        if(isset($defs['controller'])) {
+            $this->controller = $defs['controller'];
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function underlineCall(Router $route)
     {
         $name = $this->controller['name'];
         $args = $this->controller['args'];
@@ -50,17 +51,19 @@ class EntityClass extends Entity implements EntityInterface
         //     $entity->controller['name'] = $route->controller_name;
         // }
 
-        // just created ta deependency here!!!!!
+        // just created a deependency here!!!!!
         if(!isset($args)) {
             $args = $route->controller_args;
         }
 
         $method = $this->getMethod($route);
 
-        $params = $this->getRequiredParams($route->getMethod(), $method, $route->getParams());
+        $params = $this->getRequiredParams($method, $route->getMethod(), $route->getParams());
 
         // attach late listeners @ post-processing
         #$this->addAllListeners('resource', 'early');
+
+        #echo '<pre>';print_r($this->toArray());exit;
 
         return call_user_func_array(
           array(
@@ -75,13 +78,9 @@ class EntityClass extends Entity implements EntityInterface
      */
     public function _parseDocs()
     {
-        $this->reflection = new \ReflectionClass(
-            $this->getController('name')
-        );
-
         // class doc
-        $this->docs = Reflection::parsePhpDoc(
-            $this->reflection->getDocComment()
+        $docs = Reflection::parsePhpDoc(
+            $this->getReflection()->getDocComment()
         );
 
         $actions = $this->getActions();
@@ -91,11 +90,12 @@ class EntityClass extends Entity implements EntityInterface
         {
           if( $key = array_search($method->name, $actions) ) {
             $doc = $method->getDocComment();
-            $this->docs['methods'][$key] =
+            $docs['methods'][$key] =
                 Reflection::parsePhpDoc( $doc );
           }
         }
 
+        return $docs;
     }
 
     /**
@@ -103,9 +103,11 @@ class EntityClass extends Entity implements EntityInterface
      */
     public function getMethod(Router $route)
     {
+        $r = $this->getReflection();
+
         $name = $route->getAction();
-        if($this->reflection->hasMethod($name)) {
-            return $this->reflection->getMethod($name);
+        if($r->hasMethod($name)) {
+            return $r->getMethod($name);
         }
 
         throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
@@ -128,9 +130,13 @@ class EntityClass extends Entity implements EntityInterface
         return $all+$this->overrides;
     }
 
-    private function getMethods()
+    /**
+     * Returns the class methods. Use internalaly.
+     * @return array An array of \ReflectionMethod objects.
+     */
+    public function getMethods()
     {
-        return $this->reflection->getMethods(
+        return $this->getReflection()->getMethods(
             \ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC
         );
     }

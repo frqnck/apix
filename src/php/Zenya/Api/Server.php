@@ -191,10 +191,10 @@ class Server extends Listener
         );
 
         // Set the response format...
-        $this->negotiateFormat($opts, $ext?:null);
+        $this->negotiateFormat($opts, isset($ext)?$ext:null);
 
         $this->route->map($path, $request->getParams());
-        
+
         if(isset($rawController)) {
             $this->route->setController($rawController);
         }

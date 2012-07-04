@@ -31,7 +31,7 @@ class CrudClass
      */
     public function onRead($id, array $optional=null)
     {
-        echo $id, $optional;
+        #echo $id, $optional;
         return func_get_args();
     }
 

@@ -34,10 +34,10 @@ class Config extends \Pimple
 
         $this['server_debug'] = 'test';
 
-        // $file = realpath(__DIR__ . '/../../../data/config.dist.php');
+        $file = realpath(__DIR__ . '/../../../data/config.dist.php');
         // echo $file = realpath('../data/config.dist.php');
         //getenv('HOME') . '/.zenya/config.php';
-        $file = ('../data/config.dist.php');
+        ##$file = realpath('../data/config.dist.php');
 
         if( $skip !== true ) {
             $this->config = $this->getConfigurations($file);

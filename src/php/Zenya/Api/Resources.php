@@ -46,24 +46,33 @@ class Resources
      *
      * @param  string $name         A resource name
      * @param  array  $resource     A resource definition array
-     * @return void
+     * @return Entity
      */
     public function add($name, array $resources)
     {
-        // factory
-        if( isset($resources['action'])
-          && $resources['action'] instanceOf \Closure
-        ) {
-            $this->setEntity(new Entity\EntityClosure);
-        } else { //if(isset($resource['controller'])) {
-            $this->setEntity(new Entity\EntityClass);
-        }
+        switch(true):
+
+            case isset($resources['action'])
+                && $resources['action'] instanceOf \Closure:
+                $this->setEntity(
+                    new Entity\EntityClosure
+                );
+            break;
+
+            case isset($resources['controller']):
+            default:
+                $this->setEntity(
+                    new Entity\EntityClass
+                );
+
+        endswitch;
 
         if(!isset($this->resources[$name])) {
             $entity = get_class($this->getEntity());
             $this->resources[$name] = new $entity; //new Entity($group);
         }
         $this->resources[$name]->append($resources);
+
         return $this->resources[$name];
     }
 
