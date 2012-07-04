@@ -43,7 +43,7 @@ class Response
      * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      * @link http://tools.ietf.org/html/rfc2616#section-10
      */
-    protected static $httpPhrases = array(
+    protected static $http_phrases = array(
 
         // 1xx: Informational - Request received, continuing process
         100 => 'Continue',
@@ -115,7 +115,7 @@ class Response
      *
      * @var  array
      */
-    protected static $longHttpPhrases = array(
+    protected static $long_http_phrases = array(
 
         200 => 'The request has succeeded.',
         201 => 'The request has been fulfilled and resulted in a new resource being created.',
@@ -230,11 +230,11 @@ class Response
      * readfile('original.pdf');
      *
      * @param integer $http_code
-     * @param string  $versionString
+     * @param string  $version_string
      */
-    public function sendAllHttpHeaders($http_code, $versionString)
+    public function sendAllHttpHeaders($http_code, $version_string)
     {
-        $out = array( $this->sendHeader('X-Powered-By: ' . $versionString, true, $http_code) );
+        $out = array( $this->sendHeader('X-Powered-By: ' . $version_string, true, $http_code) );
 
         foreach ($this->headers as $key => $value) {
            $out[] = $this->sendheader($key . ': ' . $value);
@@ -297,8 +297,8 @@ class Response
     public function getStatusPrases($http_code=null, $long=false)
     {
         $http_code = is_null($http_code) ? $this->http_code : $http_code;
-        $type = $long === true ? self::$longHttpPhrases : self::$httpPhrases;
-        $status =  self::$httpPhrases[$http_code];
+        $type = $long === true ? self::$long_http_phrases : self::$http_phrases;
+        $status =  self::$http_phrases[$http_code];
 
         return $long === true
             ? isset($type[$http_code]) ? $type[$http_code] : $http_code . ' ' . $status
@@ -356,16 +356,16 @@ class Response
      * Generates the response & send the headers...
      *
      * @param  array  $results
-     * @param  string $versionString
+     * @param  string $version_string
      * @param  string $rootNode
      * @return string
      */
-    public function generate($name, array $results, $versionString='ouarz', $rootNode='root')
+    public function generate($name, array $results, $version_string='ouarz', $rootNode='root')
     {
         $renderer = __NAMESPACE__ . '\Output\\' . ucfirst($this->getFormat());
         $output = new $renderer($this->encoding);
         $this->setHeader('Content-Type', $output->getContentType());
-        $this->sendAllHttpHeaders($this->getHttpCode(), $versionString);
+        $this->sendAllHttpHeaders($this->getHttpCode(), $version_string);
 
         return $output->encode($this->collate($name, $results), $rootNode);
     }
