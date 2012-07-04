@@ -19,7 +19,6 @@ if (
 }
 */
 
-
 /**
  * HTTP Digest authentication class
  *
@@ -30,15 +29,15 @@ class Basic implements Adapter
     /**
      * @var string The authentication realm.
      */
-    var $realm = null;
+    public $realm = null;
 
     /**
      * @var string The base URL of the application.
      */
-    var $baseURL = '/';
+    public $baseURL = '/';
 
     /**
-     * @var boolean Holds 
+     * @var boolean Holds
      */
     public $token = null;
 
@@ -61,11 +60,12 @@ class Basic implements Adapter
      * @param array Teh digest array
      * @return string The token to macth with the digest password
      */
-    function getToken(array $user)
+    public function getToken(array $user)
     {
-      if(is_null($this->token)) {
+      if (is_null($this->token)) {
         call_user_func_array($this->setToken, array($user));
       }
+
       return $this->token;
     }
 
@@ -74,7 +74,7 @@ class Basic implements Adapter
      *
      * @return void
      */
-    function send()
+    public function send()
     {
         header('WWW-Authenticate: Basic '.
             'realm="'.$this->realm.'"'
@@ -96,13 +96,13 @@ class Basic implements Adapter
      *               return access to $this->send() which will pop up the authentication
      *               challenge once again.
      */
-    function authenticate()
+    public function authenticate()
     {
         if (
             isset($_SERVER['PHP_AUTH_USER'])
         ) {
             $user = array('username'=>$_SERVER['PHP_AUTH_USER'], 'password'=>$_SERVER['PHP_AUTH_PW']);
-            if($this->getToken($user) === true) {
+            if ($this->getToken($user) === true) {
                 return $_SERVER['PHP_AUTH_USER'];
             }
         }

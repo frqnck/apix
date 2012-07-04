@@ -21,7 +21,6 @@ class Resource extends Listener
   // protected $action;
   // protected $method;
 
-
   // protected $commits = array();
   // protected $building = false;
   // protected $notifiers = array();
@@ -51,6 +50,7 @@ class Resource extends Listener
     public function getActions()
     {
         $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
+
         return $this->actions+$overrides;
     }
 
@@ -104,13 +104,12 @@ class Resource extends Listener
       // use actions as the standad mean (Refactor).
       $this->setRouteOverrides();
 
-
       // Alias: current action has an aliased controller
       $action = isset($this->resource['actions'][$this->route->getMethod()]['alias'])
             ? $this->resource['actions'][$this->route->getMethod()]['alias']
             : null;
 
-      if(isset($action['controller'])) {
+      if (isset($action['controller'])) {
           $this->resource['controller'] = $action['controller'];
 
           #$this->resource['controller'][]
@@ -124,7 +123,7 @@ class Resource extends Listener
       }
 
       // assume closure based
-      #if($action instanceOf \Closure) { //is_callable( $action )) {
+      #if ($action instanceOf \Closure) { //is_callable( $action )) {
       return $this->_closure($this->resource, $this->route);
       #}
 
@@ -194,7 +193,7 @@ class Resource extends Listener
     {
       $this->actions = $resource['actions'];
 
-      if(!isset($this->actions[$route->getMethod()])) {
+      if (!isset($this->actions[$route->getMethod()])) {
           throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
       }
 
@@ -209,22 +208,20 @@ class Resource extends Listener
         // TODO: merge with TEST & OPTIONS ???
         ###Server::d( $this->actions );
 
-
         $params = $this->getRequiredParams($route->getMethod(), $this->refMethod, $route->getParams());
         $this->addAllListeners('resource', 'early');
 
         return call_user_func_array($action, $params);
     }
 
-
     public function getDocs($action=null)
     {
         $ref = isset($this->refClass) ? $this->refClass : $this->refMethod;
         $ref->parseClassDoc();
 
-        if( isset($action)) {
+        if ( isset($action)) {
           $ref->parseMethodDoc($action);
-        } elseif(isset($this->actions)) {
+        } elseif (isset($this->actions)) {
           foreach ($this->actions as $method) {
              $ref->parseMethodDoc($method);
           }
@@ -243,7 +240,7 @@ class Resource extends Listener
           ? $docs['methods'][$verb]['api_role']
           : false;
 
-        if( !$role || $role == 'public') {
+        if (!$role || $role == 'public') {
           return true;
         }
 

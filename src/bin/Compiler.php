@@ -20,7 +20,7 @@ class Compiler
             unlink($pharFile);
         }
 
-        if( $log = system('git log --pretty="%h %ci" -n1 HEAD') ) {
+        if ( $log = system('git log --pretty="%h %ci" -n1 HEAD') ) {
             $this->version = trim($log);
         } else {
             throw new \RuntimeException('The git binary cannot be found.');
@@ -36,7 +36,7 @@ class Compiler
         $root = __DIR__ . '/../..';
         foreach ( array('src/php', 'vendor/php') as $dir) {
             $it = new \RecursiveDirectoryIterator("$root/$dir");
-            foreach(new \RecursiveIteratorIterator($it) as $file) {
+            foreach (new \RecursiveIteratorIterator($it) as $file) {
                 if (
                     $file->getExtension() == 'php'
                     && !preg_match ('@/src/php/Zenya/Api/Util/Compile.php$@', $file->getPathName())
@@ -138,8 +138,7 @@ try {
     die('Cannot initialize Phar');
 }
 
-if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'][0]))
-{
+if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'][0])) {
     $version = Zenya\Api\Server::VERSION;
     $versionStr = sprintf("Zenya API Server %s by Franck Cassedanne", $version);
 
@@ -163,7 +162,7 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
             break;
 
         case '--selfupdate':
-            try{
+            try {
                 $remote = '{URL}/{PHAR}';
                 $local  = __DIR__ . '/sleepover.phar';
 
@@ -178,7 +177,7 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
             break;
 
         case '-c': case '--check':
-            try{
+            try {
                 $latest = trim(file_get_contents('{URL}/{PHAR}/version'));
 
                 if ($latest != $version) {

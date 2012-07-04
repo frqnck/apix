@@ -23,13 +23,14 @@ class EntityClosure extends Entity implements EntityInterface
     public function getReflection($name)
     {
 
-        if(null == $this->reflection[$name]) {
-          if(isset($this->actions[$name]['action']) && $this->actions[$name]['action'] InstanceOf \Closure) {
+        if (null == $this->reflection[$name]) {
+          if (isset($this->actions[$name]['action']) && $this->actions[$name]['action'] InstanceOf \Closure) {
             $this->reflection[$name] = new \ReflectionFunction($this->actions[$name]['action']);
           } else {
             return false;
           }
         }
+
         return $this->reflection[$name];
     }
 
@@ -47,7 +48,7 @@ class EntityClosure extends Entity implements EntityInterface
      */
      function underlineCall(Router $route)
     {
-      #if(!isset($this->actions[$route->getMethod()])) {
+      #if (!isset($this->actions[$route->getMethod()])) {
 #          throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.!!", 405);
 #      }
 
@@ -77,14 +78,15 @@ class EntityClosure extends Entity implements EntityInterface
         $docs = Reflection::parsePhpDoc( $this->group );
 
         // doc for all methods
-        foreach($this->getActions() as $key => $func) {
-          if($func['action'] InstanceOf \Closure) {
+        foreach ($this->getActions() as $key => $func) {
+          if ($func['action'] InstanceOf \Closure) {
               #$r = $this->getReflection($key);
               $this->reflection[$key] = new \ReflectionFunction($func['action']);
               $doc = $this->reflection[$key]->getDocComment();
               $docs['methods'][$key] = Reflection::parsePhpDoc( $doc );
           }
         }
+
         return $docs;
     }
 
@@ -95,7 +97,7 @@ class EntityClosure extends Entity implements EntityInterface
     {
         $name = $route->getMethod();
         $r = $this->getReflection($name);
-        if(false !== $r) {
+        if (false !== $r) {
           return $r;
         }
 
@@ -121,7 +123,7 @@ class EntityClosure extends Entity implements EntityInterface
     /**
      * Group a resource entity.
      *
-     * @param  string $name     The group name
+     * @param  string $name The group name
      * @return void
      */
     public function group($test)
@@ -137,7 +139,7 @@ class EntityClosure extends Entity implements EntityInterface
     /**
      * Adds a redirect.
      *
-     * @param  string $location   A  name
+     * @param  string $location A  name
      * @param  array  $resource The resource definition array
      * @return void
      */

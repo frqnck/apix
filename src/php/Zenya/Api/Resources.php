@@ -44,8 +44,8 @@ class Resources
     /**
      * Adds a resource entity.
      *
-     * @param  string $name         A resource name
-     * @param  array  $resource     A resource definition array
+     * @param  string $name     A resource name
+     * @param  array  $resource A resource definition array
      * @return Entity
      */
     public function add($name, array $resources)
@@ -67,7 +67,7 @@ class Resources
 
         endswitch;
 
-        if(!isset($this->resources[$name])) {
+        if (!isset($this->resources[$name])) {
             $entity = get_class($this->getEntity());
             $this->resources[$name] = new $entity; //new Entity($group);
         }
@@ -79,7 +79,7 @@ class Resources
     /**
      * Checks wether a specified resource name exists.
      *
-     * @param  string $name     The resource name to check
+     * @param  string  $name The resource name to check
      * @return boolean
      */
     public function has($name)
@@ -100,7 +100,7 @@ class Resources
     /**
      * Gets the specified ressource entity.
      *
-     * @param  string   $name A resource name
+     * @param  string                           $name A resource name
      * @return Zenya/Api/Entity/EntityInterface
      */
     public function get(Router $route)
@@ -114,18 +114,18 @@ class Resources
         $entity = $this->resources[$name];
 
         // swap if aliased/redirected
-        if($redirect = $entity->getRedirect()) {
+        if ($redirect = $entity->getRedirect()) {
             $entity = $this->resources[$redirect];
         }
         $entity->setRoute($route);
         /*
-        if( $entity instanceOf Entity\EntityClass ) {
+        if ($entity instanceOf Entity\EntityClass) {
             // var_dump($entity->getController());
-            if(!isset($entity->controller['name'])) {
+            if (!isset($entity->controller['name'])) {
                 $entity->controller['name'] = $route->controller_name;
             }
 
-            if(!isset($entity->controller['args'])) {
+            if (!isset($entity->controller['args'])) {
                 $entity->controller['args'] = $route->controller_args;
             }
         }

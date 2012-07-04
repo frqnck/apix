@@ -195,7 +195,7 @@ class Server extends Listener
 
         $this->route->map($path, $request->getParams());
 
-        if(isset($rawController)) {
+        if (isset($rawController)) {
             $this->route->setController($rawController);
         }
     }
@@ -319,8 +319,8 @@ class Server extends Listener
     /**
      * POST request handler
      *
-     * @param string $path  Matched route pattern
-     * @param mixed  $to    Callback that returns the response when matched
+     * @param string $path Matched route pattern
+     * @param mixed  $to   Callback that returns the response when matched
      *
      * @return Controller
      */

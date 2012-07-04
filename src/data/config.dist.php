@@ -22,6 +22,7 @@ $c['services'] = array(
             0=>array('username'=>'franck', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey', 'role'=>'admin'),
             1=>array('username'=>'bob', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'sesame', 'role'=>'guest')
         );
+
         return $users;
     }
 );
@@ -78,18 +79,15 @@ $c['listeners'] = array(
         // fires early @ resource discovery stage
         'early_off' => array(
             // Basic Auth
-            function() use ($c)
-            {
+            function() use ($c) {
                 $adapter = new Listener\Auth\Basic($c['api_realm']);
-                $adapter->setToken = function(array $basic) use ($c, $adapter)
-                {
+                $adapter->setToken = function(array $basic) use ($c, $adapter) {
                     $users = Services::get('users');
-                    foreach($users as $user)
-                    {
-                        if(
+                    foreach ($users as $user) {
+                        if (
                             $user['username'] == $basic['username']
                             && $user['sharedSecret'] == $basic['password']
-                        ) {
+) {
                             return $adapter->token = true;
                         }
                     }
@@ -103,25 +101,23 @@ $c['listeners'] = array(
        // fires early @ resource discovery stage
         'early' => array(
             // Digest Auth
-            function() use ($c)
-            {
+            function() use ($c) {
                 $adapter = new Listener\Auth\Digest($c['api_realm']);
-                $adapter->setToken = function(array $digest) use ($c, $adapter)
-                {
+                $adapter->setToken = function(array $digest) use ($c, $adapter) {
                     $config = Config::getInstance();
                     $users = $config->getServices('users');
-                    foreach($users as $user)
-                    {
-                        if( // this should be altered accordingly!
+                    foreach ($users as $user) {
+                        if (// this should be altered accordingly!
                             $user['username'] == $digest['username']
                             && $user['realm'] == $c['api_realm']
-                        ) {
+) {
                             // Can be set to password, apiKey, or hashed mixture...
                             return $adapter->token = $user['sharedSecret'];
                         }
                     }
                     $adapter->token = false;
                 };
+
                 return new Listener\Auth($adapter);
             },
             //'Zenya\Api\Listener\BodyData',
@@ -133,18 +129,21 @@ $c['listeners'] = array(
 
 /* Prototype:
 
-function onRead($route, $call) {
+function onRead($route, $call)
+{
 // add route to config route
 // add call to resources.
 }
 
     $c->onRead('/auth/:param1', function($param1) {
         new Zenya\Api\Fixtures\AuthResource($param1);
+
         return array();
     });
 
     $c->onCreate('/auth/:param1', function() {
         new Zenya\Api\Fixtures\AuthResource();
+
         return array();
     });
 */

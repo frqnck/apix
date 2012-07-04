@@ -23,13 +23,13 @@ class Entity extends Listener
     /**
      * Appends the given array definition and apply generic mappings.
      *
-     * @param array $definitions
+     * @param  array $definitions
      * @return void
      * @see EntityInterface::_append
      */
     final public function _append(array $defs)
     {
-        if(isset($defs['redirect'])) {
+        if (isset($defs['redirect'])) {
           $this->redirect = $defs['redirect'];
         }
     }
@@ -46,7 +46,7 @@ class Entity extends Listener
     public function call()
     {
         // TODO: this is temporary...
-        if($this->route->getMethod() == 'OPTIONS') {
+        if ($this->route->getMethod() == 'OPTIONS') {
             return $this->getDocs();
         }
 
@@ -81,16 +81,16 @@ class Entity extends Listener
     /**
      * Returns the full or just the specified method documentation .
      *
-     * @param  string  $method
+     * @param  string $method
      * @return array
      */
     public function getDocs($method=null)
     {
-        if(null === $this->docs) {
+        if (null === $this->docs) {
             $this->docs = $this->_parseDocs();
         }
 
-        if(null !== $method) {
+        if (null !== $method) {
             return isset($this->docs['methods'][$method])
                     ? $this->docs['methods'][$method] : null;
         }
@@ -101,11 +101,11 @@ class Entity extends Listener
     /**
      * Returns the validated required parameters.
      *
-     * @param  \ReflectionFunctionAbstract  $refMethod      A reflected method/function to introspect.
-     * @param  string                       $httpMethod     A public method name e.g. GET, POST.
-     * @param  array                        $routeParams    An array of route parameters to check upon.
-     * @return array                                        The array of required parameters
-     * @throws \BadMethodCallException 400
+     * @param  \ReflectionFunctionAbstract $refMethod   A reflected method/function to introspect.
+     * @param  string                      $httpMethod  A public method name e.g. GET, POST.
+     * @param  array                       $routeParams An array of route parameters to check upon.
+     * @return array                       The array of required parameters
+     * @throws \BadMethodCallException     400
      */
     public function getRequiredParams(\ReflectionFunctionAbstract $refMethod, $httpMethod, array $routeParams)
     {
@@ -130,7 +130,7 @@ class Entity extends Listener
     /**
      * Sets the route object.
      *
-     * @param Router $route
+     * @param  Router $route
      * @return void
      */
     public function setRoute(Router $route)
@@ -163,7 +163,7 @@ class Entity extends Listener
           ? $doc['api_role']
           : false;
 
-        if( !$role || $role == 'public') {
+        if (!$role || $role == 'public') {
           return true;
         }
 
