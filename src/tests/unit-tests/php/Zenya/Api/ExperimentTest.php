@@ -18,7 +18,6 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
 
         $this->api = new Server(null, $this->request, $this->response);
 
-
         #$this->server = new Server(new Config, $this->request);
     }
 
@@ -69,7 +68,6 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('GET', $routes['/keywords/:keyword']);
         $this->assertArrayHasKey('POST', $routes['/keywords/:keyword']);
 
-
         #d($this->api->getResources());exit;
 
         $this->request->expects($this->once())->method('getUri')->will($this->returnValue('/keywords/keywordToTest'));
@@ -78,7 +76,5 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
         echo $this->api->run();
         echo 'END';
     }
-
-
 
 }

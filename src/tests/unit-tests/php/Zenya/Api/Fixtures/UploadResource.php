@@ -29,7 +29,6 @@ class UploadResource
         $this->server = $server;
     }
 
-
     /**
      * Post
      *
@@ -68,7 +67,7 @@ class UploadResource
     {
         $request = $request === null ? Request::getInstance() : $request;
 
-        if($debug==true) {
+        if ($debug==true) {
             $results['debug'] = $request->getHeaders();
         }
 

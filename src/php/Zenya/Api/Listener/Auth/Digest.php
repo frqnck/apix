@@ -19,7 +19,6 @@ if (
 }
 */
 
-
 /**
  * HTTP Digest authentication class
  *
@@ -31,32 +30,32 @@ class Digest implements Adapter
     /**
      * @var string The opaque value
      */
-    var $opaque = 'opaque';
+    public $opaque = 'opaque';
 
     /**
      * @var string The authentication realm.
      */
-    var $realm = null;
+    public $realm = null;
 
     /**
      * @var string The base URL of the application.
      */
-    var $baseURL = '/';
+    public $baseURL = '/';
 
     /**
      * @var boolean Are passwords stored as an a1 hash (username:realm:password) rather than plain text.
      */
-    var $passwordsHashed = true;
+    public $passwordsHashed = true;
 
     /**
      * @var string  The private key.
      */
-    var $privateKey = 'privatekey';
+    public $privateKey = 'privatekey';
 
     /**
      * @var int The life of the nonce value in seconds
      */
-    var $nonceLife = 300;
+    public $nonceLife = 300;
 
     /**
      * @var string The token to macth with the digest password
@@ -85,11 +84,12 @@ class Digest implements Adapter
      * @param array Teh digest array
      * @return string The token to macth with the digest password
      */
-    function getToken(array $digest)
+    public function getToken(array $digest)
     {
-      if(is_null($this->token)) {
+      if (is_null($this->token)) {
         call_user_func_array($this->setToken, array($digest));
       }
+
       return $this->token;
     }
 
@@ -98,7 +98,7 @@ class Digest implements Adapter
      *
      * @return void
      */
-    function send()
+    public function send()
     {
         header('WWW-Authenticate: Digest '.
             'realm="'.$this->realm.'", '.
@@ -120,7 +120,7 @@ class Digest implements Adapter
      * @return str
      */
 /*
-    function getAuthHeader()
+    public function getAuthHeader()
     {
         if (isset($_SERVER['Authorization'])) {
             return $_SERVER['Authorization'];
@@ -130,6 +130,7 @@ class Digest implements Adapter
                 return $headers['Authorization'];
             }
         }
+
         return NULL;
     }
 */
@@ -143,7 +144,7 @@ class Digest implements Adapter
      *               return access to $this->send() which will pop up the authentication
      *               challenge once again.
      */
-    function authenticate()
+    public function authenticate()
     {
         if (
             isset($_SERVER['PHP_AUTH_DIGEST'])
@@ -165,7 +166,7 @@ class Digest implements Adapter
      *
      * @return string
      */
-    function getNonce()
+    public function getNonce()
     {
         $time = ceil(time() / $this->nonceLife) * $this->nonceLife;
 
@@ -256,7 +257,7 @@ class Digest implements Adapter
      *
      * @return string
      */
-    function getOpaque()
+    public function getOpaque()
     {
         return md5($this->opaque);
     }

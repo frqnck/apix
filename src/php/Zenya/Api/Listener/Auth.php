@@ -35,12 +35,12 @@ class Auth implements \SplObserver
     public function update(\SplSubject $entity)
     {
         // skip if public
-        if($entity->isPublic()) {
+        if ($entity->isPublic()) {
           return;
         }
 
         $username = $this->adapter->authenticate();
-        if(!$username) {
+        if (!$username) {
             throw new Exception('Authentication Required', 401);
         }
 

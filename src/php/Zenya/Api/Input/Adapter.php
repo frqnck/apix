@@ -2,8 +2,8 @@
 
 namespace Zenya\Api\Input;
 
-interface Adapter {
-
+interface Adapter
+{
     /**
      * Data decoder.
      *

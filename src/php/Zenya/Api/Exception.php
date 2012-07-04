@@ -64,10 +64,11 @@ class Exception extends \Exception
     {
         if(self::DEBUG) return false;
 
-        if ( E_RECOVERABLE_ERROR === $errno ) {
+        if (E_RECOVERABLE_ERROR === $errno) {
             $errstr = preg_replace('@to\s.*::\w+\(\)@', '', $errstr, 1);
             throw new \ErrorException($errstr, 400, 0, $errfile, $errline);
         }
+
         return false;
     }
 

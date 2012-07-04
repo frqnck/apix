@@ -13,9 +13,9 @@ class Xml implements Adapter
     /**
      * Convert an XML string to its array representation
      *
-     * @param string  $str   An XML string.
-     * @param boolean $assoc Convert objects to array.
-     * @return	mix
+     * @param  string  $str   An XML string.
+     * @param  boolean $assoc Convert objects to array.
+     * @return mix
      * @see		Zenya\Api\Input\Adapter
      */
     public function decode($xmlStr, $assoc=true)

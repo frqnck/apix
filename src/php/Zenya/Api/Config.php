@@ -12,14 +12,14 @@ class Config extends \Pimple
      * The singleton instance
      * @var Config
      */
-    static private $instance = null;
+    private static $instance = null;
 
     /**
      * Returns as a singleton instance
      *
      * @return Config
      */
-    static public function getInstance($skip=false)
+    public static function getInstance($skip=false)
     {
         if (null === self::$instance) {
             self::$instance = new self($skip);
@@ -39,7 +39,7 @@ class Config extends \Pimple
         //getenv('HOME') . '/.zenya/config.php';
         ##$file = realpath('../data/config.dist.php');
 
-        if( $skip !== true ) {
+        if ($skip !== true) {
             $this->config = $this->getConfigurations($file);
         } else {
             $this->config = $this->getConfigDefaults();
@@ -101,7 +101,6 @@ class Config extends \Pimple
         return $this->retrieve('resources', $key);
     }
 
-
     public function inject($key, $mixed)
     {
         return $this->injected[$key] = $mixed;
@@ -120,7 +119,7 @@ class Config extends \Pimple
     // New: closure
     public function addRoute($route, $action)
     {
-        if($action instanceOf \Closure) {
+        if ($action instanceOf \Closure) {
             return $this->config['routes'][$route] = array(
                 'controller' => $route,
             );
@@ -129,10 +128,10 @@ class Config extends \Pimple
         throw RuntimeException('Route could not be imported');
     }
 
-
     public function getConfigDefaults()
     {
         #$c = $this;
+
         return array(
             'api_realm'     => 'Zenya',
             'api_version'   => '1.0',
@@ -184,10 +183,10 @@ class Config extends \Pimple
                     'early' => array(
                         // todo
                         /*
-                        'Zenya\Api\Listener\Auth' => function()
-                        {
+                        'Zenya\Api\Listener\Auth' => function() {
                             #echo $c['api_realm'];
                             #"$c['api_realm']"
+
                             return new \Zenya\Api\Listener\Auth\HttpDigest();
                         },
 */

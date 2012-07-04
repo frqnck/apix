@@ -10,35 +10,35 @@ interface EntityInterface
 
     /**
      * Appends the given array definition and apply _local_ mappings.
-	 *
-	 * @param array $definitions
-	 * @return void
-	 */
+     *
+     * @param  array $definitions
+     * @return void
+     */
     public function append(array $defs);
 
     /**
- 	 * Calls the underline entity.
-	 *
-	 * @param Router $route
-	 * @return array
-	 * @throws InvalidArgumentException 405
-	 */
+      * Calls the underline entity.
+     *
+     * @param  Router                   $route
+     * @return array
+     * @throws InvalidArgumentException 405
+     */
     public function underlineCall(Router $route);
 
     /**
- 	 * Parses the PHP docs.
-	 *
-	 * @return void
-	 */
-    function _parseDocs();
+      * Parses the PHP docs.
+     *
+     * @return void
+     */
+    public function _parseDocs();
 
     /**
- 	 * Gets the method
-	 *
-	 * @param string $name
-	 * @return
-	 */
-    function getMethod(Router $route);
+      * Gets the method
+     *
+     * @param string $name
+     * @return
+     */
+    public function getMethod(Router $route);
 
     /**
      * Returns an array of method keys and action values.
@@ -46,6 +46,6 @@ interface EntityInterface
      * @param  array $array
      * @return array
      */
-    function getActions();
+    public function getActions();
 
 }

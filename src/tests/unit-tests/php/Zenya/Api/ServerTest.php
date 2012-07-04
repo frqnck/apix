@@ -43,7 +43,6 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(null, $this->server->getResults());
     }
 
-
     public function testGetFormatFromHttpAccept()
     {
         $this->request->expects($this->any())->method('hasHeader')->will($this->returnValue(true));
