@@ -140,8 +140,15 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
 
     public function testSpecialCharacteres()
     {
-        $this->markTestIncomplete('TODO: maybe fix signle *s');
+        $this->markTestIncomplete('TODO: allow to use wildcard within doc (fix regex)');
         $this->assertSame('OPTIONS /*/etc...', $this->method['api_link']);
+    }
+
+    /* TODO Prefix handler */
+    public function testPrefix()
+    {
+        $r = new Reflection('api_');
+        $this->assertSame($r->getPrefix(), 'api_');
     }
 
 }

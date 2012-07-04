@@ -2,21 +2,25 @@
 
 namespace Zenya\Api;
 
-use Zenya\Api\Entity;
+use Zenya\Api\Entity,
+    Zenya\Api\EntityInterface;
 
 class ResourcesTest extends \PHPUnit_Framework_TestCase
 {
 
-    protected $resources, $mockEntity;
+    protected $resources, $entity, $route;
 
     protected function setUp()
     {
-        $this->mockEntity = $this->getMock('Zenya\Api\Entity\EntityInterface');
-        $this->mockEntity->expects($this->any())->method('append')->will($this->returnValue(array('test')));
-        $this->mockEntity->expects($this->any())->method('getRedirect')->will($this->returnValue('paul'));
+        $this->entity = $this->getMock('Zenya\Api\Entity\EntityInterface');
+
+        $this->route = $this->getMock('Zenya\Api\Router');
+        $this->route->expects($this->any())
+            ->method('getPathName')
+            ->will($this->returnValue('/route'));
 
         $resources = new Resources;
-        $resources->setEntity($this->mockEntity);
+        $resources->setEntity($this->entity);
 
         $this->resources = $resources;
     }
@@ -24,21 +28,23 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->resources);
+        unset($this->entity);
+        unset($this->route);
     }
 
     /**
      * @covers Zenya\Api\Resources::setEntity
      * @covers Zenya\Api\Resources::getEntity
      */
-    public function testSetEntity()
+    public function testGetEntity()
     {
-        $this->resources->setEntity($this->mockEntity);
+        #$this->resources->setEntity($this->entity);
 
         $r = new \ReflectionObject($this->resources);
         $p = $r->getProperty('entity');
         $p->setAccessible(true);
 
-        $this->assertSame($this->mockEntity, $this->resources->getEntity());
+        $this->assertSame($this->entity, $this->resources->getEntity());
     }
 
     /**
@@ -69,25 +75,65 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Zenya\Api\Resources::get
      */
-    public function testGet()
+    public function testGetReturnsEntityInterface()
     {
-        $this->resources->add('name', array());
-        $this->assertInstanceOf('Zenya\Api\Entity\EntityInterface', $this->resources->get('name'));
+        $this->resources->add('/route', array());
+        $this->assertInstanceOf('Zenya\Api\Entity\EntityInterface', $this->resources->get($this->route));
+    }
+
+    /**
+     * @expectedException           \InvalidArgumentException
+     * @expectedExceptionCode       404
+     */
+    public function testGetThrowsInvalidArgumentException()
+    {
+        // not resources where defined, and none wodu therefore macth
+        $this->resources->get($this->route);
     }
 
     public function testGetFollowsRedirect()
     {
-        $this->resources->add('paul', array('redirect'=>'pierre'));
-        $this->resources->add('pierre', array('redirect'=>'bob'));
-        $this->resources->add('bob', array());
+        $this->resources->add('Pierre', array('redirect'=>'Jacques'));
+        $this->resources->add('Jacques', array());
 
-        $this->assertEquals('bob', $this->resources->get('paul')->getRedirect());
-
-        $this->assertEquals($this->resources->get('bob'), $this->resources->get('pierre'));
-        $this->assertNotEquals($this->resources->get('bob'), $this->resources->get('paul'));
+        $route = $this->getMock('Zenya\Api\Router');
+        $route->expects($this->any(3))
+            ->method('getPathName')
+            ->will($this->onConsecutiveCalls('Jacques', 'Pierre'));
+        $this->assertEquals($this->resources->get($route), $this->resources->get($route), 'Pierre should be equal to Jacques');
     }
 
-/* ---------- TODO: review below when we refactor --- */
+    public function testGetFollowsSubsequentRedirect()
+    {
+        $this->resources->add('Paul', array('redirect'=>'Pierre'));
+        $this->resources->add('Pierre', array('redirect'=>'Jacques'));
+        $this->resources->add('Jacques', array());
+
+        $route = $this->getMock('Zenya\Api\Router');
+        $route->expects($this->once())
+            ->method('getPathName')
+            ->will($this->returnValue('Paul'));
+
+        $this->assertEquals('Jacques', $this->resources->get($route)->getRedirect(), 'Paul follows a redirect from Pierre, and equals to Jacques');
+    }
+
+
+    public function testGetDoNotRedirect()
+    {
+        $this->resources->add('Paul', array('redirect'=>'Pierre'));
+        $this->resources->add('Pierre', array('redirect'=>'Jacques'));
+        $this->resources->add('Jacques', array());
+
+        $route = $this->getMock('Zenya\Api\Router');
+        $route->expects($this->exactly(2))
+            ->method('getPathName')
+            ->will($this->onConsecutiveCalls('Jacques', 'Paul'));
+        $this->assertNotEquals($this->resources->get($route), $this->resources->get($route), 'Paul should not be equal to Jacques');
+    }
+
+#######
+##### TODO: review below when we refactor!
+#######
 
     /**
      * @covers Zenya\Api\Resources::add
@@ -100,15 +146,15 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
     public function testAddClosureObject()
     {
-        $this->resources->add('closure', array('action'=>function(){return 'string';}, 'method'=>'some'));
-        $this->assertInstanceOf('Zenya\Api\Entity\EntityClosure', $this->resources->get('closure'));
+        $this->resources->add('/route', array('action'=>function(){return 'string';}, 'method'=>'some'));
+        $this->assertInstanceOf('Zenya\Api\Entity\EntityClosure', $this->resources->get($this->route));
     }
 
     public function testAddClassObject()
     {
         // TODO: use 'controller' instead of default to class...
-        $this->resources->add('class', array());
-        $this->assertInstanceOf('Zenya\Api\Entity\EntityClass', $this->resources->get('class'));
+        $this->resources->add('/route', array());
+        $this->assertInstanceOf('Zenya\Api\Entity\EntityClass', $this->resources->get($this->route));
     }
 
     public function testAddGroupObject()

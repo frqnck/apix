@@ -24,6 +24,16 @@ class Reflection
     }
 
     /**
+     * Returns prefix
+     *
+     * @return string
+     */
+    public function getPrefix()
+    {
+        return $this->prefix;
+    }
+
+    /**
      * Extract PHPDOCs
      *
      * @param  string $str
