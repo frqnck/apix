@@ -91,12 +91,12 @@ class Server extends Listener
 
         } catch (\Exception $e) {
 
-            $httpCode =  $e->getCode()>199 ? $e->getCode() : 500;
-            $this->response->setHttpCode($httpCode);
+            $http_code =  $e->getCode()>199 ? $e->getCode() : 500;
+            $this->response->setHttpCode($http_code);
 
             $this->results['error'] = array(
                 'message'   => $e->getMessage(),
-                'code'      => $httpCode
+                'code'      => $http_code
             );
 
             // set the error controller!
