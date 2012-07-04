@@ -10,65 +10,64 @@ use Zenya\Api\Listener,
  * Represents a resource.
  *
  */
-class Entity extends Listener #implements EntityInterface
+class Entity extends Listener
 {
-    protected $name;
-    protected $controller;
-    protected $actions = array();
-    protected $redirect = null;
-    protected $docs = null;
+    protected $docs;
 
-    protected $route = null;
+    protected $route;
 
-    public $group = '/* -- todo group -- */';
+    protected $redirect;
 
     protected $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
 
     /**
-     * {@inheritdoc}
-     */
-    public function append(array $defs=null)
-    {
-        $this->_append($defs);
-    }
-
-    /**
-     * Group a resource entity.
+     * Appends the given array definition and apply generic mappings.
      *
-     * @param  string $name     The group name
+     * @param array $definitions
      * @return void
+     * @see EntityInterface::_append
      */
-    public function group($name)
+    final public function _append(array $defs)
     {
-        // group test
-        $this->group = $name;
-
-        return $this;
+        if(isset($defs['redirect'])) {
+          $this->redirect = $defs['redirect'];
+        }
     }
 
     /**
-     * Adds a redirect.
+     * Call the resource entity applying any method overrides.
      *
-     * @param  string $location   A  name
-     * @param  array  $resource The resource definition array
-     * @return void
-     */
-    public function redirect($location)
-    {
-        $this->redirect = $location;
-
-        return $this;
-    }
-
-    /**
-     * Returns the redirect location.
+     * @return array
+     * @throws Zenya\Api\Exception
+     * @see EntityInterface::_call
      *
-     * @return string
+     * @todo OPTIONS returns the help array for now, will need to redirect the entity instead... using clone!
      */
-    public function getRedirect()
+    public function call()
     {
-        return $this->redirect;
-    }
+        // TODO: this is temporary...
+        if($this->route->getMethod() == 'OPTIONS') {
+            return $this->getDocs();
+        }
+
+        /*
+            $this->route->setParams(
+              array('entity' => clone $this)
+            );
+
+            // TODO: review this
+            $c = Config::getInstance();
+            $alt = $c->getResources($this->overrides[$method]);
+            // TODO: auto inject here!!
+            $alt['controller']['args'] = $c->getInjected('Server');
+
+            $this->controller = $alt['controller'];
+
+            #$this->ref = new Reflection( $this->parseDocs() );
+        */
+
+        return $this->underlineCall($this->route);
+   }
 
     /**
      * To array...
@@ -80,80 +79,35 @@ class Entity extends Listener #implements EntityInterface
     }
 
     /**
-     * Sets router object.
+     * Returns the full or just the specified method documentation .
      *
-     * @param Router $route 
-     * @return void
+     * @param  string  $method
+     * @return array
      */
-    public function setRoute(Router $route)
+    public function getDocs($method=null)
     {
-        $this->route = $route;
+        if(null === $this->docs) {
+            $this->docs = $this->_parseDocs();
+        }
+
+        if(null !== $method) {
+            return isset($this->docs['methods'][$method])
+                    ? $this->docs['methods'][$method] : null;
+        }
+
+        return $this->docs;
     }
 
     /**
-     * Call the resource entity from route
+     * Returns the validated required parameters.
      *
-     * @return array
-     * @throws Zenya\Api\Exception
+     * @param  \ReflectionFunctionAbstract  $refMethod      A reflected method/function to introspect.
+     * @param  string                       $httpMethod     A public method name e.g. GET, POST.
+     * @param  array                        $routeParams    An array of route parameters to check upon.
+     * @return array                                        The array of required parameters
+     * @throws \BadMethodCallException 400
      */
-    public function call()
-    {
-        try {
-
-            // cache?!
-            $this->_parseDocs();
-
-            //$this->actions = $this->getActions();
-
-        } catch (\Exception $e) {
-            throw new \RuntimeException("Call to a unimplemented resource entity.", 500);
-        }
-
-        // return the help...
-        if($this->route->getMethod() == 'OPTIONS') {
-          //return $this->getDocs();
-        }
-
-        // attach the early listeners @ pre-processing stage
-        #$this->addAllListeners('entity', 'early');
-
-        return $this->_call($this->route);
-   }
-
-    public function getController($key=null)
-    {
-      if(null !== $key) {
-        return isset($this->controller[$key]) ? $this->controller[$key] : null;
-      }
-
-print_r($this->controller);
-exit;
-
-      return $this->controller;
-    }
-
-    public function isPublic()
-    {
-        // $verb = isset($this->_ref)
-        //   ? $this->route->getAction()   // closure
-        //   : $this->route->getMethod();
-
-        $method = $this->route->getMethod();
-
-        $doc = $this->getDocs($method);
-
-        $role = isset($doc['api_role'])
-          ? $doc['api_role']
-          : false;
-
-        if( !$role || $role == 'public') {
-          return true;
-        }
-
-        return false;
-    }
-
-    public function getRequiredParams($httpMethod, $refMethod, array $routeParams)
+    public function getRequiredParams(\ReflectionFunctionAbstract $refMethod, $httpMethod, array $routeParams)
     {
         $params = array();
         foreach ($refMethod->getParameters() as $param) {
@@ -174,38 +128,46 @@ exit;
     }
 
     /**
-     * Returns the full Documentations or specified method.
+     * Sets the route object.
      *
-     * @param  string  $method
-     * @return array
+     * @param Router $route
+     * @return void
      */
-    public function getDocs($method=null)
+    public function setRoute(Router $route)
     {
-        if(null === $this->docs) {
-            $this->_parseDocs();
+        $this->route = $route;
+    }
+
+    /**
+     * Returns the redirect location.
+     *
+     * @return string
+     */
+    public function getRedirect()
+    {
+        return $this->redirect;
+    }
+
+    /**
+     * Check wether is public or not.
+     *
+     * @return boolean
+     */
+    public function isPublic()
+    {
+        $method = $this->route->getMethod();
+
+        $doc = $this->getDocs($method);
+
+        $role = isset($doc['api_role'])
+          ? $doc['api_role']
+          : false;
+
+        if( !$role || $role == 'public') {
+          return true;
         }
 
-        if(null !== $method) {
-            return isset($this->docs['methods'][$method]) ? $this->docs['methods'][$method] : 'false';
-        }
-
-        return $this->docs;
-
-      /*
-        $this->route->setParams(
-          array('entity' => clone $this)
-        );
-
-        // TODO: review this
-        $c = Config::getInstance();
-        $alt = $c->getResources($this->overrides[$method]);
-        // TODO: auto inject here!!
-        $alt['controller']['args'] = $c->getInjected('Server');
-
-        $this->controller = $alt['controller'];
-
-        #$this->ref = new Reflection( $this->parseDocs() );
-      */
+        return false;
     }
 
 }
