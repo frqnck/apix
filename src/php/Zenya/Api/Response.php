@@ -34,7 +34,7 @@ class Response
      * Holds the current HTTP Code
      * @var  string
      */
-    protected $httpCode = 200;
+    protected $http_code = 200;
 
     /**
      * Associative array of HTTP phrases.
@@ -229,12 +229,12 @@ class Response
      * header('Content-Disposition: attachment; filename="downloaded.pdf"');
      * readfile('original.pdf');
      *
-     * @param integer $httpCode
+     * @param integer $http_code
      * @param string  $versionString
      */
-    public function sendAllHttpHeaders($httpCode, $versionString)
+    public function sendAllHttpHeaders($http_code, $versionString)
     {
-        $out = array( $this->sendHeader('X-Powered-By: ' . $versionString, true, $httpCode) );
+        $out = array( $this->sendHeader('X-Powered-By: ' . $versionString, true, $http_code) );
 
         foreach ($this->headers as $key => $value) {
            $out[] = $this->sendheader($key . ': ' . $value);
@@ -274,7 +274,7 @@ class Response
      */
     public function setHttpCode($int)
     {
-        $this->httpCode = (int) $int;
+        $this->http_code = (int) $int;
     }
 
     /**
@@ -284,38 +284,38 @@ class Response
      */
     public function getHttpCode()
     {
-        return $this->httpCode;
+        return $this->http_code;
     }
 
     /**
      * Returns an HTTP status phrase.
      *
-     * @param  integer $httpCode
+     * @param  integer $http_code
      * @param  bolean  $long
      * @return string
      */
-    public function getStatusPrases($httpCode=null, $long=false)
+    public function getStatusPrases($http_code=null, $long=false)
     {
-        $httpCode = is_null($httpCode) ? $this->httpCode : $httpCode;
+        $http_code = is_null($http_code) ? $this->http_code : $http_code;
         $type = $long === true ? self::$longHttpPhrases : self::$httpPhrases;
-        $status =  self::$httpPhrases[$httpCode];
+        $status =  self::$httpPhrases[$http_code];
 
         return $long === true
-            ? isset($type[$httpCode]) ? $type[$httpCode] : $httpCode . ' ' . $status
+            ? isset($type[$http_code]) ? $type[$http_code] : $http_code . ' ' . $status
             : $status;
     }
 
     /**
      * Returns sucessful or failed string.
      *
-     * @param  integer $httpCode
+     * @param  integer $http_code
      * @return string
      */
-    public function getStatusAdjective($httpCode = null)
+    public function getStatusAdjective($http_code = null)
     {
-        $httpCode = is_null($httpCode) ? $this->httpCode : $httpCode;
+        $http_code = is_null($http_code) ? $this->http_code : $http_code;
 
-        return floor($httpCode/100)<=3 ? 'successful' : 'failed';
+        return floor($http_code/100)<=3 ? 'successful' : 'failed';
     }
 
     /**
