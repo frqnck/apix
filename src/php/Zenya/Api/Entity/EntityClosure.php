@@ -14,20 +14,38 @@ use Zenya\Api\Entity,
 class EntityClosure extends Entity implements EntityInterface
 {
 
+    protected $actions = array();
+
     private $reflection;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function _append(array $defs)
+    public $group;
+
+    public function getReflection($name)
     {
-      $this->actions[$defs['method']] = $defs;
+
+        if(null == $this->reflection[$name]) {
+          if(isset($this->actions[$name]['action']) && $this->actions[$name]['action'] InstanceOf \Closure) {
+            $this->reflection[$name] = new \ReflectionFunction($this->actions[$name]['action']);
+          } else {
+            return false;
+          }
+        }
+        return $this->reflection[$name];
     }
 
     /**
      * {@inheritdoc}
      */
-     function _call(Router $route)
+    public function append(array $defs)
+    {
+        parent::_append($defs);
+        $this->actions[$defs['method']] = $defs;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+     function underlineCall(Router $route)
     {
       #if(!isset($this->actions[$route->getMethod()])) {
 #          throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.!!", 405);
@@ -43,7 +61,7 @@ class EntityClosure extends Entity implements EntityInterface
 
         // TODO: merge with TEST & OPTIONS ???
 
-        $params = $this->getRequiredParams($route->getMethod(), $method, $route->getParams());
+        $params = $this->getRequiredParams($method, $route->getMethod(), $route->getParams());
 
         #$this->addAllListeners('resource', 'early');
 
@@ -56,18 +74,18 @@ class EntityClosure extends Entity implements EntityInterface
     public function _parseDocs()
     {
         // class doc
-        $this->docs = Reflection::parsePhpDoc(
-            $this->group
-        );
+        $docs = Reflection::parsePhpDoc( $this->group );
 
-      // doc for all methods
-      foreach($this->getActions() as $key => $func) {
+        // doc for all methods
+        foreach($this->getActions() as $key => $func) {
           if($func['action'] InstanceOf \Closure) {
+              #$r = $this->getReflection($key);
               $this->reflection[$key] = new \ReflectionFunction($func['action']);
               $doc = $this->reflection[$key]->getDocComment();
-              $this->docs['methods'][$key] = Reflection::parsePhpDoc( $doc );
+              $docs['methods'][$key] = Reflection::parsePhpDoc( $doc );
           }
-      }
+        }
+        return $docs;
     }
 
     /**
@@ -76,11 +94,12 @@ class EntityClosure extends Entity implements EntityInterface
     public function getMethod(Router $route)
     {
         $name = $route->getMethod();
-        if(isset($this->reflection[$name])) {
-          return $this->reflection[$name];
+        $r = $this->getReflection($name);
+        if(false !== $r) {
+          return $r;
         }
 
-        throw new \InvalidArgumentException("Invalid resource's method ({$name}) specified.!!", 405);
+        throw new \InvalidArgumentException("Invalid resource's method ({$name}) specified.", 405);
     }
 
     /**
@@ -97,10 +116,35 @@ class EntityClosure extends Entity implements EntityInterface
       return $this->actions[$method]['action'];
     }
 
-    // private function getCurrentAction()
-    // {
-    //   $method = $this->route->getMethod();
-    //   return $this->getAction($method);
-    // }
+    /* --- CLOSURE only --- */
 
+    /**
+     * Group a resource entity.
+     *
+     * @param  string $name     The group name
+     * @return void
+     */
+    public function group($test)
+    {
+        // TODO retrive phpdoc coment strinfg here!
+        #$test = "/* TODO {closure-group-title} */";
+        // group test
+        $this->group = $test;
+
+        return $this;
+    }
+
+    /**
+     * Adds a redirect.
+     *
+     * @param  string $location   A  name
+     * @param  array  $resource The resource definition array
+     * @return void
+     */
+    public function redirect($location)
+    {
+        $this->redirect = $location;
+
+        return $this;
+    }
 }

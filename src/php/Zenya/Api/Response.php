@@ -9,7 +9,7 @@ class Response
      * List of supported formats.
      * @var array
      */
-    protected $formats = array('json', 'xml');
+    protected $formats = array('json', 'xml', 'html');
 
     /**
      * Holds the current output format.

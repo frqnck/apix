@@ -2,18 +2,19 @@
 
 namespace Zenya\Api\Entity;
 
-use Zenya\Api\Router;
+use Zenya\Api\Entity,
+    Zenya\Api\Router;
 
 interface EntityInterface
 {
 
     /**
- 	 * Append the given array definitions.
+     * Appends the given array definition and apply _local_ mappings.
 	 *
 	 * @param array $definitions
 	 * @return void
 	 */
-	public function _append(array $defs);
+    public function append(array $defs);
 
     /**
  	 * Calls the underline entity.
@@ -22,7 +23,7 @@ interface EntityInterface
 	 * @return array
 	 * @throws InvalidArgumentException 405
 	 */
-    public function _call(Router $route);
+    public function underlineCall(Router $route);
 
     /**
  	 * Parses the PHP docs.
