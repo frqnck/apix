@@ -78,7 +78,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     {
 #        static $listeners = array();
 
-#        if($listeners[] === null) {
+#        if ($listeners[] === null) {
             $listeners = Config::getInstance()->getListeners($level);
 #        }
 
@@ -100,7 +100,6 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
 
         $this->setNotice($type);
     }
-
 
     /**
      * Last event in request / response handling, intended for observers

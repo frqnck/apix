@@ -57,7 +57,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals('test', $route->getController());
 
-/* todo review        
+/* todo review
         $params = $route->getParams(); // TODO: review!
         $this->assertSame('resourceName', $params['name']);
         $this->assertSame(array('controller' => 'resourceName', 'arg1' => 'param1'), $params['params']);

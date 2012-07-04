@@ -59,7 +59,6 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('impliedAction', $route->getAction());
     }
 
-
     public function testBasicRoutingThreeSteps()
     {
         $rules = array('/:one/:two/:three' => array('controller'=>'impliedController', 'action'=>'impliedAction'));

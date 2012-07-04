@@ -18,7 +18,7 @@ class EntityClass extends Entity implements EntityInterface
 
     public function getReflection()
     {
-        if(null == $this->reflection) {
+        if (null == $this->reflection) {
             $this->reflection = new \ReflectionClass(
                 $this->controller['name']
             );
@@ -34,7 +34,7 @@ class EntityClass extends Entity implements EntityInterface
     {
         parent::_append($defs);
 
-        if(isset($defs['controller'])) {
+        if (isset($defs['controller'])) {
             $this->controller = $defs['controller'];
         }
     }
@@ -47,12 +47,12 @@ class EntityClass extends Entity implements EntityInterface
         $name = $this->controller['name'];
         $args = $this->controller['args'];
 
-        // if(!isset($entity->controller['name'])) {
+        // if (!isset($entity->controller['name'])) {
         //     $entity->controller['name'] = $route->controller_name;
         // }
 
         // just created a deependency here!!!!!
-        // if(!isset($args)) {
+        // if (!isset($args)) {
         //     $args = $route->controller_args;
         // }
 
@@ -86,9 +86,8 @@ class EntityClass extends Entity implements EntityInterface
         $actions = $this->getActions();
 
         // doc for all methods
-        foreach($this->getMethods() as $key => $method)
-        {
-          if( $key = array_search($method->name, $actions) ) {
+        foreach ($this->getMethods() as $key => $method) {
+          if ( $key = array_search($method->name, $actions) ) {
             $doc = $method->getDocComment();
             $docs['methods'][$key] =
                 Reflection::parsePhpDoc( $doc );
@@ -106,7 +105,7 @@ class EntityClass extends Entity implements EntityInterface
         $r = $this->getReflection();
 
         $name = $route->getAction();
-        if($r->hasMethod($name)) {
+        if ($r->hasMethod($name)) {
             return $r->getMethod($name);
         }
 
@@ -127,6 +126,7 @@ class EntityClass extends Entity implements EntityInterface
         return array_intersect($routes, $funcs);
 
         $all= array_intersect($routes, $funcs);
+
         return $all+$this->overrides;
     }
 

@@ -9,14 +9,14 @@ class Request
      * The singleton instance
      * @var Request
      */
-    static private $instance = null;
+    private static $instance = null;
 
     /**
      * Returns as a singleton instance
      *
      * @return Request
      */
-    static public function getInstance()
+    public static function getInstance()
     {
         if (null === self::$instance) {
             self::$instance = new self();

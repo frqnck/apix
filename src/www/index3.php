@@ -16,8 +16,7 @@ try {
          * @return array  The array to return to the client
          * @api_role admin
          */
-        function($software) use ($api)
-        {
+        function($software) use ($api) {
             return array($software);
         }
     )->group('software');
@@ -30,8 +29,7 @@ try {
          * @return array  The array to return to the client
          * @api_role admin
          */
-        function($software) use ($api)
-        {
+        function($software) use ($api) {
             return array('version for ' . $software);
         }
     )->group('software');
