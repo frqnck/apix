@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 Zenya.com
+ * Copyright (c) 2011 Franck Cassedanne, zenya.com
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,10 +32,10 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya
- * @subpackage  ApiException
+ * @package     Zenya\Api
+ * @subpackage  Server
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
- * @copyright   2011 zenya.com
+ * @copyright   2011 Franck Cassedanne, zenya.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://zenya.github.com
  * @version     @@PACKAGE_VERSION@@
