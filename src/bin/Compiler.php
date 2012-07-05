@@ -210,9 +210,9 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
             echo <<<HELP
 {$versionStr}
 
-Usage: {$_SERVER['argv'][0]} [command]
+Usage: {$_SERVER['argv'][0]} [options]
 
-Commands:
+Options:
    --readme | -r    Display the README file.
 
    --extractdist    Extract the latest distribution data.
@@ -231,8 +231,10 @@ Commands:
 
    --tests | -t     Run some tests.
 
+   --colors | -c    Use colors in output.
+
 HELP;
-            break;
+        break;
 
         default:
             printf("Error: Unknown command '%s' (try \"%s --help\" for a list of available commands).", $_SERVER['argv'][1], $_SERVER['argv'][0]);
