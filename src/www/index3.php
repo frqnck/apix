@@ -31,7 +31,7 @@ try {
          *
          * @param string    $software
          * @return array    The array to return to the client
-         * @api_role        admin
+         * @api_role        public
          */
         function($software) use ($api) {
             return array($software => 'dl');

@@ -124,16 +124,22 @@ HELP;
 
     public function check($key, $check)
     {
-        $this->out("   - {$key}: ");
-        if($check['fail'] === true) {
+        $this->out("   - {$key}");
+        if($check['fail'] !== true) {
+            if($this->verbose > 0 && isset($check['verbose'])) {
+                $this->out(sprintf(' (%s): ', $check['verbose']));
+            } else {
+                $this->out(': ');
+            }
+            $this->out('pass', 'success');
+        } else {            
+            $this->out(': ');
             $this->out('failed', 'failed');
             $this->out(PHP_EOL);
             foreach($check['msgs'] as $msg) {
                 $this->out(PHP_EOL);
                 $this->out("     " . $msg, 'green');
             }
-        } else {
-            $this->out('pass', 'success');
         }
     }
 
@@ -144,6 +150,7 @@ HELP;
         $required = array(
             'PHP version' => array(
     			'fail' => version_compare(PHP_VERSION, '5.3.2', '<'),
+                'verbose' => PHP_VERSION,
     			'msgs' => array(
                     "The version of PHP (" . PHP_VERSION .") installed is too old.",
                     "You must upgrade to PHP 5.3.2 or higher."
@@ -151,6 +158,7 @@ HELP;
             ),
             'Phar support' => array(
                 'fail' => !extension_loaded('Phar'),
+                'verbose' => 'on',
                 'msgs' =>array(
                     "The phar extension is missing.",
                     "Install it or recompile PHP without using --disable-phar"
@@ -158,6 +166,7 @@ HELP;
             ),
             'Suhosin' => array(
     			'fail' => false !== $suhosin && false === stripos($suhosin, 'phar'),
+                'verbose' => 'off or whitelisted',
     			'msgs' => array(
                     "The suhosin.executor.include.whitelist setting is incorrect.",
                     "Add the following to the end of your 'php.ini' or 'suhosin.ini':",
@@ -166,6 +175,7 @@ HELP;
             ),
             'detect_unicode' => array(
                 'fail' => ini_get('detect_unicode'),
+                'verbose' => 'off',
                 'msgs' => array(
                     "This setting must be disabled.",
                     "Add the following to the end of your 'php.ini':",
@@ -174,6 +184,7 @@ HELP;
             ),
             'allow_url_fopen' => array(
     			'fail' => !ini_get('allow_url_fopen'),
+                'verbose' => 'on',
     			'msgs' => array(
                     "The allow_url_fopen setting is incorrect.",
                     "Add the following to the end of your 'php.ini':",
@@ -182,6 +193,7 @@ HELP;
             ),
             'ionCube loader disabled' => array(
     			'fail' => extension_loaded('ionCube Loader'),
+                'verbose' => 'off',
     			'msgs' => array(
                     "The ionCube Loader extension is incompatible with Phar files.",
                     "Remove this line (path may be different) from your 'php.ini':",
@@ -205,6 +217,7 @@ HELP;
             // APC
             'apc_cli' => array(
                 'fail' => ini_get('apc.enable_cli'),
+                'verbose' => 'off',
                 'msgs' => array(
                     "The apc.enable_cli setting is incorrect.",
                     "Add the following to the end of your 'php.ini':",
@@ -215,6 +228,7 @@ HELP;
             // sigchild
             'sigchild' => array(
                 'fail' => false !== strpos($config[1], '--enable-sigchild'),
+                'verbose' => 'off',
                 'msgs' => array(
                     "PHP was compiled with --enable-sigchild which can cause issues on some platforms.",
                     "Recompile it without this flag if possible, see also:",
