@@ -20,7 +20,7 @@ class Compiler
             unlink($pharFile);
         }
 
-        if ( $log = system('git log --pretty="%h %ci" -n1 HEAD') ) {
+        if ( $log = exec('git log --pretty="%h %ci" -n1 HEAD') ) {
             $this->version = trim($log);
         } else {
             throw new \RuntimeException('The git binary cannot be found.');
@@ -62,7 +62,7 @@ class Compiler
 
         $phar->stopBuffering();
 
-        #$phar->compressFiles(\Phar::GZ);
+        $phar->compressFiles(\Phar::GZ);
 
         echo 'The new phar has ' . $phar->count() . " entries\n";
 
@@ -88,7 +88,7 @@ class Compiler
             $content = self::stripWhitespace($content);
         }
 
-        // TODO review this!!!
+        // TODO: review versioning!!!
         $content = preg_replace("/const VERSION = '.*?';/", "const VERSION = '".$this->version."';", $content);
 
         #$localPath = strtolower($localPath);
@@ -168,7 +168,7 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
         case '--selfupdate':
             try {
                 $remote = '{URL}/download/{PHAR}';
-                $local  = __DIR__ . '/sleepover.phar';
+                $local  = __DIR__ . '/{PHAR}';
 
                 file_put_contents($local, file_get_contents($remote));
             } catch (Exception $e) {
