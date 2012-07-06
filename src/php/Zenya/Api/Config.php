@@ -21,7 +21,7 @@ class Config extends \Pimple
      */
     public static function getInstance(array $config=null)
     {
-        if (null === self::$instance) {       
+        if (null === self::$instance) {
             self::$instance = new self($config);
         }
 

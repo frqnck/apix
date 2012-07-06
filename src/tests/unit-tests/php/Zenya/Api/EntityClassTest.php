@@ -96,4 +96,24 @@ class EntityClassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('onRead', $method->getShortName());
         $this->assertSame(4, count($actions));
     }
+
+    public function testReflectedClass()
+    {
+        $class = $this->entity->reflectedClass();
+        $this->assertInstanceOf('ReflectionClass', $class, "Shoulf be a ReflectionClass instance");
+
+        $this->assertSame($class, $this->entity->reflectedClass());
+    }
+
+    /**
+     * @expectedException           \RuntimeException
+     * @expectedExceptionCode       501
+     */
+    public function testReflectedClassReturnsFalse()
+    {
+        $bad_definition = array('controller'=>array('name'=>'ClassThatDoesNotExist(YET?)', 'args'=>array()));
+        $this->entity->append($bad_definition);
+        $this->entity->reflectedClass();
+    }
+
 }

@@ -1,16 +1,29 @@
 <?php
-require_once __DIR__ . '../../../dist/zenya-api-server.phar';
-
 #echo $_SERVER["SCRIPT_FILENAME"];
 #exit;
 
+define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
+define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
+define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
+
+require_once APP_LIBDIR . '/psr0.autoloader.php';
+
+psr0_autoloader_searchFirst(APP_LIBDIR);
+psr0_autoloader_searchFirst(APP_TESTDIR);
+psr0_autoloader_searchFirst(APP_TOPDIR);
+
 # Test server
 try {
-    $api = new Zenya\Api\Server(require "../../src/data/config.dist.php");
+    $api = new Zenya\Api\Server;
+
+// // Test server
+// require_once __DIR__ . '../../../dist/zenya-api-server.phar';
+// try {
+//     $api = new Zenya\Api\Server(require "../../src/data/config.dist.php");
 
     $api->onRead('/version/:software',
         /**
-         * Returns the last version of the :software  
+         * Returns the last version of the :software
          *
          * Blahh blahh...
          *
@@ -48,7 +61,7 @@ try {
 
     $api->onCreate('/upload/:software',
         /**
-         * Upload a new software :software  
+         * Upload a new software :software
          *
          * @param string    $software
          * @return array    The array to return to the client
@@ -62,7 +75,7 @@ try {
 
     $api->onUpdate('/upload/:software',
         /**
-         * Update an existing software :software  
+         * Update an existing software :software
          *
          * @param string    $software
          * @return array    The array to return to the client

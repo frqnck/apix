@@ -82,10 +82,10 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException           \InvalidArgumentException
+     * @expectedException           \DomainException
      * @expectedExceptionCode       404
      */
-    public function testGetThrowsInvalidArgumentException()
+    public function testGetThrowsDomainException()
     {
         // not resources where defined, and none wodu therefore macth
         $this->resources->get($this->route);
