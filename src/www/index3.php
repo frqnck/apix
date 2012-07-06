@@ -34,7 +34,12 @@ try {
          * @api_role        public
          */
         function($software) use ($api) {
-            return array($software => 'dl');
+            $file = "../../dist/$software";
+            if(file_exists($file)) {
+                echo file_get_contents($file);
+                exit;
+            }
+            throw new Exception("'$software' doesn't not exist.");
         }
     )->group('software');
 
