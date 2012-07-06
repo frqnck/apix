@@ -16,13 +16,23 @@ class EntityClass extends Entity implements EntityInterface
 
     private $reflection;
 
-    public function getReflection()
+    /**
+     * Sets and returns a reflection of the entity class.
+     *
+     * @return \ReflectionClass|false
+     */
+    public function reflectedClass()
     {
         if (null == $this->reflection) {
-            $this->reflection = new \ReflectionClass(
-                $this->controller['name']
-            );
+            try {
+                $this->reflection = new \ReflectionClass(
+                    $this->controller['name']
+                );
+            } catch (\Exception $Exception) {
+                throw new \RuntimeException("Resource entity not (yet) implemented.", 501);
+            }
         }
+
 
         return $this->reflection;
     }
@@ -80,7 +90,7 @@ class EntityClass extends Entity implements EntityInterface
     {
         // class doc
         $docs = Reflection::parsePhpDoc(
-            $this->getReflection()->getDocComment()
+            $this->reflectedClass()->getDocComment()
         );
 
         $actions = $this->getActions();
@@ -102,14 +112,12 @@ class EntityClass extends Entity implements EntityInterface
      */
     public function getMethod(Router $route)
     {
-        $r = $this->getReflection();
-
         $name = $route->getAction();
-        if ($r->hasMethod($name)) {
-            return $r->getMethod($name);
+        if (false === $this->reflectedClass()->hasMethod($name)) {
+            throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
         }
 
-        throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
+        return $this->reflectedClass()->getMethod($name);
     }
 
     /**
@@ -136,7 +144,7 @@ class EntityClass extends Entity implements EntityInterface
      */
     public function getMethods()
     {
-        return $this->getReflection()->getMethods(
+        return $this->reflectedClass()->getMethods(
             \ReflectionMethod::IS_STATIC | \ReflectionMethod::IS_PUBLIC
         );
     }

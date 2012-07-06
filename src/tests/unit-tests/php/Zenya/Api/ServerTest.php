@@ -57,10 +57,10 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException           \InvalidArgumentException
+     * @expectedException           \DomainException
      * @expectedExceptionCode       406
      */
-    public function testNegotiateFormatUseDefaultAndthrowsException()
+    public function testNegotiateFormatUseDefaultAndthrowsDomainException()
     {
         $c = array(
             'default_format'    => 'defaultExt',

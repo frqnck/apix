@@ -53,7 +53,7 @@ $c['resources'] = array(
 
     '/upload/:type/:debug' => array(
         'controller' => array(
-            'name'  => 'Zenya\Api\Fixtures\UploadResource',
+            'name'  => 'Zenya\Api\Fixtures\UploadResource1',
             'args'  => null,
         )
     ),

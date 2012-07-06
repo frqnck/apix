@@ -152,14 +152,14 @@ class Response
      * Sets the output format.
      *
      * @param  string                    $format
-     * @throws \InvalidArgumentException 406
+     * @throws \DomainException 406
      */
     public function setFormat($format, $default)
     {
         $format = is_null($format) ? $default : $format;
         if (!in_array(strtolower($format), $this->getFormats())) {
             $this->format = strtolower($default);
-            throw new \InvalidArgumentException("Format ({$format}) not supported.", 406); // maybe 404?
+            throw new \DomainException("Format ({$format}) not supported.", 406); // maybe 404?
         }
         $this->format = strtolower($format);
     }

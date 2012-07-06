@@ -24,9 +24,10 @@ class UploadResource
      *
      * @return void
      */
-    public function __construct(Server $server)
+   #public function __construct(Server $server)
+   public function __construct()
     {
-        $this->server = $server;
+#        $this->server = $server;
     }
 
     /**
