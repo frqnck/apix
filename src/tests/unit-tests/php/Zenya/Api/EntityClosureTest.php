@@ -85,6 +85,18 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('{closure}', $method->getShortName());
     }
 
+    /**
+     * @expectedException           \InvalidArgumentException
+     * @expectedExceptionCode       405
+     */
+    public function testGetMethodThrowsInvalidArgumentException()
+    {
+        $this->route->map('/controller/id');
+        $this->route->setMethod('PUT');
+
+        $this->entity->getMethod($this->route);
+    }
+
     public function testGetActions()
     {
         $actions = $this->entity->getActions();
@@ -99,6 +111,21 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
         $entity = $this->entity->toArray();
 
         $this->assertSame('paris', $entity['redirect']);
+    }
+
+    public function testReflectedFunc()
+    {
+        $func = $this->entity->reflectedFunc('GET');
+        $this->assertInstanceOf('ReflectionFunction', $func, "Shoulf be a ReflectionFunction instance");
+
+        $this->assertSame($func, $this->entity->reflectedFunc('GET'));
+    }
+
+    public function testReflectedFuncReturnsFalse()
+    {
+        $this->assertFalse(
+            $this->entity->reflectedFunc('non-existant')
+        );
     }
 
 }

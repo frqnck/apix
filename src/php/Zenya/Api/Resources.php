@@ -102,12 +102,13 @@ class Resources
      *
      * @param  string                           $name A resource name
      * @return Zenya/Api/Entity/EntityInterface
+     * @throws /DomainException 404
      */
     public function get(Router $route)
     {
         $name = $route->getPathName();
         if (!isset($this->resources[$name])) {
-            throw new \InvalidArgumentException(
+            throw new \DomainException(
                 sprintf("Invalid resource entity specified (%s).", $name), 404
             );
         }
@@ -118,6 +119,7 @@ class Resources
             $entity = $this->resources[$redirect];
         }
         $entity->setRoute($route);
+
         /*
         if ($entity instanceOf Entity\EntityClass) {
             // var_dump($entity->getController());
