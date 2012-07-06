@@ -4,8 +4,6 @@ require_once __DIR__ . '../../../dist/zenya-api-server.phar';
 #echo $_SERVER["SCRIPT_FILENAME"];
 #exit;
 
-$config = array();
-
 # Test server
 try {
     $api = new Zenya\Api\Server(require "../../src/data/config.dist.php");
@@ -14,12 +12,16 @@ try {
         /**
          * Returns the last version of the :software  
          *
+         * Blahh blahh...
+         *
          * @param string    $software
          * @return array    The array to return to the client
+         * @api_role        public
+         * @api_cache 10h   julien
          */
-
         function($software) use ($api) {
             return array(
+                'zazz' =>' is pretty',
                 $software => exec('git log --pretty="%h %ci" -n1 HEAD')
             );
         }
@@ -32,6 +34,7 @@ try {
          * @param string    $software
          * @return array    The array to return to the client
          * @api_role        public
+         * @api_cahce 3w    julien
          */
         function($software) use ($api) {
             $file = "../../dist/$software";
@@ -40,6 +43,34 @@ try {
                 exit;
             }
             throw new Exception("'$software' doesn't not exist.");
+        }
+    )->group('software');
+
+    $api->onCreate('/upload/:software',
+        /**
+         * Upload a new software :software  
+         *
+         * @param string    $software
+         * @return array    The array to return to the client
+         * @api_role admin
+         * @api_purge_cache julien
+         */
+        function($software) use ($api) {
+            throw new Exception("Todo");
+        }
+    )->group('software');
+
+    $api->onUpdate('/upload/:software',
+        /**
+         * Update an existing software :software  
+         *
+         * @param string    $software
+         * @return array    The array to return to the client
+         * @api_role admin
+         * @api_purge_cache julien
+         */
+        function($software) use ($api) {
+            throw new Exception("Todo");
         }
     )->group('software');
 
