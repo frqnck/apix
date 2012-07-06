@@ -54,7 +54,7 @@ class Compiler
         // get the stub
         $stub = preg_replace("@{VERSION}@", $this->version, $this->getStub());
         $stub = preg_replace("@{PHAR}@", $pharFile, $stub);
-        $stub = preg_replace("@{URL}@", 'http://zenya.dev/get', $stub);
+        $stub = preg_replace("@{URL}@", 'http://zenya.dev/index3.php/api/v1', $stub);
         $stub = preg_replace("@{BUILD}@", gmdate("Y-m-d\TH:i:s\Z"), $stub);
 
         // Add the stub
@@ -139,12 +139,16 @@ try {
 }
 
 if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'][0])) {
+
+    $cli = new Zenya\Api\Console;
+    $cli->args[0] = 'php ' . $cli->args[0];
+    
     $version = Zenya\Api\Server::VERSION;
     $versionStr = sprintf("Zenya API Server %s by Franck Cassedanne", $version);
 
-    $cmd = empty($_SERVER['argv'][1])
+    $cmd = empty($cli->args[1])
             ? '--help'
-            : trim($_SERVER['argv'][1]);
+            : $cli->args[1];
 
     switch ($cmd):
         case '--extractdist':
@@ -163,7 +167,7 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
 
         case '--selfupdate':
             try {
-                $remote = '{URL}/{PHAR}';
+                $remote = '{URL}/download/{PHAR}';
                 $local  = __DIR__ . '/sleepover.phar';
 
                 file_put_contents($local, file_get_contents($remote));
@@ -172,13 +176,22 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
             }
             break;
 
+        case '-s': case '--syscheck':
+            $syscheck = new Zenya\Api\SystemCheck();
+            $syscheck->run();
+            break;
+
         case '-t': case '--tests':
                 system('phpunit --colors tests/phar-test.php');
             break;
 
-        case '-c': case '--check':
+        case '-l': case '--live':
             try {
-                $latest = trim(file_get_contents('{URL}/{PHAR}/version'));
+                $body = trim(file_get_contents('{URL}/version/{PHAR}'));
+                $input = new Zenya\Api\Input\Json;
+
+                $r = $input->decode($body, true);
+                $latest = $r['zenya']['version']['{PHAR}'];
 
                 if ($latest != $version) {
                     printf("A newer version is available (%s).", $latest);
@@ -190,7 +203,7 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
             }
             break;
 
-        case '-l': case '--license':
+        case '--license':
                 echo file_get_contents('phar://{PHAR}/LICENSE.txt');
             break;
 
@@ -210,16 +223,16 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
             echo <<<HELP
 {$versionStr}
 
-Usage: {$_SERVER['argv'][0]} [options]
+Usage: {$cli->args[0]} [options]
 
 Options:
    --readme | -r    Display the README file.
 
    --extractdist    Extract the latest distribution data.
 
-   --selfupdate     Upgrade the server to the latest version available.
+   --live | -l      Check for updates.
 
-   --check | -c     Check the version.
+   --selfupdate     Upgrade the server to the latest version available.
 
    --version | -v   Display the version information and exit.
 
@@ -227,9 +240,11 @@ Options:
 
    --info | -i      PHP information and configuration.
 
-   --license | -l   Display the software license.
+   --license        Display the software license.
 
-   --tests | -t     Run some tests.
+   --syscheck | -s  Run a system check.
+
+   --tests | -t     Run some unit & functional tests.
 
    --colors | -c    Use colors in output.
 
@@ -237,8 +252,10 @@ HELP;
         break;
 
         default:
-            printf("Error: Unknown command '%s' (try \"%s --help\" for a list of available commands).", $_SERVER['argv'][1], $_SERVER['argv'][0]);
-
+            $cli->out("Error: ", 'red');
+            $cli->out(sprintf('unknown command "%s".' . PHP_EOL . 'Try "', $cli->args[1]));
+            $cli->out(sprintf('%s --help".' . PHP_EOL, $cli->args[0]), "blue");
+ 
     endswitch;
 
     echo PHP_EOL;
