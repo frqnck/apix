@@ -18,9 +18,13 @@ class Server extends Listener
 
     public $route = null;
 
-    public function __construct(Config $config=null, Request $request=null, Response $response=null)
+    public function __construct($config=null, Request $request=null, Response $response=null)
     {
-        $c = $config === null ? Config::getInstance() : $config;
+        if(null === $config || $config instanceOf Config) {
+            $c = $config === null ? Config::getInstance() : $config;
+        } else {
+            $c = Config::getInstance($config);
+        }
 
         $this->config = $c->get();
 
@@ -205,20 +209,22 @@ class Server extends Listener
      *
      * @return array
      */
-    public function getBodyData()
+    static public function getBodyData(Request $request=null)
     {
-        if ( $this->request->hasHeader('CONTENT_TYPE') && $this->request->hasBody() ) {
-            $ct = $this->request->getHeader('CONTENT_TYPE');
+        $request = $request === null ? Request::getInstance() : $request;
+
+        if ( $request->hasHeader('CONTENT_TYPE') && $request->hasBody() ) {
+            $ct = $request->getHeader('CONTENT_TYPE');
             switch (true) {
                 // application/x-www-form-urlencoded
                 case (strstr($ct, '/x-www-form-urlencoded')):
-                    $params = $this->request->getParams();
+                    $params = $request->getParams();
                 break;
 
                 // 'application/json'
                 case (strstr($ct, '/json')):
                     $input = new Input\Json;
-                    $params = $input->decode($this->request->getBody(), true);
+                    $params = $input->decode($request->getBody(), true);
                     #$this->request->setParams($r);
                 break;
 
@@ -226,17 +232,15 @@ class Server extends Listener
                 case (strstr($ct, '/xml')
                     && (!strstr($ct, 'html'))):
                     $input = new Input\Xml;
-                    $params = $input->decode($this->request->getBody(), true);
+                    $params = $input->decode($request->getBody(), true);
                     #$this->request->setParams($r);
                 break;
 
                 default:
                     $params = null;
             }
-
             return $params;
         }
-        throw(new Exception('no body-data', 404));
     }
 
     /**
