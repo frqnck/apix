@@ -39,10 +39,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException           \InvalidArgumentException
+     * @expectedException           \DomainException
      * @expectedExceptionCode       406
      */
-    public function testSetFormatThrowsException()
+    public function testSetFormatThrowsDomainException()
     {
         $this->response->setFormat('whatever', 'default');
     }

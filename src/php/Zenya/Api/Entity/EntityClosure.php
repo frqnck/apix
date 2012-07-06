@@ -16,22 +16,27 @@ class EntityClosure extends Entity implements EntityInterface
 
     protected $actions = array();
 
-    private $reflection;
-
     public $group;
 
-    public function getReflection($name)
+    private $reflection;
+
+    /**
+     * Sets and returns a reflection of a function.
+     *
+     * @param string $name The REST name of function.
+     * @return \ReflectionFunction|false
+     */
+    public function reflectedFunc($name)
     {
-
-        if (null == $this->reflection[$name]) {
-          if (isset($this->actions[$name]['action']) && $this->actions[$name]['action'] InstanceOf \Closure) {
+        if(isset($this->reflection[$name])) {
+            return $this->reflection[$name];
+        } else if ( isset($this->actions[$name]['action'])
+            && $this->actions[$name]['action'] instanceOf \Closure
+        ) {
             $this->reflection[$name] = new \ReflectionFunction($this->actions[$name]['action']);
-          } else {
-            return false;
-          }
+            return $this->reflection[$name];
         }
-
-        return $this->reflection[$name];
+        return false;
     }
 
     /**
@@ -48,17 +53,13 @@ class EntityClosure extends Entity implements EntityInterface
      */
      function underlineCall(Router $route)
     {
-      #if (!isset($this->actions[$route->getMethod()])) {
-#          throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.!!", 405);
-#      }
+        $method = $this->getMethod($route);
 
-      #try {
-            $method = $this->getMethod($route);
+        #try {
             $action = $this->getAction($route->getMethod());
-
-       # } catch (\Exception $e) {
-       #   throw new \RuntimeException("Resource entity not implemented.");
-      #  }
+        #} catch (\Exception $e) {
+        #    throw new \RuntimeException("Resource entity not (yet) implemented.", 501);
+        #}
 
         // TODO: merge with TEST & OPTIONS ???
 
@@ -80,10 +81,8 @@ class EntityClosure extends Entity implements EntityInterface
         // doc for all methods
         foreach ($this->getActions() as $key => $func) {
           if ($func['action'] InstanceOf \Closure) {
-              #$r = $this->getReflection($key);
-              $this->reflection[$key] = new \ReflectionFunction($func['action']);
-              $doc = $this->reflection[$key]->getDocComment();
-              $docs['methods'][$key] = Reflection::parsePhpDoc( $doc );
+              $doc = $this->reflectedFunc($key)->getDocComment();
+              $docs['methods'][$key] = Reflection::parsePhpDoc($doc);
           }
         }
 
@@ -96,12 +95,11 @@ class EntityClosure extends Entity implements EntityInterface
     public function getMethod(Router $route)
     {
         $name = $route->getMethod();
-        $r = $this->getReflection($name);
-        if (false !== $r) {
-          return $r;
+        if (false === $method = $this->reflectedFunc($name)) {
+            throw new \InvalidArgumentException("Invalid resource's method ({$name}) specified.", 405);
         }
 
-        throw new \InvalidArgumentException("Invalid resource's method ({$name}) specified.", 405);
+        return $method;
     }
 
     /**
