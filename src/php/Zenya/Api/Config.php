@@ -19,28 +19,23 @@ class Config extends \Pimple
      *
      * @return Config
      */
-    public static function getInstance($skip=false)
+    public static function getInstance(array $config=null)
     {
-        if (null === self::$instance) {
-            self::$instance = new self($skip);
+        if (null === self::$instance) {       
+            self::$instance = new self($config);
         }
 
         return self::$instance;
     }
 
-    public function __construct($skip=false)
+    public function __construct(array $config=null, $skip=false)
     {
         $c = $this;
 
         $this['server_debug'] = 'test';
 
-        $file = realpath(__DIR__ . '/../../../data/config.dist.php');
-        // echo $file = realpath('../data/config.dist.php');
-        //getenv('HOME') . '/.zenya/config.php';
-        ##$file = realpath('../data/config.dist.php');
-
         if ($skip !== true) {
-            $this->config = $this->getConfigurations($file);
+            $this->config = $this->getConfigUser($config);
         } else {
             $this->config = $this->getConfigDefaults();
         }
@@ -48,19 +43,26 @@ class Config extends \Pimple
         //echo ' [construct] ';
     }
 
-    public function getConfigurations($file)
+    public function getConfigUser(array $config=null)
     {
+        $file = realpath(__DIR__ . '/../../../data/config.dist.php');
+        // echo $file = realpath('../data/config.dist.php');
+        //getenv('HOME') . '/.zenya/config.php';
+        ##$file = realpath('../data/config.dist.php');
+
         if (is_file($file)) {
             $config = require $file;
             if (null === $config || !is_array($config)) {
                 throw new \RuntimeException(sprintf('The "%s" configuration file must return an array.', $file));
             }
-            // merge
-            return $config+$this->getConfigDefaults();
-        } else {
+        } else if (null === $config) {
             throw new \RuntimeException(sprintf('The "%s" configuration file does not exist.', $file));
         }
+
+        // merge
+        return $config+$this->getConfigDefaults();
     }
+
 
     public function getServices($key=null)
     {
