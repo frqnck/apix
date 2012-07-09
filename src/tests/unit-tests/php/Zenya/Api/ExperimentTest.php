@@ -24,6 +24,7 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->server);
+        unset($this->request);
     }
 
     public function OfftestOnReadUpdateRoutesInConfig()

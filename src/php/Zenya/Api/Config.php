@@ -2,138 +2,230 @@
 
 namespace Zenya\Api;
 
-class Config extends \Pimple
+class Config #extends \Pimple
 {
 
     public $config = array();
-    private $injected = array();
 
     /**
-     * The singleton instance
+     * TEMP: Holds the injected array.
+     * @var array
+     */
+    private $injected;
+
+    /**
+     * TEMP: Holds the singleton instance.
      * @var Config
      */
     private static $instance = null;
 
     /**
-     * Returns as a singleton instance
+     * TEMP: Returns as a singleton instance.
      *
      * @return Config
      */
-    public static function getInstance(array $config=null)
+    public static function getInstance($config=null, $skip=false)
     {
         if (null === self::$instance) {
-            self::$instance = new self($config);
+            self::$instance = new self($config, $skip);
         }
 
         return self::$instance;
     }
 
-    public function __construct(array $config=null, $skip=false)
+    /**
+     * TEMP: disalow cloning.
+     *
+     * @codeCoverageIgnore
+     */
+    private final function __clone() {}
+
+    /**
+     * Initialises and sets the config property.
+     *
+     * @return Config
+     */
+    public function __construct($config=null)
     {
-        $c = $this;
+        switch(true) {
 
-        $this['server_debug'] = 'test';
+            case is_array($config):
+                // add from user provided array
+                $this->setConfig($config);
+                break;
 
-        if ($skip !== true) {
-            $this->config = $this->getConfigUser($config);
-        } else {
-            $this->config = $this->getConfigDefaults();
+            case is_string($config):
+                // add from a user file
+                $config = $this->getConfigFromFile($config);
+
+                $this->setConfig($config);
+
+                break;
+
+            default:
+                // TODO: maybe try from the user dir?
+                // $file = getenv('HOME') . '/.zenya/config.php';
+
+                // TEMP: add the distribution file
+                // TODO: add the distribution file
+                $file = realpath(__DIR__ . '/../../../data/config.dist.php');
+                $config = $this->getConfigFromFile($file);
+
+                $this->setConfig($config);
         }
-        // TODO: debug
-        //echo ' [construct] ';
     }
 
-    public function getConfigUser(array $config=null)
+    /**
+     * Sets the config array from a file.
+     *
+     * @param string $file The full path to a configuration file.
+     * @throws \RuntimeException
+     * @return void;
+     */
+    public function getConfigFromFile($file)
     {
-        $file = realpath(__DIR__ . '/../../../data/config.dist.php');
-        // echo $file = realpath('../data/config.dist.php');
-        //getenv('HOME') . '/.zenya/config.php';
-        ##$file = realpath('../data/config.dist.php');
-
-        if (is_file($file)) {
-            $config = require $file;
-            if (null === $config || !is_array($config)) {
-                throw new \RuntimeException(sprintf('The "%s" configuration file must return an array.', $file));
-            }
-        } else if (null === $config) {
-            throw new \RuntimeException(sprintf('The "%s" configuration file does not exist.', $file));
+        if(!is_file($file)) {
+            throw new \RuntimeException(sprintf('The "%s" config file does not exist.', $file), 5000);
         }
 
-        // merge
-        return $config+$this->getConfigDefaults();
-    }
-
-
-    public function getServices($key=null)
-    {
-        $cb = $this->retrieve('services', $key);
-        #$shared = $this->share($cb);
-
-        return $cb();
-    }
-
-    public function getListeners($key=null)
-    {
-        return $this->retrieve('listeners', $key);
-    }
-
-    protected function retrieve($kind, $key=null)
-    {
-        $config = $this->config[$kind]+$this->config[$kind .'_default'];
-        if (is_null($key)) {
-            return $config;
-        } elseif (isset($config[$key])) {
-            return $config[$key];
+        $config = require $file;
+        if (null === $config || !is_array($config)) {
+            throw new \RuntimeException(sprintf('The "%s" config file must return an array.', $file), 5001);
         }
-       throw new \RuntimeException( sprintf('%s for "%s" does not exists.', ucfirst($kind), $key) );
+
+        return $config;
     }
 
+    /**
+     * Sets the config property and merge the defaults.
+     *
+     * @param array $config=null
+     */
+    public function setConfig(array $config)
+    {
+        $this->config = $config+$this->getConfigDefaults();
+    }
+
+    /**
+     * Returns the config array.
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
+     * Returns the specified config value using its index key.
+     * If the index key is not set then it will return the whole config property.
+     *
+     * @param  string $key=null The key to retrieve.
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
     public function get($key=null)
     {
         if (is_null($key)) {
-            return $this->config;
+            return $this->getConfig();
         } elseif (isset($this->config[$key])) {
             return $this->config[$key];
         }
        throw new \InvalidArgumentException( sprintf('Config for "%s" does not exists.', $key) );
     }
 
+    /**
+     * Returns a specified sub-array type from config.
+     * If an index key is specified return the corresponding (mixed) value.
+     *
+     * @param  string $type     The sub-array type to retrieve.
+     * @param  string $key=null A key to narrow the retrieval.
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
+    public function retrieve($type, $key=null)
+    {
+        #$default = isset($this->config[$kind .'_default'])
+        $config = $this->config[$type]+$this->config[$type .'_default'];
+        if (is_null($key)) {
+            return $config;
+        } elseif (isset($config[$key])) {
+            return $config[$key];
+        }
+       throw new \RuntimeException( sprintf('"%s" does not exists in %s.', $key, $type) );
+    }
+
+    /**
+     * Returns all the resources or as the specified.
+     *
+     * @param   string $key=null The resource key to retrieve.
+     * @see     self::retrieve
+     */
     public function getResources($key=null)
     {
         return $this->retrieve('resources', $key);
     }
 
-    public function inject($key, $mixed)
+    /**
+     * Returns the specified plugin (or all if unspecified).
+     *
+     * @param   string $key=null The plugin key to retrieve.
+     * @see     self::retrieve
+     */
+    public function getListeners($key=null)
     {
-        return $this->injected[$key] = $mixed;
+        return $this->retrieve('listeners', $key);
     }
 
+    /**
+     * Returns the specified service (or all if unspecified).
+     *
+     * @param   string $key=null The service key to retrieve.
+     * @see self::retrieve
+     * @return mixed Generally should return a callback
+     */
+    public function getServices($key=null)
+    {
+        $service = $this->retrieve('services', $key);
+
+        if(is_callable($service)) {
+            return $service();
+        }
+
+        return $service;
+    }
+
+    /**
+     * TEMP: Sets/injects a key/value pair in the injected array.
+     *
+     * @param   string  $key    An index key to set.
+     * @param   mixed   $value  The value to inject.
+     * @return  void
+     */
+    public function inject($key, $value)
+    {
+        $this->injected[$key] = $value;
+    }
+
+    /**
+     * TEMP: Returns the specified injected key.
+     *
+     * @param   string  $key    The index key to retrieve.
+     * @return  mixed
+     */
     public function getInjected($key)
     {
         return $this->injected[$key];
     }
 
-    // public function getRoutes()
-    // {
-    //     return $this->config['routes']+$this->config['routes_default'];
-    // }
-
-    // New: closure
-    public function addRoute($route, $action)
-    {
-        if ($action instanceOf \Closure) {
-            return $this->config['routes'][$route] = array(
-                'controller' => $route,
-            );
-        }
-
-        throw RuntimeException('Route could not be imported');
-    }
-
+    /**
+     * TEMP: Returns the default configuration.
+     * TODO: should use 'config.dist.php'
+     *
+     * @return  array
+     */
     public function getConfigDefaults()
     {
-        #$c = $this;
-
         return array(
             'api_realm'     => 'Zenya',
             'api_version'   => '1.0',
@@ -154,12 +246,29 @@ class Config extends \Pimple
                 'http_accept'       => true, // true or false
             ),
 
-            // services
-            'services' => array(),
-            'services_default' => array(),
+            // resources
+            'resources' => array(),
+
+            'resources_default' => array(
+                // OPTIONS
+                'help' => array(
+                    'controller' => array(
+                        'name' => __NAMESPACE__ . '\Resource\Help',
+                        'args' => null
+                    ),
+                ),
+                // HEAD
+                'test' => array(
+                    'controller' => array(
+                        'name' => __NAMESPACE__ . '\Resource\Test',
+                        'args' => null
+                    ),
+                )
+            ),
 
             // listeners
             'listeners' => array(),
+
             'listeners_default' => array(
                 'server' => array(
                     // pre-processing stage
@@ -207,31 +316,10 @@ class Config extends \Pimple
                 'response' => array(),
             ),
 
-            // resources
-            'resources' => array(),
-            'resources_default' => array(
-                // OPTIONS
-                'help' => array(
-                    'controller' => array(
-                        'name' => __NAMESPACE__ . '\Resource\Help',
-                        'args' => null,
-                        // 'args'          => array(
-                        //     'method'    => 'GET',
-                        //     'name'      => $this->route->getControllerName(),
-                        //     'resource'  => $this->server->getResource( $route->getControllerName() ),
-                        //     'params'    => $route->getParams(),
-                        // )
-                    ),
-                ),
-                // HEAD
-                'test' => array(
-                    'controller' => array(
-                        'name' => __NAMESPACE__ . '\Resource\Test',
-                        'args' => null #array( &$this ), #
-                    ),
-                    // 'args' => array()
-                )
-            )
+            // services
+            'services' => array(),
+            'services_default' => array()
+
         );
     }
 

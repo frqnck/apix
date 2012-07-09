@@ -16,7 +16,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
         $this->route = $this->getMock('Zenya\Api\Router');
         $this->route->expects($this->any())
-            ->method('getPathName')
+            ->method('getName')
             ->will($this->returnValue('/route'));
 
         $resources = new Resources;
@@ -98,7 +98,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
         $route = $this->getMock('Zenya\Api\Router');
         $route->expects($this->any(3))
-            ->method('getPathName')
+            ->method('getName')
             ->will($this->onConsecutiveCalls('Jacques', 'Pierre'));
         $this->assertEquals($this->resources->get($route), $this->resources->get($route), 'Pierre should be equal to Jacques');
     }
@@ -111,7 +111,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
         $route = $this->getMock('Zenya\Api\Router');
         $route->expects($this->once())
-            ->method('getPathName')
+            ->method('getName')
             ->will($this->returnValue('Paul'));
 
         $this->assertEquals('Jacques', $this->resources->get($route)->getRedirect(), 'Paul follows a redirect from Pierre, and equals to Jacques');
@@ -125,7 +125,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
         $route = $this->getMock('Zenya\Api\Router');
         $route->expects($this->exactly(2))
-            ->method('getPathName')
+            ->method('getName')
             ->will($this->onConsecutiveCalls('Jacques', 'Paul'));
         $this->assertNotEquals($this->resources->get($route), $this->resources->get($route), 'Paul should not be equal to Jacques');
     }

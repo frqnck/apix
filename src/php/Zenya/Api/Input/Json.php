@@ -2,16 +2,13 @@
 
 namespace Zenya\Api\Input;
 
-class Json implements Adapter
+use Zenya\Api\Input\InputInterface;
+
+class Json implements InputInterface
 {
 
     /**
-     * Decode a JSON string
-     *
-     * @param  string  $str   An XML string.
-     * @param  boolean $assoc Convert objects to array.
-     * @return mix
-     * @see		Zenya\Api\Input\Adapter
+     * {@inheritdoc}
      */
     public function decode($jsonStr, $assoc=true)
     {

@@ -11,8 +11,9 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 
 # Test server
 try {
-    //$config = new Zenya\Api\Config;
-    $server = new Zenya\Api\Server();
+    #$server = new Zenya\Api\Server(require "../../src/data/config.dist.php");
+
+    $server = new Zenya\Api\Server("../../src/data/config.dist.php");
     echo $server->run();
 
     // Zenya\Api\d( $server->getResources() );

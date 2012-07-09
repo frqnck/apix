@@ -20,31 +20,32 @@ class Router
 {
 
     /**
-     * Holds the controller string
+     * Holds the controller string.
      * @var	string
      */
     protected $controller = null;
 
     /**
-     * Holds the current method
+     * Holds the current method.
      * @var string
      */
     protected $method = null;
 
     /**
-     * Holds the current action
+     * Holds the current action.
      * @var	string
      */
     protected $action = null;
 
     /**
-     * Holds the current action
+     * Holds the current action.
      * @var string
      */
     protected $name = null;
 
     /**
-     * Holds all the actions (HTTP methods to CRUD verbs)
+     * Holds all the actions (HTTP methods to CRUD verbs).
+     * TODO: refactor this!!
      * @var array
      */
     public static $actions = array(
@@ -68,7 +69,7 @@ class Router
     private $_defaults = array();
 
     /**
-     * Constructor
+     * The constructor, set the default routing rules.
      *
      * @param  array                     $rules
      * @param  array                     $defaults
@@ -123,7 +124,7 @@ class Router
     }
 
     /**
-     * Maps an URI to the routing/rules table
+     * Maps an URI against the routing/rule table.
      *
      * @param  string $uri
      * @param  array  $params Additional params to merge with the current set (optional)
@@ -149,7 +150,7 @@ class Router
     }
 
     /**
-     * Tries to match a route to an URI params
+     * Tries to match a route to an URI params.
      *
      * @param  string $route
      * @param  string $uri
@@ -185,7 +186,7 @@ class Router
 
     /**
      * Sets the current action from a specified method
-     * or use the method in the current scope
+     * or use the method in the current scope.
      *
      * @param  string $method The method to set the action (optional)
      * @return void
@@ -201,7 +202,7 @@ class Router
     }
 
     /**
-     * Returns the current or specified action
+     * Returns the current action, or as specified.
      *
      * @param  string $method A method key (optional)
      * @return string
@@ -219,7 +220,7 @@ class Router
     }
 
     /**
-     * Returns all the actions
+     * Returns all the actions.
      *
      * @return array
      */
@@ -229,7 +230,7 @@ class Router
     }
 
     /**
-     * Sets the router's params
+     * Sets the router's params.
      *
      * @param  array $params
      * @return void
@@ -240,7 +241,7 @@ class Router
     }
 
     /**
-     * Returns all the router's params
+     * Returns all the router's params.
      *
      * @return array
      */
@@ -250,7 +251,7 @@ class Router
     }
 
     /**
-     * Sets the specified router param
+     * Sets the specified router param.
      *
      * @param  string $key
      * @param  string $value
@@ -262,7 +263,7 @@ class Router
     }
 
     /**
-     * Returns the specified router param
+     * Returns the specified router param.
      *
      * @param  string $key
      * @return array
@@ -284,7 +285,7 @@ class Router
     }
 
     /**
-     * Sets the controller
+     * Sets the controller.
      *
      * @param  string $controller
      * @return void
@@ -295,7 +296,7 @@ class Router
     }
 
     /**
-     * Returns the current controller
+     * Returns the current controller.
      *
      * @return string
      */
@@ -305,7 +306,7 @@ class Router
     }
 
     /**
-     * Sets the method
+     * Sets the method.
      *
      * @param  string $method
      * @return void
@@ -316,7 +317,7 @@ class Router
     }
 
     /**
-     * Returns the current method
+     * Returns the current method.
      *
      * @return string
      */
@@ -326,13 +327,14 @@ class Router
     }
 
     /**
-     * Returns the path name
+     * Returns the current route name e.g. '/route_pathname'.
      *
-     * @return string
+     * @return string|null
      */
-    public function getPathName()
+    public function getName()
     {
-        return isset($this->name) ? $this->name : $this->path;
+        #return isset($this->name) ? $this->name : $this->path;
+        return isset($this->name) ? $this->name : null;
     }
 
 }

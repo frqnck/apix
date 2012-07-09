@@ -20,6 +20,9 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         unset($this->request);
     }
 
+    /**
+     * TEMP
+     */
     public function testIsSingleton()
     {
         $req = Request::getInstance();
@@ -27,10 +30,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($req, $req2);
     }
+
     /**
+     * TEMP
      * @covers Zenya\Api\Request::__clone
      */
-    public function Off___testIsSingletonIsNotClonable()
+    public function testIsSingletonIsNotClonable()
     {
         // $r = clone $this->request;
         $r = new \ReflectionClass($this->request);
