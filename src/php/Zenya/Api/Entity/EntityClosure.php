@@ -45,6 +45,9 @@ class EntityClosure extends Entity implements EntityInterface
     public function append(array $defs)
     {
         parent::_append($defs);
+        if(!isset($defs['method'])) {
+            throw new \RuntimeException('Closure is not defining a method?');
+        }
         $this->actions[$defs['method']] = $defs;
     }
 

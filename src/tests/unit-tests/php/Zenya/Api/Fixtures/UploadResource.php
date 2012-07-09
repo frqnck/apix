@@ -7,9 +7,9 @@ use Zenya\Api\Request as Request;
 use Zenya\Api\Input as Input;
 
 /**
- * BlankResource
+ * Upload resource
  *
- * This is just a blank resource. Use for testing and demo.
+ * This is a test uplaoding resource. Use for testing and demo.
  *
  * @api_public true
  * @api_version 1.0
