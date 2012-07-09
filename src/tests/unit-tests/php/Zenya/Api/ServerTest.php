@@ -11,20 +11,13 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     {
         $this->request = $this->getMockBuilder('Zenya\Api\Request')->disableOriginalConstructor()->getMock();
 
-        $this->server = new Server(new Config, $this->request);
+        $this->server = new Server(null, $this->request);
     }
 
     protected function tearDown()
     {
         unset($this->server);
-    }
-
-    public function testConstructor()
-    {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-        #$this->server->run();
+        unset($this->request);
     }
 
     public function testRun()
@@ -35,22 +28,15 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->server->run();
     }
 
-    public function testGetResults()
-    {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
-        $this->assertSame(null, $this->server->getResults());
-    }
-
     public function testGetFormatFromHttpAccept()
     {
         $this->request->expects($this->any())->method('hasHeader')->will($this->returnValue(true));
         $this->request->expects($this->any())->method('getHeader')->will(
-            $this->onConsecutiveCalls('application/json', 'application/xml', 'text/xml', 'text/html' )
+            $this->onConsecutiveCalls('application/json', 'application/javascript', 'application/xml', 'text/xml', 'text/html' )
         );
 
         $this->assertEquals('json', $this->server->getFormatFromHttpAccept($this->request));
+        $this->assertEquals('jsonp', $this->server->getFormatFromHttpAccept($this->request));
         $this->assertEquals('xml', $this->server->getFormatFromHttpAccept($this->request));
         $this->assertEquals('xml', $this->server->getFormatFromHttpAccept($this->request));
         $this->assertEquals(false, $this->server->getFormatFromHttpAccept($this->request));

@@ -106,7 +106,7 @@ class Resources
      */
     public function get(Router $route)
     {
-        $name = $route->getPathName();
+        $name = $route->getName();
         if (!isset($this->resources[$name])) {
             throw new \DomainException(
                 sprintf("Invalid resource entity specified (%s).", $name), 404

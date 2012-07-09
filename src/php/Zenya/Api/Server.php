@@ -20,16 +20,14 @@ class Server extends Listener
 
     public function __construct($config=null, Request $request=null, Response $response=null)
     {
-        if(null === $config || $config instanceOf Config) {
-            $c = $config === null ? Config::getInstance() : $config;
-        } else {
-            $c = Config::getInstance($config);
-        }
-
+        // Set the config
+        $c = $config instanceOf Config ? $config : Config::getInstance($config);
         $this->config = $c->get();
 
+        // TEMP
         $c->inject('Server', $this);
 
+        // Set the request
         $this->request = $request === null ? Request::getInstance() : $request;
 
         // Init response object
@@ -43,9 +41,10 @@ class Server extends Listener
                 );
         $this->response->setFormats($this->config['routing']['formats']);
 
-        // Resources
+        // set the resources
         $this->resources = new Resources;
 
+        // set the generic errors & exception handlers
         set_error_handler(array('Zenya\Api\Exception', 'errorHandler'));
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
     }
@@ -146,20 +145,11 @@ class Server extends Listener
      * Gets the server version string.
      *
      * @return string
+     * @codeCoverageIgnore
      */
     private function getServerVersion()
     {
         return sprintf('%s/%s (%s)', $this->config['api_realm'], $this->config['api_version'], Server::VERSION);
-    }
-
-    /**
-     * Gets the results array.
-     *
-     * @return array
-     */
-    public function getResults()
-    {
-        return $this->results;
     }
 
     /**
@@ -201,45 +191,6 @@ class Server extends Listener
 
         if (isset($rawController)) {
             $this->route->setController($rawController);
-        }
-    }
-
-    /**
-     * Get (& parse) body-data (refactor)
-     *
-     * @return array
-     */
-    static public function getBodyData(Request $request=null)
-    {
-        $request = $request === null ? Request::getInstance() : $request;
-
-        if ( $request->hasHeader('CONTENT_TYPE') && $request->hasBody() ) {
-            $ct = $request->getHeader('CONTENT_TYPE');
-            switch (true) {
-                // application/x-www-form-urlencoded
-                case (strstr($ct, '/x-www-form-urlencoded')):
-                    $params = $request->getParams();
-                break;
-
-                // 'application/json'
-                case (strstr($ct, '/json')):
-                    $input = new Input\Json;
-                    $params = $input->decode($request->getBody(), true);
-                    #$this->request->setParams($r);
-                break;
-
-                // 'text/xml', 'application/xml'
-                case (strstr($ct, '/xml')
-                    && (!strstr($ct, 'html'))):
-                    $input = new Input\Xml;
-                    $params = $input->decode($request->getBody(), true);
-                    #$this->request->setParams($r);
-                break;
-
-                default:
-                    $params = null;
-            }
-            return $params;
         }
     }
 
@@ -310,6 +261,11 @@ class Server extends Listener
         $this->response->setFormat($format, $opts['default_format']);
     }
 
+
+/* -- Closure prototyping  --- */
+
+
+
     protected function proxy($path, \Closure $to, $method)
     {
         return $this->resources->add($path,
@@ -363,6 +319,10 @@ class Server extends Listener
         return $this->proxy($path, $to, 'HEAD');
     }
 
+    public function getBodyData()
+    {
+        return Input::getBodyData($this->request);
+    }
 
     /**
      * test chain.

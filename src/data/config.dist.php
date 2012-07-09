@@ -1,7 +1,8 @@
 <?php
 
 namespace Zenya\Api;
-#$app = Config::getInstance();
+
+#$dic = new \Pimple();
 
 $c = array(
     'api_realm'     => 'api.zenya.com',
@@ -15,11 +16,14 @@ $c = array(
 
 // services
 $c['services'] = array(
-    'users' => function() {
+    'users' => function()
+    {
+        static $i = 0;
+
         // TODO: retrieve the users from somewhere, caching strategy?
         $users = array(
             // username:realm:sharedSecret:role
-            0=>array('username'=>'franck', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey', 'role'=>'admin'),
+            0=>array('username'=>'franck', 'test_i' => ++$i, 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'apiKey', 'role'=>'admin'),
             1=>array('username'=>'bob', 'password'=>'123', 'realm'=>'api.zenya.com', 'sharedSecret'=>'sesame', 'role'=>'guest')
         );
 
@@ -53,7 +57,7 @@ $c['resources'] = array(
 
     '/upload/:type/:debug' => array(
         'controller' => array(
-            'name'  => 'Zenya\Api\Fixtures\UploadResource1',
+            'name'  => 'Zenya\Api\Fixtures\UploadResource',
             'args'  => null,
         )
     ),
@@ -104,8 +108,9 @@ $c['listeners'] = array(
             function() use ($c) {
                 $adapter = new Listener\Auth\Digest($c['api_realm']);
                 $adapter->setToken = function(array $digest) use ($c, $adapter) {
-                    $config = Config::getInstance();
-                    $users = $config->getServices('users');
+
+                    $users = Config::getInstance()->getServices('users');
+
                     foreach ($users as $user) {
                         if (// this should be altered accordingly!
                             $user['username'] == $digest['username']
@@ -162,5 +167,7 @@ $c['routes'] = array(
 //     'controller_name' => 'Zenya\Api\Fixtures\AuthResource',
 //     'controller_args' => array('arg1'=>'value1', 'arg2'=>'string')
 // ),
+
+$c['config_path'] = __FILE__;
 
 return $c;

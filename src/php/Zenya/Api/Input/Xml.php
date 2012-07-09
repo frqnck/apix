@@ -2,7 +2,9 @@
 
 namespace Zenya\Api\Input;
 
-class Xml implements Adapter
+use Zenya\Api\Input\InputInterface;
+
+class Xml implements InputInterface
 {
 
     /**
@@ -11,12 +13,7 @@ class Xml implements Adapter
     public $encoding = 'utf-8';
 
     /**
-     * Convert an XML string to its array representation
-     *
-     * @param  string  $str   An XML string.
-     * @param  boolean $assoc Convert objects to array.
-     * @return mix
-     * @see		Zenya\Api\Input\Adapter
+     * {@inheritdoc}
      */
     public function decode($xmlStr, $assoc=true)
     {

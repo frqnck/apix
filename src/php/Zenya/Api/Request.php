@@ -6,26 +6,6 @@ class Request
 {
 
     /**
-     * The singleton instance
-     * @var Request
-     */
-    private static $instance = null;
-
-    /**
-     * Returns as a singleton instance
-     *
-     * @return Request
-     */
-    public static function getInstance()
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    /**
      * Holds the URI string
      * @var string
      */
@@ -50,6 +30,33 @@ class Request
     protected $method = null;
 
     /**
+     * TEMP: The singleton instance
+     * @var Request
+     */
+    private static $instance = null;
+
+    /**
+     * TEMP: Returns as a singleton instance
+     *
+     * @return Request
+     */
+    public static function getInstance()
+    {
+        if (null === self::$instance) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
+    }
+
+    /**
+     * TEMP: disalow cloning.
+     *
+     * @codeCoverageIgnore
+     */
+    private final function __clone() {}
+
+    /**
      * Constructor
      * return void
      */
@@ -64,7 +71,6 @@ class Request
         $this->setBody();
     }
 
-    // private final function __clone() {}
 
     public function getUri()
     {

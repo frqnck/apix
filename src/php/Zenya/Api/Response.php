@@ -131,6 +131,7 @@ class Response
         401 => 'Not Authenticated.',
         403 => 'Access to this ressource has been denied.',
         404 => 'No ressource found at the Request-URI.',
+        501 => 'This resource entity is not (yet) implemented. Try again later.',
         503 => 'The service is currently unable to handle the request due to a temporary overloading or maintenance of the server. Try again later.',
 
     );
@@ -319,7 +320,7 @@ class Response
     }
 
     /**
-     * Returns an array representation of the output
+     * Returns an array representation of the output.
      *
      * @return array
      */
@@ -330,13 +331,13 @@ class Response
         if ($this->sign === true) {
             $array['signature'] = array(
                 'request'   => sprintf('%s %s', $this->request->getMethod(), $this->request->getUri()),
-                'timestamp' => gmdate('Y-m-d H:i:s') . ' UTC',
                 'status'    => sprintf(
                                 '%d %s - %s',
                                 $this->getHttpCode(),
                                 $this->getStatusPrases(),
                                 $this->getStatusAdjective()
                             ),
+                'timestamp' => gmdate('Y-m-d H:i:s') . ' UTC',
                 'client_ip' => $this->request->getIp(true)
             );
         }
