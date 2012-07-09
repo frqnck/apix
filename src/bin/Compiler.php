@@ -39,9 +39,9 @@ class Compiler
             foreach (new \RecursiveIteratorIterator($it) as $file) {
                 if (
                     $file->getExtension() == 'php'
-                    && !preg_match ('@/src/php/Zenya/Api/Util/Compile.php$@', $file->getPathName())
+                    && !preg_match ('@/src/php/Zenya/Api/Util/Compile.php$@', $file->getPathname())
                 ) {
-                    $path = $file->getPathName();
+                    $path = $file->getPathname();
                     $this->addFile($phar, $path);
                 }
             }
@@ -142,7 +142,7 @@ if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'
 
     $cli = new Zenya\Api\Console;
     $cli->args[0] = 'php ' . $cli->args[0];
-    
+
     $version = Zenya\Api\Server::VERSION;
     $versionStr = sprintf("Zenya API Server %s by Franck Cassedanne", $version);
 
@@ -255,7 +255,7 @@ HELP;
             $cli->out("Error: ", 'red');
             $cli->out(sprintf('unknown command "%s".' . PHP_EOL . 'Try "', $cli->args[1]));
             $cli->out(sprintf('%s --help".' . PHP_EOL, $cli->args[0]), "blue");
- 
+
     endswitch;
 
     echo PHP_EOL;

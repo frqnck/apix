@@ -305,7 +305,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetActions()
     {
-        $router = new Router(array());
+        $route = new Router;
         $actions = array(
             'POST'      => 'onCreate',
             'GET'       => 'onRead',
@@ -316,43 +316,52 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             'HEAD'      => 'onTest',
             'TRACE'     => 'onTrace'
         );
-        $this->assertSame($actions, $router->getActions());
+        $this->assertSame($actions, $route->getActions());
     }
 
     public function testGetActionWithMethod()
     {
-        $router = new Router();
-        $this->assertSame(null, $router->getAction());
-        $this->assertSame('onCreate', $router->getAction('POST'));
-        $this->assertSame('onUpdate', $router->getAction('PUT'));
+        $route = new Router;
+        $this->assertSame(null, $route->getAction());
+        $this->assertSame('onCreate', $route->getAction('POST'));
+        $this->assertSame('onUpdate', $route->getAction('PUT'));
     }
 
     public function testGetSetActions()
     {
-        $router = new Router(array());
-        $router->setAction('PUT');
-        $this->assertSame('onUpdate', $router->getAction() );
+        $route = new Router;
+        $route->setAction('PUT');
+        $this->assertSame('onUpdate', $route->getAction() );
     }
 
     public function testGetsetController()
     {
-        $router = new Router(array());
-        $router->setController('resourceName');
-        $this->assertSame('resourceName', $router->getController() );
+        $route = new Router;
+        $route->setController('resourceName');
+        $this->assertSame('resourceName', $route->getController() );
     }
 
     public function testGetSetMethodGoesUppercase()
     {
-        $router = new Router(array());
-        $router->setMethod('get');
-        $this->assertSame('GET', $router->getMethod() );
+        $route = new Router;
+        $route->setMethod('get');
+        $this->assertSame('GET', $route->getMethod() );
     }
 
     public function testGetSetParam()
     {
-        $router = new Router(array());
-        $router->setParam('test', 'value');
-        $this->assertSame('value', $router->getParam('test') );
+        $route = new Router;
+        $route->setParam('test', 'value');
+        $this->assertSame('value', $route->getParam('test') );
+    }
+
+    public function testGetName()
+    {
+        $route = new Router(array('/'=>array()));
+        $this->assertSame(null, $route->getName() );
+
+        $route->map('/');
+        $this->assertSame('/', $route->getName() );
     }
 
 }
