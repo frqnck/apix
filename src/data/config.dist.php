@@ -1,5 +1,4 @@
 <?php
-
 namespace Zenya\Api;
 
 #$dic = new \Pimple();
