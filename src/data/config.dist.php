@@ -2,7 +2,6 @@
 namespace Zenya\Api;
 
 #$dic = new \Pimple();
-
 $c = array(
     'api_realm'     => 'api.zenya.com',
     'api_version'   => '1.0',
@@ -10,7 +9,34 @@ $c = array(
     // output
     'output_rootNode'  => 'zenya',
     'output_sign'      => true,
-    'output_debug'     => true
+    'output_debug'     => true,
+
+    // init
+    'init' => array(
+        // Whether to transparently compress outputs with gzip.
+        // Once enable, this will also set 'Vary: Accept-Encoding'.
+        'zlib.output_compression' => true,
+
+        // wheter to display errors (should be set to false in production)
+        'display_errors' => true,
+
+        // enable or disable php error logging
+        'init_log_errors' => true,
+
+        // path to the error log file
+        'error_log' => '/tmp/zenya-errors.log',
+    ),
+
+    // routing
+    'routing' => array(
+        'route_prefix'      => '@^(/index(\d)?.php)?/api/v(\d*)@i', // regex
+        'default_format'    => 'json',
+        'formats'           => array('json', 'xml', 'html', 'php', 'jsonp'),
+        // output format negociations
+        'controller_ext'    => true, // true or false (e.g. resource.json)
+        'format_override'   => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
+        'http_accept'       => true, // true or false
+    )
 );
 
 // services

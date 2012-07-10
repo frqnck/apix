@@ -29,7 +29,7 @@ try {
                 'params'    => $api->getBodyData()
             );
         }
-    )->group('atestme');
+    )->group('group1');
 
     /**
      * group.
@@ -51,7 +51,7 @@ try {
         function() {
             return array('List keywords');
         }
-    )->group('tesftme');
+    )->group('group1');
 
     $api->onRead('/keywordoos/:cat_id/:optional',
 
@@ -92,13 +92,11 @@ try {
     });
 
     echo $api->run();
-
     // Zenya\Api\d( $api->getResources() );
 
     // Zenya\Api\d( Zenya\Api\Config::getInstance()->getRoutes() );
 
 } catch (\Exception $e) {
-    header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-    die("<h1>500 Internal Server Error</h1>" . $e->getMessage());
+    Zenya\Api\Exception::startupException($e);
 }
 exit;

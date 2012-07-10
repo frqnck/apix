@@ -3,7 +3,7 @@ define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
 define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
 define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
 
-ini_set('zlib.output_compression', 1);
+#ini_set('zlib.output_compression', 1);
 
 require_once APP_LIBDIR . '/psr0.autoloader.php';
 
