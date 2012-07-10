@@ -73,7 +73,7 @@ class Router
      *
      * @param  array                     $rules
      * @param  array                     $defaults
-     * @throws \InvalidArgumentException 500
+     * @throws \InvalidArgumentException
      */
     public function __construct(array $rules=array(), array $defaults=array())
     {
@@ -265,12 +265,17 @@ class Router
     /**
      * Returns the specified router param.
      *
-     * @param  string $key
-     * @return array
+     * @param   string $key
+     * @return  array
+     * @throws \InvalidArgumentException
      */
     public function getParam($key)
     {
-        return $this->params[$key];
+        if(isset($this->params[$key])) {
+            return $this->params[$key];
+        }
+
+        throw(new \InvalidArgumentException(sprintf('Invalid parameter "%s" requested.', $key)));
     }
 
     /**
@@ -336,6 +341,17 @@ class Router
     {
         return isset($this->name) ? $this->name
             : ( isset($this->path) ? $this->path : null );
+    }
+
+    /**
+     * Sets the route name.
+     *
+     * @param  $name
+     * @return string|null
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
 }

@@ -18,6 +18,8 @@ define('APP_TOPDIR', realpath(__DIR__ . '/../../php'));
 define('APP_LIBDIR', realpath(__DIR__ . '/../../../vendor/php'));
 define('APP_TESTDIR', realpath(__DIR__ . '/php'));
 
+define('UNIT_TEST', true);
+
 $app_libdir = realpath(__DIR__ . '/../../../vendor/php');
 
 require_once($app_libdir . '/psr0.autoloader.php');

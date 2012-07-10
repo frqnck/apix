@@ -24,6 +24,9 @@ class Server extends Listener
         $c = $config instanceOf Config ? $config : Config::getInstance($config);
         $this->config = $c->get();
 
+        $this->init($this->config['init']);
+
+
         // TEMP
         $c->inject('Server', $this);
 
@@ -43,6 +46,24 @@ class Server extends Listener
 
         // set the resources
         $this->resources = new Resources;
+    }
+
+    /**
+     * Acts as the initialisation.
+     *
+     * @param  array $configs The config entries to initialise.
+     * @return  void
+     *
+     * @codeCoverageIgnore
+     */
+    public function init(array $configs)
+    {
+        if(!defined('UNIT_TEST')) {
+            // set config inits
+            foreach($configs as $key => $value) {
+                ini_set($key, $value);
+            }
+        }
 
         // set the generic errors & exception handlers
         set_error_handler(array('Zenya\Api\Exception', 'errorHandler'), E_ALL);
@@ -64,19 +85,14 @@ class Server extends Listener
                 $key, $values
             );
         }
-
-        try {
             // set the routing
             $this->setRouting(
                 $this->request,
                 $this->resources->toArray(),
                 $this->config['routing']
             );
+        try {
 
-            // set http accept
-            if ($this->config['routing']['http_accept']) {
-                $this->response->setHeader('Vary', 'Accept');
-            }
 
             // attach the early listeners @ pre-processing stage
             $this->addAllListeners('server', 'early');
@@ -183,6 +199,7 @@ class Server extends Listener
                 'path'              => $path,
                 'controller_name'   => null,    // TODO: TEMP!?
                 'controller_args'   => &$this,  // TODO: TEMP!?
+                'server'            => 'test'
             )
         );
 
@@ -194,6 +211,16 @@ class Server extends Listener
         if (isset($rawController)) {
             $this->route->setController($rawController);
         }
+    }
+
+    /**
+     * Returns the route object.
+     *
+     * @return Router
+     */
+    public function getRoute()
+    {
+        return $this->route;
     }
 
     /**
@@ -220,7 +247,6 @@ class Server extends Listener
 
             case $opts['http_accept']
                 && $format = Input::getAcceptFormat($this->request):
-                $this->response->setHeader('Vary', 'Accept');
             break;
 
             default:
@@ -228,14 +254,24 @@ class Server extends Listener
         }
 
         $this->response->setFormat($format, $opts['default_format']);
+
+        if ($opts['http_accept']) {
+            $this->response->setHeader('Vary', 'Accept');
+        }
     }
 
+/* -- Closure prototyping  -- */
 
-/* -- Closure prototyping  --- */
-
-
-
-    protected function proxy($path, \Closure $to, $method)
+    /**
+     * Proxy to resources::add (shortcut)
+     *
+     * @param string $method The HTTP method to match against.
+     * @param string $path The path name to match against.
+     * @param mixed  $to   Callback that returns the response when matched.
+     * @return Controller
+     * @see  Resources::add
+     */
+    protected function proxy($method, $path, \Closure $to)
     {
         return $this->resources->add($path,
             array(
@@ -246,69 +282,111 @@ class Server extends Listener
     }
 
     /**
-     * POST request handler
+     * Create / POST request handler
      *
-     * @param string $path Matched route pattern
-     * @param mixed  $to   Callback that returns the response when matched
-     *
-     * @return Controller
+     * @param string $path The path name to match against.
+     * @param mixed  $to   Callback that returns the response when matched.
+     * @see  Server::proxy
+     * @return Controller  Provides a fluent interface.
      */
     public function onCreate($path, $to)
     {
-        return $this->proxy($path, $to, 'POST');
-    }
-
-    public function onRead($path, $to)
-    {
-        return $this->proxy($path, $to, 'GET');
-    }
-
-    public function onUpdate($path, $to)
-    {
-        return $this->proxy($path, $to, 'PUT');
-    }
-
-    public function onModify($path, $to)
-    {
-        return $this->proxy($path, $to, 'PATCH');
-    }
-
-    public function onDelete($path, $to)
-    {
-        return $this->proxy($path, $to, 'DELETE');
-    }
-
-    public function onHelp($path, $to)
-    {
-        return $this->proxy($path, $to, 'OPTIONS');
-    }
-
-    public function onTest($path, $to)
-    {
-        return $this->proxy($path, $to, 'HEAD');
-    }
-
-    public function getBodyData()
-    {
-        return Input::getBodyData($this->request);
+        return $this->proxy('POST', $path, $to);
     }
 
     /**
-     * test chain.
-     * @param array $opts Options are:
+     * Read / GET request handler
      *
+     * @param string $path The path name to match against.
+     * @param mixed  $to   Callback that returns the response when matched.
+     * @see  Server::proxy
+     * @return Controller  Provides a fluent interface.
+     */
+    public function onRead($path, $to)
+    {
+        return $this->proxy('GET', $path, $to);
+    }
+
+    /**
+     * Update / PUT request handler
+     *
+     * @param string $path The path name to match against.
+     * @param mixed  $to   Callback that returns the response when matched.
+     * @see  Server::proxy
+     * @return Controller  Provides a fluent interface.
+     */
+    public function onUpdate($path, $to)
+    {
+        return $this->proxy('PUT', $path, $to);
+    }
+
+    /**
+     * Modify / PATCH request handler
+     *
+     * @param string $path The path name to match against.
+     * @param mixed  $to   Callback that returns the response when matched.
+     * @see  Server::proxy
+     * @return Controller  Provides a fluent interface.
+     */
+    public function onModify($path, $to)
+    {
+        return $this->proxy('PATCH', $path, $to);
+    }
+
+    /**
+     * Delete / DELETE request handler
+     *
+     * @param string $path The path name to match against.
+     * @param mixed  $to   Callback that returns the response when matched.
+     * @see  Server::proxy
+     * @return Controller  Provides a fluent interface.
+     */
+    public function onDelete($path, $to)
+    {
+        return $this->proxy('DELETE', $path, $to);
+    }
+
+    /**
+     * Help / OPTIONS request handler
+     *
+     * @param string $path The path name to match against.
+     * @param mixed  $to   Callback that returns the response when matched.
+     * @see  Server::proxy
+     * @return Controller  Provides a fluent interface.
+     */
+    public function onHelp($path, $to)
+    {
+        return $this->proxy('OPTIONS', $path, $to);
+    }
+
+    /**
+     * Test / HEAD request handler
+     *
+     * @param string $path The path name to match against.
+     * @param mixed  $to   Callback that returns the response when matched.
+     * @see  Server::proxy
+     * @return Controller  Provides a fluent interface.
+     */
+    public function onTest($path, $to)
+    {
+        return $this->proxy('HEAD', $path, $to);
+    }
+
+    /**
+     * Test Read from a group.
+     *
+     * @param array $opts Options are:
      * @return string
      */
     public function setGroup($name)
     {
         $class = new \ReflectionClass($this);
         $method = $class->getMethod('setGroup');
-var_dump($class);
+    var_dump($class);
 
         $class = new \ReflectionFunction();
         //$method = $class->getMethod('setGroup');
-var_dump($class);
-
+    var_dump($class);
 
         $doc = $method->getDocComment();
 
@@ -318,12 +396,15 @@ var_dump($class);
         );
     }
 
-}
+    /**
+     * Shortcut to Input::getBodyData
+     *
+     * @see  Input::getBodyData
+     * @return array
+     */
+    public function getBodyData()
+    {
+        return Input::getBodyData($this->request);
+    }
 
-/**
- * Temp Debug
- */
-function d($mix)
-{
-    echo '<pre>' . $mix . '</pre>';
 }

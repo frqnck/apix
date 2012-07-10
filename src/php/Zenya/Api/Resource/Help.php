@@ -22,9 +22,9 @@ class Help
      *
      * @return void
      */
-    public function __construct(Server $server)
+    public function __construct()
     {
-        $this->server = $server;
+        #$this->server = $server;
         $this->verbose = isset($_REQUEST['verbose'])?:false;
     }
 
@@ -67,12 +67,16 @@ class Help
      * @api_links OPTIONS /path/to/entity
      * @api_links OPTIONS /*
      */
-    public function onHelp(Entity $entity, array $filters=null)
+    public function onHelp(Entity $entity, Server $server, array $filters=null)
     {
-        echo 'qwertyuio';
-        // apply to the whole server
-        if ($entity->route->path == '/*') {
 
+print_r($server);exit;
+
+echo 'whole!! hte';
+
+        // apply to the whole server
+        if ($this->server->getRoute()->getName() == '/*') {
+echo 'whole!!';
             // return the whole api doc
             $doc = array();
             foreach ($this->server->getResources() as $key => $entity) {
@@ -89,10 +93,8 @@ class Help
             // }
 
         } else {
-
-            $doc = $this->_getHelp($entity, $filters);
-
-            return $doc;
+            // one entity
+            return $this->_getHelp($entity, $filters);
 
 
             // specific to just one resource.

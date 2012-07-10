@@ -14,8 +14,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testMapMerging()
     {
-        $r1 = array('/test'=>'/:test');
-        $r2 = array('/test2'=>'/:test2');
+        $r1 = array('/test' => '/:test');
+        $r2 = array('/test2' => '/:test2');
         $this->assertSame($r1+$r2, array_merge($r1, $r2));
 
         $route = new Router( array() );
@@ -39,7 +39,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testBasicRouting1Step($url='/voila')
     {
-        $rules = array($url => array('controller'=>'impliedController', 'action'=>'impliedAction'));
+        $rules = array($url => array('controller' => 'impliedController', 'action' => 'impliedAction'));
 
         $route = new Router( $rules );
         $route->map($url);
@@ -50,7 +50,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testBasicRouting2Step($url='/voila')
     {
-        $rules = array($url . '/:someparams' => array('controller'=>'impliedController', 'action'=>'impliedAction'));
+        $rules = array($url . '/:someparams' => array('controller' => 'impliedController', 'action' => 'impliedAction'));
 
         $route = new Router( $rules );
         $route->map($url);
@@ -61,7 +61,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testBasicRoutingThreeSteps()
     {
-        $rules = array('/:one/:two/:three' => array('controller'=>'impliedController', 'action'=>'impliedAction'));
+        $rules = array('/:one/:two/:three' => array('controller' => 'impliedController', 'action' => 'impliedAction'));
         $route = new Router( $rules );
         $route->map('/controller/action/123');
         $this->assertSame('impliedController', $route->getController());

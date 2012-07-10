@@ -38,7 +38,7 @@ class InputTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetBodyData($type, $body, $assoc=true, $expected)
     {
-        $this->request->setHeader('CONTENT-TYPE', $type);
+        $this->request->setHeader('CONTENT_TYPE', $type);
         $this->request->setBody($body);
 
         $this->assertEquals($expected, Input::getBodyData($this->request, $assoc));

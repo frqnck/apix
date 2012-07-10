@@ -110,7 +110,7 @@ class EntityClosure extends Entity implements EntityInterface
      */
     public function getActions()
     {
-        return $this->actions+$this->overrides;
+        #return $this->actions+$this->overrides;
         return $this->actions;
     }
 
