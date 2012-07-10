@@ -18,7 +18,7 @@ class Entity extends Listener
 
     protected $redirect;
 
-    protected $overrides = array('OPTIONS'=>'help', 'HEAD'=>'test');
+    protected $defaultActions = array('OPTIONS'=>'help', 'HEAD'=>'test');
 
     /**
      * Appends the given array definition and apply generic mappings.
@@ -35,7 +35,7 @@ class Entity extends Listener
     }
 
     /**
-     * Call the resource entity applying any method overrides.
+     * Call the resource entity.
      *
      * @return array
      * @throws Zenya\Api\Exception
@@ -45,7 +45,7 @@ class Entity extends Listener
      */
     public function call()
     {
-        $method = $this->route->getMethod();
+        //$method = $this->route->getMethod();
 
         // if ($method == 'OPTIONS') {
         //     return $this->getDocs();
@@ -84,8 +84,11 @@ class Entity extends Listener
    }
 
     /**
-     * Does this entity has the method
+     * Does this entity hold the specified method?
      *
+     * @param   string    $method
+     * @param   array     $actions=null   Use to override local actions.
+     * @return  boolean
      */
     public function hasMethod($method, array $actions = null)
     {
@@ -94,7 +97,28 @@ class Entity extends Listener
     }
 
     /**
+     * Returns all the default actions.
+     *
+     * @return  array
+     */
+    public function getDefaultActions()
+    {
+        return $this->defaultActions;
+    }
+
+    /**
+     * Gets the speified default action.
+     *
+     * @return  string
+     */
+    public function getDefaultAction($method)
+    {
+        return $this->defaultActions[$method];
+    }
+
+    /**
      * To array...
+     *
      * @return  array
      */
     public function toArray()
@@ -141,22 +165,18 @@ class Entity extends Listener
                 && !array_key_exists($name, $routeParams)
             ) {
 
-                // check for local class inclusion
+                // auto inject local classes
                 if($class = $param->getClass()) {
-                    $class = $class->getName();
-
-                    // TODO: DOIGN THIS!!!!!
-#                    $params[$name] = new $class;
-                    echo "<pre>";echo 'class: '; print_r($this->route->getParams());exit;
+                    $obj = strtolower(str_replace(__NAMESPACE__ . '\\', '', $class->getName()));
+                    $params[$name] = $obj == 'server' ? $this->route->server : $this->route->server->$obj;
                 } else {
                     throw new \BadMethodCallException("Required {$httpMethod} parameter \"{$name}\" missing in action.", 400);
                 }
+
             } elseif (isset($routeParams[$name])) {
                 $params[$name] = $routeParams[$name];
             }
         }
-
-
         // TODO: maybe we need to check the order of params key match the method?
         // TODO: maybe add a type casting handler here
         return $params;

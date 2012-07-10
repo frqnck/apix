@@ -120,68 +120,17 @@ class Resources
         }
         $entity->setRoute($route);
 
-
-// TODO: DOING THIS!!!!!
-
-        // Overides inexistant methods!
+        // handle the default actions (and allow local overrides).
         $method = $route->getMethod();
         if( !$entity->hasMethod($method)
-           # && $entity->hasMethod($route->getMethod(), $entity->overrides)
-        ) {
-            echo '- method not implemented - ';
-            #$entity = $this->resources['help'];
-
-            $route->setName('help');
-
-            #echo '<pre>'; print_r($entity-);exit;
-
-/*
-            $entity->controller = array(
-                'args'=>'ff'
+           && $entity->hasMethod($method, $entity->getDefaultActions()) ) {
+            $route->setName(
+                $entity->getDefaultAction($method)
             );
- */
-            $route->setParams(
-                array(
-                    'entity' => $entity,
-                )
-            );
-           return $this->get($route);
-
-            #echo '<pre>'; print_r($route);exit;
-
-
-            // // TEMP: should be a DIC here!
-            // $c = Config::getInstance();
-            // $alt = $c->getResources('help');
-            // // TEMP: and here, auto inject!
-
-            // $enity->controller = $alt['controller'];
-            // $alt['controller']['args'] = $c->getInjected('Server');
-
-
-            #print_r( $this->controller['name'] );
-
-
-            // $this->controller = array(
-            //    'name' => 'Zenya\Api\Resource\Help',
-            //    'args' => $this->route->controller_args
-            // );
+            $route->setParams(array('entity' => $entity));
+        
+            return $this->get($route);
         }
-
-
-
-        /*
-        if ($entity instanceOf Entity\EntityClass) {
-            // var_dump($entity->getController());
-            if (!isset($entity->controller['name'])) {
-                $entity->controller['name'] = $route->controller_name;
-            }
-
-            if (!isset($entity->controller['args'])) {
-                $entity->controller['args'] = $route->controller_args;
-            }
-        }
-        */
 
         return $entity;
     }

@@ -132,10 +132,6 @@ class EntityClass extends Entity implements EntityInterface
         $routes = Router::$actions;
 
         return array_intersect($routes, $funcs);
-
-        $all= array_intersect($routes, $funcs);
-
-        return $all+$this->overrides;
     }
 
     /**
