@@ -9,7 +9,7 @@ use Zenya\Api\Listener,
 
 class Input
 {
-    
+
     /**
      * Returns the format from an HTTP context.
      *
@@ -29,7 +29,7 @@ class Input
                 && (!strstr($context, 'html'))):
                 $format = 'xml';
         }
-    
+
         return isset($format) ? $format : null;
     }
 
@@ -61,8 +61,8 @@ class Input
      */
     static public function getBodyData(Request $request, $assoc=true)
     {
-        if ($request->hasBody() && $request->hasHeader('CONTENT-TYPE')) {
-            $ctx = $request->getHeader('CONTENT-TYPE');
+        if ($request->hasBody() && $request->hasHeader('CONTENT_TYPE')) {
+            $ctx = $request->getHeader('CONTENT_TYPE');
 
             // application/x-www-form-urlencoded
             if(strstr($ctx, '/x-www-form-urlencoded')) {

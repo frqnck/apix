@@ -25,7 +25,17 @@ $api->read('/keywords/id');
 $api->addK
 ?>
 
+Use Strict-Transport-Security (STS) to force the use of SSL.
+<?php
+$use_sts = TRUE;
 
+if ($use_sts && isset($_SERVER['HTTPS']) {
+  header('Strict-Transport-Security: max-age=500');
+} elseif ($use_sts && !isset($_SERVER['HTTPS']) {
+  header('Status-Code: 301');
+  header('Location: https://'.$_SERVER["HTTP_HOST"].$_SERVER['REQUEST_URI']);
+}
+?>
 
 System-Wide Installation
 ------------------------
