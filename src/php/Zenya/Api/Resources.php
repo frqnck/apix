@@ -98,18 +98,18 @@ class Resources
     }
 
     /**
-     * Gets the specified ressource entity.
+     * Gets the specified ressource entity from a route object.
      *
-     * @param  string                           $name A resource name
-     * @return Zenya/Api/Entity/EntityInterface
-     * @throws /DomainException 404
+     * @param   Router                   $route  The resource route object.
+     * @throws  /DomainException                 404
+     * @return  Entity/EntityInterface
      */
-    public function get(Router $route)
+    public function get(Router &$route)
     {
         $name = $route->getName();
         if (!isset($this->resources[$name])) {
             throw new \DomainException(
-                sprintf("Invalid resource entity specified (%s).", $name), 404
+                sprintf('Invalid resource entity specified (%s).', $name), 404
             );
         }
         $entity = $this->resources[$name];
@@ -119,6 +119,56 @@ class Resources
             $entity = $this->resources[$redirect];
         }
         $entity->setRoute($route);
+
+
+// TODO: DOING THIS!!!!!
+
+        // Overides inexistant methods!
+        $method = $route->getMethod();
+        if( !$entity->hasMethod($method)
+           # && $entity->hasMethod($route->getMethod(), $entity->overrides)
+        ) {
+            echo '- method not implemented - ';
+            #$entity = $this->resources['help'];
+
+            $route->setName('help');
+
+            #echo '<pre>'; print_r($entity-);exit;
+
+/*
+            $entity->controller = array(
+                'args'=>'ff'
+            );
+ */
+            $route->setParams(
+                array(
+                    'entity' => $entity,
+                )
+            );
+           return $this->get($route);
+
+            #echo '<pre>'; print_r($route);exit;
+
+
+            // // TEMP: should be a DIC here!
+            // $c = Config::getInstance();
+            // $alt = $c->getResources('help');
+            // // TEMP: and here, auto inject!
+
+            // $enity->controller = $alt['controller'];
+            // $alt['controller']['args'] = $c->getInjected('Server');
+
+
+            #print_r( $this->controller['name'] );
+
+
+            // $this->controller = array(
+            //    'name' => 'Zenya\Api\Resource\Help',
+            //    'args' => $this->route->controller_args
+            // );
+        }
+
+
 
         /*
         if ($entity instanceOf Entity\EntityClass) {

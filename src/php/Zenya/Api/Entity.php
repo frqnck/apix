@@ -30,7 +30,7 @@ class Entity extends Listener
     final public function _append(array $defs)
     {
         if (isset($defs['redirect'])) {
-          $this->redirect = $defs['redirect'];
+            $this->redirect = $defs['redirect'];
         }
     }
 
@@ -45,33 +45,57 @@ class Entity extends Listener
      */
     public function call()
     {
-        // TODO: this is temporary...
-        if ($this->route->getMethod() == 'OPTIONS') {
-            return $this->getDocs();
-        }
+        $method = $this->route->getMethod();
 
-        /*
-            $this->route->setParams(
-              array('entity' => clone $this)
-            );
+        // if ($method == 'OPTIONS') {
+        //     return $this->getDocs();
+        // }
 
-            // TODO: review this
-            $c = Config::getInstance();
-            $alt = $c->getResources($this->overrides[$method]);
-            // TODO: auto inject here!!
-            $alt['controller']['args'] = $c->getInjected('Server');
+        #print_r( $this );
+        #print_r($this->getActions());
 
-            $this->controller = $alt['controller'];
+        // Handler for the generic methods.
+        // if( !$this->hasMethod($method)
+        //     && $this->hasMethod($method, $this->overrides)
+        // ) {
+        //     $this->route->setParams(
+        //         array('entity' => clone $this)
+        //     );
 
-            #$this->ref = new Reflection( $this->parseDocs() );
-        */
+        //     // TEMP: should be a DIC here!
+        //     $c = Config::getInstance();
+        //     $alt = $c->getResources($this->overrides[$method]);
+
+        //     // TEMP: and here, auto inject!
+        //     $alt['controller']['args'] = $c->getInjected('Server');
+
+        //     $this->controller = $alt['controller'];
+
+        //     print_r( $this->controller['name'] );
+
+
+        //     // $this->controller = array(
+        //     //    'name' => 'Zenya\Api\Resource\Help',
+        //     //    'args' => $this->route->controller_args
+        //     // );
+        // }
 
         return $this->underlineCall($this->route);
    }
 
     /**
-     * To array...
+     * Does this entity has the method
      *
+     */
+    public function hasMethod($method, array $actions = null)
+    {
+        $actions = null === $actions ? $this->getActions() : $actions;
+        return in_array($method, array_keys($actions));
+    }
+
+    /**
+     * To array...
+     * @return  array
      */
     public function toArray()
     {
@@ -116,11 +140,22 @@ class Entity extends Listener
                 !$param->isOptional()
                 && !array_key_exists($name, $routeParams)
             ) {
-                throw new \BadMethodCallException("Required {$httpMethod} parameter \"{$name}\" missing in action.", 400);
+
+                // check for local class inclusion
+                if($class = $param->getClass()) {
+                    $class = $class->getName();
+
+                    // TODO: DOIGN THIS!!!!!
+#                    $params[$name] = new $class;
+                    echo "<pre>";echo 'class: '; print_r($this->route->getParams());exit;
+                } else {
+                    throw new \BadMethodCallException("Required {$httpMethod} parameter \"{$name}\" missing in action.", 400);
+                }
             } elseif (isset($routeParams[$name])) {
                 $params[$name] = $routeParams[$name];
             }
         }
+
 
         // TODO: maybe we need to check the order of params key match the method?
         // TODO: maybe add a type casting handler here
@@ -137,6 +172,17 @@ class Entity extends Listener
     {
         $this->route = $route;
     }
+
+    /**
+     * Returns the route object.
+     *
+     * @return Router
+     */
+    // public function getRoute()
+    // {
+    //     return $this->route;
+    // }
+
 
     /**
      * Returns the redirect location.

@@ -46,7 +46,7 @@ namespace Zenya\Api;
 class Exception extends \Exception
 {
 
-    const DEBUG = true;
+    const DEBUG =  true;
 
     /**
      *  E_RECOVERABLE_ERROR handler
@@ -81,7 +81,7 @@ class Exception extends \Exception
      */
     public static function startupException(\Exception $e)
     {
-        self::errorOutput($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
+        self::errorOutput($e->getCode(), 'Startup:- ' . $e->getMessage(), $e->getFile(), $e->getLine());
     }
 
     /**
@@ -91,8 +91,8 @@ class Exception extends \Exception
      */
     public static function shutdownHandler()
     {
-        if ($error = error_get_last()) {
-            self::errorOutput($error['type'], $error['message'], $error['file'], $error['line']);
+        if ($e = error_get_last()) {
+            self::errorOutput($e['type'], 'Shutdown:- ' . $e['message'], $e['file'], $e['line']);
         }
     }
 
@@ -109,16 +109,22 @@ class Exception extends \Exception
      */
     public static function errorOutput($code, $message, $file, $line, $context = null)
     {
-        header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
+        $proto = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'http:1/1';
+        if(!defined('UNIT_TEST')) {
+            header($proto . ' 500 Internal Server Error', true, 500);
+        }
         echo '<h1>500 Internal Server Error</h1>';
-        $info = sprintf(
-            "#%d %s @ %s:%d",
-            $code,
-            $message,
-            $file,
-            $line
-        );
-        die($info);
+
+        if(self::DEBUG) {
+            $info = sprintf(
+                "#%d %s @ %s:%d",
+                $code,
+                $message,
+                $file,
+                $line
+            );
+            die($info);
+        }
     }
 
 }

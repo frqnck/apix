@@ -139,7 +139,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected['format'], $this->server->response->getFormat());
     }
 
-    public function testSetRoutingWithHeader()
+    public function testSetRoutingWithAcceptHeader()
     {
         $uri = '/index.php/api/v1/mock/test/param';
         $options = array(
@@ -162,6 +162,40 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('xml', $this->server->response->getFormat());
     }
 
+    public function testSetRoutingSetVaryWhenAcceptIsEnable()
+    {
+        $options = array(
+            'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+            'default_format'    => 'jsonp',
+            'controller_ext'    => false,
+            'format_override'   => false,
+            'http_accept'       => true,
+        );
+
+        $this->server->setRouting($this->request, array('/whatever' => array()), $options);
+        $this->assertSame('Accept', $this->server->response->getHeader('Vary'), "Should be set when accept is enable.");
+    }
+
+    public function testSetRoutingDoesnotSetVaryWenAcceptIsDisable()
+    {
+        $options = array(
+            'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+            'default_format'    => 'jsonp',
+            'controller_ext'    => false,
+            'format_override'   => false,
+            'http_accept'       => false,
+        );
+
+        $this->server->setRouting($this->request, array('/whatever' => array()), $options);
+        $this->assertSame(null, $this->server->response->getHeader('Vary'), "Should not be set when accept is disable.");
+    }
+
     // TODO: resources and config parsinfg related!
+
+    // public function testProxy()
+    // {
+
+    // }
+
 
 }
