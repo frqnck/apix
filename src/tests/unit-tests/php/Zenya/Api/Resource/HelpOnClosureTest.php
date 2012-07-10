@@ -51,7 +51,7 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
 
         $entity = $this->api->resources->get($route);
 
-        $help = $this->help->onHelp($entity);
+        $help = $this->help->onHelp($entity, $this->api);
         #print_r($help);
     }
 

@@ -140,7 +140,9 @@ class Server extends Listener
 
             case 405:
                 $this->response->setHeader('Allow',
-                    implode(', ', array_keys($entity->getActions())),
+                    implode(', ', array_keys(
+                        $entity->getActions()+$entity->defaultActions()
+                    )),
                     false // preserve existing
                 );
 
@@ -197,9 +199,9 @@ class Server extends Listener
             array(
                 'method'            => $request->getMethod(),
                 'path'              => $path,
-                'controller_name'   => null,    // TODO: TEMP!?
-                'controller_args'   => &$this,  // TODO: TEMP!?
-                'server'            => 'test'
+                #'controller_name'   => null,    // TODO: TEMP!?
+                #'controller_args'   => &$this,  // TODO: TEMP!?
+                'server'            => &$this
             )
         );
 

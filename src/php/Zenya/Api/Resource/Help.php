@@ -5,6 +5,7 @@ namespace Zenya\Api\Resource;
 use Zenya\Api\Reflection,
     Zenya\Api\Entity,
     Zenya\Api\Server,
+    Zenya\Api\Request,
     Zenya\Api\Router;
 
 /**
@@ -70,13 +71,12 @@ class Help
     public function onHelp(Entity $entity, Server $server, array $filters=null)
     {
 
-print_r($server);exit;
+//print_r($server);exit;
 
-echo 'whole!! hte';
 
         // apply to the whole server
-        if ($this->server->getRoute()->getName() == '/*') {
-echo 'whole!!';
+        if ($server->getRoute()->getName() == '/*') {
+
             // return the whole api doc
             $doc = array();
             foreach ($this->server->getResources() as $key => $entity) {
