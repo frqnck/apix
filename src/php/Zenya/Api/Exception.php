@@ -51,66 +51,74 @@ class Exception extends \Exception
     /**
      *  E_RECOVERABLE_ERROR handler
      *
-     *  Throws exception occur.
+     *  Use to re-throw E_RECOVERABLE_ERROR as they occur.
      *
-     * @param  int             $errno
-     * @param  string          $errstr
-     * @param  string          $errfile
-     * @param  int             $errline
-     * @return boolean
+     * @param  int             $code       The error number.
+     * @param  string          $message    The error message.
+     * @param  string          $file       The filename where the error occured.
+     * @param  int             $line       The line number at which the error happened.
+     * @param  array           $context    The array of context vars.
      * @throws \ErrorException
+     * @return false
      */
-    public static function errorHandler($errno, $errstr, $errfile, $errline)
+    public static function errorHandler($code, $message, $file, $line, $context)
     {
         if(self::DEBUG) return false;
 
-        if (E_RECOVERABLE_ERROR === $errno) {
-            $errstr = preg_replace('@to\s.*::\w+\(\)@', '', $errstr, 1);
-            throw new \ErrorException($errstr, 400, 0, $errfile, $errline);
+        if (E_RECOVERABLE_ERROR === $code) {
+            $message = preg_replace('@to\s.*::\w+\(\)@', '', $message, 1);
+            throw new \ErrorException($message, 400, 0, $file, $line, $context);
         }
 
         return false;
     }
 
     /**
-     *  Fatal error handler
+     *  Startup Exception handler
      *
-     *  Throws exception occur.
+     * @param  \Exception   $e
+     * @see errorOutput
+     */
+    public static function startupException(\Exception $e)
+    {
+        self::errorOutput($e->getCode(), $e->getMessage(), $e->getFile(), $e->getLine());
+    }
+
+    /**
+     *  Shutdown / Fatal error handler
      *
-     * @param  int             $errno
-     * @param  string          $errstr
-     * @param  string          $errfile
-     * @param  int             $errline
-     * @return boolean
-     * @throws \ErrorException
+     * @see errorOutput
      */
     public static function shutdownHandler()
     {
         if ($error = error_get_last()) {
-            header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-            echo "<h1>500 Internal Server Error</h1>";
-            $info = sprintf(
-                    '[SHUTDOWN] file: %s | line: %d | message: %s',
-                    $error['file'],
-                    $error['line'],
-                    $error['message']
-                );
-            die( $info );
+            self::errorOutput($error['type'], $error['message'], $error['file'], $error['line']);
         }
     }
 
-    public static function startupException(\Exception $e)
+    /**
+     * Output the error
+     *
+     * @param  int             $code       The error number.
+     * @param  string          $message    The error message.
+     * @param  string          $file       The filename where the error occured.
+     * @param  int             $line       The line number at which the error happened.
+     * @param  array           $context    The array of context vars.
+     * @throws \ErrorException
+     * @return false
+     */
+    public static function errorOutput($code, $message, $file, $line, $context = null)
     {
         header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
-        echo "<h1>500 Internal Server Error</h1>";
+        echo '<h1>500 Internal Server Error</h1>';
         $info = sprintf(
-                "[%s]\n %s:%d %s",
-                'Startup',
-                $e->getFile(),
-                $e->getLine(),
-                $e->getMessage()
-            );
-        die( $info );
+            "#%d %s @ %s:%d",
+            $code,
+            $message,
+            $file,
+            $line
+        );
+        die($info);
     }
 
 }

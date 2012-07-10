@@ -327,14 +327,15 @@ class Router
     }
 
     /**
-     * Returns the current route name e.g. '/route_pathname'.
+     * Returns, if set, the current route name.
+     * Alternatively, return the current path in scope.
      *
      * @return string|null
      */
     public function getName()
     {
-        #return isset($this->name) ? $this->name : $this->path;
-        return isset($this->name) ? $this->name : null;
+        return isset($this->name) ? $this->name
+            : ( isset($this->path) ? $this->path : null );
     }
 
 }

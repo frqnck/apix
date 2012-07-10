@@ -9,42 +9,73 @@ use Zenya\Api\Listener,
 
 class Input
 {
+    
     /**
-     * Get (& parse) body-data (refactor)
+     * Returns the format from an HTTP context.
      *
+     * @param  string   $context    The context to extract the format from.
+     * @return string               The extracted format.
+     */
+    static public function getFormat($context)
+    {
+        switch (true) {
+            // 'application/json'
+            case (strstr($context, '/json')):
+                $format = 'json';
+                break;
+
+            // 'text/xml', 'application/xml'
+            case (strstr($context, '/xml')
+                && (!strstr($context, 'html'))):
+                $format = 'xml';
+        }
+    
+        return isset($format) ? $format : null;
+    }
+
+    /**
+     * Returns the format from an HTTP Accept.
+     *
+     * @param  Request $request
+     * @return string  The output format
+     */
+    static public function getAcceptFormat(Request $request)
+    {
+        if ($request->hasHeader('HTTP_ACCEPT')) {
+            $accept = $request->getHeader('HTTP_ACCEPT');
+
+            if (!$format = self::getFormat($accept)) {
+                // 'application/javascript'
+                $format = strstr($accept, '/javascript') ? 'jsonp' : null;
+            }
+        }
+        return isset($format) ? $format : false;
+    }
+
+    /**
+     * Get & parse body-data.
+     *
+     * @param  Request  $request
+     * @param  boolean  $assoc   Wether to convert objects to associative arrays.
      * @return array
      */
-    static public function getBodyData(Request $request)
+    static public function getBodyData(Request $request, $assoc=true)
     {
-        #$request = $request === null ? Request::getInstance() : $request;
+        if ($request->hasBody() && $request->hasHeader('CONTENT-TYPE')) {
+            $ctx = $request->getHeader('CONTENT-TYPE');
 
-        if ( $request->hasHeader('CONTENT_TYPE') && $request->hasBody() ) {
-            $ct = $request->getHeader('CONTENT_TYPE');
-            switch (true) {
-                // application/x-www-form-urlencoded
-                case (strstr($ct, '/x-www-form-urlencoded')):
-                    $params = $request->getParams();
-                break;
-
-                // 'application/json'
-                case (strstr($ct, '/json')):
-                    $input = new Input\Json;
-                    $params = $input->decode($request->getBody(), true);
-                    #$this->request->setParams($r);
-                break;
-
-                // 'text/xml', 'application/xml'
-                case (strstr($ct, '/xml')
-                    && (!strstr($ct, 'html'))):
-                    $input = new Input\Xml;
-                    $params = $input->decode($request->getBody(), true);
-                    #$this->request->setParams($r);
-                break;
-
-                default:
-                    $params = null;
+            // application/x-www-form-urlencoded
+            if(strstr($ctx, '/x-www-form-urlencoded')) {
+                return $request->getParams();
+            } else if ($format = self::getFormat($ctx) ) {
+                $class = __NAMESPACE__ . '\Input\\' . ucfirst($format);
+                $input = new $class;
+                return $input->decode($request->getBody(), $assoc);
+                #$this->request->setParams($r);
             }
-            return $params;
+
+            return null;
         }
     }
+
 }
