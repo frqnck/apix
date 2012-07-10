@@ -28,20 +28,6 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->server->run();
     }
 
-    public function testGetFormatFromHttpAccept()
-    {
-        $this->request->expects($this->any())->method('hasHeader')->will($this->returnValue(true));
-        $this->request->expects($this->any())->method('getHeader')->will(
-            $this->onConsecutiveCalls('application/json', 'application/javascript', 'application/xml', 'text/xml', 'text/html' )
-        );
-
-        $this->assertEquals('json', $this->server->getFormatFromHttpAccept($this->request));
-        $this->assertEquals('jsonp', $this->server->getFormatFromHttpAccept($this->request));
-        $this->assertEquals('xml', $this->server->getFormatFromHttpAccept($this->request));
-        $this->assertEquals('xml', $this->server->getFormatFromHttpAccept($this->request));
-        $this->assertEquals(false, $this->server->getFormatFromHttpAccept($this->request));
-    }
-
     /**
      * @expectedException           \DomainException
      * @expectedExceptionCode       406

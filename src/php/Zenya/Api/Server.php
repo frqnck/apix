@@ -45,15 +45,17 @@ class Server extends Listener
         $this->resources = new Resources;
 
         // set the generic errors & exception handlers
-        set_error_handler(array('Zenya\Api\Exception', 'errorHandler'));
+        set_error_handler(array('Zenya\Api\Exception', 'errorHandler'), E_ALL);
         register_shutdown_function(array('Zenya\Api\Exception', 'shutdownHandler'));
     }
 
     /**
+    * @codeCoverageIgnore
     * @throws \InvalidArgumentException 404
     */
     public function run()
     {
+
         $c = Config::getInstance();
 
         // add all the resources from config.
@@ -131,7 +133,7 @@ class Server extends Listener
         $output = $this->response->generate(
                 $this->route->getController(),
                 $this->results,
-                $this->getServerVersion(),
+                $this->getServerVersion($this->config['api_realm'], $this->config['api_version']),
                 $this->config['output_rootNode']
             );
 
@@ -147,9 +149,9 @@ class Server extends Listener
      * @return string
      * @codeCoverageIgnore
      */
-    private function getServerVersion()
+    private function getServerVersion($realm, $version)
     {
-        return sprintf('%s/%s (%s)', $this->config['api_realm'], $this->config['api_version'], Server::VERSION);
+        return sprintf('%s/%s (%s)', $realm, $version, Server::VERSION);
     }
 
     /**
@@ -179,13 +181,13 @@ class Server extends Listener
             array(
                 'method'            => $request->getMethod(),
                 'path'              => $path,
-                'controller_name'   => null,
-                'controller_args'   => &$this, // TODO: temp!?'
+                'controller_name'   => null,    // TODO: TEMP!?
+                'controller_args'   => &$this,  // TODO: TEMP!?
             )
         );
 
         // Set the response format...
-        $this->negotiateFormat($opts, isset($ext)?$ext:null);
+        $this->negotiateFormat($opts, isset($ext)?$ext:false);
 
         $this->route->map($path, $request->getParams());
 
@@ -195,52 +197,21 @@ class Server extends Listener
     }
 
     /**
-     * Returns the output format from an HTTP Accept.
-     *
-     * @param  Request $request
-     * @return string  The output format
-     */
-    public function getFormatFromHttpAccept(Request $request)
-    {
-
-        if ($request->hasHeader('HTTP_ACCEPT')) {
-            $accept = $request->getHeader('HTTP_ACCEPT');
-
-            switch (true) {
-                // 'application/json'
-                case (strstr($accept, '/json')):
-                    $format ='json';
-                break;
-
-                // 'application/javascript'
-                case (strstr($accept, '/javascript')):
-                    $format ='jsonp';
-                break;
-
-                // 'text/xml', 'application/xml'
-                case (strstr($accept, '/xml')
-                    && (!strstr($accept, 'html'))):
-                    $format = 'xml';
-            }
-        }
-
-        return isset($format) ? $format : false;
-    }
-
-    /**
      * Returns the output format from the request chain.
-     * @param array $opts Options are:
-     *                      - [default] => string e.g. 'json',
-     *                      - [controller_ext] => boolean,
-     *                      - [override] => false or string use $_REQUEST['format'],
-     *                      - [http_accept] => boolean.
+     *
+     * @param  array $opts          Options are:
+     *                              - [default] => string e.g. 'json',
+     *                              - [controller_ext] => boolean,
+     *                              - [override] => false or string use $_REQUEST['format'],
+     *                              - [http_accept] => boolean.
+     * @param  string|false $ext    The contoller defined extension.
      * @return string
      */
-    public function negotiateFormat(array $opts, $extension=false)
+    public function negotiateFormat(array $opts, $ext=false)
     {
         switch (true) {
             case $opts['controller_ext']
-                && $format = $extension:
+                && $format = $ext:
             break;
 
             case false !== $opts['format_override']
@@ -248,9 +219,7 @@ class Server extends Listener
             break;
 
             case $opts['http_accept']
-                && $format = $this->getFormatFromHttpAccept(
-                        $this->request
-                    ):
+                && $format = Input::getAcceptFormat($this->request):
                 $this->response->setHeader('Vary', 'Accept');
             break;
 
