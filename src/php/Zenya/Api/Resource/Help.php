@@ -25,7 +25,6 @@ class Help
      */
     public function __construct()
     {
-        #$this->server = $server;
         $this->verbose = isset($_REQUEST['verbose'])?:false;
     }
 
@@ -68,20 +67,20 @@ class Help
      * @api_links OPTIONS /path/to/entity
      * @api_links OPTIONS /*
      */
-    public function onHelp(Entity $entity, Server $server, array $filters=null)
+    public function onHelp(Server $server, Entity $entity=null, array $filters=null)
     {
-
-//print_r($server);exit;
-
-
-        // apply to the whole server
+        // return the whole api doc
         if ($server->getRoute()->getName() == '/*') {
 
-            // return the whole api doc
             $doc = array();
-            foreach ($this->server->getResources() as $key => $entity) {
-                $doc[$resource] =  $this->_getHelp($entity, $filters);
+            foreach ($server->resources->toArray() as $key => $entity) {
+                $doc[$key] =  $this->getDocs($entity, $filters);
+                #$doc[$key] =  $entity->toArray();
             }
+
+echo '<pre>';print_r(
+    $doc
+);exit;
 
             // // set Content-Type (negotiate or default)
             // if( $request->hasHeader('CONTENT_LENGTH')
@@ -94,19 +93,19 @@ class Help
 
         } else {
             // one entity
-            return $this->_getHelp($entity, $filters);
+            return $this->getDocs($entity, $filters);
 
 
             // specific to just one resource.
             if ($resource == 'help') {
                 // helps help itslef
-                $doc = $this->_getHelp($this->server->route, $http_method, $filters);
+                $doc = $this->getDocs($this->server->route, $http_method, $filters);
             } else {
                 // helps specified resource
 
 
 
-                $doc = array($resource => $this->_getHelp($this->server->route, $http_method, $filters));
+                $doc = array($resource => $this->getDocs($this->server->route, $http_method, $filters));
             }
 
             // // A server that does not support such an extension MAY discard the request body.
@@ -129,7 +128,7 @@ class Help
      * @param  array  $filters
      * @return array  array
      */
-    private function _getHelp(Entity $entity, array $filters=null)
+    protected function getDocs(Entity $entity, array $filters=null)
     {
         // $man = $this->getParam('resource');
         // $resource = Zenya_Api_Resource::getInternalAppelation($man);

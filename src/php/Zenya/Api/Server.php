@@ -14,9 +14,12 @@ class Server extends Listener
 {
     const VERSION = '@package_version@';
 
-    private $config = array();
+    public $config = array(); // todo chnage this!
 
-    public $route = null;
+    public $request;
+    public $response;
+    public $route;
+    public $resources;
 
     public function __construct($config=null, Request $request=null, Response $response=null)
     {

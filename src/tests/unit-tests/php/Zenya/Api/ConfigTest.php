@@ -51,7 +51,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      * @expectedException       \RuntimeException
      * @expectedExceptionCode   5001
      */
-    public function testSetConfigFromFileNotReturnedThrowException()
+    public function testSetConfigFromFileNotReturnedThrowException5001()
     {
         $file = APP_TESTDIR . '/Zenya/Api/Fixtures/config-not-returned.unit-test.php';
         $this->config->getConfigFromFile($file);

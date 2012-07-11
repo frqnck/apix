@@ -98,6 +98,23 @@ class Resources
     }
 
     /**
+     * Gets the specified resource enity.
+     *
+     * @param   string                   $name  The resource name.
+     * @throws  /DomainException                 404
+     * @return  Entity/EntityInterface
+     */
+    public function getResource($name)
+    {
+        if(isset($this->resources[$name])) {
+            return $this->resources[$name];
+        }
+        throw new \DomainException(
+            sprintf('Invalid resource entity specified (%s).', $name), 404
+        );
+    }
+
+    /**
      * Gets the specified ressource entity from a route object.
      *
      * @param   Router                   $route  The resource route object.
@@ -106,31 +123,25 @@ class Resources
      */
     public function get(Router &$route)
     {
-        $name = $route->getName();
-        if (!isset($this->resources[$name])) {
-            throw new \DomainException(
-                sprintf('Invalid resource entity specified (%s).', $name), 404
-            );
-        }
-        $entity = $this->resources[$name];
+        $entity = $this->getResource(
+            $route->getName()
+        );
 
         // swap if aliased/redirected
         if ($redirect = $entity->getRedirect()) {
-            $entity = $this->resources[$redirect];
+            $entity = $this->getResource($redirect);
+        }
+
+        // handles the default actions. And allow local overrides.
+        $method = $route->getMethod();
+        if(
+            ($redirect = $entity->getDefaultAction($method))
+            && !$entity->hasMethod($method)
+        ) {
+            $entity = $this->getResource($redirect);
+            $route->setParams(array('entity' => $entity)); // clone?
         }
         $entity->setRoute($route);
-
-        // handle the default actions (and allow local overrides).
-        $method = $route->getMethod();
-        if( !$entity->hasMethod($method)
-           && $entity->hasMethod($method, $entity->getDefaultActions()) ) {
-            $route->setName(
-                $entity->getDefaultAction($method)
-            );
-            $route->setParams(array('entity' => $entity));
-        
-            return $this->get($route);
-        }
 
         return $entity;
     }
