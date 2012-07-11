@@ -58,6 +58,11 @@ $c['services'] = array(
 
 // resources
 $c['resources'] = array(
+    '/*' => array(
+        'redirect' => 'help',
+    ),
+);
+$c['resources_OFF'] = array(
 
     // '/:controller/:param1/:param2' => array(
     //     'controller' => array(
@@ -95,9 +100,9 @@ $c['resources'] = array(
         'redirect' => 'help',
     ),
 
-    '/test/:resource/:http_method/:filters' => array(
-        'redirect' => 'test',
-    ),
+    // '/test/:resource/:http_method/:filters' => array(
+    //     'redirect' => 'test',
+    // ),
 
 );
 

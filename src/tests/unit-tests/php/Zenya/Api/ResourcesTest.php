@@ -8,27 +8,28 @@ use Zenya\Api\Entity,
 class ResourcesTest extends \PHPUnit_Framework_TestCase
 {
 
-    protected $resources, $entity, $route;
+    protected $resources, $route;
 
     protected function setUp()
     {
-        $this->entity = $this->getMock('Zenya\Api\Entity\EntityInterface');
-
-        $this->route = $this->getMock('Zenya\Api\Router');
-        $this->route->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('/route'));
-
         $resources = new Resources;
-        $resources->setEntity($this->entity);
+        $resources->setEntity(
+            $this->getMock('Zenya\Api\Entity\EntityInterface')
+        );
+        $resources->add('/paris', array('action'=>function(){return 'metro';}, 'method'=>'some'));
 
         $this->resources = $resources;
+
+        $this->route = $this->getMock('Zenya\Api\Router');
+
+        $this->route->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('/paris'));
     }
 
     protected function tearDown()
     {
         unset($this->resources);
-        unset($this->entity);
         unset($this->route);
     }
 
@@ -38,19 +39,20 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetEntity()
     {
-        #$this->resources->setEntity($this->entity);
-
         $r = new \ReflectionObject($this->resources);
-        $p = $r->getProperty('entity');
-        $p->setAccessible(true);
+        $entity = $r->getProperty('entity');
+        $entity->setAccessible(true);
 
-        $this->assertSame($this->entity, $this->resources->getEntity());
+        $this->assertSame(
+            $entity->getValue($this->resources),
+            $this->resources->getEntity()
+        );
     }
 
     /**
      * @covers Zenya\Api\Resources::has
      */
-    public function testHasEntityObject($name='whatever')
+    public function testHasEntityObject($name='mango')
     {
         $this->resources->add($name, array());
         $this->assertTrue($this->resources->has($name));
@@ -60,16 +62,16 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
     /**
      * @covers Zenya\Api\Resources::toArray
      */
-    public function testToArray($name='whatever')
+    public function testToArray()
     {
-        $this->assertSame(array(), $this->resources->toArray());
+        $resources = new Resources;
+        $this->assertSame(array(), $resources->toArray());
 
-        $this->resources->add('name1', array());
-        $this->resources->add('name2', array());
-
-        $this->assertSame(2, count($this->resources->toArray()));
-        $this->assertArrayHasKey('name1', $this->resources->toArray());
-        $this->assertArrayHasKey('name2', $this->resources->toArray());
+        $resources->add('name1', array());
+        $resources->add('name2', array());
+        $this->assertSame(2, count($resources->toArray()));
+        $this->assertArrayHasKey('name1', $resources->toArray());
+        $this->assertArrayHasKey('name2', $resources->toArray());
     }
 
     /**
@@ -77,62 +79,60 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetReturnsEntityInterface()
     {
-        $this->resources->add('/route', array());
         $this->assertInstanceOf('Zenya\Api\Entity\EntityInterface', $this->resources->get($this->route));
     }
 
     /**
+     * Should throw a 404, Invalid resource entity specified.
+     *
      * @expectedException           \DomainException
      * @expectedExceptionCode       404
      */
     public function testGetThrowsDomainException()
     {
-        // not resources where defined, and none wodu therefore macth
-        $this->resources->get($this->route);
+        $route = $this->getMock('Zenya\Api\Router');
+        $this->resources->get($route);
     }
 
     public function testGetFollowsRedirect()
     {
-        $this->resources->add('Pierre', array('redirect'=>'Jacques'));
-        $this->resources->add('Jacques', array());
+        $this->resources->add('/milan', array('redirect'=>'/paris'));
 
         $route = $this->getMock('Zenya\Api\Router');
         $route->expects($this->any(3))
             ->method('getName')
-            ->will($this->onConsecutiveCalls('Jacques', 'Pierre'));
-        $this->assertEquals($this->resources->get($route), $this->resources->get($route), 'Pierre should be equal to Jacques');
+            ->will($this->onConsecutiveCalls('/paris', '/milan'));
+
+        $this->assertEquals($this->resources->get($route), $this->resources->get($route), '/milan should be equal to /paris');
     }
 
-    public function testGetFollowsSubsequentRedirect()
+    public function testGetFollowsAllTheSubsequentRedirects()
     {
-        $this->resources->add('Paul', array('redirect'=>'Pierre'));
-        $this->resources->add('Pierre', array('redirect'=>'Jacques'));
-        $this->resources->add('Jacques', array());
+        $this->resources->add('/pierre', array('redirect'=>'/paul'));
+        $this->resources->add('/paul', array('redirect'=>'/jacques'));
+        $this->resources->add('/jacques', array('redirect'=>'/paris'));
 
         $route = $this->getMock('Zenya\Api\Router');
         $route->expects($this->once())
             ->method('getName')
-            ->will($this->returnValue('Paul'));
+            ->will($this->returnValue('/pierre'));
 
-        $this->assertEquals('Jacques', $this->resources->get($route)->getRedirect(), 'Paul follows a redirect from Pierre, and equals to Jacques');
+        $this->assertEquals('/jacques', $this->resources->get($route)->getRedirect(), '/pierre follows a redirect from /paul to /jacques');
     }
 
     public function testGetDoNotRedirect()
     {
-        $this->resources->add('Paul', array('redirect'=>'Pierre'));
-        $this->resources->add('Pierre', array('redirect'=>'Jacques'));
-        $this->resources->add('Jacques', array());
+        $this->resources->add('/pierre', array('redirect'=>'/paul'));
+        $this->resources->add('/paul', array('redirect'=>'/jacques'));
+        $this->resources->add('/jacques', array('redirect'=>'/paris'));
 
         $route = $this->getMock('Zenya\Api\Router');
         $route->expects($this->exactly(2))
             ->method('getName')
-            ->will($this->onConsecutiveCalls('Jacques', 'Paul'));
-        $this->assertNotEquals($this->resources->get($route), $this->resources->get($route), 'Paul should not be equal to Jacques');
-    }
+            ->will($this->onConsecutiveCalls('/jacques', '/paul'));
 
-#######
-##### TODO: review below when we refactor!
-#######
+        $this->assertNotEquals($this->resources->get($route), $this->resources->get($route), '/pierre should not be equal to /jacques');
+    }
 
     /**
      * @covers Zenya\Api\Resources::add
@@ -145,20 +145,48 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
     public function testAddClosureObject()
     {
-        $this->resources->add('/route', array('action'=>function(){return 'string';}, 'method'=>'some'));
         $this->assertInstanceOf('Zenya\Api\Entity\EntityClosure', $this->resources->get($this->route));
     }
 
     public function testAddClassObject()
     {
-        // TODO: use 'controller' instead of default to class...
-        $this->resources->add('/route', array());
-        $this->assertInstanceOf('Zenya\Api\Entity\EntityClass', $this->resources->get($this->route));
+        $this->resources->add('/london', array(
+            'controller' => array(
+                'name' => __NAMESPACE__ . '\Fixtures\BlankResource',
+            )
+        ));
+
+        $route = $this->getMock('Zenya\Api\Router');
+        $route->expects($this->once())
+            ->method('getName')
+            ->will($this->returnValue('/london'));
+
+        $this->assertInstanceOf('Zenya\Api\Entity\EntityClass', $this->resources->get($route));
     }
+
+    public function testRedirectToHelp()
+    {
+        $this->resources->add('help', array(
+            'controller' => array(
+                'name' => __NAMESPACE__ . '\Resource\Help',
+            )
+        ));
+
+        $this->route->expects($this->any())
+            ->method('getMethod')
+            ->will($this->returnValue('OPTIONS'));
+
+        $this->assertSame($this->resources->getResource('help'), $this->resources->get($this->route));
+    }
+
+
+#######
+##### TODO: review below when we refactor!
+#######
 
     public function testAddGroupObject()
     {
-        $this->markTestIncomplete('TODO: group objcts!');
+        $this->markTestIncomplete('TODO: grouping of objcts!');
 
         // $this->resources->add('group', array('group'=>function(){return 'string';}, 'method'=>'some'));
         // $this->assertInstanceOf('Zenya\Api\Entity\EntityClosure', $this->resources->get('closure'));
