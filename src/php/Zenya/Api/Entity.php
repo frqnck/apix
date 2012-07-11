@@ -40,48 +40,11 @@ class Entity extends Listener
      * @return array
      * @throws Zenya\Api\Exception
      * @see EntityInterface::_call
-     *
-     * @todo OPTIONS returns the help array for now, will need to redirect the entity instead... using clone!
      */
     public function call()
     {
-        //$method = $this->route->getMethod();
-
-        // if ($method == 'OPTIONS') {
-        //     return $this->getDocs();
-        // }
-
-        #print_r( $this );
-        #print_r($this->getActions());
-
-        // Handler for the generic methods.
-        // if( !$this->hasMethod($method)
-        //     && $this->hasMethod($method, $this->overrides)
-        // ) {
-        //     $this->route->setParams(
-        //         array('entity' => clone $this)
-        //     );
-
-        //     // TEMP: should be a DIC here!
-        //     $c = Config::getInstance();
-        //     $alt = $c->getResources($this->overrides[$method]);
-
-        //     // TEMP: and here, auto inject!
-        //     $alt['controller']['args'] = $c->getInjected('Server');
-
-        //     $this->controller = $alt['controller'];
-
-        //     print_r( $this->controller['name'] );
-
-
-        //     // $this->controller = array(
-        //     //    'name' => 'Zenya\Api\Resource\Help',
-        //     //    'args' => $this->route->controller_args
-        //     // );
-        // }
-
         return $this->underlineCall($this->route);
-   }
+    }
 
     /**
      * Does this entity hold the specified method?
@@ -113,7 +76,9 @@ class Entity extends Listener
      */
     public function getDefaultAction($method)
     {
-        return $this->defaultActions[$method];
+        if(isset($this->defaultActions[$method])) {
+            return $this->defaultActions[$method];
+        }
     }
 
     /**
@@ -177,8 +142,8 @@ class Entity extends Listener
                 $params[$name] = $routeParams[$name];
             }
         }
-        // TODO: maybe we need to check the order of params key match the method?
-        // TODO: maybe add a type casting handler here
+        // TODO: maybe we need to check the order of params to match the method?
+        // TODO: maybe add a type casting handler.
         return $params;
     }
 

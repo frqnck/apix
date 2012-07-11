@@ -23,16 +23,18 @@ class EntityClass extends Entity implements EntityInterface
      */
     public function reflectedClass()
     {
-       # if (null == $this->reflection) {
+
+// tODO
+        echo '-' . $this->controller['name'] . '<br>';
+        if (null == $this->reflection) {
             try {
                 $this->reflection = new \ReflectionClass(
                     $this->controller['name']
                 );
             } catch (\Exception $Exception) {
-                throw new \RuntimeException("Resource entity not (yet) implemented.", 501);
+                throw new \RuntimeException('Resource entity class not (yet) implemented.', 501);
             }
-        #}
-
+        }
 
         return $this->reflection;
     }
