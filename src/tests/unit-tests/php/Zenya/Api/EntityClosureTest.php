@@ -100,9 +100,8 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
     public function testGetActions()
     {
         $actions = $this->entity->getActions();
-
-        // has the overide todo
-        $this->assertSame(3, count($actions));
+        $this->assertSame(1, count($actions));
+        $this->assertSame('GET', key($actions));
     }
 
     public function testAddRedirect()

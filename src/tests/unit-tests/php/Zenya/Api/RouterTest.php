@@ -348,20 +348,28 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('GET', $route->getMethod() );
     }
 
+    /**
+     * @expectedException           \InvalidArgumentException
+     */
     public function testGetSetParam()
     {
         $route = new Router;
         $route->setParam('test', 'value');
         $this->assertSame('value', $route->getParam('test') );
+
+        $route->getParam('-inexistant-');
     }
 
-    public function testGetName()
+    public function testGetSetName()
     {
         $route = new Router(array('/'=>array()));
-        $this->assertSame(null, $route->getName() );
+        $this->assertSame(null, $route->getName());
+
+        $route->setName('test');
+        $this->assertSame('test', $route->getName());
 
         $route->map('/');
-        $this->assertSame('/', $route->getName() );
-    }
+        $this->assertSame('/', $route->getName());
+   }
 
 }
