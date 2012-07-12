@@ -49,6 +49,13 @@ class Server extends Listener
 
         // set the resources
         $this->resources = new Resources;
+
+        // add all the resources from config.
+        foreach ($c->getResources() as $key => $values) {
+            $this->resources->add(
+                $key, $values
+            );
+        }
     }
 
     /**
@@ -79,23 +86,15 @@ class Server extends Listener
     */
     public function run()
     {
-
         $c = Config::getInstance();
-
-        // add all the resources from config.
-        foreach ($c->getResources() as $key => $values) {
-            $this->resources->add(
-                $key, $values
-            );
-        }
             // set the routing
             $this->setRouting(
                 $this->request,
                 $this->resources->toArray(),
                 $this->config['routing']
             );
-        try {
 
+        try {
 
             // attach the early listeners @ pre-processing stage
             $this->addAllListeners('server', 'early');
@@ -161,7 +160,8 @@ class Server extends Listener
         // attach the late listeners @ post-processing stage
         $this->addAllListeners('server', 'late');
 
-        return $this->route->getMethod() != 'HEAD' ? $output : null;
+        return $output;
+        #return $this->route->getMethod() != 'HEAD' ? $output : null;
     }
 
     /**
@@ -181,10 +181,14 @@ class Server extends Listener
      * @param  Request $request
      * @return void
      */
-    public function setRouting(Request $request, array $resources, array $opts)
+    public function setRouting(Request $request, array $resources, array $opts=null)
     {
-        // Get path without the route prefix
-        $path = preg_replace($opts['route_prefix'], '', $request->getUri());
+
+        $path =
+            // Get path without the route prefix
+            isset($opts['route_prefix']) ? preg_replace($opts['route_prefix'], '', $request->getUri())
+            : $request->getUri();
+
 
         // check controller_ext
         if ($opts['controller_ext']) {
@@ -209,7 +213,9 @@ class Server extends Listener
         );
 
         // Set the response format...
-        $this->negotiateFormat($opts, isset($ext)?$ext:false);
+        if(null !== $opts) {
+            $this->negotiateFormat($opts, isset($ext)?$ext:false);
+        }
 
         $this->route->map($path, $request->getParams());
 

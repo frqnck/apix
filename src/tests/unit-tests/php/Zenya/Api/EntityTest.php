@@ -98,10 +98,12 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Zenya\Api\Resources', $params['resources']);
     }
 
-    public function testSetRoute()
+    public function testSetGetRoute()
     {
         $this->entity->setRoute($this->route);
         $this->assertAttributeEquals($this->route, 'route', $this->entity);
+
+        $this->assertEquals($this->route, $this->entity->getRoute());
     }
 
     public function testGetHasRedirect()
