@@ -58,11 +58,6 @@ $c['services'] = array(
 
 // resources
 $c['resources'] = array(
-    '/*' => array(
-        'redirect' => 'help',
-    ),
-);
-$c['resources_OFF'] = array(
 
     // '/:controller/:param1/:param2' => array(
     //     'controller' => array(

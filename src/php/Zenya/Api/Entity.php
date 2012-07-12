@@ -168,6 +168,15 @@ class Entity extends Listener
     //     return $this->route;
     // }
 
+    /**
+     * Returns the redirect location.
+     *
+     * @return string
+     */
+    public function hasRedirect()
+    {
+        return isset($this->redirect);
+    }
 
     /**
      * Returns the redirect location.
