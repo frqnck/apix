@@ -2,8 +2,7 @@
 
 namespace Zenya\Api\Resource;
 
-use Zenya\Api\Reflection,
-    Zenya\Api\Entity,
+use Zenya\Api\Entity,
     Zenya\Api\Server,
     Zenya\Api\Request,
     Zenya\Api\Router;
@@ -25,7 +24,16 @@ class Help
      */
     public function __construct()
     {
-        $this->verbose = isset($_REQUEST['verbose'])?$_REQUEST['verbose']:false;
+        $this->verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
+    }
+
+    public function getEntityFromPath($server)
+    {
+        $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
+        if(!empty($path) && $server->resources->has($path)) {
+            $server->route->setName($path);
+            return $server->resources->get($server->route);
+        }
     }
 
     /**
@@ -38,14 +46,13 @@ class Help
      *
      * @api_link GET /help/path/to/entity
      */
-    public function onRead(Server $server, $path, array $filters=null)
+    public function onRead(Server $server, array $filters=null)
     {
-        $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
-        $server->route->setName($path);
-        $entity = $server->resources->get($server->route);
-        return array(
-            $path => $this->getDocs($entity, $filters)
-        );
+        echo 'GET HELP';
+        $entity = $this->getEntityFromPath($server);
+        $name = $server->getRoute()->getName();
+        //$name = empty($name) ? 'all' : $name;
+        return $this->onHelp($server, $entity, $filters);
     }
 
     /**
@@ -69,6 +76,7 @@ class Help
      */
     public function onHelp(Server $server, Entity $entity=null, array $filters=null)
     {
+
         // output the whole api doc
         if ($server->getRoute()->getName() == '/*' || null == $entity) {
             $server->route->setController('help');
@@ -78,6 +86,7 @@ class Help
                     $doc[$key] = $this->getDocs($entity, $filters);
                 }
             }
+            return $doc;
 
             // // set Content-Type (negotiate or default)
             // if(
@@ -89,33 +98,9 @@ class Help
             // }
 
         } else {
-            // one entity
+            // output docs for the specified resource entity
             return $this->getDocs($entity, $filters);
-
-
-            // specific to just one resource.
-            if ($resource == 'help') {
-                // helps help itslef
-                $doc = $this->getDocs($this->server->route, $http_method, $filters);
-            } else {
-                // helps specified resource
-
-
-
-                $doc = array($resource => $this->getDocs($this->server->route, $http_method, $filters));
-            }
-
-            // // A server that does not support such an extension MAY discard the request body.
-            // if ( null === $this->server->request->getRawBody()) {
-            //     $this->server->response->setHeader('Content-Length', 0);
-            // }
-            // $this->server->response->setHeader('Allow',
-            //     implode(', ', $this->server->resource->getMethodKeys())
-            // );
-
         }
-
-        return $doc;
     }
 
     /**
@@ -134,8 +119,8 @@ class Help
 
         if ($this->verbose) {
             return array(
-                'TODO'          => 'Verbose mode',
-                'end-user-doc'  => $entity->getDocs()
+                'operator-manual' => 'TODO verbose/admin mode (display AUTH/ACL, Cache entries, etc...)',
+                'end-user-manual' => $entity->getDocs()
             );
         }
 

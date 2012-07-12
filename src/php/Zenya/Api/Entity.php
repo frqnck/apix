@@ -23,14 +23,14 @@ class Entity extends Listener
     /**
      * Appends the given array definition and apply generic mappings.
      *
-     * @param  array $definitions
+     * @param  array $def   An entity array definition.
      * @return void
      * @see EntityInterface::_append
      */
-    final public function _append(array $defs)
+    final public function _append(array $def)
     {
-        if (isset($defs['redirect'])) {
-            $this->redirect = $defs['redirect'];
+        if (isset($def['redirect'])) {
+            $this->redirect = $def['redirect'];
         }
     }
 
@@ -159,14 +159,14 @@ class Entity extends Listener
     }
 
     /**
-     * Returns the route object.
-     *
-     * @return Router
-     */
-    // public function getRoute()
-    // {
-    //     return $this->route;
-    // }
+    * Returns the route object.
+    *
+    * @return Router
+    */
+    public function getRoute()
+    {
+        return $this->route;
+    }
 
     /**
      * Returns the redirect location.

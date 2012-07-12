@@ -39,12 +39,12 @@ class EntityClass extends Entity implements EntityInterface
     /**
      * {@inheritdoc}
      */
-    public function append(array $defs)
+    public function append(array $def)
     {
-        parent::_append($defs);
+        parent::_append($def);
 
-        if (isset($defs['controller'])) {
-            $this->controller = $defs['controller'];
+        if (isset($def['controller'])) {
+            $this->controller = $def['controller'];
         }
     }
 
