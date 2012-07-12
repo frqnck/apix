@@ -25,7 +25,7 @@ class Help
      */
     public function __construct()
     {
-        $this->verbose = isset($_REQUEST['verbose'])?:false;
+        $this->verbose = isset($_REQUEST['verbose'])?$_REQUEST['verbose']:false;
     }
 
     /**
@@ -38,18 +38,18 @@ class Help
      *
      * @api_link GET /help/path/to/entity
      */
-    public function onRead($path, array $filters=null)
+    public function onRead(Server $server, $path, array $filters=null)
     {
-        $path = preg_replace('@^.*help(\.\w+)?@i', '', $this->server->request->getUri());
-        $entity = $this->server->resources->get($path);
-
+        $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
+        $server->route->setName($path);
+        $entity = $server->resources->get($server->route);
         return array(
-            $path => $this->_getHelp($entity, $filters)
+            $path => $this->getDocs($entity, $filters)
         );
     }
 
     /**
-     * Outputs help info for a resource entity (OPTIONS request).
+     * Help info for a resource entity (OPTIONS request).
      *
      * The OPTIONS method represents a request for information about the
      * communication options available on the request/response chain
@@ -69,25 +69,22 @@ class Help
      */
     public function onHelp(Server $server, Entity $entity=null, array $filters=null)
     {
-        // return the whole api doc
-        if ($server->getRoute()->getName() == '/*') {
-
+        // output the whole api doc
+        if ($server->getRoute()->getName() == '/*' || null == $entity) {
+            $server->route->setController('help');
             $doc = array();
             foreach ($server->resources->toArray() as $key => $entity) {
-                $doc[$key] =  $this->getDocs($entity, $filters);
-                #$doc[$key] =  $entity->toArray();
+                if(!$entity->hasRedirect()) {
+                    $doc[$key] = $this->getDocs($entity, $filters);
+                }
             }
 
-echo '<pre>';print_r(
-    $doc
-);exit;
-
             // // set Content-Type (negotiate or default)
-            // if( $request->hasHeader('CONTENT_LENGTH')
-            //     || $request->hasHeader('TRANSFER_ENCODING')
+            // if(
+            //      $request->hasHeader('CONTENT_LENGTH')
+            //      || $request->hasHeader('TRANSFER_ENCODING')
             // ) {
-            //     // TODO: process the $this->server->body!
-            //     // @expect   client request  has an entity-body (indicated by Content-Length or Transfer-Encoding) then client's Content-Type must be set.
+            //     // @expect   client request has an entity-body (indicated by Content-Length or Transfer-Encoding) then client's Content-Type must be set.
             //     return array('doc'=>'Todo: return all the resource doc as per CONTENT_LENGTH and/or TRANSFER_ENCODING');
             // }
 
