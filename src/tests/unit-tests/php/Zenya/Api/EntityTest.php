@@ -104,11 +104,12 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($this->route, 'route', $this->entity);
     }
 
-    public function testGetRedirect()
+    public function testGetHasRedirect()
     {
-        $this->entity->_append(array('redirect'=>'test'));
-
-        $this->assertSame('test', $this->entity->getRedirect());
+        $this->assertFalse($this->entity->hasRedirect());
+        $this->entity->_append(array('redirect'=>'route-name-to-redirect-to'));
+        $this->assertTrue($this->entity->hasRedirect());
+        $this->assertSame('route-name-to-redirect-to', $this->entity->getRedirect());
     }
 
     public function testIsPublic()
