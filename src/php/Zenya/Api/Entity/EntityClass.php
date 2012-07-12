@@ -23,10 +23,7 @@ class EntityClass extends Entity implements EntityInterface
      */
     public function reflectedClass()
     {
-
-// tODO
-        echo '-' . $this->controller['name'] . '<br>';
-        if (null == $this->reflection) {
+        if (null === $this->reflection) {
             try {
                 $this->reflection = new \ReflectionClass(
                     $this->controller['name']
