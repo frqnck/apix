@@ -10,7 +10,20 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->api = new Server;
+        $this->request = $this->getMockBuilder('Zenya\Api\Request')->disableOriginalConstructor()->getMock();
+
+        $this->api = new Server(false, $this->request);
+
+        $this->api->onCreate('/create/:test',
+            /**
+             * Create something...
+             *
+             * @return array  The array to return to the client
+             */
+            function($test) {
+                return array("You just created $test.");
+            }
+        );
 
         $this->api->onRead('/unit/:test',
             /**
@@ -35,6 +48,12 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
         );
         #$this->api->run();
 
+        $this->api->setRouting(
+            $this->request,
+            $this->api->resources->toArray()
+        );
+
+
         $this->help = new Resource\Help($this->api);
     }
 
@@ -44,29 +63,75 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
         unset($this->help);
     }
 
-    public function OFFtestOnHelpRetrieveOneEntity()
+    public function testGetEntityFromPath()
     {
-        $route = new Router(array('/unit/:test'=>array()));
-        $route->map('/unit/test');
+        $this->request->expects($this->any())
+            ->method('getUri')
+            ->will( $this->onConsecutiveCalls('/', '/unit/:test', '/*') );
 
-        $entity = $this->api->resources->get($route);
+        $this->assertSame(null, $this->help->getEntityFromPath($this->api));
+        $this->assertInstanceOf('Zenya\Api\Entity', $this->help->getEntityFromPath($this->api));
+    }
 
-        $help = $this->help->onHelp($entity, $this->api);
-        #print_r($help);
+    public function testOnReadReturnsArrayForOneEntity()
+    {
+        $this->request->expects($this->any())
+            ->method('getUri')
+            ->will( $this->onConsecutiveCalls('/unit/:test') );
+
+        $results = $this->help->onRead($this->api);
+
+        $this->assertArrayHasKey('GET', $results['methods']);
+        $this->assertArrayHasKey('PATCH', $results['methods']);
+        $this->assertEquals(3, count($results));
+    }
+
+    protected function genericTest($results)
+    {
+        $this->assertArrayHasKey('/unit/:test', $results);
+        $this->assertArrayHasKey('GET', $results['/unit/:test']['methods']);
+        $this->assertArrayHasKey('PATCH', $results['/unit/:test']['methods']);
+
+        $this->assertArrayHasKey('/create/:test', $results);
+        $this->assertArrayHasKey('POST', $results['/create/:test']['methods']);
+    }
+
+    public function testOnReadReturnsArrayForAllEntities()
+    {
+        $this->request->expects($this->any())
+            ->method('getUri')
+            ->will( $this->onConsecutiveCalls('/') );
+
+        $results = $this->help->onRead($this->api);
+        $this->assertTrue( count($results)>1 );
+
+        $this->genericTest($results);
     }
 
     public function testOnHelpRetrieveAllTheEntities()
     {
-        #$route = $this->api->getRoute();
-        #$route->map('/unit/test');
+        $this->request->expects($this->any())
+            ->method('getUri')
+            ->will( $this->onConsecutiveCalls('/*') );
 
-        $route = new Router(array('/*'=>array()));
-        $route->map('/*');
+        $results = $this->help->onHelp($this->api);
 
-        $entity = $this->api->resources->get($route);
+        $this->genericTest($results);
+    }
 
-        $help = $this->help->onHelp($entity);
-        print_r($help);
+    public function testVerboseOutput()
+    {
+        $_REQUEST['verbose'] = true;
+        $this->help = new Resource\Help($this->api);
+
+        $this->request->expects($this->any())
+            ->method('getUri')
+            ->will( $this->onConsecutiveCalls('/*') );
+
+        $results = $this->help->onHelp($this->api);
+
+        $this->assertArrayHasKey('operator-manual', $results['/unit/:test']);
+        $this->assertArrayHasKey('end-user-manual', $results['/unit/:test']);
     }
 
 }
