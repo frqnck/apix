@@ -101,7 +101,7 @@ class Resources
      * Gets the specified resource enity.
      *
      * @param   string                   $name  The resource name.
-     * @throws  /DomainException                 404
+     * @throws  /DomainException                404
      * @return  Entity/EntityInterface
      */
     public function getResource($name)
