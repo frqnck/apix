@@ -183,12 +183,14 @@ class Server extends Listener
      */
     public function setRouting(Request $request, array $resources, array $opts=null)
     {
-
         $path =
             // Get path without the route prefix
             isset($opts['route_prefix']) ? preg_replace($opts['route_prefix'], '', $request->getUri())
             : $request->getUri();
 
+        if ($path == '') {
+            $path = '/';
+        }
 
         // check controller_ext
         if ($opts['controller_ext']) {

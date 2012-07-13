@@ -56,16 +56,17 @@ $c['services'] = array(
     }
 );
 
-// resources
+// resources class definitions
 $c['resources'] = array(
 
     // '/:controller/:param1/:param2' => array(
     //     'controller' => array(
-    //         'name' => 'Zenya\Api\Fixtures\BlankResource',
-    //         'args' => array('classArg1' => 'test1', 'classArg2' => 'test2')
+    //         'name' => 'namespace\classname',                 # string
+    //         'args' => array('classArg1' => 'test1', ...)     # array|null
     //     )
     // ),
 
+/*
     '/keywords/:keyword' => array(
         'controller' => array(
             'name' => 'Zenya\Api\Fixtures\BlankResource',
@@ -86,6 +87,14 @@ $c['resources'] = array(
             'args'  => null,
         )
     ),
+ */
+
+    // '/' => array(
+    //     'controller' => array(
+    //         'name' => 'a_classname representing an index maybe',
+    //         'args' => null
+    //     )
+    // ),
 
     '/help/:path' => array(
         'redirect' => 'help',
