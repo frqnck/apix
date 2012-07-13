@@ -27,17 +27,18 @@ class Help
         $this->verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
     }
 
-    public function getEntityFromPath($server)
+    public function setRouteName(&$server)
     {
         $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
         if(!empty($path) && $server->resources->has($path)) {
-            $server->route->setName($path);
-            return $server->resources->get($server->route);
+            $server->getRoute()->setName($path);
         }
+        return $path;
     }
 
     /**
-     * Outputs help info for a resource entity (GET request).
+     * Outputs help info for a resource path.
+     *
      * Filters can be use to narrow down to a specified method.
      *
      * @param  string $path    A path to a resource entity to retrieve
@@ -48,15 +49,16 @@ class Help
      */
     public function onRead(Server $server, array $filters=null)
     {
-        echo 'GET HELP';
-        $entity = $this->getEntityFromPath($server);
+        $this->setRouteName($server);
+
         #$name = $server->getRoute()->getName();
         //$name = empty($name) ? 'all' : $name;
-        return $this->onHelp($server, $entity, $filters);
+
+        return $this->onHelp($server, $filters);
     }
 
     /**
-     * Help info for a resource entity (OPTIONS request).
+     * Outputs help info for a resource entity.
      *
      * The OPTIONS method represents a request for information about the
      * communication options available on the request/response chain
@@ -74,16 +76,17 @@ class Help
      * @api_links OPTIONS /path/to/entity
      * @api_links OPTIONS /*
      */
-    public function onHelp(Server $server, Entity $entity=null, array $filters=null)
+    public function onHelp(Server $server, array $filters=null)
     {
-        if(  null === $entity && $server->route->getName()) {
-            $entity = $server->resources->get($server->route);
-        }
+        $route = $server->getRoute();
+        $entity = $route->getName()
+            ? $server->resources->get($route, false)
+            : null;
 
         // output the whole api doc
-        if ( $server->getRoute()->getName() == '/*' || null === $entity
+        if ( null === $entity || $route->getName() == '/*'
             ) {
-            $server->route->setController('help');
+            $route->setController('help');
             $doc = array();
             foreach ($server->resources->toArray() as $key => $entity) {
                 if(!$entity->hasRedirect()) {
