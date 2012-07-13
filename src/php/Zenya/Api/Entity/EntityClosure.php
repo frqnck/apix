@@ -14,8 +14,6 @@ use Zenya\Api\Entity,
 class EntityClosure extends Entity implements EntityInterface
 {
 
-    protected $actions = array();
-
     public $group;
 
     private $reflection;
@@ -50,6 +48,16 @@ class EntityClosure extends Entity implements EntityInterface
         // }
         $this->actions[$def['method']] = $def;
     }
+
+    /**
+     * {@inheritdoc}
+     * @codeCoverageIgnore
+     */
+    public function setActions(array $asso = null)
+    {
+        // obsolete!
+    }
+
 
     /**
      * {@inheritdoc}
@@ -103,14 +111,6 @@ class EntityClosure extends Entity implements EntityInterface
         }
 
         return $method;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getActions()
-    {
-        return $this->actions;
     }
 
     private function getAction($method)

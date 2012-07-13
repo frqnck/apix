@@ -12,7 +12,7 @@ class EntityClassTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    public $definition = array('controller'=>array('name'=>'Zenya\Api\Fixtures\CrudClass', 'args'=>array()),'redirect'=>'location');
+    public $definition = array('controller'=>array('name'=>'Zenya\Api\Fixtures\CrudClass', 'args'=>null), 'redirect'=>'location');
     protected $entity, $route;
 
     protected function setUp()
@@ -68,6 +68,13 @@ class EntityClassTest extends \PHPUnit_Framework_TestCase
         $this->entity->underlineCall($this->route);
     }
 
+    public function testGetActions()
+    {
+        $actions = $this->entity->getActions();
+        $this->assertSame(4, count($actions));
+    }
+
+
     public function testParseDocsClassLevel()
     {
         $docs = $this->entity->_parseDocs();
@@ -80,12 +87,6 @@ class EntityClassTest extends \PHPUnit_Framework_TestCase
         $method = $this->entity->getMethod($this->route);
         $this->assertInstanceOf('ReflectionMethod',  $method, "Shoulf be a ReflectionMethod instance");
         $this->assertSame('onRead', $method->getShortName());
-    }
-
-    public function testGetActions()
-    {
-        $actions = $this->entity->getActions();
-        $this->assertSame(4, count($actions));
     }
 
     public function testGetMethods()
