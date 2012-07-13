@@ -69,10 +69,10 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
             ->method('getUri')
             ->will( $this->onConsecutiveCalls('/', '/unit/:test', '/*') );
 
-        $this->help->setRouteName($this->api);
+        $this->help->onRead($this->api);
         $this->assertSame(null, $this->api->getRoute()->getName());
 
-        $this->help->setRouteName($this->api);
+        $this->help->onRead($this->api);
         $this->assertSame('/unit/:test', $this->api->getRoute()->getName());
     }
 
@@ -83,10 +83,11 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
             ->will( $this->onConsecutiveCalls('/unit/:test') );
 
         $results = $this->help->onRead($this->api);
+        $res = $results[$this->help->doc_nodeName];
 
-        $this->assertArrayHasKey('GET', $results['methods']);
-        $this->assertArrayHasKey('PATCH', $results['methods']);
-        $this->assertEquals(3, count($results));
+        $this->assertArrayHasKey('GET', $res['methods']);
+        $this->assertArrayHasKey('PATCH', $res['methods']);
+        $this->assertEquals(3, count($res));
     }
 
     protected function genericTest($results)
@@ -133,8 +134,8 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
 
         $results = $this->help->onHelp($this->api);
 
-        $this->assertArrayHasKey('operator-manual', $results['/unit/:test']);
-        $this->assertArrayHasKey('end-user-manual', $results['/unit/:test']);
+        $this->assertArrayHasKey($this->help->private_nodeName, $results['/unit/:test']);
+        $this->assertArrayHasKey($this->help->public_nodeName, $results['/unit/:test']);
     }
 
 }
