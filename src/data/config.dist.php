@@ -73,6 +73,8 @@ $c['resources'] = array(
             'args' => array('arg1'=>'value1', 'arg2'=>'string')
         )
     ),
+ */
+/*
 
     '/auth/:param1' => array(
         'controller' => array(
@@ -91,7 +93,7 @@ $c['resources'] = array(
 
     // '/' => array(
     //     'controller' => array(
-    //         'name' => 'a_classname representing an index maybe',
+    //         'name' => 'namespace\classname',
     //         'args' => null
     //     )
     // ),

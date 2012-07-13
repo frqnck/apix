@@ -121,20 +121,16 @@ class Help
 
         $out = $entity->getDocs();
 
-        $out = $this->array_unshift_assoc($out, 'path', $path);
+        // unshift associatively (php sucks!)
+        $out = array_reverse($out, true);
+        $out['path'] =  $path;
+        $out = array_reverse($out, true);
 
         if ($verbose) {
             $out[$this->private_nodeName] = 'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)';
         }
 
         return $out;
-    }
-
-    function array_unshift_assoc(&$arr, $key, $val)
-    {
-        $arr = array_reverse($arr, true);
-        $arr[$key] = $val;
-        return array_reverse($arr, true);
     }
 
 }

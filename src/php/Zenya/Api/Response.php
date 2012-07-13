@@ -324,13 +324,13 @@ class Response
      *
      * @return array
      */
-    public function collate($name, $results)
+    public function collate(Router $route, $results)
     {
-        $array = array($name => $results);
+        $array = array($route->getController() => $results);
 
         if ($this->sign === true) {
             $array['signature'] = array(
-                'request'   => sprintf('%s %s', $this->request->getMethod(), $this->request->getUri()),
+                'resource'   => sprintf('%s %s', $route->getMethod(), $route->getName()),
                 'status'    => sprintf(
                                 '%d %s - %s',
                                 $this->getHttpCode(),
@@ -344,9 +344,10 @@ class Response
 
         if ($this->debug === true) {
             $array['debug'] = array(
+                    'request'   => sprintf('%s %s %s', $this->request->getMethod(), $this->request->getRequestUri(), !isset($_SERVER['SERVER_PROTOCOL'])?null:$_SERVER['SERVER_PROTOCOL']),
                     'headers'	=> $this->getHeaders(),
-                    'format'    => $this->getFormat(),
-                    #'params'    => $this->request->route->getParams(),
+                    'output_format'    => $this->getFormat(),
+                    'router_params'    => $route->getParams(),
             );
         }
 
@@ -361,14 +362,14 @@ class Response
      * @param  string $rootNode
      * @return string
      */
-    public function generate($name, array $results, $version_string='ouarz', $rootNode='root')
+    public function generate(Router $route, array $results, $version_string='ouarz', $rootNode='root')
     {
         $renderer = __NAMESPACE__ . '\Output\\' . ucfirst($this->getFormat());
         $output = new $renderer($this->encoding);
         $this->setHeader('Content-Type', $output->getContentType());
         $this->sendAllHttpHeaders($this->getHttpCode(), $version_string);
 
-        return $output->encode($this->collate($name, $results), $rootNode);
+        return $output->encode($this->collate($route, $results), $rootNode);
     }
 
 }
