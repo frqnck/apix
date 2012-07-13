@@ -63,14 +63,17 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
         unset($this->help);
     }
 
-    public function testGetEntityFromPath()
+    public function testSetRouteName()
     {
         $this->request->expects($this->any())
             ->method('getUri')
             ->will( $this->onConsecutiveCalls('/', '/unit/:test', '/*') );
 
-        $this->assertSame(null, $this->help->getEntityFromPath($this->api));
-        $this->assertInstanceOf('Zenya\Api\Entity', $this->help->getEntityFromPath($this->api));
+        $this->help->setRouteName($this->api);
+        $this->assertSame(null, $this->api->getRoute()->getName());
+
+        $this->help->setRouteName($this->api);
+        $this->assertSame('/unit/:test', $this->api->getRoute()->getName());
     }
 
     public function testOnReadReturnsArrayForOneEntity()

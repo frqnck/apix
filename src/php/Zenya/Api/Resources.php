@@ -121,7 +121,7 @@ class Resources
      * @throws  /DomainException                 404
      * @return  Entity/EntityInterface
      */
-    public function get(Router &$route)
+    public function get(Router &$route, $follow=true)
     {
         $entity = $this->getResource(
             $route->getName()
@@ -133,13 +133,15 @@ class Resources
         }
 
         // handles the default actions but do not override local definition.
-        $method = $route->getMethod();
-        if(
-            ($redirect = $entity->getDefaultAction($method))
-            && !$entity->hasMethod($method)
-        ) {
-            $entity = $this->getResource($redirect);
-            #$route->setParams(array('entity' => $entity)); // use clone?
+        if($follow===true) {
+            $method = $route->getMethod();
+            if(
+                ($redirect = $entity->getDefaultAction($method))
+                && !$entity->hasMethod($method)
+            ) {
+                $entity = $this->getResource($redirect);
+                #$route->setParams(array('entity' => $entity)); // use clone?
+            }
         }
         $entity->setRoute($route);
 
