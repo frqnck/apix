@@ -20,8 +20,7 @@ class Help
     public $doc_nodeName = 'documentation';
 
     // only use in verbose mode.
-    public $private_nodeName = 'private';
-    public $public_nodeName  = 'public';
+    public $private_nodeName = 'verbose';
 
     /**
      * Outputs help info for a resource path.
@@ -68,16 +67,17 @@ class Help
     {
         $route = $server->getRoute();
 
-        $entity = $route->getName() && $route->getName() != '/*'
+        $entity = $route->getName() != '/' && $route->getName() != '/*'
             ? $server->resources->get($route, false)
             : null;
 
         // returns the whole api doc.
         if ( null === $entity ) {
             $doc = array();
-            foreach ($server->resources->toArray() as $key => $entity) {
+            foreach ($server->resources->toArray() as $path => $entity) {
                 if(!$entity->hasRedirect()) {
-                    $doc[$key] = $this->getDocs($entity, $filters);
+                    #$doc[$path] = $this->getDocs($entity, $filters);
+                    $doc[] = $this->getDocs($path, $entity, $filters);
                 }
             }
 
@@ -97,7 +97,7 @@ class Help
 
         } else {
             // returns the specified entity doc.
-            return array($this->doc_nodeName => $this->getDocs($entity, $filters));
+            return array($this->doc_nodeName => $this->getDocs($route->getName(), $entity, $filters));
         }
 
     }
@@ -105,11 +105,12 @@ class Help
     /**
      * Get an entity documentaion.
      *
+     * @param  string           $path           The Request-URI for that entity.
      * @param  EntityInterface  $entity         An Entity object.
      * @param  array            $filters=null   An array of filters.
      * @return array                            The array documentation.
      */
-    protected function getDocs(Entity $entity, array $filters=null)
+    protected function getDocs($path, Entity $entity, array $filters=null)
     {
         // $man = $this->getParam('resource');
         // $resource = Zenya_Api_Resource::getInternalAppelation($man);
@@ -118,14 +119,22 @@ class Help
 
         $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
 
+        $out = $entity->getDocs();
+
+        $out = $this->array_unshift_assoc($out, 'path', $path);
+
         if ($verbose) {
-            return array(
-                $this->private_nodeName => 'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)',
-                $this->public_nodeName  => $entity->getDocs()
-            );
+            $out[$this->private_nodeName] = 'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)';
         }
 
-        return $entity->getDocs();
+        return $out;
+    }
+
+    function array_unshift_assoc(&$arr, $key, $val)
+    {
+        $arr = array_reverse($arr, true);
+        $arr[$key] = $val;
+        return array_reverse($arr, true);
     }
 
 }

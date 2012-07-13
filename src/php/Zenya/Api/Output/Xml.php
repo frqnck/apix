@@ -69,6 +69,7 @@ class Xml extends Adapter
     protected function arrayToXml(\SimpleXMLElement $xml, array $array)
     {
         foreach ($array as $k => $v) {
+            // replace numeric index key to 'item' e.g. <results<item>...</item></results>
             if (is_int($k)) {
                 $k = 'item';
             }
@@ -82,7 +83,10 @@ class Xml extends Adapter
                     $this->arrayToXml($child, $v);
                 }
             } else {
-                $xml->addChild($k, htmlentities($v, ENT_NOQUOTES, $this->encoding));
+                $xml->addChild(
+                    $k,
+                    htmlentities($v, ENT_NOQUOTES, $this->encoding)
+                );
             }
         }
     }
@@ -115,4 +119,40 @@ class Xml extends Adapter
         return $xml;
     }
 
+}
+
+if( !function_exists( 'xmlentities' ) ) {
+
+    function xmlentities( $string ) {
+
+        $not_in_list = "A-Z0-9a-z\s_-";
+        return preg_replace_callback( "/[^{$not_in_list}]/" , function($CHAR) {
+        if( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
+            die( "function: 'get_xml_entity_at_index_zero' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type." );
+        }
+        switch( $CHAR[0] ) {
+            case "'":    case '"':    case '&':    case '<':    case '>': case ':': case '/':
+                return htmlspecialchars( $CHAR[0], ENT_QUOTES );    break;
+            default:
+                return numeric_entity_4_char($CHAR[0]);                break;
+        }
+            }, $string );
+    }
+
+    function get_xml_entity_at_index_zero( $CHAR ) {
+        if( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
+            die( "function: 'get_xml_entity_at_index_zero' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type." );
+        }
+        switch( $CHAR[0] ) {
+            case "'":    case '"':    case '&':    case '<':    case '>':
+                return htmlspecialchars( $CHAR[0], ENT_QUOTES );    break;
+            default:
+                return numeric_entity_4_char($CHAR[0]); break;
+        }
+    }
+
+
+    function numeric_entity_4_char( $char ) {
+        return "&#".str_pad(ord($char), 3, '0', STR_PAD_LEFT).";";
+    }
 }

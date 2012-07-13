@@ -107,7 +107,6 @@ class Entity extends Listener
             return isset($this->docs['methods'][$method])
                     ? $this->docs['methods'][$method] : null;
         }
-
         return $this->docs;
     }
 
