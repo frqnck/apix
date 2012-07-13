@@ -132,14 +132,14 @@ class Resources
             $entity = $this->getResource($redirect);
         }
 
-        // handles the default actions. And allow local overrides.
+        // handles the default actions but do not override local definition.
         $method = $route->getMethod();
         if(
             ($redirect = $entity->getDefaultAction($method))
             && !$entity->hasMethod($method)
         ) {
             $entity = $this->getResource($redirect);
-            $route->setParams(array('entity' => $entity)); // clone?
+            #$route->setParams(array('entity' => $entity)); // use clone?
         }
         $entity->setRoute($route);
 
