@@ -122,7 +122,7 @@ class EntityClass extends Entity implements EntityInterface
     /**
      * {@inheritdoc}
      */
-    public function getActions()
+    public function setActions(array $asso = null)
     {
         $funcs = array();
         foreach ($this->getMethods() as $ref) {
@@ -130,7 +130,7 @@ class EntityClass extends Entity implements EntityInterface
         }
         $routes = Router::$actions;
 
-        return array_intersect($routes, $funcs);
+        $this->actions = array_intersect($routes, $funcs);
     }
 
     /**

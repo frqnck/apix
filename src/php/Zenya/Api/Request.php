@@ -71,7 +71,6 @@ class Request
         $this->setBody();
     }
 
-
     public function getUri()
     {
         if (null === $this->uri) {
@@ -81,30 +80,31 @@ class Request
         return $this->uri;
     }
 
+    public function getRequestUri()
+    {
+        if (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
+            $uri = $_SERVER['HTTP_X_REWRITE_URL'];
+        } elseif (isset($_SERVER['IIS_WasUrlRewritten'])
+                && $_SERVER['IIS_WasUrlRewritten'] == '1'
+                && isset($_SERVER['UNENCODED_URL'])
+                && $_SERVER['UNENCODED_URL'] != ''
+        ) {
+            $uri = $_SERVER['UNENCODED_URL'];
+        } elseif (isset($_SERVER['REQUEST_URI'])) {
+            $uri = $_SERVER['REQUEST_URI'];
+        } elseif (isset($_SERVER['PATH_INFO'])) {
+            $uri = $_SERVER['PATH_INFO'];
+        } elseif (isset($_SERVER['ORIG_PATH_INFO'])) {
+            $uri = $_SERVER['ORIG_PATH_INFO'];
+        }
+
+        return isset($uri) ? $uri : '/';
+    }
+
     public function setUri($uri=false)
     {
-        if (false === $uri) {
-            if (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
-                $uri = $_SERVER['HTTP_X_REWRITE_URL'];
-            } elseif (isset($_SERVER['IIS_WasUrlRewritten'])
-                    && $_SERVER['IIS_WasUrlRewritten'] == '1'
-                    && isset($_SERVER['UNENCODED_URL'])
-                    && $_SERVER['UNENCODED_URL'] != ''
-            ) {
-                $uri = $_SERVER['UNENCODED_URL'];
-            } elseif (isset($_SERVER['REQUEST_URI'])) {
-                $uri = $_SERVER['REQUEST_URI'];
-            } elseif (isset($_SERVER['PATH_INFO'])) {
-                $uri = $_SERVER['PATH_INFO'];
-            } elseif (isset($_SERVER['ORIG_PATH_INFO'])) {
-                $uri = $_SERVER['ORIG_PATH_INFO'];
-            }
-        }
+        $uri = false === $uri ? $this->getRequestUri() : $uri;
         $uri = parse_url($uri, PHP_URL_PATH);
-
-        if ($uri == '') {
-            $uri = '/';
-        }
 
         if ( $uri != '/' && substr($uri, -1) == '/' ) {
             $uri = substr($uri, 0, -1);

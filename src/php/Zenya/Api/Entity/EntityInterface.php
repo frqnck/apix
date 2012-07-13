@@ -41,11 +41,11 @@ interface EntityInterface
     public function getMethod(Router $route);
 
     /**
-     * Returns an array of method keys and action values.
+     * Sets the actions array.
      *
-     * @param  array $array
-     * @return array
+     * @param  array $array=null    An associative array of methods as keys and actions as values.
+     * @return void
      */
-    public function getActions();
+    public function setActions(array $asso = null);
 
 }

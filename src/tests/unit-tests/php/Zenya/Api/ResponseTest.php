@@ -8,18 +8,31 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Zenya_Api_Response
      */
-    protected $responce;
+    protected $response;
 
     protected function setUp()
     {
         $request = Request::getInstance();
         $this->response = new Response($request);
         $this->response->unit_test = true;
+
+        $this->route = $this->getMock('Zenya\Api\Router');
+
+        $this->route->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('/resource'));
+
+        $this->route->expects($this->any())
+            ->method('getController')
+            ->will($this->returnValue('resource'));
+
     }
 
     protected function tearDown()
     {
         unset($this->response);
+        unset($this->route);
+
     }
 
     /**
@@ -124,7 +137,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             array('resource' => array('results')),
-            $this->response->collate('resource', array('results'))
+            $this->response->collate($this->route, array('results'))
         );
     }
 
@@ -134,16 +147,20 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(
             array(
                 'resource' => array('results'),
-                'debug' => array('headers'=> array(), 'format' => 'html')
+                'debug' => array(
+                    'request' => 'METHD / ',
+                    'headers' => array(),
+                    'output_format' => 'html',
+                    'router_params' => null)
             ),
-            $this->response->collate('resource', array('results'))
+            $this->response->collate($this->route, array('results'))
         );
     }
 
     public function testCollateWithSignature()
     {
         $this->response->sign = true;
-        $results = $this->response->collate('resource', array('results'));
+        $results = $this->response->collate($this->route, array('results'));
 
         $this->assertArrayHasKey('signature', $results);
     }
@@ -152,7 +169,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->response->debug=true;
         $this->response->sign=true;
-        $results = $this->response->collate('resource', array('results'));
+        $results = $this->response->collate($this->route, array('results'));
 
         $this->assertArrayHasKey('resource', $results);
         $this->assertArrayHasKey('signature', $results);
@@ -184,7 +201,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             $html,
-            $this->response->generate('resource', $results)
+            $this->response->generate($this->route, $results)
         );
     }
 
@@ -194,7 +211,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $results = array('results');
         $this->assertSame(
             '{"root":{"resource":["results"]}}',
-            $this->response->generate('resource', $results)
+            $this->response->generate($this->route, $results)
         );
     }
 
@@ -212,7 +229,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             '<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL . $xml,
-            $this->response->generate('resource', $results)
+            $this->response->generate($this->route, $results)
         );
     }
 

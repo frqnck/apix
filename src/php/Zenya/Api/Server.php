@@ -143,7 +143,7 @@ class Server extends Listener
             case 405:
                 $this->response->setHeader('Allow',
                     implode(', ', array_keys(
-                        $entity->getActions()+$entity->defaultActions()
+                        $entity->getAllActions()
                     )),
                     false // preserve existing
                 );
@@ -151,7 +151,7 @@ class Server extends Listener
         }
 
         $output = $this->response->generate(
-                $this->route->getController(),
+                $this->route,
                 $this->results,
                 $this->getServerVersion($this->config['api_realm'], $this->config['api_version']),
                 $this->config['output_rootNode']
@@ -160,8 +160,8 @@ class Server extends Listener
         // attach the late listeners @ post-processing stage
         $this->addAllListeners('server', 'late');
 
-        return $output;
-        #return $this->route->getMethod() != 'HEAD' ? $output : null;
+        return  $output;
+        return $this->request->getMethod() != 'HEAD' ? $output : null;
     }
 
     /**

@@ -64,11 +64,49 @@ class EntityTest extends \PHPUnit_Framework_TestCase
        $this->assertTrue($this->entity->hasMethod('POST'));
     }
 
-    public function testGetDefaultActionsAndAction()
+    public function testGetDefaultAction()
     {
        $this->assertSame('help', $this->entity->getDefaultAction('OPTIONS'));
        $this->assertNull($this->entity->getDefaultAction('inexistant'));
-       $this->assertSame(array('OPTIONS'=>'help', 'HEAD'=>'test'), $this->entity->getDefaultActions());
+   }
+
+   // public function testSetActions()
+   //  {
+   //      $r = new \ReflectionObject($this->entity);
+   //      $prop1 = $r->getProperty('actions');
+   //      $prop1->setAccessible(true);
+
+   //      $this->entity->setActions( array('key'=>'val') );
+
+   //      $this->assertSame(
+   //          $prop1->getValue($this->entity),
+   //          $this->entity->getAllActions()
+   //      );
+
+   //  }
+
+    /**
+     * @dataProvider actionProvider
+     */
+   public function testGetAllActions(array $actions, array $expected)
+    {
+        $this->entity->expects($this->any())
+                ->method('getActions')
+                ->will($this->returnValue($actions));
+
+        $this->assertSame(
+            $expected,
+            $this->entity->getAllActions()
+        );
+    }
+
+    public function actionProvider()
+    {
+        return array(
+            'Without GET Has No HEAD' => array( array(), array('OPTIONS' => 'help')),
+            'With GET has HEAD' => array(array('GET'=>'some'), array('GET'=>'some', 'OPTIONS' => 'help', 'HEAD' => 'test') ),
+            'HAs POST but without GET has no HEAD' => array(array('POST'=>'some'), array('POST'=>'some', 'OPTIONS' => 'help') ),
+        );
     }
 
     /**

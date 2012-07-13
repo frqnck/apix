@@ -194,6 +194,27 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->resources->getResource('/paris'), $this->resources->get($this->route, false));
     }
 
+    public function testHeadRequestSetRouteMethodToGet()
+    {
+        $this->resources->add('GET', array(
+            'controller' => array(
+                'name' => __NAMESPACE__ . '\Resource\Help',
+            )
+        ));
+        $this->resources->add('HEAD', array(
+            'controller' => array(
+                'name' => __NAMESPACE__ . '\Resource\Help',
+            )
+        ));
+        $this->route->expects($this->any())
+            ->method('getMethod')
+            ->will($this->returnValue('HEAD'));
+
+        $entity = $this->resources->get($this->route);
+
+        $this->assertSame('get', $this->route->getMethod());
+    }
+
 #######
 ##### TODO: review below when we refactor!
 #######
