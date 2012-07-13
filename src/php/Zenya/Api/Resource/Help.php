@@ -50,7 +50,7 @@ class Help
     {
         echo 'GET HELP';
         $entity = $this->getEntityFromPath($server);
-        $name = $server->getRoute()->getName();
+        #$name = $server->getRoute()->getName();
         //$name = empty($name) ? 'all' : $name;
         return $this->onHelp($server, $entity, $filters);
     }
@@ -76,9 +76,13 @@ class Help
      */
     public function onHelp(Server $server, Entity $entity=null, array $filters=null)
     {
+        if(  null === $entity && $server->route->getName()) {
+            $entity = $server->resources->get($server->route);
+        }
 
         // output the whole api doc
-        if ($server->getRoute()->getName() == '/*' || null == $entity) {
+        if ( $server->getRoute()->getName() == '/*' || null === $entity
+            ) {
             $server->route->setController('help');
             $doc = array();
             foreach ($server->resources->toArray() as $key => $entity) {
