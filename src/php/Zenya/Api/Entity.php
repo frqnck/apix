@@ -18,7 +18,12 @@ class Entity extends Listener
 
     protected $redirect;
 
-    protected $defaultActions = array('OPTIONS'=>'help', 'HEAD'=>'test');
+    protected $actions = null;
+
+    protected $defaultActions = array(
+        'OPTIONS'=>'help',
+        'HEAD'=>'test'
+    );
 
     /**
      * Appends the given array definition and apply generic mappings.
@@ -47,30 +52,34 @@ class Entity extends Listener
     }
 
     /**
-     * Does this entity hold the specified method?
+     * Checks wether the current entity holds the specified method.
      *
      * @param   string    $method
      * @param   array     $actions=null   Use to override local actions.
      * @return  boolean
      */
-    public function hasMethod($method, array $actions = null)
+    public function hasMethod($method)
     {
-        $actions = null === $actions ? $this->getActions() : $actions;
-        return in_array($method, array_keys($actions));
+        return array_key_exists($method, $this->getActions());
     }
 
     /**
-     * Returns all the default actions.
+     * Returns all the available actions.
      *
      * @return  array
      */
-    public function getDefaultActions()
+    public function getAllActions()
     {
-        return $this->defaultActions;
+        $current = null === $this->getActions() ? array() : $this->getActions();
+        $default = $this->defaultActions;
+        if(false == array_key_exists('GET', $current) ) {
+            unset($default['HEAD']);
+        }
+        return $current+$default;
     }
 
     /**
-     * Gets the speified default action.
+     * Gets the specified default action.
      *
      * @return  string
      */
@@ -207,6 +216,20 @@ class Entity extends Listener
         }
 
         return false;
+    }
+
+    /**
+     * Returns an array of method keys and action values.
+     *
+     * @param  array $array
+     * @return array
+     */
+    public function getActions()
+    {
+        if(null === $this->actions) {
+            $this->setActions();
+        }
+        return $this->actions;
     }
 
 }

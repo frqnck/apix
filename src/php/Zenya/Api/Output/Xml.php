@@ -121,6 +121,7 @@ class Xml extends Adapter
 
 }
 
+/*
 if( !function_exists( 'xmlentities' ) ) {
 
     function xmlentities( $string ) {
@@ -156,3 +157,4 @@ if( !function_exists( 'xmlentities' ) ) {
         return "&#".str_pad(ord($char), 3, '0', STR_PAD_LEFT).";";
     }
 }
+*/
