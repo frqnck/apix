@@ -17,42 +17,30 @@ use Zenya\Api\Entity,
  */
 class Help
 {
-    /**
-     * Constructor
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
-    }
+    public $doc_nodeName = 'documentation';
 
-    public function setRouteName(&$server)
-    {
-        $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
-        if(!empty($path) && $server->resources->has($path)) {
-            $server->getRoute()->setName($path);
-        }
-        return $path;
-    }
+    // only use in verbose mode.
+    public $private_nodeName = 'private';
+    public $public_nodeName  = 'public';
 
     /**
      * Outputs help info for a resource path.
      *
      * Filters can be use to narrow down to a specified method.
      *
-     * @param  string $path    A path to a resource entity to retrieve
-     * @param  array  $filters An array of filters (optional)
-     * @return array
+     * @param   Server   $server    The main server object.
+     * @param   array    $filters   An array of filters.
+     * @return  array
+     * @see     self::onHelp
      *
-     * @api_link GET /help/path/to/entity
+     * @api_link    GET /help/path/to/entity
      */
     public function onRead(Server $server, array $filters=null)
     {
-        $this->setRouteName($server);
-
-        #$name = $server->getRoute()->getName();
-        //$name = empty($name) ? 'all' : $name;
+        $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
+        if(!empty($path) && $server->resources->has($path)) {
+            $server->getRoute()->setName($path);
+        }
 
         return $this->onHelp($server, $filters);
     }
@@ -69,30 +57,33 @@ class Help
      *
      * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
      *
-     * @param  string $path    A path to a resource entity to retrieve
-     * @param  array  $filters An array of filters (optional)
-     * @return array
+     * @param  Server   $server    The main server object.
+     * @param  array    $filters   An array of filters.
+     * @return array               The array documentation.
      *
-     * @api_links OPTIONS /path/to/entity
-     * @api_links OPTIONS /*
+     * @api_link    OPTIONS /path/to/entity
+     * @api_link    OPTIONS /*
      */
     public function onHelp(Server $server, array $filters=null)
     {
         $route = $server->getRoute();
-        $entity = $route->getName()
+
+        $entity = $route->getName() && $route->getName() != '/*'
             ? $server->resources->get($route, false)
             : null;
 
-        // output the whole api doc
-        if ( null === $entity || $route->getName() == '/*'
-            ) {
-            $route->setController('help');
+        // returns the whole api doc.
+        if ( null === $entity ) {
             $doc = array();
             foreach ($server->resources->toArray() as $key => $entity) {
                 if(!$entity->hasRedirect()) {
                     $doc[$key] = $this->getDocs($entity, $filters);
                 }
             }
+
+            // insures the top node is set to help.
+            $route->setController('help');
+
             return $doc;
 
             // // set Content-Type (negotiate or default)
@@ -105,17 +96,18 @@ class Help
             // }
 
         } else {
-            // output docs for the specified resource entity
-            return $this->getDocs($entity, $filters);
+            // returns the specified entity doc.
+            return array($this->doc_nodeName => $this->getDocs($entity, $filters));
         }
+
     }
 
     /**
      * Get an entity documentaion.
      *
-     * @param  string $entity
-     * @param  array  $filters
-     * @return array  array
+     * @param  EntityInterface  $entity         An Entity object.
+     * @param  array            $filters=null   An array of filters.
+     * @return array                            The array documentation.
      */
     protected function getDocs(Entity $entity, array $filters=null)
     {
@@ -124,10 +116,12 @@ class Help
         // $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
         // $this->_output = $help->toArray();
 
-        if ($this->verbose) {
+        $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
+
+        if ($verbose) {
             return array(
-                'operator-manual' => 'TODO verbose/admin mode (display AUTH/ACL, Cache entries, etc...)',
-                'end-user-manual' => $entity->getDocs()
+                $this->private_nodeName => 'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)',
+                $this->public_nodeName  => $entity->getDocs()
             );
         }
 
