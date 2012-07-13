@@ -201,18 +201,18 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
                 'name' => __NAMESPACE__ . '\Resource\Help',
             )
         ));
-        $this->resources->add('HEAD', array(
+        $this->resources->add('test', array(
             'controller' => array(
                 'name' => __NAMESPACE__ . '\Resource\Help',
             )
         ));
-        $this->route->expects($this->any())
+        $this->route->expects($this->once())
             ->method('getMethod')
             ->will($this->returnValue('HEAD'));
 
         $entity = $this->resources->get($this->route);
 
-        $this->assertSame('get', $this->route->getMethod());
+        $this->assertSame('GET', $this->route->getMethod());
     }
 
 #######
