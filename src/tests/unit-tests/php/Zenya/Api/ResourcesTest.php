@@ -164,7 +164,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Zenya\Api\Entity\EntityClass', $this->resources->get($route));
     }
 
-    public function testRedirectToHelp()
+    public function testRedirectToTheHelpResourceOnHelpRequest()
     {
         $this->resources->add('help', array(
             'controller' => array(
@@ -179,6 +179,20 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->resources->getResource('help'), $this->resources->get($this->route));
     }
 
+    public function testDoNotRedirectToTheHelpResourceOnHelpRequestWhenFollowIsFalse()
+    {
+        $this->resources->add('help', array(
+            'controller' => array(
+                'name' => __NAMESPACE__ . '\Resource\Help',
+            )
+        ));
+
+        $this->route->expects($this->any())
+            ->method('getMethod')
+            ->will($this->returnValue('OPTIONS'));
+
+        $this->assertSame($this->resources->getResource('/paris'), $this->resources->get($this->route, false));
+    }
 
 #######
 ##### TODO: review below when we refactor!
