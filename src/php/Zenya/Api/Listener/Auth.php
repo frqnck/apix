@@ -8,7 +8,7 @@ class Auth implements \SplObserver
      * Constructor.
      *
      * @param object $adapter Can be a file path (default: php://output), a resource,
-     *                      or an instance of the PEAR Log class.
+     *                        or an instance of the PEAR Log class.
      * @param array $events Array of events to listen to (default: all events)
      *
      * @return void
@@ -36,19 +36,22 @@ class Auth implements \SplObserver
     {
         // skip if public
         if ($entity->isPublic()) {
-          return;
+          return false;
         }
 
         $username = $this->adapter->authenticate();
         if (!$username) {
-            throw new Exception('Authentication Required', 401);
+            throw new Exception('Authentication required', 401);
         }
 
         // todo set X_REMOTE_USER or X_AUTH_USER
-        #$entity->response->setHeader('X_REMOTE_USER', $username);
+        //$entity->getResponse()->setHeader('X_REMOTE_USER', $username);
         $_SERVER['X_AUTH_USER'] = $username;
+        
+        return $username;
 
-        return;
+
+
 
         $s = new \Zenya_Model_Session;
 

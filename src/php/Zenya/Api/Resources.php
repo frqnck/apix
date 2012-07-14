@@ -136,15 +136,16 @@ class Resources
         if($follow===true) {
             $method = $route->getMethod();
 
-            if ($method == 'HEAD' && $entity->hasMethod('GET')) {
+            if ( $method == 'HEAD' && $entity->hasMethod('GET') ) {
                 $route->setMethod('GET');
-            } else
+            }
+            
             if (
-                ($redirect = $entity->getDefaultAction($method))
+                ( $redirect = $entity->getDefaultAction($method) )
                 && !$entity->hasMethod($method)
             ) {
                 $entity = $this->getResource($redirect);
-                #$route->setParams(array('entity' => $entity)); // use clone?
+                #$route->setParams(array('entity' => clone $entity));
             }
         }
 

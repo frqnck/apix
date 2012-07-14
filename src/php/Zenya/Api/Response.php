@@ -337,18 +337,21 @@ class Response
                                 $this->getStatusPrases(),
                                 $this->getStatusAdjective()
                             ),
-                'timestamp' => gmdate('Y-m-d H:i:s') . ' UTC',
                 'client_ip' => $this->request->getIp(true)
             );
         }
 
         if ($this->debug === true) {
             $array['debug'] = array(
+                    'timestamp' => gmdate('Y-m-d H:i:s') . ' UTC',
                     'request'   => sprintf('%s %s %s', $this->request->getMethod(), $this->request->getRequestUri(), !isset($_SERVER['SERVER_PROTOCOL'])?null:$_SERVER['SERVER_PROTOCOL']),
                     'headers'	=> $this->getHeaders(),
                     'output_format'    => $this->getFormat(),
                     'router_params'    => $route->getParams(),
             );
+
+            $array['debug']['user'] = isset($_SERVER['X_AUTH_USER']) ? $_SERVER['X_AUTH_USER'] : null;
+
         }
 
         return $array;

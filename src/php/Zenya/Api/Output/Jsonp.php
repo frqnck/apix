@@ -22,7 +22,7 @@ class Jsonp extends Adapter
     {
         $cb = isset($_REQUEST['callback']) && !empty($_REQUEST['callback'])
                         ? $_REQUEST['callback']
-                        : 'callback';
+                        : $rootNode;
 
         $json = new Json();
         $str = $json->encode($data, $rootNode);
