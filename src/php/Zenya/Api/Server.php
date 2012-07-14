@@ -27,8 +27,7 @@ class Server extends Listener
         $c = $config instanceOf Config ? $config : Config::getInstance($config);
         $this->config = $c->get();
 
-        $this->init($this->config['init']);
-
+        $this->init($this->config);
 
         // TEMP
         $c->inject('Server', $this);
@@ -68,9 +67,10 @@ class Server extends Listener
      */
     public function init(array $configs)
     {
-        if(!defined('UNIT_TEST')) {
+        if(!defined('UNIT_TEST') && isset($configs['init'])
+            ) {
             // set config inits
-            foreach($configs as $key => $value) {
+            foreach($configs['init'] as $key => $value) {
                 ini_set($key, $value);
             }
         }
@@ -176,7 +176,7 @@ class Server extends Listener
     }
 
     /**
-     * Sets the router.
+     * Sets and initialise the routing processes.
      *
      * @param  Request $request
      * @return void
@@ -185,7 +185,7 @@ class Server extends Listener
     {
         $path =
             // Get path without the route prefix
-            isset($opts['route_prefix']) ? preg_replace($opts['route_prefix'], '', $request->getUri())
+            isset($opts['path_prefix']) ? preg_replace($opts['path_prefix'], '', $request->getUri())
             : $request->getUri();
 
         if ($path == '') {
