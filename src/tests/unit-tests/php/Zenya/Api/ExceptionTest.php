@@ -26,11 +26,15 @@ class ExceptionTest extends \PHPUnit_Framework_TestCase
         unset($this->route);
     }
 
-    // public function testAppend()
-    // {
+    public function testAppend()
+    {
+        $this->markTestIncomplete(
+            'This test has not been implemented yet.'
+        );
+
     //     $entity = $this->entity->toArray();
 
     //     $this->assertSame($this->definition['controller'], $entity['controller']);
     //     $this
-    // }
+    }
 }

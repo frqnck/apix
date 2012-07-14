@@ -50,7 +50,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
             'controller_ext set to true' => array(
                 'uri'=>'/index.php/api/v1/mock.xml/test/param',
                 'options' => array(
-                    'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
                     'default_format'    => 'xml',
                     'controller_ext'    => true,
                     'format_override'   => false,
@@ -64,7 +64,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
             'controller_ext set to false' => array(
                 'uri'=>'/index.php/api/v1/mock.json/test/param',
                 'options' => array(
-                    'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
                     'default_format'    => 'json',
                     'controller_ext'    => false,
                     'format_override'   => false,
@@ -78,7 +78,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
             'format_override set' => array(
                 'uri'=>'/index.php/api/v1/mock.json/test/param',
                 'options' => array(
-                    'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
                     'default_format'    => 'json',
                     'controller_ext'    => false,
                     'format_override'   => 'html',
@@ -92,7 +92,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
             'http_accept is set (but none provided)' => array(
                 'uri'=>'/index.php/api/v1/mock.json/test/param',
                 'options' => array(
-                    'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
                     'default_format'    => 'xml',
                     'controller_ext'    => false,
                     'format_override'   => false,
@@ -106,7 +106,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
             'all false, shodu use default' => array(
                 'uri'=>'/index.php/api/v1/mock.json/test/param',
                 'options' => array(
-                    'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
                     'default_format'    => 'xml',
                     'controller_ext'    => false,
                     'format_override'   => false,
@@ -143,7 +143,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     {
         $uri = '/index.php/api/v1/mock/test/param';
         $options = array(
-            'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+            'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
             'default_format'    => 'xml',
             'controller_ext'    => false,
             'format_override'   => false,
@@ -165,7 +165,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     public function testSetRoutingSetVaryWhenAcceptIsEnable()
     {
         $options = array(
-            'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+            'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
             'default_format'    => 'jsonp',
             'controller_ext'    => false,
             'format_override'   => false,
@@ -179,7 +179,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
     public function testSetRoutingDoesnotSetVaryWenAcceptIsDisable()
     {
         $options = array(
-            'route_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
+            'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i', // regex
             'default_format'    => 'jsonp',
             'controller_ext'    => false,
             'format_override'   => false,
