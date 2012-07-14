@@ -8,7 +8,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     /**
      * @var Zenya_Api_Response
      */
-    protected $response;
+    protected $response, $route;
 
     protected function setUp()
     {
@@ -32,7 +32,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         unset($this->response);
         unset($this->route);
-
     }
 
     /**
@@ -144,16 +143,19 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     public function testCollateWithDebug()
     {
         $this->response->debug = true;
+        $results = $this->response->collate($this->route, array('results'));
         $this->assertSame(
             array(
                 'resource' => array('results'),
                 'debug' => array(
+                    // TODO
+                    'timestamp' => preg_match('.*', $results['zenya']['timestamp']),
                     'request' => 'METHD / ',
                     'headers' => array(),
                     'output_format' => 'html',
                     'router_params' => null)
             ),
-            $this->response->collate($this->route, array('results'))
+            $results
         );
     }
 
@@ -232,5 +234,20 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
             $this->response->generate($this->route, $results)
         );
     }
+
+    public function testGenerateAsJsonp()
+    {
+        $this->markTestIncomplete(
+            'TODO: This test has not been implemented yet.'
+        );
+
+        $this->response->setFormat('jsonp', 'default');
+        $results = array('results');
+        $this->assertSame(
+            '{"root":{"resource":["results"]}}',
+            $this->response->generate($this->route, $results)
+        );
+    }
+
 
 }

@@ -196,23 +196,34 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
     public function testHeadRequestSetRouteMethodToGet()
     {
-        $this->resources->add('GET', array(
+        // with GET
+        $this->resources->add('help', array(
             'controller' => array(
                 'name' => __NAMESPACE__ . '\Resource\Help',
             )
         ));
+
+        // without GET
         $this->resources->add('test', array(
             'controller' => array(
-                'name' => __NAMESPACE__ . '\Resource\Help',
+                'name' => __NAMESPACE__ . '\Resource\Test',
             )
         ));
-        $this->route->expects($this->once())
-            ->method('getMethod')
-            ->will($this->returnValue('HEAD'));
+        // $this->route->expects($this->any())
+        //     ->method('getMethod')
+        //     ->will($this->returnValue('HEAD'));
+        $route = new Router;
 
-        $entity = $this->resources->get($this->route);
+        $route->setMethod('HEAD');
+        $route->setName('help');
+        $entity = $this->resources->get($route);
+        $this->assertSame('GET', $route->getMethod(), 'HEAD should forward to GET');
 
-        $this->assertSame('GET', $this->route->getMethod());
+        $route->setMethod('HEAD');
+        $route->setName('test');
+        $entity = $this->resources->get($route);
+        $this->assertSame('HEAD', $route->getMethod(), 'HEAD should not be forwarded if GET is not defined.');
+
     }
 
 #######
