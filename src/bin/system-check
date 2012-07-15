@@ -35,7 +35,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Zenya\Api
- * @subpackage  Server
+ * @subpackage  Console
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
  * @copyright   2011 Franck Cassedanne, Zenya.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -54,5 +54,5 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 //psr0_autoloader_searchFirst(APP_TESTDIR);
 
 #require 'CheckSystem.php';
-$sys = new Zenya\Api\SystemCheck();
+$sys = new Zenya\Api\SystemCheck;
 $sys->run();
