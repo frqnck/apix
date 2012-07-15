@@ -34,7 +34,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     public function testConstructorLoadsDistFile()
     {
         $config = new Config;
-        $this->assertRegExp('@.*/config.dist.php$@', $config->get('config_path'));
+        $this->assertRegExp('@\/.*$@', $config->get('config_path'));
     }
 
     /**
