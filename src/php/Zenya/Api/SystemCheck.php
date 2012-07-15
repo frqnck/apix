@@ -34,7 +34,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Zenya\Api
- * @subpackage  Server
+ * @subpackage  Console
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
  * @copyright   2011 Franck Cassedanne, Zenya.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
@@ -87,7 +87,7 @@ HELP;
         }
 
         $this->display(
-            'Required to pass: ', 
+            'Minimum requirements (required to pass): ', 
             $this->getRequired(),
             array('--required', '--all')
         );
@@ -95,7 +95,7 @@ HELP;
         $this->out(PHP_EOL . PHP_EOL);
 
         $this->display(
-            'Recommended to pass (optionals): ',
+            'Optionals (recommended to pass): ',
             $this->getOptionals(),
             array('--optionals', '--all')
         );
@@ -138,7 +138,8 @@ HELP;
             $this->out(PHP_EOL);
             foreach($check['msgs'] as $msg) {
                 $this->out(PHP_EOL);
-                $this->out("     " . $msg, 'green');
+                $this->out("     ---> ",'red');
+                $this->out($msg, 'green');
             }
         }
     }
@@ -148,9 +149,9 @@ HELP;
         $suhosin = ini_get('suhosin.executor.include.whitelist');
 
         $required = array(
-            'PHP version' => array(
+            'PHP version > 5.3.2' => array(
     			'fail' => version_compare(PHP_VERSION, '5.3.2', '<'),
-                'verbose' => PHP_VERSION,
+                'verbose' => 'currently '. PHP_VERSION,
     			'msgs' => array(
                     "The version of PHP (" . PHP_VERSION .") installed is too old.",
                     "You must upgrade to PHP 5.3.2 or higher."
@@ -234,7 +235,16 @@ HELP;
                     "Recompile it without this flag if possible, see also:",
                     "    https://bugs.php.net/bug.php?id=22999"
                 )
-            )
+            ),
+
+            // PHP > 5.4
+            'PHP version > 5.4' => array(
+                'fail' => version_compare(PHP_VERSION, '5.4.0', '<'),
+                'msgs' => array(
+                    "PHP 5.4 introduces lots of nifty additions and is generally faster.",
+                    "You should consider upgrading to PHP 5.4 or higher."
+                )
+            ),
         );
         
         return $optionals;
