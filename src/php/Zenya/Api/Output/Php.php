@@ -34,7 +34,7 @@ class Php extends Adapter
     {
         # "<pre style=\"border: 1px solid #000; height: {$height}; overflow: auto; margin: 0.5em;\">";
         var_dump($data);
-        #echo "</pre>\n";
+        # echo "</pre>\n";
     }
 
 }

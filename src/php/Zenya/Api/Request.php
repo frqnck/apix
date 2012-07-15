@@ -29,38 +29,38 @@ class Request
      */
     protected $method = null;
 
-    /**
-     * TEMP: The singleton instance
-     * @var Request
-     */
-    private static $instance = null;
+    // /**
+    //  * TEMP: The singleton instance
+    //  * @var Request
+    //  */
+    // private static $instance = null;
 
-    /**
-     * TEMP: Returns as a singleton instance
-     *
-     * @return Request
-     */
-    public static function getInstance()
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
+    // /**
+    //  * TEMP: Returns as a singleton instance
+    //  *
+    //  * @return Request
+    //  */
+    // public static function getInstance()
+    // {
+    //     if (null === self::$instance) {
+    //         self::$instance = new self;
+    //     }
 
-        return self::$instance;
-    }
+    //     return self::$instance;
+    // }
 
-    /**
-     * TEMP: disalow cloning.
-     *
-     * @codeCoverageIgnore
-     */
-    private final function __clone() {}
+    // /**
+    //  * TEMP: disalow cloning.
+    //  *
+    //  * @codeCoverageIgnore
+    //  */
+    // private final function __clone() {}
 
     /**
      * Constructor
      * return void
      */
-    protected function __construct()
+    public function __construct()
     {
         #$request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
         #print_r($request->get());

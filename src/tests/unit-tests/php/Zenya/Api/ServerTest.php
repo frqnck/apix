@@ -9,7 +9,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->request = $this->getMockBuilder('Zenya\Api\Request')->disableOriginalConstructor()->getMock();
+        $this->request = $this->getMockBuilder('Zenya\Api\HttpRequest')->disableOriginalConstructor()->getMock();
 
         $this->server = new Server(null, $this->request);
     }

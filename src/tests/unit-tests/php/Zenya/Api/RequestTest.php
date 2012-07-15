@@ -12,35 +12,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->request = Request::getInstance();
+        $this->request = new Request;
     }
 
     protected function tearDown()
     {
         unset($this->request);
-    }
-
-    /**
-     * TEMP
-     */
-    public function testIsSingleton()
-    {
-        $req = Request::getInstance();
-        $req2 = Request::getInstance();
-
-        $this->assertSame($req, $req2);
-    }
-
-    /**
-     * TEMP
-     * @covers Zenya\Api\Request::__clone
-     */
-    public function testIsSingletonIsNotClonable()
-    {
-        // $r = clone $this->request;
-        $r = new \ReflectionClass($this->request);
-        $p = $r->getMethods(\ReflectionMethod::IS_PRIVATE|\ReflectionMethod::IS_FINAL);
-        $this->assertSame('__clone', $p[0]->name);
     }
 
     public function testGetSetUri()

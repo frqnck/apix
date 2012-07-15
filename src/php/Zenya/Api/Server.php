@@ -6,8 +6,8 @@ use Zenya\Api\Listener,
     Zenya\Api\Config,
     Zenya\Api\Resources,
     Zenya\Api\Entity,
-    Zenya\Api\Input,
     Zenya\Api\Request,
+    Zenya\Api\HttpRequest,
     Zenya\Api\Response;
 
 class Server extends Listener
@@ -33,7 +33,8 @@ class Server extends Listener
         $c->inject('Server', $this);
 
         // Set the request
-        $this->request = $request === null ? Request::getInstance() : $request;
+        $this->request = $request === null ? HttpRequest::getInstance() : $request;
+        $this->request->setFormats($this->config['input_formats']);
 
         // Init response object
         $this->response =
@@ -259,7 +260,7 @@ class Server extends Listener
             break;
 
             case $opts['http_accept']
-                && $format = Input::getAcceptFormat($this->request):
+                && $format = $this->request->getAcceptFormat():
             break;
 
             default:
@@ -410,14 +411,14 @@ class Server extends Listener
     }
 
     /**
-     * Shortcut to Input::getBodyData
+     * Shortcut to HttpRequest::getBodyData
      *
-     * @see  Input::getBodyData
+     * @see  HttpRequest::getBodyData
      * @return array
      */
     public function getBodyData()
     {
-        return Input::getBodyData($this->request);
+        return HttpRequest::getBodyData($this->request);
     }
 
 }

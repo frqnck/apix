@@ -89,6 +89,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
 
         self::assertEquals($observer->update($subject), $subject->getValue());
     }
+ 
     /**
      * @expectedException InvalidArgumentException
      */
@@ -98,4 +99,5 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
             'This test has not been implemented yet.'
         );
     }
+
 }
