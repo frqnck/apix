@@ -35,7 +35,13 @@ $c = array(
     // Beware this settign affects page cachability.
     'output_debug'      => DEBUG,
 
-    // routing
+    // The array of available data formats for input representation:
+    // - POST:  Body post data. 
+    // - JSON:  Light text-based open standard designed for human-readable data interchange. 
+    // - XML:   Generic and standard markup language (defined by XML 1.0 specification). Currently only supporting UTF-8.
+    'input_formats'     => array('post', 'json', 'xml'),
+
+    // routing definitions
     'routing'           => array(
 
         // The regular expression representing the path prefix from the Request-Uri. Allows notably to retrieve
@@ -302,6 +308,6 @@ $c['routes'] = array(
 // Anything below that point should not need to be modified. //
 ///////////////////////////////////////////////////////////////
 
-$c['config_path'] = __FILE__;
+$c['config_path'] = __DIR__;
 
 return $c;

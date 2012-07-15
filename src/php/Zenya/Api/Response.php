@@ -6,7 +6,7 @@ class Response
 {
 
     /**
-     * List of supported formats.
+     * List of supported response formats.
      * @var array
      */
     protected $formats = array('json', 'xml', 'html');
@@ -326,11 +326,11 @@ class Response
      */
     public function collate(Router $route, $results)
     {
-        $array = array($route->getController() => $results);
+        $r = array($route->getController() => $results);
 
         if ($this->sign === true) {
-            $array['signature'] = array(
-                'resource'   => sprintf('%s %s', $route->getMethod(), $route->getName()),
+            $r['signature'] = array(
+                'resource'  => sprintf('%s %s', $route->getMethod(), $route->getName()),
                 'status'    => sprintf(
                                 '%d %s - %s',
                                 $this->getHttpCode(),
@@ -342,19 +342,22 @@ class Response
         }
 
         if ($this->debug === true) {
-            $array['debug'] = array(
-                    'timestamp' => gmdate('Y-m-d H:i:s') . ' UTC',
-                    'request'   => sprintf('%s %s %s', $this->request->getMethod(), $this->request->getRequestUri(), !isset($_SERVER['SERVER_PROTOCOL'])?null:$_SERVER['SERVER_PROTOCOL']),
-                    'headers'	=> $this->getHeaders(),
-                    'output_format'    => $this->getFormat(),
-                    'router_params'    => $route->getParams(),
+            $r['debug'] = array(
+                    'timestamp'     => gmdate('Y-m-d H:i:s') . ' UTC',
+                    'request'       => sprintf('%s %s%s', 
+                                            $this->request->getMethod(),
+                                            $this->request->getRequestUri(), 
+                                            isset($_SERVER['SERVER_PROTOCOL']) ? ' ' . $_SERVER['SERVER_PROTOCOL'] : null 
+                                        ),
+                    'headers'	    => $this->getHeaders(),
+                    'output_format' => $this->getFormat(),
+                    'router_params' => $route->getParams(),
             );
-
-            $array['debug']['user'] = isset($_SERVER['X_AUTH_USER']) ? $_SERVER['X_AUTH_USER'] : null;
-
+            // TEMP: just a shortcut cannot be trusted.
+            if(isset($_SERVER['X_AUTH_USER'])) $r['debug']['user'] = $_SERVER['X_AUTH_USER'];
         }
 
-        return $array;
+        return $r;
     }
 
     /**

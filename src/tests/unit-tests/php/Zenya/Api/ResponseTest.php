@@ -12,7 +12,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $request = Request::getInstance();
+        $request = HttpRequest::GetInstance();
         $this->response = new Response($request);
         $this->response->unit_test = true;
 
@@ -25,7 +25,6 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->route->expects($this->any())
             ->method('getController')
             ->will($this->returnValue('resource'));
-
     }
 
     protected function tearDown()
@@ -144,19 +143,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->response->debug = true;
         $results = $this->response->collate($this->route, array('results'));
-        $this->assertSame(
-            array(
-                'resource' => array('results'),
-                'debug' => array(
-                    // TODO
-                    'timestamp' => preg_match('.*', $results['zenya']['timestamp']),
-                    'request' => 'METHD / ',
-                    'headers' => array(),
-                    'output_format' => 'html',
-                    'router_params' => null)
-            ),
-            $results
-        );
+        $this->assertArrayHasKey('debug', $results); 
+        $this->assertArrayHasKey('timestamp', $results['debug']); 
+        $this->assertSame('REQUEST_METHOD /', $results['debug']['request']);
+        $this->assertSame(array('results'), $results['resource']);
     }
 
     public function testCollateWithSignature()
