@@ -143,8 +143,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->response->debug = true;
         $results = $this->response->collate($this->route, array('results'));
-        $this->assertArrayHasKey('debug', $results); 
-        $this->assertArrayHasKey('timestamp', $results['debug']); 
+        $this->assertArrayHasKey('debug', $results);
+        $this->assertArrayHasKey('timestamp', $results['debug']);
         $this->assertSame('REQUEST_METHOD /', $results['debug']['request']);
         $this->assertSame(array('results'), $results['resource']);
     }
@@ -238,6 +238,5 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
             $this->response->generate($this->route, $results)
         );
     }
-
 
 }

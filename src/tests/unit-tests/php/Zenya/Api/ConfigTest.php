@@ -57,16 +57,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->config->getConfigFromFile($file);
     }
 
-    public function testEmptyConfigSetAnAssociativeArrayOfEmptyArray()
-    {
-        $this->config->setConfig(
-            array() // make sure 'config.dist.php', etc.. don't get loaded here.
-        );
-        $this->assertEquals(array(), $this->config->get('resources'));
-        $this->assertEquals(array(), $this->config->get('services'));
-        $this->assertEquals(array(), $this->config->get('listeners'));
-    }
-
     /**
      * @expectedException   InvalidArgumentException
      */
@@ -81,22 +71,24 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetConfigHasDefaultResource()
     {
-        $this->assertArrayHasKey('resources_default', $this->config->getConfig());
-        $this->assertArrayHasKey('resources_default', $this->config->get());
+        $r = $this->config->getConfig();
+        $this->assertArrayHasKey('resources', $r['default']);
+
+        $r = $this->config->get();
+        $this->assertArrayHasKey('resources', $r['default']);
     }
 
     public function testRetrieveMany()
     {
-        $default = $this->config->get('resources')+$this->config->get('resources_default');
+        $default = $this->config->get('resources')+$this->config->getDefault('resources');
 
         $this->assertSame($default, $this->config->retrieve('resources'));
     }
 
     public function testRetrieveOne()
     {
-        $default = $this->config->get('resources_default');
-
-        $this->assertSame($default['help'], $this->config->retrieve('resources', 'help'));
+        $default = $this->config->getDefault('resources');
+        $this->assertSame($default['OPTIONS'], $this->config->retrieve('resources', 'OPTIONS'));
     }
 
     /**
@@ -104,22 +96,20 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testRetrieveThrowRuntimeException()
     {
-        $default = $this->config->get('resources_default');
-
-        $this->assertSame($default['help'], $this->config->retrieve('resources', 'not-existant'));
+        $default = $this->config->getDefault('resources');
+        $this->config->retrieve('resources', 'not-existant');
     }
-
 
     public function testGetManyResources()
     {
-        $default = $this->config->get('resources')+$this->config->get('resources_default');
+        $default = $this->config->get('resources')+$this->config->getDefault('resources');
 
         $this->assertSame($default, $this->config->getResources());
     }
 
     public function testGetManyPlugins()
     {
-        $default = $this->config->get('listeners')+$this->config->get('listeners_default');
+        $default = $this->config->get('listeners')+$this->config->getDefault('listeners');
 
         $this->assertSame($default, $this->config->getListeners());
     }
@@ -171,5 +161,17 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame('some_value', $this->config->getInjected('some_key'));
     }
+
+
+    public function TODO_testEmptyConfigSetAnAssociativeArrayOfEmptyArray()
+    {
+        $this->config->setConfig(
+            array() // make sure 'config.dist.php', etc.. don't get loaded here.
+        );
+        $this->assertEquals(array(), $this->config->get('resources'));
+        $this->assertEquals(array(), $this->config->get('services'));
+        $this->assertEquals(array(), $this->config->get('listeners'));
+    }
+
 
 }

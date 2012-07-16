@@ -66,7 +66,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetBodyData($type, $body, $assoc=true, $expected, array $formats=null)
     {
-        if($formats !== null) {
+        if ($formats !== null) {
            $this->request->setFormats($formats);
         }
         $this->request->setHeader('CONTENT_TYPE', $type);

@@ -20,6 +20,7 @@ class Test
      *
      * @return null
      * @cacheable true
+     * @codeCoverageIgnore
      */
     final public function onTest()
     {

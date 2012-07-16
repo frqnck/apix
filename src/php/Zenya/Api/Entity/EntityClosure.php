@@ -21,19 +21,21 @@ class EntityClosure extends Entity implements EntityInterface
     /**
      * Sets and returns a reflection of a function.
      *
-     * @param string $name The REST name of function.
+     * @param  string                    $name The REST name of function.
      * @return \ReflectionFunction|false
      */
     public function reflectedFunc($name)
     {
-        if(isset($this->reflection[$name])) {
+        if (isset($this->reflection[$name])) {
             return $this->reflection[$name];
-        } else if ( isset($this->actions[$name]['action'])
+        } elseif ( isset($this->actions[$name]['action'])
             && $this->actions[$name]['action'] instanceOf \Closure
         ) {
             $this->reflection[$name] = new \ReflectionFunction($this->actions[$name]['action']);
+
             return $this->reflection[$name];
         }
+
         return false;
     }
 
@@ -43,7 +45,7 @@ class EntityClosure extends Entity implements EntityInterface
     public function append(array $def)
     {
         parent::_append($def);
-        // if(!isset($def['method'])) {
+        // if (!isset($def['method'])) {
         //     throw new \RuntimeException('Closure not defining a method, somehting must be wrong!?');
         // }
         $this->actions[$def['method']] = $def;
@@ -57,7 +59,6 @@ class EntityClosure extends Entity implements EntityInterface
     {
         // obsolete!
     }
-
 
     /**
      * {@inheritdoc}

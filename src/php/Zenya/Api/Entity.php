@@ -21,14 +21,14 @@ class Entity extends Listener
     protected $actions = null;
 
     protected $defaultActions = array(
-        'OPTIONS'=>'help',
-        'HEAD'=>'test'
+        'OPTIONS' => 'help',
+        'HEAD' => 'test'
     );
 
     /**
      * Appends the given array definition and apply generic mappings.
      *
-     * @param  array $def   An entity array definition.
+     * @param  array $def An entity array definition.
      * @return void
      * @see EntityInterface::_append
      */
@@ -54,9 +54,9 @@ class Entity extends Listener
     /**
      * Checks wether the current entity holds the specified method.
      *
-     * @param   string    $method
-     * @param   array     $actions=null   Use to override local actions.
-     * @return  boolean
+     * @param  string  $method
+     * @param  array   $actions=null Use to override local actions.
+     * @return boolean
      */
     public function hasMethod($method)
     {
@@ -66,26 +66,27 @@ class Entity extends Listener
     /**
      * Returns all the available actions.
      *
-     * @return  array
+     * @return array
      */
     public function getAllActions()
     {
         $current = null === $this->getActions() ? array() : $this->getActions();
         $default = $this->defaultActions;
-        if(false == array_key_exists('GET', $current) ) {
+        if (false == array_key_exists('GET', $current) ) {
             unset($default['HEAD']);
         }
+
         return $current+$default;
     }
 
     /**
      * Gets the specified default action.
      *
-     * @return  string
+     * @return string
      */
     public function getDefaultAction($method)
     {
-        if(isset($this->defaultActions[$method])) {
+        if (isset($this->defaultActions[$method])) {
             return $this->defaultActions[$method];
         }
     }
@@ -93,7 +94,7 @@ class Entity extends Listener
     /**
      * To array...
      *
-     * @return  array
+     * @return array
      */
     public function toArray()
     {
@@ -116,6 +117,7 @@ class Entity extends Listener
             return isset($this->docs['methods'][$method])
                     ? $this->docs['methods'][$method] : null;
         }
+
         return $this->docs;
     }
 
@@ -139,7 +141,7 @@ class Entity extends Listener
             ) {
 
                 // auto inject local classes
-                if($class = $param->getClass()) {
+                if ($class = $param->getClass()) {
                     $obj = strtolower(str_replace(__NAMESPACE__ . '\\', '', $class->getName()));
                     $params[$name] = $obj == 'server' ? $this->route->server : $this->route->server->$obj;
                 } else {
@@ -226,9 +228,10 @@ class Entity extends Listener
      */
     public function getActions()
     {
-        if(null === $this->actions) {
+        if (null === $this->actions) {
             $this->setActions();
         }
+
         return $this->actions;
     }
 

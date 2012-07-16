@@ -136,6 +136,26 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Zenya\Api\Resources', $params['resources']);
     }
 
+    public function testAutoInjectHttpRequestInsteadOfRequest()
+    {
+        // hack to imitate a web browser
+        $_REQUEST['param1'] = 'value1';
+        $_REQUEST['param2'] = 'value2';
+
+        $request = New HttpRequest;
+        $request->setHeader('CONTENT_TYPE', 'application/x-www-form-urlencoded');
+        $request->setBody('param1=value1&param2=value2');
+
+        $this->route->server = new Server(null, $request);
+
+        $ref = new \ReflectionFunction(function(Request $request){echo '*test*'; return $request->getBodyData();return func_get_args();});
+        $params = $this->entity->getRequiredParams($ref, 'aStringName', array());
+
+        $this->assertInstanceOf('Zenya\Api\HttpRequest', $params['request']);
+        $this->assertEquals(array('param1'=>'value1', 'param2'=>'value2'), $params['request']->getBodyData());
+    }
+
+
     public function testSetGetRoute()
     {
         $this->entity->setRoute($this->route);

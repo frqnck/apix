@@ -25,7 +25,7 @@ class PostBodyTest extends \PHPUnit_Framework_TestCase
     public function testFormPostAsString()
     {
         $r = $this->post('param1=value1&param2=value2');
-
+print_r($r);exit;
         $this->assertEquals('param1=value1&param2=value2', $r->zenya->upload->body);
     }
 

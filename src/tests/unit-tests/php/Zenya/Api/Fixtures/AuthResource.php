@@ -9,7 +9,7 @@ namespace Zenya\Api\Fixtures;
  *
  * @api_version 1.0
  */
-class AuthResource #extends ResourceAbstract
+class AuthResource
 {
     /**
      * constructor
@@ -31,7 +31,7 @@ class AuthResource #extends ResourceAbstract
      *
      * @api_role public
      */
-    public function onRead($param1, $optional=null)
+    public function onRead($username, $optional=null)
     {
         return array(
             'class' 			=> __CLASS__,
@@ -49,7 +49,7 @@ class AuthResource #extends ResourceAbstract
      *
      * @api_role admin
     */
-    public function onCreate($param1)
+    public function onCreate($username)
     {
         return array('method'=>__METHOD__);
     }
