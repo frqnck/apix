@@ -47,11 +47,8 @@ class Auth implements \SplObserver
         // todo set X_REMOTE_USER or X_AUTH_USER
         //$entity->getResponse()->setHeader('X_REMOTE_USER', $username);
         $_SERVER['X_AUTH_USER'] = $username;
-        
+
         return $username;
-
-
-
 
         $s = new \Zenya_Model_Session;
 

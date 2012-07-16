@@ -1,11 +1,11 @@
 <?php
-#namespace Zenya\Api\Util;
+#namespace Zenya\bin;
 
 #use Zenya\Api;
 
 class Compiler
 {
-    const DEFAULT_PHAR_FILE = 'zenya-api-server.phar';
+    const DEFAULT_PHAR_FILE = 'sleepover-server.phar';
 
     protected $version;
 

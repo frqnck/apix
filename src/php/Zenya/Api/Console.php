@@ -51,7 +51,7 @@ class Console
         'colors' => array('-c', '--colors', '--colours'),
         'verbose' => array('-v', '--verbose')
     );
-    
+
     protected $colors = false;
     protected $verbose = false;
 
@@ -65,14 +65,14 @@ class Console
         $this->args = array_unique($_SERVER['argv']);
 
         $this->options = null === $options ? $this->getOptions() : $options;
-        
+
         $this->setModes();
     }
 
     public function setModes()
     {
-        foreach($this->switches as $key => $values) {
-            if(array_intersect($values, $this->args)) {
+        foreach ($this->switches as $key => $values) {
+            if (array_intersect($values, $this->args)) {
                 $this->args = array_diff($this->args, $values);
                 reset($this->args); // TODO: php bug here???
                 $this->$key = true;
@@ -104,6 +104,7 @@ class Console
             )
         );
         unset($options['']); // remove the null(s)
+
         return $options;
     }
 
@@ -112,9 +113,9 @@ class Console
         $styles = is_array($msg) ? $msg : func_get_args();
         $msg = array_shift($styles);
 
-        if(false !== $this->colors) {
+        if (false !== $this->colors) {
             foreach ($styles as $style) {
-                if(isset($this->options[$style])) {
+                if (isset($this->options[$style])) {
                     $msg = sprintf($this->start, $this->options[$style], $msg) . $this->end;
                 }
             }

@@ -3,10 +3,10 @@ namespace Zenya\Api;
 
 use Zenya\Api\Server;
 
-class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
+class HelpTest extends \PHPUnit_Framework_TestCase
 {
 
-    protected $api, $help;
+    protected $request, $api, $help;
 
     protected function setUp()
     {
@@ -46,19 +46,18 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
                 return array("$test was modified.");
             }
         );
-        #$this->api->run();
 
         $this->api->setRouting(
             $this->request,
             $this->api->resources->toArray()
         );
 
-
         $this->help = new Resource\Help($this->api);
     }
 
     protected function tearDown()
     {
+        unset($this->request);
         unset($this->api);
         unset($this->help);
     }
@@ -80,7 +79,9 @@ class HelpOnClosureTest extends \PHPUnit_Framework_TestCase
     {
         $this->request->expects($this->any())
             ->method('getUri')
-            ->will( $this->onConsecutiveCalls('/unit/:test') );
+            ->will(
+                $this->onConsecutiveCalls('/unit/:test')
+            );
 
         $results = $this->help->onRead($this->api);
         $res = $results[$this->help->doc_nodeName];

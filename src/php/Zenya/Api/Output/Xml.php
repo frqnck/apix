@@ -122,16 +122,17 @@ class Xml extends Adapter
 }
 
 /*
-if( !function_exists( 'xmlentities' ) ) {
+if ( !function_exists( 'xmlentities' ) ) {
 
-    function xmlentities( $string ) {
-
+    public function xmlentities( $string )
+    {
         $not_in_list = "A-Z0-9a-z\s_-";
+
         return preg_replace_callback( "/[^{$not_in_list}]/" , function($CHAR) {
-        if( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
+        if ( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
             die( "function: 'get_xml_entity_at_index_zero' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type." );
         }
-        switch( $CHAR[0] ) {
+        switch ($CHAR[0]) {
             case "'":    case '"':    case '&':    case '<':    case '>': case ':': case '/':
                 return htmlspecialchars( $CHAR[0], ENT_QUOTES );    break;
             default:
@@ -140,11 +141,12 @@ if( !function_exists( 'xmlentities' ) ) {
             }, $string );
     }
 
-    function get_xml_entity_at_index_zero( $CHAR ) {
-        if( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
+    public function get_xml_entity_at_index_zero( $CHAR )
+    {
+        if ( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
             die( "function: 'get_xml_entity_at_index_zero' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type." );
         }
-        switch( $CHAR[0] ) {
+        switch ($CHAR[0]) {
             case "'":    case '"':    case '&':    case '<':    case '>':
                 return htmlspecialchars( $CHAR[0], ENT_QUOTES );    break;
             default:
@@ -152,8 +154,8 @@ if( !function_exists( 'xmlentities' ) ) {
         }
     }
 
-
-    function numeric_entity_4_char( $char ) {
+    public function numeric_entity_4_char( $char )
+    {
         return "&#".str_pad(ord($char), 3, '0', STR_PAD_LEFT).";";
     }
 }

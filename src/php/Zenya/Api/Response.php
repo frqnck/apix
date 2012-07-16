@@ -152,7 +152,7 @@ class Response
     /**
      * Sets the output format.
      *
-     * @param  string                    $format
+     * @param  string           $format
      * @throws \DomainException 406
      */
     public function setFormat($format, $default)
@@ -344,10 +344,10 @@ class Response
         if ($this->debug === true) {
             $r['debug'] = array(
                     'timestamp'     => gmdate('Y-m-d H:i:s') . ' UTC',
-                    'request'       => sprintf('%s %s%s', 
+                    'request'       => sprintf('%s %s%s',
                                             $this->request->getMethod(),
-                                            $this->request->getRequestUri(), 
-                                            isset($_SERVER['SERVER_PROTOCOL']) ? ' ' . $_SERVER['SERVER_PROTOCOL'] : null 
+                                            $this->request->getRequestUri(),
+                                            isset($_SERVER['SERVER_PROTOCOL']) ? ' ' . $_SERVER['SERVER_PROTOCOL'] : null
                                         ),
                     'headers'	    => $this->getHeaders(),
                     'output_format' => $this->getFormat(),

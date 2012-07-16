@@ -43,7 +43,7 @@ interface EntityInterface
     /**
      * Sets the actions array.
      *
-     * @param  array $array=null    An associative array of methods as keys and actions as values.
+     * @param  array $array=null An associative array of methods as keys and actions as values.
      * @return void
      */
     public function setActions(array $asso = null);

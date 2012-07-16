@@ -74,7 +74,6 @@ class EntityClassTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(4, count($actions));
     }
 
-
     public function testParseDocsClassLevel()
     {
         $docs = $this->entity->_parseDocs();
