@@ -53,11 +53,11 @@ class Exception extends \Exception
      *
      *  Use to re-throw E_RECOVERABLE_ERROR as they occur.
      *
-     * @param  int             $code       The error number.
-     * @param  string          $message    The error message.
-     * @param  string          $file       The filename where the error occured.
-     * @param  int             $line       The line number at which the error happened.
-     * @param  array           $context    The array of context vars.
+     * @param  int             $code    The error number.
+     * @param  string          $message The error message.
+     * @param  string          $file    The filename where the error occured.
+     * @param  int             $line    The line number at which the error happened.
+     * @param  array           $context The array of context vars.
      * @throws \ErrorException
      * @return false
      */
@@ -76,7 +76,7 @@ class Exception extends \Exception
     /**
      *  Startup Exception handler
      *
-     * @param  \Exception   $e
+     * @param \Exception $e
      * @see errorOutput
      */
     public static function startupException(\Exception $e)
@@ -99,23 +99,23 @@ class Exception extends \Exception
     /**
      * Output the error
      *
-     * @param  int             $code       The error number.
-     * @param  string          $message    The error message.
-     * @param  string          $file       The filename where the error occured.
-     * @param  int             $line       The line number at which the error happened.
-     * @param  array           $context    The array of context vars.
+     * @param  int             $code    The error number.
+     * @param  string          $message The error message.
+     * @param  string          $file    The filename where the error occured.
+     * @param  int             $line    The line number at which the error happened.
+     * @param  array           $context The array of context vars.
      * @throws \ErrorException
      * @return false
      */
     public static function errorOutput($code, $message, $file, $line, $context = null)
     {
         $proto = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'http:1/1';
-        if(!defined('UNIT_TEST')) {
+        if (!defined('UNIT_TEST')) {
             header($proto . ' 500 Internal Server Error', true, 500);
         }
         echo '<h1>500 Internal Server Error</h1>';
 
-        if(self::DEBUG) {
+        if (self::DEBUG) {
             $info = sprintf(
                 "#%d %s @ %s:%d",
                 $code,

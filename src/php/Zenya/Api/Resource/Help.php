@@ -12,8 +12,7 @@ use Zenya\Api\Entity,
  *
  * The Help resource provides in-line referencial to the API resources and methods.
  * By specify a resource and method you can narrow down to specific section.
- *
- * @api_version 1
+ * @cacheable true
  */
 class Help
 {
@@ -27,9 +26,9 @@ class Help
      *
      * Filters can be use to narrow down to a specified method.
      *
-     * @param   Server   $server    The main server object.
-     * @param   array    $filters   An array of filters.
-     * @return  array
+     * @param  Server $server  The main server object.
+     * @param  array  $filters An array of filters.
+     * @return array
      * @see     self::onHelp
      *
      * @api_link    GET /help/path/to/entity
@@ -37,7 +36,7 @@ class Help
     public function onRead(Server $server, array $filters=null)
     {
         $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
-        if(!empty($path) && $server->resources->has($path)) {
+        if (!empty($path) && $server->resources->has($path)) {
             $server->getRoute()->setName($path);
         }
 
@@ -56,9 +55,9 @@ class Help
      *
      * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
      *
-     * @param  Server   $server    The main server object.
-     * @param  array    $filters   An array of filters.
-     * @return array               The array documentation.
+     * @param  Server $server  The main server object.
+     * @param  array  $filters An array of filters.
+     * @return array  The array documentation.
      *
      * @api_link    OPTIONS /path/to/entity
      * @api_link    OPTIONS /*
@@ -72,10 +71,10 @@ class Help
             : null;
 
         // returns the whole api doc.
-        if ( null === $entity ) {
+        if (null === $entity) {
             $doc = array();
             foreach ($server->resources->toArray() as $path => $entity) {
-                if(!$entity->hasRedirect()) {
+                if (!$entity->hasRedirect()) {
                     #$doc[$path] = $this->getDocs($entity, $filters);
                     $doc[] = $this->getDocs($path, $entity, $filters);
                 }
@@ -105,10 +104,10 @@ class Help
     /**
      * Get an entity documentaion.
      *
-     * @param  string           $path           The Request-URI for that entity.
-     * @param  EntityInterface  $entity         An Entity object.
-     * @param  array            $filters=null   An array of filters.
-     * @return array                            The array documentation.
+     * @param  string          $path         The Request-URI for that entity.
+     * @param  EntityInterface $entity       An Entity object.
+     * @param  array           $filters=null An array of filters.
+     * @return array           The array documentation.
      */
     protected function getDocs($path, Entity $entity, array $filters=null)
     {

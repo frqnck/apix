@@ -2,8 +2,6 @@
 
 namespace Zenya\Api;
 
-use Zenya\Api\Entity;
-
 class Reflection
 {
     /**
