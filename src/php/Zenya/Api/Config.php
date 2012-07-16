@@ -38,7 +38,7 @@ class Config #extends \Pimple
      *
      * @codeCoverageIgnore
      */
-    private final function __clone() {}
+    final private function __clone() {}
 
     /**
      * Initialises and sets the config property.
@@ -47,7 +47,7 @@ class Config #extends \Pimple
      */
     public function __construct($config=null)
     {
-        switch(true) {
+        switch (true) {
 
             case is_array($config):
                 // add from user provided array
@@ -78,13 +78,13 @@ class Config #extends \Pimple
     /**
      * Sets the config array from a file.
      *
-     * @param string $file The full path to a configuration file.
+     * @param  string            $file The full path to a configuration file.
      * @throws \RuntimeException
      * @return void;
      */
     public function getConfigFromFile($file)
     {
-        if(!is_file($file)) {
+        if (!is_file($file)) {
             throw new \RuntimeException(sprintf('The "%s" config file does not exist.', $file), 5000);
         }
 
@@ -103,7 +103,7 @@ class Config #extends \Pimple
      */
     public function setConfig(array $config)
     {
-        $this->config = $config+$this->getConfigDefaults();
+        $this->config = $config;//+$this->getConfigDefaults();
     }
 
     /**
@@ -120,7 +120,7 @@ class Config #extends \Pimple
      * Returns the specified config value using its index key.
      * If the index key is not set then it will return the whole config property.
      *
-     * @param  string $key=null The key to retrieve.
+     * @param  string                    $key=null The key to retrieve.
      * @return mixed
      * @throws \InvalidArgumentException
      */
@@ -135,18 +135,39 @@ class Config #extends \Pimple
     }
 
     /**
+     * Returns the specified default config value using its index key.
+     * If the index key is not set then it will return the whole default config property.
+     *
+     * @param  string                    $key=null The key to retrieve.
+     * @return mixed
+     * @throws \InvalidArgumentException
+     */
+    public function getDefault($key=null)
+    {
+        if (is_null($key)) {
+            return $this->config['default'];
+        } elseif (isset($this->config['default'][$key])) {
+            return $this->config['default'][$key];
+        }
+       throw new \InvalidArgumentException( sprintf('Default config for "%s" does not exists.', $key) );
+    }
+
+
+    /**
      * Returns a specified sub-array type from config.
      * If an index key is specified return the corresponding (mixed) value.
      *
-     * @param  string $type     The sub-array type to retrieve.
-     * @param  string $key=null A key to narrow the retrieval.
+     * @param  string                    $type     The sub-array type to retrieve.
+     * @param  string                    $key=null A key to narrow the retrieval.
      * @return mixed
      * @throws \InvalidArgumentException
      */
     public function retrieve($type, $key=null)
     {
-        #$default = isset($this->config[$kind .'_default'])
-        $config = $this->config[$type]+$this->config[$type .'_default'];
+        $config = isset($this->config['default'][$type])
+                    ? $this->config[$type]+$this->getDefault($type)
+                    : $this->config[$type];
+
         if (is_null($key)) {
             return $config;
         } elseif (isset($config[$key])) {
@@ -158,7 +179,7 @@ class Config #extends \Pimple
     /**
      * Returns all the resources or as the specified.
      *
-     * @param   string $key=null The resource key to retrieve.
+     * @param string $key=null The resource key to retrieve.
      * @see     self::retrieve
      */
     public function getResources($key=null)
@@ -169,7 +190,7 @@ class Config #extends \Pimple
     /**
      * Returns the specified plugin (or all if unspecified).
      *
-     * @param   string $key=null The plugin key to retrieve.
+     * @param string $key=null The plugin key to retrieve.
      * @see     self::retrieve
      */
     public function getListeners($key=null)
@@ -180,7 +201,7 @@ class Config #extends \Pimple
     /**
      * Returns the specified service (or all if unspecified).
      *
-     * @param   string $key=null The service key to retrieve.
+     * @param string $key=null The service key to retrieve.
      * @see self::retrieve
      * @return mixed Generally should return a callback
      */
@@ -188,7 +209,7 @@ class Config #extends \Pimple
     {
         $service = $this->retrieve('services', $key);
 
-        if(is_callable($service)) {
+        if (is_callable($service)) {
             return $service();
         }
 
@@ -198,9 +219,9 @@ class Config #extends \Pimple
     /**
      * TEMP: Sets/injects a key/value pair in the injected array.
      *
-     * @param   string  $key    An index key to set.
-     * @param   mixed   $value  The value to inject.
-     * @return  void
+     * @param  string $key   An index key to set.
+     * @param  mixed  $value The value to inject.
+     * @return void
      */
     public function inject($key, $value)
     {
@@ -210,8 +231,8 @@ class Config #extends \Pimple
     /**
      * TEMP: Returns the specified injected key.
      *
-     * @param   string  $key    The index key to retrieve.
-     * @return  mixed
+     * @param  string $key The index key to retrieve.
+     * @return mixed
      */
     public function getInjected($key)
     {
@@ -222,7 +243,7 @@ class Config #extends \Pimple
      * TEMP: Returns the default configuration.
      * TODO: should use 'config.dist.php'
      *
-     * @return  array
+     * @return array
      */
     public function getConfigDefaults()
     {
@@ -284,31 +305,10 @@ class Config #extends \Pimple
                         #'Zenya\Api\Listener\Log' => array('php://output'),
                     )
                 ),
-                // 'request' => array(
-                //     'early'=>array(
-                //         'Zenya\Api\Listener\BodyData',
-                //     ),
-                //     #'Zenya\Api\Listener\Log',
-                // ),
                 'entity' => array(
-                    'early' => array(
-                        // todo
-                        /*
-                        'Zenya\Api\Listener\Auth' => function() {
-                            #echo $c['api_realm'];
-                            #"$c['api_realm']"
-
-                            return new \Zenya\Api\Listener\Auth\HttpDigest();
-                        },
-*/
-                        #'Zenya\Api\Listener\CheckIp' => null,
-                        #'Zenya\Api\Listener\Acl',
-                        #'Zenya\Api\Listener\Log',
-                        #'Listener\Log',
-                    ),
+                    'early' => array(),
                     // post-processing stage
                     'late'=>array(
-
                         #'Zenya\Api\Listener\Mock',
                         #'Zenya\Api\Listener\Log' => array('php://output'),
                     ),
@@ -318,7 +318,7 @@ class Config #extends \Pimple
 
             // services
             'services' => array(),
-            'services_default' => array()
+            #'services_default' => array()
 
         );
     }

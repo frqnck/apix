@@ -89,7 +89,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
 
         self::assertEquals($observer->update($subject), $subject->getValue());
     }
- 
+
     /**
      * @expectedException InvalidArgumentException
      */

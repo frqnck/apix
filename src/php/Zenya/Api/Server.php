@@ -29,12 +29,12 @@ class Server extends Listener
 
         $this->init($this->config);
 
-        // TEMP
-        $c->inject('Server', $this);
-
         // Set the request
         $this->request = $request === null ? HttpRequest::getInstance() : $request;
-        $this->request->setFormats($this->config['input_formats']);
+
+        if($this->request instanceOf HttpRequest) {
+            $this->request->setFormats($this->config['input_formats']);
+        }
 
         // Init response object
         $this->response =
@@ -62,7 +62,7 @@ class Server extends Listener
      * Acts as the initialisation.
      *
      * @param  array $configs The config entries to initialise.
-     * @return  void
+     * @return void
      *
      * @codeCoverageIgnore
      */
@@ -71,7 +71,7 @@ class Server extends Listener
         if(!defined('UNIT_TEST') && isset($configs['init'])
             ) {
             // set config inits
-            foreach($configs['init'] as $key => $value) {
+            foreach ($configs['init'] as $key => $value) {
                 ini_set($key, $value);
             }
         }
@@ -161,7 +161,6 @@ class Server extends Listener
         // attach the late listeners @ post-processing stage
         $this->addAllListeners('server', 'late');
 
-        return  $output;
         return $this->request->getMethod() != 'HEAD' ? $output : null;
     }
 
@@ -216,7 +215,7 @@ class Server extends Listener
         );
 
         // Set the response format...
-        if(null !== $opts) {
+        if (null !== $opts) {
             $this->negotiateFormat($opts, isset($ext)?$ext:false);
         }
 
@@ -240,12 +239,12 @@ class Server extends Listener
     /**
      * Returns the output format from the request chain.
      *
-     * @param  array $opts          Options are:
+     * @param array $opts Options are:
      *                              - [default] => string e.g. 'json',
      *                              - [controller_ext] => boolean,
      *                              - [override] => false or string use $_REQUEST['format'],
      *                              - [http_accept] => boolean.
-     * @param  string|false $ext    The contoller defined extension.
+     * @param  string|false $ext The contoller defined extension.
      * @return string
      */
     public function negotiateFormat(array $opts, $ext=false)
@@ -279,9 +278,9 @@ class Server extends Listener
     /**
      * Proxy to resources::add (shortcut)
      *
-     * @param string $method The HTTP method to match against.
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
+     * @param  string     $method The HTTP method to match against.
+     * @param  string     $path   The path name to match against.
+     * @param  mixed      $to     Callback that returns the response when matched.
      * @return Controller
      * @see  Resources::add
      */
@@ -301,7 +300,7 @@ class Server extends Listener
      * @param string $path The path name to match against.
      * @param mixed  $to   Callback that returns the response when matched.
      * @see  Server::proxy
-     * @return Controller  Provides a fluent interface.
+     * @return Controller Provides a fluent interface.
      */
     public function onCreate($path, $to)
     {
@@ -314,7 +313,7 @@ class Server extends Listener
      * @param string $path The path name to match against.
      * @param mixed  $to   Callback that returns the response when matched.
      * @see  Server::proxy
-     * @return Controller  Provides a fluent interface.
+     * @return Controller Provides a fluent interface.
      */
     public function onRead($path, $to)
     {
@@ -327,7 +326,7 @@ class Server extends Listener
      * @param string $path The path name to match against.
      * @param mixed  $to   Callback that returns the response when matched.
      * @see  Server::proxy
-     * @return Controller  Provides a fluent interface.
+     * @return Controller Provides a fluent interface.
      */
     public function onUpdate($path, $to)
     {
@@ -340,7 +339,7 @@ class Server extends Listener
      * @param string $path The path name to match against.
      * @param mixed  $to   Callback that returns the response when matched.
      * @see  Server::proxy
-     * @return Controller  Provides a fluent interface.
+     * @return Controller Provides a fluent interface.
      */
     public function onModify($path, $to)
     {
@@ -353,7 +352,7 @@ class Server extends Listener
      * @param string $path The path name to match against.
      * @param mixed  $to   Callback that returns the response when matched.
      * @see  Server::proxy
-     * @return Controller  Provides a fluent interface.
+     * @return Controller Provides a fluent interface.
      */
     public function onDelete($path, $to)
     {
@@ -366,7 +365,7 @@ class Server extends Listener
      * @param string $path The path name to match against.
      * @param mixed  $to   Callback that returns the response when matched.
      * @see  Server::proxy
-     * @return Controller  Provides a fluent interface.
+     * @return Controller Provides a fluent interface.
      */
     public function onHelp($path, $to)
     {
@@ -379,7 +378,7 @@ class Server extends Listener
      * @param string $path The path name to match against.
      * @param mixed  $to   Callback that returns the response when matched.
      * @see  Server::proxy
-     * @return Controller  Provides a fluent interface.
+     * @return Controller Provides a fluent interface.
      */
     public function onTest($path, $to)
     {
@@ -389,7 +388,7 @@ class Server extends Listener
     /**
      * Test Read from a group.
      *
-     * @param array $opts Options are:
+     * @param  array  $opts Options are:
      * @return string
      */
     public function setGroup($name)
@@ -410,15 +409,15 @@ class Server extends Listener
         );
     }
 
-    /**
-     * Shortcut to HttpRequest::getBodyData
-     *
-     * @see  HttpRequest::getBodyData
-     * @return array
-     */
-    public function getBodyData()
-    {
-        return HttpRequest::getBodyData($this->request);
-    }
+    // *
+    //  * Shortcut to HttpRequest::getBodyData
+    //  *
+    //  * @see  HttpRequest::getBodyData
+    //  * @return array
+
+    // public function getBodyData()
+    // {
+    //     return HttpRequest::getBodyData($this->request);
+    // }
 
 }

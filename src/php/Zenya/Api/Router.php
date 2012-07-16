@@ -265,13 +265,13 @@ class Router
     /**
      * Returns the specified router param.
      *
-     * @param   string $key
-     * @return  array
+     * @param  string                    $key
+     * @return array
      * @throws \InvalidArgumentException
      */
     public function getParam($key)
     {
-        if(isset($this->params[$key])) {
+        if (isset($this->params[$key])) {
             return $this->params[$key];
         }
 

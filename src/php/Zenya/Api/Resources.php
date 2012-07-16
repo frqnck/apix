@@ -100,13 +100,13 @@ class Resources
     /**
      * Gets the specified resource enity.
      *
-     * @param   string                   $name  The resource name.
-     * @throws  /DomainException                404
-     * @return  Entity/EntityInterface
+     * @param  string                 $name The resource name.
+     * @throws /DomainException       404
+     * @return Entity/EntityInterface
      */
     public function getResource($name)
     {
-        if(isset($this->resources[$name])) {
+        if (isset($this->resources[$name])) {
             return $this->resources[$name];
         }
         throw new \DomainException(
@@ -117,9 +117,9 @@ class Resources
     /**
      * Gets the specified ressource entity from a route object.
      *
-     * @param   Router                   $route  The resource route object.
-     * @throws  /DomainException                 404
-     * @return  Entity/EntityInterface
+     * @param  Router                 $route The resource route object.
+     * @throws /DomainException       404
+     * @return Entity/EntityInterface
      */
     public function get(Router &$route, $follow=true)
     {
@@ -133,13 +133,13 @@ class Resources
         }
 
         // handles the default actions but do not override a local action definition.
-        if($follow===true) {
+        if ($follow===true) {
             $method = $route->getMethod();
 
             if ( $method == 'HEAD' && $entity->hasMethod('GET') ) {
                 $route->setMethod('GET');
             }
-            
+
             if (
                 ( $redirect = $entity->getDefaultAction($method) )
                 && !$entity->hasMethod($method)
