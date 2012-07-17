@@ -22,7 +22,7 @@ $c = array(
     // fresh new production deployment so the previous version can (and should)
     // be left intact for those that depend upon it.
     // - Minor: Increases each time there are new addition e.g. a new resource.
-    // - Maintenance: Increases each time there are moficiations to existing
+    // - Maintenance: Increases each time there are modifications to existing
     // resource entities and which don't break exisiting definitions.
     // - Build: Can be use for arbitrary naming such as 0.1.0.beta, 0.1.1.rc3
     // (third release candidate), 0.1.2.smoking-puma, 0.1.30.testing
@@ -56,7 +56,7 @@ $c = array(
     // - JSON: Light text-based open standard designed for human-readable data
     // interchange.
     // - XML: Generic and standard markup language as defined by XML 1.0 schema.
-    // Not that at this stage only UTF-8 is supported. Later more XML based
+    // Note that at this stage only UTF-8 is supported. Later more XML based
     // schema can be implemented if required by clients.
     'input_formats'     => array('post', 'json', 'xml'),
 
@@ -64,7 +64,7 @@ $c = array(
     'routing'           => array(
 
         // The regular expression representing the path prefix from the Request-
-        // Uri. Allows notably to retrieve the path without the route prefix,
+        // URI. Allows notably to retrieve the path without the route prefix,
         // handling variation in version numbering, Apache's mod_rewrite, etc...
         // Should match '/index.php/api/v1/entity/name?whatver...' which using
         // mod_rewrite could then translates into
@@ -91,22 +91,22 @@ $c = array(
         // case, JSON is favored.
         'default_format'    => 'json',
 
-        // Use to enable the output format negociation mechanism from an HTTP
-        // accept header. This is the expected and most RESTful way to set the
-        // output format.
+        // Wether to enable the negotiation of output format from an HTTP accept
+        // header. This is the expected and most RESTful way to set the
+        // output format. http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
         'http_accept'       => true,
 
-        // Allows the output format to be set in the Request-Uri e.g.
-        // GET /controler.json/param
+        // Wether to allow the output format to be set from the Request-URI
+        // using a file extension such as '/controller.json/id'.
         // This is handy and common practice but fairly un-RESTful...
-        // Override http_accept above.
+        // The extension overrides the http_accept negotiation.
         'controller_ext'    => true,
 
         // Forces the output format to the string provided and overrides the
         // format negotiation process. Set to false to disable. Can be use to
         // set the format from a request parameter, or any other arbitrary
-        // methods, etc... Using REQUEST is considered un-RESTful but can be
-        // handy in certain cases (.e.g. forms).
+        // methods, etc... Using REQUEST is considered un-RESTful but also can
+        // be handy in many cases e.g. forms handling.
         'format_override'   => isset($_REQUEST['_format']) ? $_REQUEST['_format'] : false,
     ),
 
@@ -117,13 +117,13 @@ $c = array(
     // set directly in PHP.ini/vhost file on productions servers -- and then
     // commented out. TODO: comparaison benchmark!?
     'init'                  => array(
-        // Wheter to display errors (should be set to false in production)
+        // Weter to display errors (should be set to false in production).
         'display_errors'            => DEBUG,
 
-        // Enable or disable php error logging
+        // Enable or disable php error logging.
         'init_log_errors'           => true,
 
-        // Path to the error log file
+        // Path to the error log file.
         'error_log'                 => '/tmp/zenya-api-server-errors.log',
 
         /////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ $c = array(
 
         // The timeout in seconds.
         // BEWARE web servers such as Apache have also their own timout settings
-        // that may interfer. See your web server manual for specific details.
+        // that may interfere. See your web server manual for specific details.
         'max_execution_time'        => 15,
 
         ////////////////////////////////////////////////////////////////////////
@@ -259,7 +259,7 @@ $c['services'] = array(
         return new Listener\Auth($adapter);
     },
 
-    // Returns a user array. Thi is used by the authentification plugins above.
+    // Returns a user array. This is used by the authentification plugins above.
     // TODO: JON to retrieve the users generic schema and data set from Magento.
     'users' => function()
     {
