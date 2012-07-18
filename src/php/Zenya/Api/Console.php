@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 Franck Cassedanne, Zenya.com
+ * Copyright (c) 2011 Franck Cassedanne, Ouarz.net
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,12 +32,11 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya\Api
- * @subpackage  Server
- * @author      Franck Cassedanne <fcassedanne@zenya.com>
- * @copyright   2011 Franck Cassedanne, Zenya.com
+ * @package     Ouarz\Console
+ * @author      Franck Cassedanne <fcassedanne@ouarz.net>
+ * @copyright   2011 Franck Cassedanne, Ouarz.net
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link        http://zenya.github.com
+ * @link        http://ouarz.github.com
  * @version     @@PACKAGE_VERSION@@
  */
 
@@ -48,79 +47,103 @@ class Console
     public $args;
 
     protected $switches = array(
-        'colors' => array('-c', '--colors', '--colours'),
-        'verbose' => array('-v', '--verbose')
+        'no_colors' => array('--no-colors', '--no-colours'),
+        'verbose' => array('--verbose', '-vv', '-vvv')
     );
 
-    protected $colors = false;
+    protected $no_colors = false;
     protected $verbose = false;
 
-    protected $start = "\033[%dm%s";
+    protected $start = "\033[%sm%s";
     protected $end = "\033[0m";
 
-    protected $options;
+    protected $options = null;
 
     public function __construct(array $options = null)
     {
-        $this->args = array_unique($_SERVER['argv']);
+        $this->init();
 
         $this->options = null === $options ? $this->getOptions() : $options;
-
-        $this->setModes();
     }
 
-    public function setModes()
+    public function init()
     {
+        $this->args = array_unique($_SERVER['argv']);
+
         foreach ($this->switches as $key => $values) {
             if (array_intersect($values, $this->args)) {
                 $this->args = array_diff($this->args, $values);
-                reset($this->args); // TODO: php bug here???
+                reset($this->args); // TODO: seems we have a php bug here???
                 $this->$key = true;
             }
+        }
+
+        // check env variables.
+        if(false === $this->no_colors) {
+            $this->no_colors = exec('tput colors 2> /dev/null') > 2 ? 0 : 1;
         }
     }
 
     public function getOptions()
     {
-        $options = array_merge(
-            // Foreground colors.
+        if($this->no_colors == true) {
+            return null;
+        }
+        $ansi = array_merge(
+            // foreground colors @ level 0.
             array_combine(
-                array('grey', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan',
-                      'white'),
+                array('grey', 'red', 'green', 'brown', 'blue', 'purple', 'cyan',
+                      'light_grey'),
                 range(30, 37)
             ),
-            // Background colors.
+            // foreground colors @ level 1.
             array_combine(
-                array('on_grey', 'on_red', 'on_green', 'on_yellow', 'on_blue',
-                      'on_magenta', 'on_cyan', 'on_white'),
-                range(40, 47)
-
+                array('dark_gray', 'light_red', 'light_green', 'yellow',
+                    'light_blue', 'pink', 'light_cyan', 'white'),
+                array_map(function($k){return '1;' . $k;}, range(30, 37))
             ),
-            // Text style attributes. 3 and 6 are not used.
+            // background colors.
             array_combine(
-                array('bold', 'dark', null, 'underline', 'blink', null, 'inverse',
-                      'concealed'),
-                range(1, 8)
+                array('on_red', 'on_green', 'on_brown', 'on_blue',
+                      'on_purple', 'on_cyan', 'on_grey'),
+                range(41, 47)
+            ),
+            // text style attributes (italics & outline not predictable).
+            array_combine(
+                array('normal', 'bold', 'dark', 'italics', 'underline', 'blink',
+                    'outline', 'inverse', 'invisible', 'striked'),
+                range(0, 9)
             )
         );
-        unset($options['']); // remove the null(s)
-
-        return $options;
+        return $ansi;
     }
+
+    public function _out($msg, $styles=null)
+    {
+        if(!is_array($styles)) {
+            $styles = is_array($msg) ? $msg : func_get_args();
+            $msg = array_shift($styles);
+        }
+
+        if (true !== $this->no_colors) {
+            foreach ($styles as $style) {
+                if (isset($this->options[$style])) {
+                    $msg = sprintf($this->start, $this->options[$style], $msg);
+                    $msg .= $this->end;
+                }
+            }
+        }
+
+        return $msg;
+    }
+
 
     public function out($msg, $styles=null)
     {
         $styles = is_array($msg) ? $msg : func_get_args();
         $msg = array_shift($styles);
 
-        if (false !== $this->colors) {
-            foreach ($styles as $style) {
-                if (isset($this->options[$style])) {
-                    $msg = sprintf($this->start, $this->options[$style], $msg) . $this->end;
-                }
-            }
-        }
-        echo $msg;
+        echo $this->_out($msg, $styles);
     }
 
     // public function getArgs($default=null)

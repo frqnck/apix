@@ -1,11 +1,53 @@
 <?php
+/**
+ * Copyright (c) 2011 Franck Cassedanne, Zenya.com
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *   * Neither the name of Zenya nor the names of his
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @package     Zenya\Api
+ * @subpackage  Console
+ * @author      Franck Cassedanne <fcassedanne@zenya.com>
+ * @copyright   2011 Franck Cassedanne, Zenya.com
+ * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link        http://zenya.github.com
+ * @version     @@PACKAGE_VERSION@@
+ */
+
 #namespace Zenya\bin;
 
 #use Zenya\Api;
 
 class Compiler
 {
-    const DEFAULT_PHAR_FILE = 'sleepover-server.phar';
+    const DEFAULT_PHAR_FILE = 'zenya-api-server.phar';
 
     protected $version;
 
@@ -53,9 +95,10 @@ class Compiler
 
         // get the stub
         $stub = preg_replace("@{VERSION}@", $this->version, $this->getStub());
+        $stub = preg_replace("@{BUILD}@", gmdate("Y-m-d\TH:i:s\Z"), $stub);
+
         $stub = preg_replace("@{PHAR}@", $pharFile, $stub);
         $stub = preg_replace("@{URL}@", 'http://zenya.dev/index3.php/api/v1', $stub);
-        $stub = preg_replace("@{BUILD}@", gmdate("Y-m-d\TH:i:s\Z"), $stub);
 
         // Add the stub
         $phar->setStub( $stub );
@@ -65,10 +108,12 @@ class Compiler
         $phar->compressFiles(\Phar::GZ);
 
         echo 'The new phar has ' . $phar->count() . " entries\n";
-
         unset($phar);
+
         chmod($pharFile, 0777);
         rename($pharFile, __DIR__ . '/../../dist/' . $pharFile);
+
+        echo "Created in " . realpath(__DIR__ . '/../../dist/') . ".\n";
     }
 
     protected function addFile($phar, $path, $strip = true)
@@ -104,10 +149,46 @@ class Compiler
         return <<<'STUB'
 <?php
 /**
- * Zenya Api Server
+ * Copyright (c) 2012 Franck Cassedanne, Zenya.com
+ * All rights reserved.
  *
- * @version {VERSION}
- * @build {BUILD}
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in
+ *     the documentation and/or other materials provided with the
+ *     distribution.
+ *
+ *   * Neither the name of Zenya nor the names of his
+ *     contributors may be used to endorse or promote products derived
+ *     from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ * @package     Zenya\Api
+ * @subpackage  Server
+ * @author      Franck Cassedanne <fcassedanne@zenya.com>
+ * @copyright   2011 Franck Cassedanne, Zenya.com
+ * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @link        http://zenya.github.com
+ * @version     @@PACKAGE_VERSION@@
+ * @version     {VERSION} build: {BUILD}
  */
 try {
     Phar::mapPhar('{PHAR}');
@@ -139,127 +220,9 @@ try {
 }
 
 if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'][0])) {
-
-    $cli = new Zenya\Api\Console;
-    $cli->args[0] = 'php ' . $cli->args[0];
-
-    $version = Zenya\Api\Server::VERSION;
-    $versionStr = sprintf("Zenya API Server %s by Franck Cassedanne", $version);
-
-    $cmd = empty($cli->args[1])
-            ? '--help'
-            : $cli->args[1];
-
-    switch ($cmd):
-        case '--extractdist':
-            try {
-                $config = 'phar://{PHAR}/src/data/config.dist.php';
-                $local  = __DIR__ . '/config.dist.php';
-                file_put_contents($local, file_get_contents($config));
-            } catch (Exception $e) {
-                echo 'Error: Unable to proceed. ' . $e->getMessage();
-            }
-            echo "Latest distribution files were copied into:" . PHP_EOL;
-            echo __DIR__ . PHP_EOL .PHP_EOL;
-            echo "Manually rename each files from '*.dist.php' to '*.php' to use them." . PHP_EOL;
-            echo "e.g. cp -i config.dist.php config.php";
-            break;
-
-        case '--selfupdate':
-            try {
-                $remote = '{URL}/download/{PHAR}';
-                $local  = __DIR__ . '/{PHAR}';
-
-                file_put_contents($local, file_get_contents($remote));
-            } catch (Exception $e) {
-                echo 'Error: Unable to proceed. ' . $e->getMessage();
-            }
-            break;
-
-        case '-s': case '--syscheck':
-            $syscheck = new Zenya\Api\SystemCheck();
-            $syscheck->run();
-            break;
-
-        case '-t': case '--tests':
-                system('phpunit --colors tests/phar-test.php');
-            break;
-
-        case '-l': case '--live':
-            try {
-                $body = trim(file_get_contents('{URL}/version/{PHAR}'));
-                $input = new Zenya\Api\Input\Json;
-
-                $r = $input->decode($body, true);
-                $latest = $r['zenya']['version']['{PHAR}'];
-
-                if ($latest != $version) {
-                    printf("A newer version is available (%s).", $latest);
-                } else {
-                    print("You are using the latest version.");
-                }
-            } catch (Exception $e) {
-                echo 'Error: Unable to proceed. ' . $e->getMessage();
-            }
-            break;
-
-        case '--license':
-                echo file_get_contents('phar://{PHAR}/LICENSE.txt');
-            break;
-
-        case '-r': case '--readme':
-                echo file_get_contents('phar://{PHAR}/README.md');
-            break;
-
-        case '-i': case '--info':
-                phpinfo();
-            break;
-
-        case '-v': case '--version':
-                echo $versionStr . PHP_EOL;
-            break;
-
-        case '-h': case '--help':
-            echo <<<HELP
-{$versionStr}
-
-Usage: {$cli->args[0]} [options]
-
-Options:
-   --readme | -r    Display the README file.
-
-   --extractdist    Extract the latest distribution data.
-
-   --live | -l      Check for updates.
-
-   --selfupdate     Upgrade the server to the latest version available.
-
-   --version | -v   Display the version information and exit.
-
-   --help | -h      Display this help.
-
-   --info | -i      PHP information and configuration.
-
-   --license        Display the software license.
-
-   --syscheck | -s  Run a system check.
-
-   --tests | -t     Run some unit & functional tests.
-
-   --colors | -c    Use colors in output.
-
-HELP;
-        break;
-
-        default:
-            $cli->out("Error: ", 'red');
-            $cli->out(sprintf('unknown command "%s".' . PHP_EOL . 'Try "', $cli->args[1]));
-            $cli->out(sprintf('%s --help".' . PHP_EOL, $cli->args[0]), "blue");
-
-    endswitch;
-
-    echo PHP_EOL;
-
+    $cli = new Zenya\Api\Console\Main;
+    $cli->setPharName($loc);
+    $cli->run();
     exit(0);
 }
 
