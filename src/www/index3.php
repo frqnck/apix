@@ -13,13 +13,14 @@ psr0_autoloader_searchFirst(APP_TESTDIR);
 psr0_autoloader_searchFirst(APP_TOPDIR);
 */
 
+require_once __DIR__ . '../../../dist/zenya-api-server.phar';
+
 # Test server
 try {
     #$api = new Zenya\Api\Server;
 
-// Test server
-require_once __DIR__ . '../../../dist/zenya-api-server.phar';
-#try {
+    // Test server
+
     $api = new Zenya\Api\Server(require "../../src/data/config.dist.php");
 
     $api->onRead('/version/:software',
@@ -93,4 +94,3 @@ require_once __DIR__ . '../../../dist/zenya-api-server.phar';
     header($_SERVER['SERVER_PROTOCOL'] . ' 500 Internal Server Error', true, 500);
     die("<h1>500 Internal Server Error</h1>" . $e->getMessage());
 }
-exit;

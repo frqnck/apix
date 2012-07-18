@@ -36,13 +36,13 @@
  * @package     Zenya\Api
  * @subpackage  Console
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
- * @copyright   2011 Franck Cassedanne, Zenya.com
+ * @copyright   2012 Franck Cassedanne, Zenya.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://zenya.github.com
  * @version     @@PACKAGE_VERSION@@
  */
 
-namespace Zenya\Api;
+namespace Zenya\Api\Console;
 
 use Zenya\Api\Console;
 
@@ -60,7 +60,7 @@ Usage: {$this->args[0]} [options]
 Options:
    --help | -h      Display this help.
 
-   --colors | -c    Use colors in output.
+   --no-colors      Don't use colors in the outputs.
 
    --required       Run only the required checks.
 
@@ -77,7 +77,7 @@ HELP;
     public function run($quiet=false)
     {
         $this->out(PHP_EOL);
-        $this->out("\tSystem check for " . $this->software_name . "\t", 'black', 'on_cyan');
+        $this->out("\tSystem check for " . $this->software_name . "\t", 'cyan', 'bold', 'on_blue');
         $this->out(PHP_EOL . PHP_EOL);
 
         $this->help();
@@ -138,8 +138,8 @@ HELP;
             $this->out(PHP_EOL);
             foreach ($check['msgs'] as $msg) {
                 $this->out(PHP_EOL);
-                $this->out("     ---> ",'red');
-                $this->out($msg, 'green');
+                $this->out('     ---> ','red');
+                $this->out($msg, 'red');
             }
         }
     }
@@ -196,9 +196,9 @@ HELP;
                 'fail' => extension_loaded('ionCube Loader'),
                 'verbose' => 'off',
                 'msgs' => array(
-                    "The ionCube Loader extension is incompatible with Phar files.",
-                    "Remove this line (path may be different) from your 'php.ini':",
-                    "    zend_extension = /usr/lib/php5/20090626+lfs/ioncube_loader_lin_5.3.so"
+                    "The ionCube Loader extension could be incompatible with Phar files.",
+                    "Anything prior to 4.0.9 will not work too well with Phar archives.",
+                    "Consider upgrading to 4.0.9 or newer OR comment the 'ioncube_loader_lin_5.3.so' line from your 'php.ini'."
                 )
             )
         );
