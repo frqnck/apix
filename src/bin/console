@@ -2,7 +2,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Franck Cassedanne, Zenya.com
+ * Copyright (c) 2011 Franck Cassedanne
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -34,12 +34,12 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya\Api
+ * @package     Ouarz
  * @subpackage  Console
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
- * @copyright   2011 Franck Cassedanne, Zenya.com
+ * @copyright   2011 Franck Cassedanne, Ouarz.net
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link        http://zenya.github.com
+ * @link        http://ouarz.github.com
  * @version     @@PACKAGE_VERSION@@
  */
 
@@ -53,6 +53,5 @@ psr0_autoloader_searchFirst(APP_LIBDIR);
 psr0_autoloader_searchFirst(APP_TOPDIR);
 //psr0_autoloader_searchFirst(APP_TESTDIR);
 
-#require 'CheckSystem.php';
-$sys = new Zenya\Api\Console\SystemCheck;
-$sys->run();
+$cli = new Zenya\Api\Console\Main;
+$cli->run();
