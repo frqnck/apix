@@ -32,7 +32,7 @@ try {
          * @param string    $software
          * @return array    The array to return to the client
          * @api_role        public
-         * @api_cache 10h   julien
+         * @api_cache       10w pharFile    Cache for 10 weeks and tag as pharFile.
          */
         function($software) use ($api) {
             return array(
@@ -48,7 +48,7 @@ try {
          * @param string    $software
          * @return array    The array to return to the client
          * @api_role        public
-         * @api_cahce 3w    julien
+         * @api_cache       10w pharFile    Cache for 10 weeks and tag as pharFile.
          */
         function($software) use ($api) {
             $file = "../../dist/$software";
@@ -64,29 +64,28 @@ try {
         /**
          * Upload a new software :software
          *
-         * @param string    $software
-         * @return array    The array to return to the client
+         * @param string        $software
+         * @return array        The array to return to the client
          * @api_role admin
-         * @api_purge_cache julien
+         * @api_purge_cache     pharFile    Purge the cahce of all the 'pharFile' tagged entries.
          */
-        function($software) use ($api) {
+        function($software) {
             throw new Exception("Todo");
         }
-    )->group('software');
+    );
 
-    $api->onUpdate('/upload/:software',
-        /**
-         * Update an existing software :software
-         *
-         * @param string    $software
-         * @return array    The array to return to the client
-         * @api_role admin
-         * @api_purge_cache julien
-         */
-        function($software) use ($api) {
-            throw new Exception("Todo");
-        }
-    )->group('software');
+    /**
+     * Update an existing software :software
+     *
+     * @param string    $software
+     * @return array    The array to return to the client
+     * @api_role admin
+     * @api_purge_cache julien
+     */
+    $api->onUpdate('/upload/:software', function($software)
+    {
+        throw new Exception("TODO");
+    });
 
     echo $api->run();
 

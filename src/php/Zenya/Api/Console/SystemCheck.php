@@ -76,7 +76,7 @@ HELP;
 
     public function run($quiet=false)
     {
-        $this->out(PHP_EOL);
+        #$this->out(PHP_EOL);
         $this->out("\tSystem check for " . $this->software_name . "\t", 'cyan', 'bold', 'on_blue');
         $this->out(PHP_EOL . PHP_EOL);
 

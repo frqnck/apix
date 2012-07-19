@@ -486,6 +486,12 @@
     <phingcallifexists target="local.upgrade-skeleton"/>
   </target>
 
+  <!-- Build the Phar -->
+  <target name="build-phar">
+    <exec command="./src/bin/compile" logoutput="true" checkreturn="true" />
+  </target>
+
+
   <!-- Clean up the mess -->
   <target name="clean">
     <delete dir="${project.builddir}" />
