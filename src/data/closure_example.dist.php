@@ -33,11 +33,16 @@ try {
      * @api_role    public              Available to all!
      * @api_cache   10w softy           Cache for a maximum of 10 weeks
      *                                  and tag cache buffer as 'mySoftware'.
+     * throw DomainException 404
      */
     $api->onRead('/download/:software', function($software) {
         // ...
-        echo $file;
-        exit; // to stop the server handling the response anyfurther.
+        if (file_exists($software)) {
+            echo $software;
+            exit; // to stop the server handling the response anyfurther.
+        }
+
+        throw new DomainException("\"$software\" doesn't not exist.", 404);
     });
 
     /**
