@@ -35,7 +35,7 @@
  * @package     Zenya\Api
  * @subpackage  Console
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
- * @copyright   2011 Franck Cassedanne, Zenya.com
+ * @copyright   2012 Franck Cassedanne, Zenya.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @link        http://zenya.github.com
  * @version     @package_version@
@@ -62,9 +62,13 @@ class Compiler
             unlink($pharFile);
         }
 
-        if ( ! $this->latest_git = trim(exec('git log --pretty="%h %ci" -n1 HEAD')) ) {
-            throw new \RuntimeException('The git binary cannot be found.');
+        // set version
+        if(!isset($_SERVER['argv'][1])) {
+            echo 'Usage: ' . $_SERVER['argv'][0] . ' version_string' . PHP_EOL;
+            exit;
         }
+        $this->version = $_SERVER['argv'][1];
+        echo "Processing $pharFile-" . $this->version;
 
         $phar = new \Phar($pharFile, 0, $pharFile);
         $phar->setSignatureAlgorithm(\Phar::SHA1);
@@ -74,7 +78,7 @@ class Compiler
 
         // all the files
         $root = __DIR__ . '/../..';
-        foreach ( array('src/php', 'vendor/php') as $dir) {
+        foreach ( array('src/php', 'vendor/php', '/src/data') as $dir) {
             $it = new \RecursiveDirectoryIterator("$root/$dir");
             foreach (new \RecursiveIteratorIterator($it) as $file) {
                 if (
@@ -82,20 +86,25 @@ class Compiler
                     && !preg_match ('@/src/php/Zenya/Api/Util/Compile.php$@', $file->getPathname())
                 ) {
                     $path = $file->getPathname();
-                    $this->addFile($phar, $path);
+                    $this->addFile($phar, $path, ($dir != '/src/data' ? true : false));
                 }
             }
         }
 
         $this->addFile($phar, new \SplFileInfo($root . '/LICENSE.txt'), false);
         $this->addFile($phar, new \SplFileInfo($root . '/README.md'), false);
-        $this->addFile($phar, new \SplFileInfo($root . '/src/data/config.dist.php'), false);
+        #$this->addFile($phar, new \SplFileInfo($root . '/src/data/config.dist.php'), false);
+
+
+        if ( ! $latest_git = trim(exec('git log --pretty="%h %ci" -n1 HEAD')) ) {
+            throw new \RuntimeException('The git binary cannot be found.');
+        }
 
         // get the stub
-        $stub = preg_replace("@{GIT}@", $latest_git, $this->getStub());
-        $stub = preg_replace("@{BUILD}@", gmdate("Ymd\TH:i:s\Z"), $stub);
-
-        $stub = preg_replace("@{PHAR}@", $pharFile, $stub);
+        $stub = str_replace("@package_version@", $this->version, $this->getStub());
+        $stub = str_replace("{GIT}", $latest_git, $stub);
+        $stub = str_replace("{BUILD}", gmdate("Ymd\TH:i:s\Z"), $stub);
+        $stub = str_replace("{PHAR}", $pharFile, $stub);
 
         // Add the stub
         $phar->setStub($stub);
@@ -131,7 +140,9 @@ class Compiler
         }
 
         // TODO: review versioning!!!
-        $content = preg_replace("/const VERSION = '.*?';/", "const VERSION = '".$this->version."';", $content);
+        #$content = preg_replace("/const VERSION = '.*?';/", "const VERSION = '".$this->version."';", $content);
+
+        $content = preg_replace("/@package_version@/", $this->version, $content);
 
         #$localPath = strtolower($localPath);
         $phar->addFromString('/' . $localPath, $content);
@@ -181,11 +192,10 @@ class Compiler
  * @package     Zenya\Api
  * @subpackage  Server
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
- * @copyright   2011 Franck Cassedanne, Zenya.com
+ * @copyright   2012 Franck Cassedanne, Zenya.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version     @package_version@
- * @build       {BUILD}
- * @version     {VERSION}
+ * @build       {GIT} / {BUILD}
  */
 try {
     Phar::mapPhar('{PHAR}');
