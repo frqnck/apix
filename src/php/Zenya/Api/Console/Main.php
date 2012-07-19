@@ -19,7 +19,8 @@ class Main extends Console
 
     public function __construct(array $options = null)
     {
-        $this->src_url = 'http://zenya.dev/index3.php/api/v1';
+#        $this->src_url = 'http://zenya.dev/index3.php/api/v1';
+        $this->src_url = 'http://test.dev/index.php/api/v1';
 
         $this->src = realpath(__DIR__ . '/../../../../../');
 
@@ -61,7 +62,7 @@ class Main extends Console
                 exit(0);
             break;
 
-            case '--extractdist':
+            case '--extractdist': case '-e':
                 $src = $this->src . '/src/data/';
                 $dest = $_SERVER['PWD'];
                 try {
@@ -114,7 +115,9 @@ class Main extends Console
                     $remote = $this->src_url . '/download/' . $this->src_file;
                     $local  = __DIR__ . '/' . $this->src_file;
 
-                    file_put_contents($local, file_get_contents($remote));
+                    file_put_contents($local, $this->getContents($remote));
+
+                    echo $this->src_file . " has been updated.";
                 } catch (\Exception $e) {
                     $this->error($e);
                 }
@@ -208,7 +211,7 @@ HELP;
         $opts = array('http' => array(
             'method'  => $method,
             'header'  => "Content-Type: text/xml\r\n".
-            'Authorization: Basic ' . base64_encode("https_user:https_password") . "\r\n",
+            'Authorization: Basic ' . base64_encode($this->src_file . ":sesame") . "\r\n",
             'content' => $body,
             'timeout' => 60
             )
