@@ -19,12 +19,13 @@ class Main extends Console
 
     public function __construct(array $options = null)
     {
-        $this->src_url = 'http://zenya.dev/index3.php/api/v1';
+#        $this->src_url = 'http://zenya.dev/index3.php/api/v1';
+        $this->src_url = 'http://test.dev/index.php/api/v1';
 
         $this->src = realpath(__DIR__ . '/../../../../../');
 
         $this->version = Server::VERSION;
-        $this->version_program = sprintf("Zenya API Server %s by Franck Cassedanne", $this->version);
+        $this->version_program = sprintf("Zenya API Server %s by Franck Cassedanne.", $this->version);
 
         parent::__construct($options);
     }
@@ -48,12 +49,20 @@ class Main extends Console
                 ? '--help'
                 : $this->args[1];
 
+        echo $this->version_program . PHP_EOL .PHP_EOL;
+
         switch ($cmd):
             case '-r': case '--readme':
-                    echo file_get_contents($this->src . '/README.md');
-                break;
+                echo 'README:' . PHP_EOL . PHP_EOL;
+                echo file_get_contents($this->src . '/README.md');
+                echo PHP_EOL;
+            break;
 
-            case '--extractdist':
+            case '-v': case '--version':
+                exit(0);
+            break;
+
+            case '--extractdist': case '-e':
                 $src = $this->src . '/src/data/';
                 $dest = $_SERVER['PWD'];
                 try {
@@ -76,9 +85,10 @@ class Main extends Console
                 $this->out(" --> " . $dest . PHP_EOL .PHP_EOL, 'red');
                 $this->out("Manually rename each files from '*.dist.php' to '*.php' to use them." . PHP_EOL);
                 $this->out("e.g." . PHP_EOL . "cp -i config.dist.php projectname-config.php" . PHP_EOL, 'blue');
-                break;
+            break;
 
             case '-c': case '--check':
+
                 try {
                     $input = new Input\Json;
                     $url = $this->src_url . '/version/' . $this->src_file;
@@ -91,25 +101,27 @@ class Main extends Console
 
                     if ($latest != $this->version) {
                         printf("A newer version is available (%s).", $latest);
-                        echo ' ' . $this->version;
                     } else {
                         print("You are using the latest version.");
                     }
                 } catch (\Exception $e) {
                     $this->error($e);
                 }
-                break;
+                echo PHP_EOL;
+            break;
 
             case '--selfupdate':
                 try {
                     $remote = $this->src_url . '/download/' . $this->src_file;
                     $local  = __DIR__ . '/' . $this->src_file;
 
-                    file_put_contents($local, file_get_contents($remote));
-                } catch (Exception $e) {
-                    echo 'Error: Unable to proceed. ' . $e->getMessage();
+                    file_put_contents($local, $this->getContents($remote));
+
+                    echo $this->src_file . " has been updated.";
+                } catch (\Exception $e) {
+                    $this->error($e);
                 }
-                break;
+            break;
 
             case '-s': case '--syscheck':
                 $syscheck = new SystemCheck;
@@ -118,15 +130,11 @@ class Main extends Console
 
             case '--license':
                     echo file_get_contents($this->src .'/LICENSE.txt');
-                break;
+            break;
 
             case '-i': case '--info':
                     phpinfo();
-                break;
-
-            case '-v': case '--version':
-                    echo $this->version_program . PHP_EOL;
-                break;
+            break;
 
             case '-h': case '--help':
                 $this->help();
@@ -134,12 +142,12 @@ class Main extends Console
 
             case '-t': case '--tests':
                     system('phpunit --colors tests/phar-test.php');
-                break;
-
+            break;
 
             default:
-                $this->out(sprintf('Error: unknown option/command "%s".' . PHP_EOL, $this->args[1]), 'red');
-                $this->out(sprintf('You should try "%s --help".', $this->args[0]), "blue");
+                $this->out('Error: ', $this->args[1], 'bold', 'red');
+                $this->out(sprintf('unknown option/command "%s".' . PHP_EOL, $this->args[1]), 'red');
+                $this->out(sprintf('You should try "%s --help".', $this->args[0]), "green");
 
         endswitch;
 
@@ -151,8 +159,6 @@ class Main extends Console
     public function help()
     {
         $help = <<<HELP
-{$this->version_program}
-
 Usage: {$this->args[0]} [options]
 
 Options:
@@ -194,7 +200,8 @@ HELP;
 
     public function error(\Exception $e)
     {
-        $this->out("Error: unable to proceed." . PHP_EOL . PHP_EOL, 'red');
+        $this->out('Error: ', 'bold', 'red');
+        $this->out("unable to proceed." . PHP_EOL . PHP_EOL, 'red');
         $this->out($e->getMessage() . PHP_EOL . PHP_EOL );
         exit;
     }
@@ -204,7 +211,7 @@ HELP;
         $opts = array('http' => array(
             'method'  => $method,
             'header'  => "Content-Type: text/xml\r\n".
-            'Authorization: Basic ' . base64_encode("https_user:https_password") . "\r\n",
+            'Authorization: Basic ' . base64_encode($this->src_file . ":sesame") . "\r\n",
             'content' => $body,
             'timeout' => 60
             )
