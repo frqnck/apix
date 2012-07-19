@@ -95,19 +95,19 @@ class Compiler
 
         // get the stub
         $stub = preg_replace("@{VERSION}@", $this->version, $this->getStub());
-        $stub = preg_replace("@{BUILD}@", gmdate("Y-m-d\TH:i:s\Z"), $stub);
+        $stub = preg_replace("@{BUILD}@", gmdate("Ymd\TH:i:s\Z"), $stub);
 
         $stub = preg_replace("@{PHAR}@", $pharFile, $stub);
         $stub = preg_replace("@{URL}@", 'http://zenya.dev/index3.php/api/v1', $stub);
 
         // Add the stub
-        $phar->setStub( $stub );
+        $phar->setStub($stub);
 
         $phar->stopBuffering();
 
         $phar->compressFiles(\Phar::GZ);
 
-        echo 'The new phar has ' . $phar->count() . " entries\n";
+        echo 'The new phar has ' . $phar->count() . " entries.\n";
         unset($phar);
 
         chmod($pharFile, 0777);
