@@ -1,6 +1,6 @@
 <?php
-// This is the config.dist.php file
-// --------------------------------
+// This is the Apix config.dist.php file
+// -------------------------------------
 //
 // You should NOT edit this file! Instead, put any overrides into a local copy.
 // The local file should only contain values which override values set in the
