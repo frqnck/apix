@@ -27,7 +27,7 @@
 
 namespace myNamespace;
 
-use Zenya\Server\Request;
+use Apix;
 
 /**
  * Software Download API
