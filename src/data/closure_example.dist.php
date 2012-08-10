@@ -4,10 +4,10 @@
 //
 // Closure is exerimental... avoid using for now.
 
-require_once 'zenya-api-server.phar';
+require_once 'apix.phar';
 
 try {
-    $api = new Zenya\Api\Server(require 'config.dist.php');
+    $api = new Apix\Server(require 'config.php');
 
     /**
      * Returns the lastest version of the :software
