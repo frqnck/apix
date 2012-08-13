@@ -12,11 +12,11 @@ try {
     /**
      * Returns the lastest version of the :software
      *
-     * @param       string  $software
-     * @return      array       The array to return to the client
-     * @api_role    public      Available to all!
-     * @api_cache   10w softy   Cache for a maximum of 10 weeks
-     *                          and tag cache buffer as 'mySoftware'.
+     * @param       string          $software
+     * @return      array           The array to return to the client
+     * @api_role    public          Available to all!
+     * @api_cache   10w some_name   Cache for a maximum of 10 weeks
+     *                              and tag cache buffer as 'some_name'.
      */
     $api->onRead('/version/:software', function($software) {
         // ...
@@ -26,19 +26,19 @@ try {
     });
 
     /**
-     * Download the :software...
+     * Download some :software
      *
      * @param       string  $software
      * @return      string              Output the binary & quit.
+     * @throws      DomainException 404
      * @api_role    public              Available to all!
-     * @api_cache   10w softy           Cache for a maximum of 10 weeks
-     *                                  and tag cache buffer as 'mySoftware'.
-     * throw DomainException 404
+     * @api_cache   10w some_name       Cache for a maximum of 10 weeks
+     *                                  and tag cache buffer as 'some_name'.
      */
     $api->onRead('/download/:software', function($software) {
         // ...
         if (file_exists($software)) {
-            echo $software;
+            echo file_get_contents($software);
             exit; // to stop the server handling the response anyfurther.
         }
 
@@ -52,8 +52,8 @@ try {
      * @param               string   $software
      * @return              array               A reponse array.
      * @api_role            admin               Require admin priviledge
-     * @api_purge_cache     mySoftware          Purge the cache of all the
-     *                                          'mySoftware' tagged entries.
+     * @api_purge_cache     some_name           Purge the cache of all the
+     *                                          'some_name' tagged entries.
      */
     $api->onCreate('/upload/:software', function(Request $request, $software) {
         // ...
