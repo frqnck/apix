@@ -1,5 +1,5 @@
-Apix, a RESTful (micro)framework.
-===========================================
+Apix, a RESTful (micro)framework [DRAFT]
+================================
 
 This is a quick and dirty getting started for Apix, the RESTful (micro)framework
 to expose, at will, your web services over HTTP.
@@ -9,21 +9,21 @@ strict) RESTful interface.
 
 Out of the box, Apix features:
 
-* Light weight micro framework -- fully customisable. 
+* Light weight micro framework -- fully customisable.
 * Can be as RESTful as you wish, as strict or as lax as your need it to be.
 * Powerful and fully customisable routing mechanisms.
-* Handles most HTTP method, such as GET, POST, PUT, DELETE, HEAD, OPTIONS and PATCH (TRACE to some extend). 
+* Handles most HTTP method, such as GET, POST, PUT, DELETE, HEAD, OPTIONS and PATCH (TRACE to some extend).
 * Provides method override usign X-HTTP-Method-Override (as per Google recomendation) and/or using a query params (customisable).
 * Supports many data inputs, such as XML, JSON, CSV, ...
 * Provides various output representation, such as XML, JSONP, HTML, PHP, ...
-* Additional data formaters can be added as per your requirments. 
-* Support content negotiation (which can also be ovveriden in different ways). 
+* Additional data formaters can be added as per your requirments.
+* Support content negotiation (which can also be overriden in different ways).
 * Output the resource documention on demand, using 'GET /help' or the HTTP method OPTIONS.
-* HTTP cacheable -- provides HEAD test.
+* HTTP cacheable -- supports HEAD test.
 * Uses annotations to document and set your services and its behaviours.
-* Plugggable archicture.
-* Bundle with many adapters for:   
-    * Authentification and ACL 
+* Pluggeable archicture.
+* Bundle with many adapters for:
+    * Authentification and ACL
     * Logging
     * Caching, local and shared
 * Based upon the relevant RFCs, such as
@@ -69,108 +69,87 @@ The easiest by far is to use the Phar distribution so all the dependencies and
 autoloading requirments are taken care of. The Phar method allows, among other
 things, to run many concurrent version on the same server which ease development.
 
-Here is a basic usage showing a GET handler:
+Here is a basic usage:
 
-```php  
-   <?php  
+    ```php
+        <?php
+        require 'apix.phar';
 
-    require 'apix.phar';  
+        $api = new Apix\Server;
 
-    $api = new Apix\Server();
+        $api->onRead('/hello/:name', function($name) {
+            return array('Hello ' . $name);
+        });
 
-    $api->onRead('/hello/:name', function($name) {  
-        return array('Hello ' . $name);  
-    });  
-
-    $api->run();  
-```
-
-
-
+        $api->run();
+    ```
 
 ### Routing ###
 
-A route defines a specific resource entity, once matched the corresponding resource's controller and dedicated handlers
-are invoked.
+A route defines the path to a resource, once matched the corresponding resource's controller and dedicated handlers are invoked.
 
-Any returned value emanating from a resource's controller, generally an associative array,
-will become the main subject of the response.
+Any returned value emanating from a resource's controller, generally an associative array, will become the main subject of the response.
 
-Essentially, a route is made of:  
+Essentially, a route is made of:
 
-1.  A **route path** corresponding to a Request-URI.  
-    * It may represent a specific and _static_ resource entity, such as:  
-        <pre>/search/paris/bars</pre>  
-    * It may also be _dynamic_, and include one or many variables, such as:
-        <pre>/search/:city/:category</pre>  
-   
+1.  A **route path** corresponding to a Request-URI.
+    * It may represent a specific and _static_ resource entity, such as:
+        <pre>/search/france/paris</pre>
+    * It may also be _dynamic_, and include one or many variables indicated by a colon, such as:
+        <pre>/search/:country/:city</pre>
 
-2.  A **route method** corresponding to a HTTP verb and repreneted as eithe a public method from a user defined class or called atruntime using a closure. The methods available are:    
-    * POST: onCreate()
-    * GET: onRead()
-    * PUT: onUpdate()
-    * DELETE: onDelete()
-    * PATCH: onModify()
-    * OPTIONS: onHelp()
-    * HEAD: onTest()
-    * TRACE: onTrace()
+
+2.  A **route method** corresponding to a HTTP header method, as follow:
+        <pre>
+onCreate()   =>   POST          |        onModify()   =>   PATCH
+onRead()     =>   GET           |        onHelp()     =>   OPTIONS
+onUpdate()   =>   PUT           |        onTest()     =>   HEAD
+onDelete()   =>   DELETE        |        onTrace()    =>   TRACE
+</pre>
+    Expressed either as a public method (from a user class), or called at runtime (instance definition).
 
 ## Advanced Usage ##
 
-### Botstrap ###
+### Bootstrap ###
 
 To boostrap an Apix server, add the required file and create an instance of the
-Apix\Server, for instance:
+Apix\Server.
 
-    ```php  
-        <?php  
-            require 'apix.phar';  
+A dedicated configuration file can be injected to an Apix server:
+
+    ```php
+        <?php
+            require 'apix.phar';
 
             $api = new Apix\Server(require 'my_config.php');
 
             $api->run();
     ```
 
-In the example above, 'my_config.php' is injected into the Apix Server and
-contains dedicated settings.
-Note that the configuration file can also contain resource definitions mapped to
-your own classes. See the Configuration chapter for detailled informations.
+### Configuration ###
 
-### Configurations ###
-
-Check the comments in the 'config.dist.php' file.
-
-TODO: explain the resource class defintion. For now refers to 
+Check the inline comments in the 'config.dist.php' file shipped with the distribution.
 
 ### Console ###
 
-The Phar file contain a built-in console server. There are many commands/options
-to use.
-
-Try invoking the api.phar file on the command line as per the following:
+Apix contains a built-in console. Try invoking the 'api.phar' file on the command line as follow:
 
 ```cli
 $ php apix.phar --help
 ```
 
-For instance, to extract the distribution data, use the --extractdist:
-
-```cli
-$ php apix.phar --extractdist
-```
-
 ### Web server configuration ###
 
 Use one of the vhost file provided within the distribution and follow the
-relevant instructions provided in the comments to set your web server.
+relevant instructions provided in the comments to set your web server environement.
 
 <pre>
-  _|_|    _|_|    _|     _|      _|  
-_|    _| _|    _|         _|    _|  
-_|    _| _|    _| _|        _|_|  
-_|_|_|_| _|_|_|   _| _|_|   _|_|  
-_|    _| _|       _|      _|    _|  
-_|    _| _|       _|     _|      _|  
+  _|_|    _|_|    _|     _|      _|
+_|    _| _|    _|         _|    _|
+_|    _| _|    _| _|        _|_|
+_|_|_|_| _|_|_|   _| _|_|   _|_|
+_|    _| _|       _|      _|    _|
+_|    _| _|       _|     _|      _|
 </pre>
 
 
