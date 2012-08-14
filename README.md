@@ -105,15 +105,15 @@ onDelete()   =>   DELETE        |        onTrace()    =>   TRACE
     ```php
         $api->onRead('/category/:name', function(Request $request, $name) {
 
-            // retrieve a named param.
+            // retrieve a named param
             $page = (int) $request->getParam('page');
 
-            // retrieve the body params (parsed from XML, JSON, ...)
+            // retrieve the body params, parsed from XML, JSON, ...
             $params = $request->getBodyParams();
 
             ...
 
-            return $list;
+            return $list_defs;
         });
     ```
 
