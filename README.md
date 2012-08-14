@@ -12,9 +12,8 @@ Out of the box, Apix features:
 * Light weight micro framework -- fully customisable.
 * Can be as RESTful as you wish, as strict or as lax as your need it to be.
 * Powerful and fully customisable routing mechanisms.
-* Handles most HTTP method, such as GET, POST, PUT, DELETE, HEAD, OPTIONS and
-PATCH (TRACE to some extend).
-* Provides method override usign X-HTTP-Method-Override (as per Google recomendation) and/or using a query params (customisable).
+* Handles most HTTP methods, including PUT, DELETE, HEAD, OPTIONS and PATCH (TRACE to some extend).
+* Provides method override usign X-HTTP-Method-Override (Google recommendation) and/or using a query params (customisable).
 * Supports many data inputs, such as XML, JSON, CSV, ...
 * Provides various output representation, such as XML, JSONP, HTML, PHP, ...
 * Additional data formaters can be added as per your requirments.
@@ -76,23 +75,49 @@ Any returned value emanating from a resource's controller, generally an associat
 
 Essentially, a route is made of:
 
-1.  A **route path** corresponding to a Request-URI.
-    * It may represent a specific and _static_ resource entity, such as:
-        <pre>/search/france/paris</pre>
-    * It may also be _dynamic_, and include one or many variables indicated by a colon, such as:
-        <pre>/search/:country/:city</pre>
+1.  A **route function/method** that corresponds to a HTTP header method (as per the table below), and expressed as either:
+        * a public methods from some user defined classes,
+        * or called at runtime (instance definitions),
 
-
-2.  A **route method** corresponding to a HTTP header method, as follow:
-        <pre>
+       <pre>
 onCreate()   =>   POST          |        onModify()   =>   PATCH
 onRead()     =>   GET           |        onHelp()     =>   OPTIONS
 onUpdate()   =>   PUT           |        onTest()     =>   HEAD
 onDelete()   =>   DELETE        |        onTrace()    =>   TRACE
 </pre>
-    Expressed either as a public method (from a user class), or called at runtime (instance definition).
 
-## Advanced Usage ##
+2.  A **route path** corresponding to a Request-URI.
+    * It may represent a specific and _static_ resource entity, such as:
+        <pre>/search/france/paris</pre>
+    * It may also be _dynamic_, and may include one or many variables indicated by a colon, such as:
+        <pre>/search/:country/:city</pre>
+
+### Controller definitions ###
+
+    A resource controllers may be declared as:
+        * a public method from some user defined classes,
+        * a closure/lambda functions defined at runtime.
+
+    It will use type hinting to:
+        * inherit variables from the route's path,
+        * inject any of the current Apix objects, e.g. Request, Response, etc...
+
+    ```php
+        $api->onRead('/category/:name', function(Request $request, $name) {
+
+            // retrieve a named param.
+            $page = (int) $request->getParam('page');
+
+            // retrieve the body params (parsed from XML, JSON, ...)
+            $params = $request->getBodyParams();
+
+            ...
+
+            return $list;
+        });
+    ```
+
+## Advanced usage ##
 
 ### Bootstrap ###
 
