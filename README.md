@@ -96,11 +96,13 @@ onDelete()   =>   DELETE        |        onTrace()    =>   TRACE
 
     A resource controllers may be declared as:
         * a public method from some user defined classes,
-        * a closure/lambda functions defined at runtime.
+        * a closure/lambda function defined at runtime.
 
-    It will use type hinting to:
-        * inherit variables from the route's path,
-        * inject any of the current Apix objects, e.g. Request, Response, etc...
+    It will use:
+        * variable name to inherit values from the route's path,
+            e.g. $name in the example below.
+        * type hinting to inject any of the current Apix objects,
+            e.g. Request, Response, etc...
 
     ```php
         $api->onRead('/category/:name', function(Request $request, $name) {
