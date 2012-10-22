@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenya\Api;
+namespace Apix;
 
 class ReflectionClass extends \ReflectionClass
 {

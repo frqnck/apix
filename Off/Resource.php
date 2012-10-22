@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenya\Api;
+namespace Apix;
 
 /**
  * Represents a resource.
@@ -94,7 +94,7 @@ class Resource extends Listener
      *
      * @params Router	$route	Route object
      * @return array
-     * @throws Zenya\Api\Exception
+     * @throws Apix\Exception
      */
     public function call($entity)
     {

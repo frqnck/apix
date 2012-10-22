@@ -34,7 +34,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya\Api
+ * @package     Apix
  * @subpackage  Console
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
  * @copyright   2011 Franck Cassedanne, Zenya.com
@@ -54,5 +54,5 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 //psr0_autoloader_searchFirst(APP_TESTDIR);
 
 #require 'CheckSystem.php';
-$sys = new Zenya\Api\Console\SystemCheck;
+$sys = new Apix\Console\SystemCheck;
 $sys->run();

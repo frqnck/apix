@@ -8,7 +8,7 @@
 // new features are added. Beware this file will be upgraded regularly and
 // automatically.
 
-namespace Zenya\Api;
+namespace Apix;
 
 // Define the DEBUG constant. Should be set to false in production.
 if(!defined('DEBUG')) define('DEBUG', true);
@@ -293,11 +293,11 @@ $c['services'] = array(
 $c['listeners'] = array(
     'server' => array(
         'early' => array(
-            # 'Zenya\Api\Listener\Mock',
+            # 'Apix\Listener\Mock',
         ),
         'late' => array(),
         'exception' => array(
-            # 'Zenya\Api\Listener\Log' => array('php://output'),
+            # 'Apix\Listener\Log' => array('php://output'),
         )
     ),
     'entity' => array(
