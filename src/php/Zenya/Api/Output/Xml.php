@@ -10,12 +10,6 @@
  * <status>success</status>
  * </foo>
  * </Zenya_Model_Dummy>
- *
- * @category	Zenya
- * @package		Zenya_Api
- * @subpackage	Response
- * @copyright	Copyright (c) 2010 Info.com Ltd. (http://www.info.com)
- * @version		$Id$
  */
 
 namespace Zenya\Api\Output;

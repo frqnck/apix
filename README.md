@@ -1,10 +1,9 @@
-Apix, a RESTful (micro)framework [DRAFT]
+Apix, a RESTful (micro)framework
 ================================
 
-This is a quick and dirty getting started for Apix, the RESTful (micro)framework
-to expose, at will, your web services over HTTP.
+This is a draft intended as a quick and dirty getting started guide.
 
-Its main goal is to serve your public and private APIs over a compliant (and
+Apix main goal is to serve your public and private APIs over a compliant (and
 strict) RESTful interface.
 
 Out of the box, Apix features:
@@ -16,21 +15,17 @@ Out of the box, Apix features:
 * Provides method override usign X-HTTP-Method-Override (Google recommendation) and/or using a query params (customisable).
 * Supports many data inputs, such as XML, JSON, CSV, ...
 * Provides various output representation, such as XML, JSONP, HTML, PHP, ...
-* Additional data formaters can be added as per your requirments.
 * Support content negotiation (which can also be overriden in different ways).
 * Provides resource(s) documention on demand, using 'GET /help' or the HTTP method OPTIONS.
 * HTTP cacheable -- supports HEAD test.
 * Uses annotations to document and set your services and its behaviours.
 * Pluggeable archicture.
-* Bundle with many plugins/adapters for:
-    * Authentification and ACL.
-    * Logging.
-    * Caching, both local and shared.
+* Bundle with many plugins/adapters for Authentification and ACL, logging, caching...
+* Command line interface for maintenance, testing...
+* Comes bundle with unit-tests, integration-tests and functional-tests.
 * Based upon the relevant RFCs, such as [rfc2616] [rfc2616], [rfc2617] [rfc2617],
 [rfc2388] [rfc2388], [rfc2854] [rfc2854], [rfc4627] [rfc4627], [rfc4329] [rfc4329],
 [rfc2046] [rfc2046], [rfc3676] [rfc3676], [rfc3023] [rfc3023].
-* Has its own command line interface.
-* Comes bundle with unit-tests, integration-tests and functional-tests.
 * TODO: Follows PSR-0, PSR-1 and PSR-2.
 * TODO: self generated API resources testing.
 * TODO: add support for WSDL 2.0
@@ -40,17 +35,16 @@ Out of the box, Apix features:
 
 Apix is available through different channels:
 
-* [Phar file] [1] (recommended)
-* [PEAR] [2]
-* [Composer] [3]
-* [Github] [4]
+* [`Phar file`] [phar] (recommended)
+* [`PEAR`] [pear]
+* [`Composer`] [composer]
+* [`Github`] [github]
 
 Apix requires PHP 5.3 or later.
 
 ## Basic Usage ##
-The easiest by far is to use the Phar distribution so all the dependencies and
-autoloading requirments are taken care of. The Phar method allows, among other
-things, to run many concurrent version on the same server which ease development.
+The easiest by far is to use the [`Phar`] [phar] distribution so all the dependencies and
+autoloading requirments are taken care of.
 
 Here is a basic usage:
 
@@ -75,9 +69,7 @@ Any returned value emanating from a resource's controller, generally an associat
 
 Essentially, a route is made of:
 
-1.  A **route function/method** that corresponds to a HTTP header method (as per the table below), and expressed as either:
-        * a public methods from some user defined classes,
-        * or called at runtime (instance definitions),
+1.  A **route controller** that corresponds to a HTTP header method as per the table below:
 
        <pre>
 onCreate()   =>   POST          |        onModify()   =>   PATCH
@@ -89,42 +81,50 @@ onDelete()   =>   DELETE        |        onTrace()    =>   TRACE
 2.  A **route path** corresponding to a Request-URI.
     * It may represent a specific and _static_ resource entity, such as:
         <pre>/search/france/paris</pre>
-    * It may also be _dynamic_, and may include one or many variables indicated by a colon, such as:
+    * It may also be _dynamic_, and may include one or many variables indicated by a colon `:`, such as:
         <pre>/search/:country/:city</pre>
 
 ### Controller definitions ###
+A resource controller may be declared as either:
 
-    A resource controllers may be declared as:
-        * a public method from some user defined classes,
-        * a closure/lambda function defined at runtime.
+* a public method from some user defined classes,
+* a closure/lambda function, defined at runtime.
 
-    It will use:
-        * variable name to inherit values from the route's path,
-            e.g. $name in the example below.
-        * type hinting to inject any of the current Apix objects,
-            e.g. Request, Response, etc...
+It will use:
 
-    ```php
-        $api->onRead('/category/:name', function(Request $request, $name) {
+*   variable name to inherit values from the route's path,  
+    e.g. `$name` inherited from `/category/:name`.
 
-            // retrieve a named param
-            $page = (int) $request->getParam('page');
+*   type hinting to inject any of the current scope Apix's objects,  
+    e.g. `Request`, `Response`, etc...
 
-            // retrieve the body params, parsed from XML, JSON, ...
-            $params = $request->getBodyParams();
+    See Apix's own [API Documentation] [apidoc] for what's available.
 
-            ...
+Here is an example showing these in context:
 
-            return $list_defs;
-        });
-    ```
+```php
+
+    $api->onRead('/category/:name', function(Request $request, $name) {
+
+        // retrieve a named param
+        $page = (int) $request->getParam('page');
+
+        // retrieve the body params, parsed from XML, JSON, ...
+        $params = $request->getBodyParams();
+
+        ...
+
+        return $list_defs;
+    });
+
+```
 
 ## Advanced usage ##
 
 ### Bootstrap ###
 
 To boostrap an Apix server, add the required file and create an instance of the
-Apix\Server.
+`Apix\Server`.
 
 A dedicated configuration file can be injected to an Apix server:
 
@@ -139,11 +139,11 @@ A dedicated configuration file can be injected to an Apix server:
 
 ### Configuration ###
 
-Check the inline comments in the 'config.dist.php' file shipped with the distribution.
+Check the inline comments in the `config.dist.php` file shipped with the distribution.
 
 ### Console ###
 
-Apix contains a built-in console. Try invoking the 'api.phar' file on the command line as follow:
+Apix contains a built-in console. Try invoking the `api.phar` file on the command line as follow:
 
 ```cli
 $ php apix.phar --help
@@ -156,7 +156,9 @@ relevant instructions provided in the comments to set your web server environeme
 
 ### Annotations ###
 
-Annotations are use to define some aspects of your resources. Here is an example.
+Annotations are use to define many aspects of your resource entity.
+
+Here is a self explanatory example:
 
     ```php
         <?php
@@ -165,7 +167,8 @@ Annotations are use to define some aspects of your resources. Here is an example
             $api = new Apix\Server;
 
             /**
-             * Returns the lastest version of the :software
+             * Title: Software version
+             * Description: Returns the lastest version of the :software
              *
              * @param       string          $software
              * @return      array           A response array.
@@ -181,7 +184,8 @@ Annotations are use to define some aspects of your resources. Here is an example
             });
 
             /**
-             * Upload a new software :software
+             * Sotware uploader
+             * Uses to upload a new software :software
              *
              * @param               Request  $request   The Server Request object.
              * @param               string   $software
@@ -207,12 +211,11 @@ _|    _| _|       _|      _|    _|
 _|    _| _|       _|     _|      _|
 </pre>
 
-[1]: http://www.info.com/         "Dowload the Phar file."
-[2]: http://www.info.com/todo     "TODO: PEAR"
-[3]: http://www.info.com/todo     "TODO: Composer"
-[4]: http://www.info.com/todo     "TODO: Github"
-[5]: http://www.info.com/todo     "TODO"
-
+[phar]: http://www.info.com/todo            "Dowload the Phar file."
+[pear]: http://www.info.com/todo            "TODO: PEAR"
+[composer]: http://www.info.com/todo        "TODO: Composer"
+[github]: http://www.info.com/todo          "TODO: Github"
+[apidoc]: http://www.info.com/todo          "Apix's API Documentation"
 [rfc2616]: http://www.ietf.org/rfc/rfc2616  "Hypertext Transfer Protocol -- HTTP/1.1"
 [rfc2617]: http://www.ietf.org/rfc/rfc2617  "HTTP Authentication: Basic and Digest Access Authentication"
 [rfc2388]: http://www.ietf.org/rfc/rfc2388  "Returning Values from Forms:  multipart/form-data"

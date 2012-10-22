@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright (c) 2011 Franck Cassedanne, Zenya.com
+ * Copyright (c) 2011 Franck Cassedanne
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,8 +33,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya\Api
- * @subpackage  Console
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
  * @copyright   2012 Franck Cassedanne, Zenya.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
