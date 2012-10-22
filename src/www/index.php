@@ -13,15 +13,15 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 
 # Test server
 try {
-    #$server = new Zenya\Api\Server(require "../../src/data/config.dist.php");
+    #$server = new Apix\Server(require "../../src/data/config.dist.php");
 
-    $server = new Zenya\Api\Server("../../src/data/config.dist.php");
+    $server = new Apix\Server("../../src/data/config.dist.php");
     echo $server->run();
 
-    // Zenya\Api\d( $server->getResources() );
-    // Zenya\Api\d( Zenya\Api\Config::getInstance()->getRoutes() );
+    // Apix\d( $server->getResources() );
+    // Apix\d( Apix\Config::getInstance()->getRoutes() );
 
 } catch (\Exception $e) {
-    Zenya\Api\Exception::startupException($e);
+    Apix\Exception::startupException($e);
 }
 exit;

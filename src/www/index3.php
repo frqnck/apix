@@ -17,11 +17,11 @@ require_once __DIR__ . '../../../dist/zenya-api-server.phar';
 
 # Test server
 try {
-    #$api = new Zenya\Api\Server;
+    #$api = new Apix\Server;
 
     // Test server
 
-    $api = new Zenya\Api\Server(require "../../src/data/config.dist.php");
+    $api = new Apix\Server(require "../../src/data/config.dist.php");
 
     $api->onRead('/version/:software',
         /**
