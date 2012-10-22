@@ -1,7 +1,7 @@
 <?php
-namespace Zenya\Api;
+namespace Apix;
 
-//use Zenya\Api\Fixtures as Fixture;
+//use Apix\Fixtures as Fixture;
 //require_once APP_TESTDIR . '/Zenya/Api/Fixtures/DocbookClass.php';
 
 class ReflectionClassTest extends \PHPUnit_Framework_TestCase
@@ -14,7 +14,7 @@ class ReflectionClassTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $className = 'Zenya\Api\Fixtures\DocbookClass';
+        $className = 'Apix\Fixtures\DocbookClass';
         $methodName = 'methodNameOne';
 
         $this->reflected = new ReflectionClass($className);
@@ -32,7 +32,7 @@ class ReflectionClassTest extends \PHPUnit_Framework_TestCase
     public function testClassIsInstanceOfReflectionClass()
     {
         $class = $this->reflected;
-        $this->assertInstanceOf('Zenya\Api\ReflectionClass', $class);
+        $this->assertInstanceOf('Apix\ReflectionClass', $class);
         $this->assertSame('DocbookClass', $class->getShortName());
     }
 
@@ -140,7 +140,7 @@ class ReflectionClassTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Zenya\Api\ReflectionClass::getActionsMethods
+     * @covers Apix\ReflectionClass::getActionsMethods
      */
     public function testGetActionsMethods()
     {

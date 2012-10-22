@@ -1,6 +1,6 @@
 <?php
 
-namespace Zenya\Api;
+namespace Apix;
 
 class ResourceTest extends \PHPUnit_Framework_TestCase
 {
@@ -22,7 +22,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Zenya\Api\Resource::__construct
+     * @covers Apix\Resource::__construct
      * @expectedException           \PHPUnit_Framework_Error
      */
     public function testConstructor()
@@ -34,7 +34,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Zenya\Api\Resource::SetRouteOverrides
+     * @covers Apix\Resource::SetRouteOverrides
      */
     public function testSetRouteOverridesOnGet()
     {
@@ -43,7 +43,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Zenya\Api\Resource::SetRouteOverrides
+     * @covers Apix\Resource::SetRouteOverrides
      */
     public function testSetRouteOverridesTestOnHead()
     {
@@ -65,7 +65,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @covers Zenya\Api\Resource::SetRouteOverrides
+     * @covers Apix\Resource::SetRouteOverrides
      * @todo
      */
     public function testSetRouteOverridesHelpOnOptions()
@@ -91,7 +91,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRequiredParams()
     {
-        $refClass = new ReflectionClass('Zenya\Api\Fixtures\DocbookClass');
+        $refClass = new ReflectionClass('Apix\Fixtures\DocbookClass');
         $refMethod = $refClass->getMethod('methodNameTwo');
 
         $params = $this->resource->getRequiredParams('methodNameTwo', $refMethod, array('arg1'=>123));
@@ -104,7 +104,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
     {
         $resource = array(
             'controller' => array(
-                'name' => 'Zenya\Api\Fixtures\CrudClass'
+                'name' => 'Apix\Fixtures\CrudClass'
             )
         );
 
@@ -126,7 +126,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
         $r = array(
             'controller' => array(
-                'name' => 'Zenya\Api\Fixtures\CrudClass'
+                'name' => 'Apix\Fixtures\CrudClass'
             )
         );
 
@@ -147,7 +147,7 @@ class ResourceTest extends \PHPUnit_Framework_TestCase
 
         $r = array(
             'controller' => array(
-                'name' => 'Zenya\Api\Fixtures\CrudClass'
+                'name' => 'Apix\Fixtures\CrudClass'
             )
         );
 
