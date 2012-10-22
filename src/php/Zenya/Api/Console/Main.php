@@ -12,7 +12,7 @@ class Main extends Console
     protected $version_program;
 
     protected $src;
-    protected $src_file = 'zenya-api-server.phar';
+    protected $src_file = 'apix.phar';
     protected $src_url;
 
     protected $phar_name = null;
@@ -25,7 +25,7 @@ class Main extends Console
         $this->src = realpath(__DIR__ . '/../../../../../');
 
         $this->version = Server::VERSION;
-        $this->version_program = sprintf("Zenya API Server %s by Franck Cassedanne.", $this->version);
+        $this->version_program = sprintf('Apix Server %s by Franck Cassedanne.', $this->version);
 
         parent::__construct($options);
     }
@@ -94,7 +94,7 @@ class Main extends Console
                     $url = $this->src_url . '/version/' . $this->src_file;
                     $r = $input->decode(trim($this->getContents($url)), true);
 
-                    $latest = $r['zenya']['version'][$this->src_file];
+                    $latest = $r['apix']['version'][$this->src_file];
                     if(empty($latest)) {
                         throw new \Exception("Something, somewhere failed!");
                     }

@@ -32,8 +32,6 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya\Api
- * @subpackage  Server
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
  * @copyright   2011 Franck Cassedanne, zenya.com
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
