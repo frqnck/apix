@@ -77,13 +77,12 @@ try {
     /**
      * Update an existing software :software
      *
-     * @param string    $software
-     * @return array    The array to return to the client
+     * @param  string $software
+     * @return array  The array to return to the client
      * @api_role admin
      * @api_purge_cache julien
      */
-    $api->onUpdate('/upload/:software', function($software)
-    {
+    $api->onUpdate('/upload/:software', function($software) {
         throw new Exception("TODO");
     });
 

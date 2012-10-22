@@ -155,7 +155,6 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('param1'=>'value1', 'param2'=>'value2'), $params['request']->getBodyData());
     }
 
-
     public function testSetGetRoute()
     {
         $this->entity->setRoute($this->route);
