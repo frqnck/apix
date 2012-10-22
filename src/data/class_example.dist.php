@@ -25,9 +25,7 @@
 //  )
 // };
 
-namespace myNamespace;
-
-use Apix;
+#namespace myNamespace;
 
 /**
  * Software Download API
@@ -39,14 +37,14 @@ use Apix;
  * @api_permission  admin
  * @api_randomName  classRandomValue
  */
-class SoftwareDownload
+class class_example.dist
 {
 
     /**
      * Returns the lastest version of the :software
      *
-     * @param       string  $software
-     * @return      array       The array to return to the client
+     * @param  string $software
+     * @return array  The array to return to the client
      * @api_role    public      Available to all!
      * @api_cache   10w softy   Cache for a maximum of 10 weeks
      *                          and tag cache buffer as 'mySoftware'.
@@ -62,8 +60,8 @@ class SoftwareDownload
     /**
      * Download the :software...
      *
-     * @param       string  $software
-     * @return      string              Output the binary & quit.
+     * @param  string $software
+     * @return string Output the binary & quit.
      * @api_role    public              Available to all!
      * @api_cache   10w softy           Cache for a maximum of 10 weeks
      *                                  and tag cache buffer as 'mySoftware'.
@@ -78,9 +76,9 @@ class SoftwareDownload
     /**
      * Upload a new software :software
      *
-     * @param               Request  $request   The Server Request object.
-     * @param               string   $software
-     * @return              array               A reponse array.
+     * @param  Request $request  The Server Request object.
+     * @param  string  $software
+     * @return array   A reponse array.
      * @api_role            admin               Require admin priviledge
      * @api_purge_cache     mySoftware          Purge the cache of all the
      *                                          'mySoftware' tagged entries.
