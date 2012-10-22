@@ -32,7 +32,7 @@ class Server extends Listener
         // Set the request
         $this->request = $request === null ? HttpRequest::getInstance() : $request;
 
-        if($this->request instanceOf HttpRequest) {
+        if ($this->request instanceOf HttpRequest) {
             $this->request->setFormats($this->config['input_formats']);
         }
 

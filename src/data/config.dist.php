@@ -170,7 +170,6 @@ $c = array(
 
 );
 
-
 // Resources definitions
 // ---------------------
 // route path string (with named variable) to resource definition.
@@ -216,17 +215,15 @@ $c['services'] = array(
 
     // The Basic Authentification mechanism is generally use with SSL.
     // Example implementing 'Listener\Auth' and 'Listener\Auth\Basic' adapter.
-    'basic_auth_plugin' => function() use ($c)
-    {
+    'basic_auth_plugin' => function() use ($c) {
         $adapter = new Listener\Auth\Basic($c['api_realm']);
-        $adapter->setToken = function(array $basic) use ($c, $adapter)
-        {
+        $adapter->setToken = function(array $basic) use ($c, $adapter) {
             $users = Services::get('users');
             foreach ($users as $user) {
                 if (
                     $user['user'] == $basic['username']
                     && $user['sharedSecret'] == $basic['password']
-                ) {
+) {
                     return $adapter->token = true;
                 }
             }
@@ -241,14 +238,13 @@ $c['services'] = array(
     // Example implementing 'Listener\Auth' and 'Listener\Auth\Digest' adapter.
     'digest_auth_plugin' => function() use ($c) {
         $adapter = new Listener\Auth\Digest($c['api_realm']);
-        $adapter->setToken = function(array $digest) use ($c, $adapter)
-        {
+        $adapter->setToken = function(array $digest) use ($c, $adapter) {
             $users = Services::get('users');
             foreach ($users as $user) {
-                if ( // this should be altered accordingly!
+                if (// this should be altered accordingly!
                     $user['user'] == $digest['username']
                     && $user['realm'] == $c['api_realm']
-                ) {
+) {
                     // Can be set to password, apiKey, or hashed mixture...
                     return $adapter->token = $user['sharedSecret'];
                 }
@@ -261,8 +257,7 @@ $c['services'] = array(
 
     // Returns a user array. This is used by the authentification plugins above.
     // TODO: JON to retrieve the users generic schema and data set from Magento.
-    'users' => function()
-    {
+    'users' => function() {
         // username:password:sharedSecret:role:realm
         return array(
             0 => array(
@@ -277,7 +272,6 @@ $c['services'] = array(
     },
 
 );
-
 
 // Listeners definitions
 // ---------------------
@@ -309,7 +303,6 @@ $c['listeners'] = array(
     ),
     'response' => array(),
 );
-
 
 ///////////////////////////////////////////////////////////////
 // Anything below that point should not need to be modified. //

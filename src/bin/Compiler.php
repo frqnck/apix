@@ -62,7 +62,7 @@ class Compiler
         }
 
         // set version
-        if(!isset($_SERVER['argv'][1])) {
+        if (!isset($_SERVER['argv'][1])) {
             echo 'Usage: ' . $_SERVER['argv'][0] . ' version_string' . PHP_EOL;
             exit;
         }
@@ -93,7 +93,6 @@ class Compiler
         $this->addFile($phar, new \SplFileInfo($root . '/LICENSE.txt'), false);
         $this->addFile($phar, new \SplFileInfo($root . '/README.md'), false);
         #$this->addFile($phar, new \SplFileInfo($root . '/src/data/config.dist.php'), false);
-
 
         if ( ! $latest_git = trim(exec('git log --pretty="%h %ci" -n1 HEAD')) ) {
             throw new \RuntimeException('The git binary cannot be found.');
@@ -219,7 +218,7 @@ STUB;
      * Removes whitespace from a PHP source string while preserving line numbers.
      * Based on Kernel::stripComments(), but keeps line numbers intact.
      *
-     * @param string $source A PHP string
+     * @param  string $source A PHP string
      * @return string The PHP string with the whitespace removed
      */
     public static function stripWhitespace($source)

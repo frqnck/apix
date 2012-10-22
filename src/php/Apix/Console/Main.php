@@ -69,7 +69,7 @@ class Main extends Console
                     $it = new \DirectoryIterator($src);
                     $this->out("Latest distribution files: " . PHP_EOL, 'green');
 
-                    foreach($it as $file) {
+                    foreach ($it as $file) {
                         if ($file->isFile()) {
                             $this->out(" --> " . $file . PHP_EOL, "red");
                             file_put_contents(
@@ -95,7 +95,7 @@ class Main extends Console
                     $r = $input->decode(trim($this->getContents($url)), true);
 
                     $latest = $r['apix']['version'][$this->src_file];
-                    if(empty($latest)) {
+                    if (empty($latest)) {
                         throw new \Exception("Something, somewhere failed!");
                     }
 
@@ -189,7 +189,7 @@ Options:
 
 HELP;
 
-        if(!$this->no_colors) {
+        if (!$this->no_colors) {
             $help = preg_replace("/(%)(.*)(%)/", $this->_out('\2', 'cyan', 'green'), $help);
         } else {
             $help = str_replace("%", '', $help);
@@ -221,9 +221,10 @@ HELP;
         $body = @file_get_contents($url, false, $ctx);
         $code = substr($http_response_header[0], 9, 3);
 
-        if(floor($code/100)>3) {
+        if (floor($code/100)>3) {
             throw new \Exception("HTTP request failed: " . PHP_EOL . $http_response_header[0]);
         }
+
         return $body;
     }
 

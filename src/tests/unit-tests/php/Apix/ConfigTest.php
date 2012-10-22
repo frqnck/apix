@@ -162,7 +162,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('some_value', $this->config->getInjected('some_key'));
     }
 
-
     public function TODO_testEmptyConfigSetAnAssociativeArrayOfEmptyArray()
     {
         $this->config->setConfig(
@@ -172,6 +171,5 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $this->config->get('services'));
         $this->assertEquals(array(), $this->config->get('listeners'));
     }
-
 
 }
