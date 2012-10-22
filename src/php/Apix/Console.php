@@ -79,14 +79,14 @@ class Console
         }
 
         // check env variables.
-        if(false === $this->no_colors) {
+        if (false === $this->no_colors) {
             $this->no_colors = exec('tput colors 2> /dev/null') > 2 ? 0 : 1;
         }
     }
 
     public function getOptions()
     {
-        if($this->no_colors == true) {
+        if ($this->no_colors == true) {
             return null;
         }
         $ansi = array_merge(
@@ -115,12 +115,13 @@ class Console
                 range(0, 9)
             )
         );
+
         return $ansi;
     }
 
     public function _out($msg, $styles=null)
     {
-        if(!is_array($styles)) {
+        if (!is_array($styles)) {
             $styles = is_array($msg) ? $msg : func_get_args();
             $msg = array_shift($styles);
         }
@@ -136,7 +137,6 @@ class Console
 
         return $msg;
     }
-
 
     public function out($msg, $styles=null)
     {

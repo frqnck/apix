@@ -152,7 +152,6 @@ class Config #extends \Pimple
        throw new \InvalidArgumentException( sprintf('Default config for "%s" does not exists.', $key) );
     }
 
-
     /**
      * Returns a specified sub-array type from config.
      * If an index key is specified return the corresponding (mixed) value.
