@@ -1,5 +1,5 @@
 <?php
-namespace Zenya\Api;
+namespace Apix;
 
 define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
 define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
@@ -94,11 +94,11 @@ try {
     });
 
     echo $api->run();
-    // Zenya\Api\d( $api->getResources() );
+    // Apix\d( $api->getResources() );
 
-    // Zenya\Api\d( Zenya\Api\Config::getInstance()->getRoutes() );
+    // Apix\d( Apix\Config::getInstance()->getRoutes() );
 
 } catch (\Exception $e) {
-    Zenya\Api\Exception::startupException($e);
+    Apix\Exception::startupException($e);
 }
 exit;

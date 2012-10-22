@@ -53,5 +53,5 @@ psr0_autoloader_searchFirst(APP_LIBDIR);
 psr0_autoloader_searchFirst(APP_TOPDIR);
 //psr0_autoloader_searchFirst(APP_TESTDIR);
 
-$cli = new Zenya\Api\Console\Main;
+$cli = new Apix\Console\Main;
 $cli->run();

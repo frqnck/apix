@@ -32,7 +32,7 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya\Api
+ * @package     Apix
  * @subpackage  Console
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
  * @copyright   2012 Franck Cassedanne, Zenya.com
@@ -43,7 +43,7 @@
 
 #namespace Zenya\bin;
 
-#use Zenya\Api;
+#use Apix;
 
 class Compiler
 {
@@ -189,7 +189,7 @@ class Compiler
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya\Api
+ * @package     Apix
  * @subpackage  Server
  * @author      Franck Cassedanne <fcassedanne@zenya.com>
  * @copyright   2012 Franck Cassedanne, Zenya.com
@@ -213,7 +213,7 @@ try {
     die('Error: cannot initialize - ' . $e->getMessage());
 }
 if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'][0])) {
-    $cli = new Zenya\Api\Console\Main;
+    $cli = new Apix\Console\Main;
     $cli->setPharName('phar://{PHAR}');
     $cli->run();
     exit(0);
