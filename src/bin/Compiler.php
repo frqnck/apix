@@ -47,7 +47,7 @@
 
 class Compiler
 {
-    const DEFAULT_PHAR_FILE = 'zenya-api-server.phar';
+    const DEFAULT_PHAR_FILE = 'apix.phar';
 
     protected $version;
 
