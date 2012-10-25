@@ -9,3 +9,5 @@ vendor
 *.log
 .svn
 /.xmlregistry/
+review/
+vendor/
