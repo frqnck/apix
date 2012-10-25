@@ -27,7 +27,8 @@ abstract class Adapter
     /**
      * Returns the current mime/media/content type.
      *
-     * @return string
+     * @return  string
+     * @throws  \RuntimeException If [self::contentType === null]
      */
     public function getContentType()
     {

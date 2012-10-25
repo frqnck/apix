@@ -25,7 +25,7 @@
 //  )
 // };
 
-#namespace myNamespace;
+use Apix;
 
 /**
  * Software Download API
@@ -37,17 +37,17 @@
  * @api_permission  admin
  * @api_randomName  classRandomValue
  */
-class class_example.dist
+class SoftwareDownload
 {
 
     /**
-     * Returns the lastest version of the :software
+     * Returns the lastest version number of :software
      *
-     * @param  string $software
-     * @return array  The array to return to the client
-     * @api_role    public      Available to all!
-     * @api_cache   10w softy   Cache for a maximum of 10 weeks
-     *                          and tag cache buffer as 'mySoftware'.
+     * @param       string      $software   The name of the software.
+     * @return      array                   The array to return to the client.
+     * @api_role    public                  This API does not need ACL/AUTH (default).
+     * @api_cache   10w softy               This will be cached for a maximum of 10 weeks.
+     *                                      and tagged as 'softy'.
      */
     public function onRead($software)
     {
@@ -58,30 +58,40 @@ class class_example.dist
     }
 
     /**
-     * Download the :software...
+     * Returns the :software data to be downloaded by the client.
      *
-     * @param  string $software
-     * @return string Output the binary & quit.
-     * @api_role    public              Available to all!
-     * @api_cache   10w softy           Cache for a maximum of 10 weeks
-     *                                  and tag cache buffer as 'mySoftware'.
+     * @param       string      $software   The name of the software.
+     * @return      string                  Output the binary & quit.
+     * @api_cache   10w softy               Cache for a maximum of 10 weeks
+     *                                      and tagged as 'softy'.
      */
     public function onRead($software)
     {
-        // ...
-        echo $file;
-        exit; // to stop the server handling the response anyfurther.
+        // ... $file = filename
+        header('Content-Type: "application/octet-stream"');
+        header('Content-Disposition: attachment; filename="'.basename($file).'"');
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Content-Length: '.filesize($file));
+        header('Pragma: no-cache');
+
+        if (strstr($_SERVER['HTTP_USER_AGENT'], "MSIE")) {
+            header('Cache-Control: must-revalidate, no-cache, no-store, post-check=0, pre-check=0');
+            header('Pragma: public');
+        }
+        $data = readfile($file);
+        exit($data); // stop the server handling the response anyfurther.
     }
 
     /**
-     * Upload a new software :software
+     * Upload a new :software
      *
-     * @param  Request $request  The Server Request object.
-     * @param  string  $software
-     * @return array   A reponse array.
-     * @api_role            admin               Require admin priviledge
+     * @param               Request  $request   The current Apix Request object.
+     * @param               string   $software  The name of the software.
+     * @return              array               An array to return to the client.
+     * @api_role            admin               This API has an ACL for admin.
      * @api_purge_cache     mySoftware          Purge the cache of all the
-     *                                          'mySoftware' tagged entries.
+     *                                          'softy' tagged entries.
      */
     public function onCreate(Request $request, $software)
     {
@@ -89,9 +99,9 @@ class class_example.dist
     }
 
     /**
-     * Update an existing software :software
+     * Update an existing :software
      *
-     * @see POST /upload/:software
+     * @see     self::onCreate
      */
     public function onUpdate($software)
     {

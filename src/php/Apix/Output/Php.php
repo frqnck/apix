@@ -19,20 +19,19 @@ class Php extends Adapter
      */
     public function encode(array $data, $rootNode='root')
     {
-        return $this->dump(array($rootNode=>$data), true);
+        return $this->dump(array($rootNode=>$data));
     }
 
     public function dump($data)
     {
-        // return print_r($data, true);
-        return $this->htmldump($data);
+        return print_r($data, true);
     }
 
-    public function htmldump($data, $height="9em")
-    {
-        # "<pre style=\"border: 1px solid #000; height: {$height}; overflow: auto; margin: 0.5em;\">";
-        var_dump($data);
-        # echo "</pre>\n";
-    }
+    // public function htmldump($data, $height="9em")
+    // {
+    //     echo "<pre style=\"border: 1px solid #000; height: {$height}; overflow: auto; margin: 0.5em;\">";
+    //     var_export($data);
+    //     echo "</pre>\n";
+    // }
 
 }
