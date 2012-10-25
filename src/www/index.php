@@ -15,7 +15,7 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     #$server = new Apix\Server(require "../../src/data/config.dist.php");
 
-    $server = new Apix\Server("../../src/data/config.dist.php");
+    $server = new Apix\Server('../../src/data/config.dist.php');
     echo $server->run();
 
     // Apix\d( $server->getResources() );
