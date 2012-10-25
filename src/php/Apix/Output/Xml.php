@@ -55,10 +55,15 @@ class Xml extends Adapter
                 $k = 'item';
             }
             if (is_array($v)) {
+
+                // Attributes needs to be reviewd!!!
+                // @codeCoverageIgnoreStart
                 if ($k == '@attributes') {
                     foreach ($v as $k => $v) {
                         $xml->addAttribute($k, $v);
                     }
+                // @codeCoverageIgnoreStart
+
                 } else {
                     $child = $xml->addChild($k);
                     $this->arrayToXml($child, $v);
