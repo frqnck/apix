@@ -84,6 +84,21 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('resources', $r['default']);
     }
 
+    public function testGetDefaultWithNull()
+    {
+        $r = $this->config->getConfig();
+        $default = $this->config->getDefault();
+        $this->assertSame($r['default'], $default);
+    }
+
+    /**
+     * @expectedException   InvalidArgumentException
+     */
+    public function testGetDefaultThrowsAnInvalidArgumentException()
+    {
+        $default = $this->config->getDefault('wrong');
+    }
+
     public function testRetrieveMany()
     {
         $default = $this->config->get('resources')+$this->config->getDefault('resources');
