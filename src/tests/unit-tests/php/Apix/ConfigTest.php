@@ -31,9 +31,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($file, $config->get('config_path'));
     }
 
-    public function testConstructorLoadsDistFile()
+    public function testConstructorLoadsDistFileByDefault()
     {
         $config = new Config;
+        $this->assertRegExp('@\/.*$@', $config->get('config_path'));
+    }
+
+    public function testConstructorMergeDistFile()
+    {
+        $config = new Config(array('api_version'=>'user-defined'));
         $this->assertRegExp('@\/.*$@', $config->get('config_path'));
     }
 
@@ -141,10 +147,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * TEMP: testIsSingletonIsNotClonable
+     * TEMP: testIsSingletonAndNotClonable
      * @covers Apix\Config::__clone
      */
-    public function testIsSingletonIsNotClonable()
+    public function testIsSingletonAndNotClonable()
     {
         // $r = clone $this->request;
         $r = new \ReflectionClass($this->config);
@@ -155,7 +161,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     /**
      * TEMP: testGetAndSetInject
      */
-    public function testGetAndSetInject()
+    public function testConfigInject()
     {
         $this->config->inject('some_key', 'some_value');
 
