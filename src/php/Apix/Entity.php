@@ -140,7 +140,7 @@ class Entity extends Listener
                 && !array_key_exists($name, $routeParams)
             ) {
 
-                // auto inject local classes
+                // auto inject local objects
                 if ($class = $param->getClass()) {
                     $obj = strtolower(str_replace(__NAMESPACE__ . '\\', '', $class->getName()));
                     $params[$name] = $obj == 'server' ? $this->route->server : $this->route->server->$obj;
@@ -153,7 +153,7 @@ class Entity extends Listener
             }
         }
         // TODO: maybe we need to check the order of params to match the method?
-        // TODO: maybe add a type casting handler.
+        // TODO: eventually add type casting using namespacing e.g. method(integer $myInteger) => Apix\Casting\Integer, etc...
         return $params;
     }
 
@@ -199,6 +199,25 @@ class Entity extends Listener
     }
 
     /**
+     * Returns an array of method keys and action values.
+     *
+     * @param  array $array
+     * @return array
+     */
+    public function getActions()
+    {
+        if (null === $this->actions) {
+            $this->setActions();
+        }
+
+        return $this->actions;
+    }
+
+
+    /* --- ANYTHING BELOW TO BE MOVED ELSEWHERE (plugins) --- */
+
+
+    /**
      * Check wether is public or not.
      *
      * @return boolean
@@ -218,21 +237,6 @@ class Entity extends Listener
         }
 
         return false;
-    }
-
-    /**
-     * Returns an array of method keys and action values.
-     *
-     * @param  array $array
-     * @return array
-     */
-    public function getActions()
-    {
-        if (null === $this->actions) {
-            $this->setActions();
-        }
-
-        return $this->actions;
     }
 
 }

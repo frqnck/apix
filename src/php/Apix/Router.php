@@ -9,7 +9,7 @@ namespace Apix;
  *              $router = Router($rules);
  *              $router->init( $_SERVER['REQUEST_URI'] ); // execute router
  *
- * @todo    add a regex parser
+ * @todo    maybe add a regex parser
  *          $r = array(
  *            '@^/resource/[\w-]+/list/(.+)/$@i' =>
  *            '@^/resource/[\w-]+/list/$@i'
@@ -124,7 +124,7 @@ class Router
     }
 
     /**
-     * Maps an URI against the routing/rule table.
+     * Maps an URI against the routing table.
      *
      * @param  string $uri
      * @param  array  $params Additional params to merge with the current set (optional)

@@ -125,20 +125,25 @@ class Request
     }
 
     /**
-     * Gets a pspecified param.
+     * Gets a specified param.
      *
-     * @param  string $key
-     * @param  string $filter POSIX character classes e.g. alnum, alpha, digit.
+     * @param  string   $key
+     * @param  boolean  $raw        Set to true to get the raw URL encoded value.
+     * @param  string   $filter     POSIX character classes e.g. alnum, alpha, digit.
      * @return mixed
      */
-    public function getParam($key, $filter=null)
+    public function getParam($key, $raw=false, $filter=null)
     {
         if (isset($this->params[$key])) {
+
+            $param = $raw===false ? rawurldecode($this->params[$key])
+                                  : $this->params[$key];
+
             if (null !== $filter) {
-                return preg_replace('/[^[:' . $filter . ':]]/', '', $this->params[$key]);
+                return preg_replace('/[^[:' . $filter . ':]]/', '', $param);
             }
 
-            return $this->params[$key];
+            return $param;
         }
     }
 
