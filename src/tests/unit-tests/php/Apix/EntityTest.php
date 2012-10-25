@@ -171,6 +171,10 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('route-name-to-redirect-to', $this->entity->getRedirect());
     }
 
+
+    /* --- ANYTHING BELOW TO BE MOVED ELSEWHERE (plugins) --- */
+
+
     public function testIsPublic()
     {
         $this->assertTrue($this->entity->isPublic());

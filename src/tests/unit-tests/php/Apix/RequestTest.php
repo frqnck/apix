@@ -63,13 +63,23 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('world', $this->request->getParam('hello') );
     }
 
-    public function testGetSetParamWithFilters()
+    public function testGetParamWithPosixFilters()
     {
+        $this->request->setParam('arg', '#a%20zerty+&%$1-23.4567');
+
         // alnum, alpha, digit
-        $this->request->setParam('arg', '#azerty+&%$1-23.4567');
-        $this->assertSame('azerty1234567', $this->request->getParam('arg', 'alnum') );
-        $this->assertSame('azerty', $this->request->getParam('arg', 'alpha') );
-        $this->assertSame('1234567', $this->request->getParam('arg', 'digit') );
+        $this->assertSame('azerty1234567', $this->request->getParam('arg', false, 'alnum') );
+        $this->assertSame('azerty', $this->request->getParam('arg', false, 'alpha') );
+        $this->assertSame('1234567', $this->request->getParam('arg', false, 'digit') );
+    }
+
+    public function testGetRawParamWithPosixFilters()
+    {
+        $this->request->setParam('arg', '#a%20zerty+&%$1-23.4567');
+
+        $this->assertSame('a20zerty1234567', $this->request->getParam('arg', true, 'alnum') );
+        $this->assertSame('azerty', $this->request->getParam('arg', true, 'alpha') );
+        $this->assertSame('201234567', $this->request->getParam('arg', true, 'digit') );
     }
 
     public function testGetSetParams()
@@ -188,6 +198,25 @@ DATA;
         $this->request->setBody($raw);
         $this->assertSame($this->data, $this->request->getBody());
         $this->assertSame($raw, $this->request->getRawBody());
+    }
+
+    /*
+        There is no parameter cleaning, which means that what actually gets
+        passed in in the "keyword" parameter is "red%20racing%20cars". Would
+        it make sense to always use rawurldecode on parameters in Apix itself,
+        rather than having to do that in the route definitions?
+        - Jonathan
+     */
+    public function testGetParamFiltered()
+    {
+        $this->request->setParam('hello', 'plain%20world');
+        $this->assertEquals('plain world', $this->request->getParam('hello') );
+    }
+
+    public function testGetRawParamFiltered()
+    {
+        $this->request->setParam('hello', 'plain%20world');
+        $this->assertEquals('plain%20world', $this->request->getParam('hello', true) );
     }
 
 }
