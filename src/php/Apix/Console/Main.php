@@ -1,4 +1,5 @@
 <?php
+
 namespace Apix\Console;
 
 use Apix\Console,
