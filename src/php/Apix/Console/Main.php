@@ -160,16 +160,17 @@ class Main extends Console
     public function help()
     {
         $help = <<<HELP
-Usage: {$this->args[0]} [options]
+Usage: £{$this->args[0]}£ %[options]%
 
 Options:
+
    %--readme | -r%        Display the README file.
 
    %--extractdist | -e%   Extract the latest distribution data.
 
    %--check | -c%         Check for updates.
 
-   %--selfupdate%         Upgrade the server to the latest version available.
+   %--selfupdate%         Upgrade Apix to the latest version available.
 
    %--version | -v%       Display the version information and exit.
 
@@ -191,7 +192,8 @@ Options:
 HELP;
 
         if (!$this->no_colors) {
-            $help = preg_replace("/(%)(.*)(%)/", $this->_out('\2', 'cyan', 'green'), $help);
+            $help = preg_replace("/(£)(.*)(£)/", $this->_out('\2', 'blue', 'bold'), $help);
+            $help = preg_replace("/(%)(.*)(%)/", $this->_out('\2', 'green', 'bold'), $help);
         } else {
             $help = str_replace("%", '', $help);
         }
