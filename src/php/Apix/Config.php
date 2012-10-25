@@ -4,7 +4,6 @@ namespace Apix;
 
 class Config #extends \Pimple
 {
-
     public $config = array();
 
     /**
@@ -51,28 +50,26 @@ class Config #extends \Pimple
 
             case is_array($config):
                 // add from user provided array
-                $this->setConfig($config);
                 break;
 
             case is_string($config):
                 // add from a user file
                 $config = $this->getConfigFromFile($config);
-
-                $this->setConfig($config);
-
                 break;
 
             default:
-                // TODO: maybe try from the user dir?
-                // $file = getenv('HOME') . '/.zenya/config.php';
 
-                // TEMP: add the distribution file
-                // TODO: add the distribution file
-                $file = realpath(__DIR__ . '/../../data/config.dist.php');
-                $config = $this->getConfigFromFile($file);
+                // add from the HOME dir
+                // $file = getenv('HOME') . '/.apix/config.php';
+                // if(file_exists($file)) {
+                //     $config = $this->getConfigFromFile($file);
+                // }
 
-                $this->setConfig($config);
+                // default to the distribution file
+                $config = null;
         }
+
+        $this->setConfig($config);
     }
 
     /**
@@ -101,9 +98,10 @@ class Config #extends \Pimple
      *
      * @param array $config=null
      */
-    public function setConfig(array $config)
+    public function setConfig(array $config=null)
     {
-        $this->config = $config;//+$this->getConfigDefaults();
+        $defaults = $this->getConfigDefaults();
+        $this->config = is_null($config) ? $defaults : $config+$defaults;
     }
 
     /**
@@ -246,80 +244,9 @@ class Config #extends \Pimple
      */
     public function getConfigDefaults()
     {
-        return array(
-            'api_realm'     => 'Zenya',
-            'api_version'   => '1.0',
-
-            // output
-            'output_rootNode'  => 'zenya',
-            'output_sign'      => true,
-            'output_debug'     => true,
-
-            // routing
-            'routing' => array(
-                'route_prefix'      => '@^(/index(\d)?.php)?/api/v(\d*)@i', // regex
-                'default_format'    => 'json',
-                'formats'           => array('json', 'xml', 'html', 'php', 'jsonp'),
-                // output format negociations
-                'controller_ext'    => true, // true or false (e.g. resource.json)
-                'format_override'   => isset($_REQUEST['format']) ? $_REQUEST['format'] : false,
-                'http_accept'       => true, // true or false
-            ),
-
-            // resources
-            'resources' => array(),
-
-            'resources_default' => array(
-                // OPTIONS
-                'help' => array(
-                    'controller' => array(
-                        'name' => __NAMESPACE__ . '\Resource\Help',
-                        'args' => null
-                    ),
-                ),
-                // HEAD
-                'test' => array(
-                    'controller' => array(
-                        'name' => __NAMESPACE__ . '\Resource\Test',
-                        'args' => null
-                    ),
-                )
-            ),
-
-            // listeners
-            'listeners' => array(),
-
-            'listeners_default' => array(
-                'server' => array(
-                    // pre-processing stage
-                    'early' => array(
-                        #'Apix\Listener\Mock',
-                        #'Apix\Listener\BodyData',
-                    ),
-                    // post-processing stage
-                    'late'=>array(
-                    ),
-                    // errors and exceptions
-                    'exception' => array(
-                        #'Apix\Listener\Log' => array('php://output'),
-                    )
-                ),
-                'entity' => array(
-                    'early' => array(),
-                    // post-processing stage
-                    'late'=>array(
-                        #'Apix\Listener\Mock',
-                        #'Apix\Listener\Log' => array('php://output'),
-                    ),
-                ),
-                'response' => array(),
-            ),
-
-            // services
-            'services' => array(),
-            #'services_default' => array()
-
-        );
+        // add the distribution file
+        $file = realpath(__DIR__ . '/../../data/config.dist.php');
+        return $this->getConfigFromFile($file);
     }
 
 }
