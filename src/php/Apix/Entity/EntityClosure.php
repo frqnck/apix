@@ -73,7 +73,7 @@ class EntityClosure extends Entity implements EntityInterface
         #    throw new \RuntimeException("Resource entity not (yet) implemented.", 501);
         #}
 
-        $params = $this->getRequiredParams($method, $route->getMethod(), $route->getParams());
+        $params = $this->getValidatedParams($method, $route->getMethod(), $route->getParams());
 
         #$this->addAllListeners('resource', 'early');
 
@@ -90,10 +90,8 @@ class EntityClosure extends Entity implements EntityInterface
 
         // doc for all methods
         foreach ($this->getActions() as $key => $func) {
-          if ($func['action'] InstanceOf \Closure) {
-              $doc = $this->reflectedFunc($key)->getDocComment();
-              $docs['methods'][$key] = Reflection::parsePhpDoc($doc); // <------------------------------------ TODO (required args)
-          }
+          $ref = $this->reflectedFunc($key);
+          $docs['methods'][$key] = Reflection::parsePhpDoc($ref); // <----------------------- TODO (required args)
         }
 
         return $docs;

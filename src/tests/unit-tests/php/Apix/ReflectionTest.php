@@ -16,9 +16,10 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
         $class = new DocbookClass;
 
         $this->reflected = new \ReflectionClass($class);
+        
         $this->class = Reflection::parsePhpDoc($this->reflected->getDocComment());
 
-        $this->method = Reflection::parsePhpDoc($this->reflected->getMethod('methodNameOne')->getDocComment());
+        $this->method = Reflection::parsePhpDoc($this->reflected->getMethod('methodNameOne'));
     }
 
     protected function tearDown()
@@ -49,9 +50,10 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
         $this->assertInternalType('array', $params);
         $this->assertSame(
             array(
-                'type' => 'int',
-                'name' => 'classNamedInteger',
-                'description' => 'an integer',
+                'type'          => 'int',
+                'name'          => 'classNamedInteger',
+                'description'   => 'an integer',
+                'required'      => false
             ),
             $params['classNamedInteger']
         );
@@ -84,15 +86,34 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
     public function testMethodDocBookParam()
     {
         $params = $this->method['params'];
+
         $this->assertInternalType('array', $params);
 
         $this->assertSame(
             array(
-                'type' => 'int',
-                'name' => 'namedInteger',
-                'description' => 'an integer',
+                'type'          => 'int',
+                'name'          => 'namedInteger',
+                'description'   => 'an integer',
+                'required'      => true
             ),
             $params['namedInteger']
+        );
+    }
+
+    public function testMethodDocBookWithOPtionalParam()
+    {
+        $params = $this->method['params'];
+
+        $this->assertInternalType('array', $params);
+
+        $this->assertSame(
+            array(
+                'type'          => 'array',
+                'name'          => 'optional',
+                'description'   => 'something optional (here an array)',
+                'required'      => false
+            ),
+            $params['optional']
         );
     }
 
@@ -142,6 +163,18 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
     {
         $this->markTestIncomplete('TODO: allow to use wildcard within doc (fix regex)');
         $this->assertSame('OPTIONS /*/etc...', $this->method['api_link']);
+    }
+
+    public function testGetRequiredParams()
+    {
+        $requireds = Reflection::getRequiredParams(
+            $this->reflected->getMethod('methodNameOne')
+        );
+
+        $this->assertSame(
+            array('namedInteger','namedString','namedBoolean'),
+            $requireds
+        );
     }
 
     /* TODO Prefix handler */

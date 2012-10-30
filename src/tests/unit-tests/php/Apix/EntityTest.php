@@ -123,22 +123,22 @@ class EntityTest extends \PHPUnit_Framework_TestCase
      * @expectedException           \BadMethodCallException
      * @expectedExceptionCode       400
      */
-    public function testGetRequiredParams()
+    public function testGetValidatedParams()
     {
         $refClass = new \ReflectionClass('Apix\Fixtures\DocbookClass');
         $refMethod = $refClass->getMethod('methodNameTwo');
 
-        $params = $this->entity->getRequiredParams($refMethod, 'aStringName', array('arg1'=>123));
+        $params = $this->entity->getValidatedParams($refMethod, 'aStringName', array('arg1'=>123));
         $this->assertSame(array('arg1'=>123), $params);
 
-        $params = $this->entity->getRequiredParams($refMethod, 'aStringName', array('arg2'=>345));
+        $params = $this->entity->getValidatedParams($refMethod, 'aStringName', array('arg2'=>345));
     }
 
     public function testAutoInject()
     {
         $this->route->server = new Server;
         $ref = new \ReflectionFunction(function(Request $request, Server $server, Response $response, Resources $resources){return 'something';});
-        $params = $this->entity->getRequiredParams($ref, 'aStringName', array());
+        $params = $this->entity->getValidatedParams($ref, 'aStringName', array());
 
         $this->assertInstanceOf('Apix\Request', $params['request']);
         $this->assertInstanceOf('Apix\Server', $params['server']);
@@ -159,7 +159,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->route->server = new Server(null, $request);
 
         $ref = new \ReflectionFunction(function(Request $request){echo '*test*'; return $request->getBodyData();return func_get_args();});
-        $params = $this->entity->getRequiredParams($ref, 'aStringName', array());
+        $params = $this->entity->getValidatedParams($ref, 'aStringName', array());
 
         $this->assertInstanceOf('Apix\HttpRequest', $params['request']);
         $this->assertEquals(array('param1'=>'value1', 'param2'=>'value2'), $params['request']->getBodyData());

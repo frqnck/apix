@@ -29,15 +29,15 @@ class Xml extends Adapter
     public function encode(array $data, $rootNode="root")
     {
         $str = sprintf('<?xml version="1.0" encoding="%s"?><%s />',
-                    $this->encoding,
-                    $rootNode
-                );
+            $this->encoding,
+            $rootNode
+        );
 
-        $Xml = new \SimpleXMLElement($str);
-        $this->arrayToXml($Xml, $data);
+        $xml = new \SimpleXMLElement($str);
+        $this->arrayToXml($xml, $data);
 
         return $this->validate(
-            $Xml->asXML()
+            $xml->asXML()
         );
     }
 
@@ -54,24 +54,29 @@ class Xml extends Adapter
             if (is_int($k)) {
                 $k = 'item';
             }
+
             if (is_array($v)) {
 
+                // @codeCoverageIgnoreStart
                 // Attributes needs to be reviewd!!!
+                #if ($k == '@attributes') {
+                #    foreach ($v as $k => $v) {
+                #        $xml->addAttribute($k, $v);
+                #    }
                 // @codeCoverageIgnoreStart
-                if ($k == '@attributes') {
-                    foreach ($v as $k => $v) {
-                        $xml->addAttribute($k, $v);
-                    }
-                // @codeCoverageIgnoreStart
-
-                } else {
+                #} else {
                     $child = $xml->addChild($k);
                     $this->arrayToXml($child, $v);
-                }
+                #}
             } else {
+                // $xml->addAttribute(
+                //     $k,
+                //     htmlspecialchars($v, ENT_QUOTES, $this->encoding)
+                // )
                 $xml->addChild(
                     $k,
-                    htmlentities($v, ENT_NOQUOTES, $this->encoding)
+                    htmlspecialchars($v, ENT_QUOTES, $this->encoding)
+                    #htmlentities($v, ENT_NOQUOTES, $this->encoding)
                 );
             }
         }
@@ -80,7 +85,7 @@ class Xml extends Adapter
     /**
      * Sanitize
      *
-     * @param  string $str
+     * @param  string $xml
      * @return string
      */
     protected function validate($xml)
@@ -88,6 +93,7 @@ class Xml extends Adapter
         if (extension_loaded('tidy')) {
             $tidy = new \tidy();
             $conf = array(
+                #'clean_output'  => false, // tocheck, 
                 'clean'			=> true,
                 'input-xml'		=> true,
                 'output-xml'	=> true,
