@@ -67,7 +67,7 @@ class EntityClass extends Entity implements EntityInterface
 
         $method = $this->getMethod($route);
 
-        $params = $this->getRequiredParams($method, $route->getMethod(), $route->getParams());
+        $params = $this->getValidatedParams($method, $route->getMethod(), $route->getParams());
 
         // attach late listeners @ post-processing
         #$this->addAllListeners('resource', 'early');
@@ -97,9 +97,8 @@ class EntityClass extends Entity implements EntityInterface
         // doc for all methods
         foreach ($this->getMethods() as $key => $method) {
           if ( $key = array_search($method->name, $actions) ) {
-            $doc = $method->getDocComment();
             $docs['methods'][$key] =
-                Reflection::parsePhpDoc( $doc );
+                Reflection::parsePhpDoc( $method );
           }
         }
 
