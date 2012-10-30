@@ -21,7 +21,11 @@ class OutputXmlTest extends \PHPUnit_Framework_TestCase
         $data = array(1, 2);
         $xml = $this->xml->encode($data, 'r');
 
-        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<r>\n  <item>1</item>\n  <item>2</item>\n</r>", $xml);
+        if (extension_loaded('tidy')) {
+            $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<r>\n  <item>1</item>\n  <item>2</item>\n</r>", $xml);
+        } else {
+            $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>".PHP_EOL.'<r><item>1</item><item>2</item></r>'.PHP_EOL, $xml);
+        }
     }
 
     /**

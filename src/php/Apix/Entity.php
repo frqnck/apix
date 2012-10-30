@@ -28,9 +28,9 @@ class Entity extends Listener
     /**
      * Appends the given array definition and apply generic mappings.
      *
-     * @param  array $def An entity array definition.
-     * @return void
-     * @see EntityInterface::_append
+     * @param   array $def An entity array definition.
+     * @return  void
+     * @see     EntityInterface::_append
      */
     final public function _append(array $def)
     {
@@ -42,9 +42,9 @@ class Entity extends Listener
     /**
      * Call the resource entity.
      *
-     * @return array
-     * @throws Apix\Exception
-     * @see EntityInterface::_call
+     * @return  array
+     * @throws  Apix\Exception
+     * @see     EntityInterface::_call
      */
     public function call()
     {
@@ -122,15 +122,15 @@ class Entity extends Listener
     }
 
     /**
-     * Returns the validated required parameters.
+     * Returns the validated and required parameters.
      *
      * @param  \ReflectionFunctionAbstract $refMethod   A reflected method/function to introspect.
      * @param  string                      $httpMethod  A public method name e.g. GET, POST.
      * @param  array                       $routeParams An array of route parameters to check upon.
-     * @return array                       The array of required parameters
+     * @return array                       The array of validated and required parameters
      * @throws \BadMethodCallException     400
      */
-    public function getRequiredParams(\ReflectionFunctionAbstract $refMethod, $httpMethod, array $routeParams)
+    public function getValidatedParams(\ReflectionFunctionAbstract $refMethod, $httpMethod, array $routeParams)
     {
         $params = array();
         foreach ($refMethod->getParameters() as $param) {
@@ -156,18 +156,6 @@ class Entity extends Listener
         // TODO: eventually add type casting using namespacing e.g. method(integer $myInteger) => Apix\Casting\Integer, etc...
         return $params;
     }
-
-    public function _getRequiredParams(\ReflectionFunctionAbstract $ref)
-    {
-        $params = array();
-        foreach ($ref->getParameters() as $param) {
-            $name = $param->getName();
-            if ( !$param->isOptional() ) {
-            }
-        }
-        return $params;
-    }
-
 
     /**
      * Sets the route object.

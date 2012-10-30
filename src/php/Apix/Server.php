@@ -10,6 +10,8 @@ use Apix\Listener,
     Apix\HttpRequest,
     Apix\Response;
 
+define('APIX_START_TIME', microtime(true));
+
 class Server extends Listener
 {
     const VERSION = '@package_version@';

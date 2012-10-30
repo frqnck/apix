@@ -343,15 +343,19 @@ class Response
 
         if ($this->debug === true) {
             $r['debug'] = array(
-                    'timestamp'     => gmdate('Y-m-d H:i:s') . ' UTC',
-                    'request'       => sprintf('%s %s%s',
+                    'timestamp'     =>  gmdate('Y-m-d H:i:s') . ' UTC',
+                    'request'       =>  sprintf('%s %s%s',
                                             $this->request->getMethod(),
                                             $this->request->getRequestUri(),
                                             isset($_SERVER['SERVER_PROTOCOL']) ? ' ' . $_SERVER['SERVER_PROTOCOL'] : null
                                         ),
-                    'headers'	    => $this->getHeaders(),
-                    'output_format' => $this->getFormat(),
-                    'router_params' => $route->getParams(),
+                    'headers'	    =>  $this->getHeaders(),
+                    'output_format' =>  $this->getFormat(),
+                    'router_params' =>  $route->getParams(),
+                    // plugins?
+                    'memory'        =>  round(memory_get_usage() / (1024 * 1024), 2) . 'MB max. ' . 
+                                        round(memory_get_peak_usage() / (1024 * 1024), 2) . 'MB',
+                    'time'          =>  round(microtime(true) - APIX_START_TIME, 3) . ' seconds',
             );
             // TEMP: just a shortcut cannot be trusted.
             if(isset($_SERVER['X_AUTH_USER'])) $r['debug']['user'] = $_SERVER['X_AUTH_USER'];
