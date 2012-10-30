@@ -19,7 +19,7 @@ class EntityClosure extends Entity implements EntityInterface
     private $reflection;
 
     /**
-     * Sets and returns a reflection of a function.
+     * Sets and returns the reflection of a function.
      *
      * @param  string                    $name The REST name of function.
      * @return \ReflectionFunction|false
@@ -73,8 +73,6 @@ class EntityClosure extends Entity implements EntityInterface
         #    throw new \RuntimeException("Resource entity not (yet) implemented.", 501);
         #}
 
-        // TODO: merge with TEST & OPTIONS ???
-
         $params = $this->getRequiredParams($method, $route->getMethod(), $route->getParams());
 
         #$this->addAllListeners('resource', 'early');
@@ -94,7 +92,7 @@ class EntityClosure extends Entity implements EntityInterface
         foreach ($this->getActions() as $key => $func) {
           if ($func['action'] InstanceOf \Closure) {
               $doc = $this->reflectedFunc($key)->getDocComment();
-              $docs['methods'][$key] = Reflection::parsePhpDoc($doc);
+              $docs['methods'][$key] = Reflection::parsePhpDoc($doc); // <------------------------------------ TODO (required args)
           }
         }
 

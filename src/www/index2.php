@@ -33,6 +33,9 @@ try {
         }
     )->group('group1');
 
+
+
+
     /**
      * group.
      *
@@ -44,16 +47,24 @@ try {
     //$api->setGroup('first');
 
     $api->onRead('/keywords',
-        /**
-         * List all the keywords...
-         *
-         * @return array  The return array
-         * @api_role admin
-         */
-        function() {
-            return array('List keywords');
+
+       /**
+        * Title of the API method.
+        * Description of the API method.
+        *
+        * @param  type $test test description
+        *
+        * @return array  The return array
+        */
+        function($test='default') use ($api) {
+
+            $doc = $api->entity->getDocs();
+
+            return array('List keywords', $doc);
         }
+
     )->group('group1');
+
 
     $api->onRead('/keywordoos/:cat_id/:optional',
 

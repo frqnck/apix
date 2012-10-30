@@ -16,6 +16,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->entity = $this->getMock('Apix\Entity', array('underlineCall', '_parseDocs', 'getActions'));
+
         $this->route = $this->getMock('Apix\Router', array('getMethod'));
         $this->entity->setRoute($this->route);
     }
@@ -43,7 +44,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array('calledData'), $this->entity->call(), "Checking mocking actually work.");
     }
 
-    public function testGetDocs()
+    public function testGetDocsRetrievesAllTheApiDocs()
     {
         $docs = array('parseDocs', 'methods'=>array('GET'=>'doc for GET'));
         $this->entity->expects($this->once())
@@ -51,6 +52,15 @@ class EntityTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($docs));
 
         $this->assertSame($docs, $this->entity->getDocs());
+    }
+
+    public function testGetDocsRetrievesTheSpecifiedApiDoc()
+    {
+        $docs = array('parseDocs', 'methods'=>array('GET'=>'doc for GET'));
+        $this->entity->expects($this->once())
+                ->method('_parseDocs')
+                ->will($this->returnValue($docs));
+
         $this->assertSame($docs['methods']['GET'], $this->entity->getDocs('GET'));
     }
 
