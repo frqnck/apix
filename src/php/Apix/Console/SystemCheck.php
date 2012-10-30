@@ -195,6 +195,15 @@ HELP;
                 )
             ),
 
+            // tidy
+            'tidy' => array(
+                'fail' => !extension_loaded('tidy'),
+                'verbose' => 'off',
+                'msgs' => array(
+                    "You may want to enable the Tidy extension.",
+                )
+            ),
+
             // PHP > 5.4
             'PHP version > 5.4' => array(
                 'fail' => version_compare(PHP_VERSION, '5.4.0', '<'),
