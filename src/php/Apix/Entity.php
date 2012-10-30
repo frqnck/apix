@@ -157,6 +157,18 @@ class Entity extends Listener
         return $params;
     }
 
+    public function _getRequiredParams(\ReflectionFunctionAbstract $ref)
+    {
+        $params = array();
+        foreach ($ref->getParameters() as $param) {
+            $name = $param->getName();
+            if ( !$param->isOptional() ) {
+            }
+        }
+        return $params;
+    }
+
+
     /**
      * Sets the route object.
      *

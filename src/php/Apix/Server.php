@@ -15,28 +15,34 @@ class Server extends Listener
     const VERSION = '@package_version@';
 
     public $config = array(); // todo chnage this!
+    public $entity = null;
+    public $request = null;
+    public $resources = null;
+    public $response = null;
 
-    public $request;
-    public $response;
-    public $route;
-    public $resources;
+    public $route = null;
 
+    /**
+     * Constructor.
+     *
+     * @return void
+     */
     public function __construct($config=null, Request $request=null, Response $response=null)
     {
-        // Set the config
+        // Set and intialise the config
         $c = $config instanceOf Config ? $config : Config::getInstance($config);
         $this->config = $c->get();
 
-        $this->init($this->config);
+        $this->initSet($this->config);
 
-        // Set the request
+        // Set the current request
         $this->request = $request === null ? HttpRequest::getInstance() : $request;
 
         if ($this->request instanceOf HttpRequest) {
             $this->request->setFormats($this->config['input_formats']);
         }
 
-        // Init response object
+        // Initialise the response
         $this->response =
             $response !== null
                 ? $response
@@ -47,10 +53,8 @@ class Server extends Listener
                 );
         $this->response->setFormats($this->config['routing']['formats']);
 
-        // set the resources
+        // Add all the resources from config.
         $this->resources = new Resources;
-
-        // add all the resources from config.
         foreach ($c->getResources() as $key => $values) {
             $this->resources->add(
                 $key, $values
@@ -58,15 +62,15 @@ class Server extends Listener
         }
     }
 
-    /**
-     * Acts as the initialisation.
+   /**
+     * Deals with PHP inits and error handlers.
      *
      * @param  array $configs The config entries to initialise.
      * @return void
      *
      * @codeCoverageIgnore
      */
-    public function init(array $configs)
+    public function initSet(array $configs)
     {
         if(!defined('UNIT_TEST') && isset($configs['init'])
             ) {
@@ -82,36 +86,29 @@ class Server extends Listener
     }
 
     /**
-    * @codeCoverageIgnore
+    * Run the show...
+    *
     * @throws \InvalidArgumentException 404
+    *
+    * @codeCoverageIgnore
     */
     public function run()
     {
         $c = Config::getInstance();
-            // set the routing
-            $this->setRouting(
-                $this->request,
-                $this->resources->toArray(),
-                $this->config['routing']
-            );
+
+        // set the routing
+        $this->setRouting(
+            $this->request,
+            $this->resources->toArray(),
+            $this->config['routing']
+        );
 
         try {
 
             // attach the early listeners @ pre-processing stage
             $this->addAllListeners('server', 'early');
 
-            // get the entity object
-            $entity = $this->resources->get(
-                $this->route
-            );
-
-            // attach the early listeners @ pre-processing stage
-            $entity->addAllListeners('entity', 'early');
-
-            $this->results = $entity->call();
-
-            // attach the late listeners @ post-processing stage
-            $entity->addAllListeners('entity', 'late');
+            $this->setResourceEntity($this->route);
 
         } catch (\Exception $e) {
 
@@ -144,7 +141,7 @@ class Server extends Listener
             case 405:
                 $this->response->setHeader('Allow',
                     implode(', ', array_keys(
-                        $entity->getAllActions()
+                        $this->entity->getAllActions()
                     )),
                     false // preserve existing
                 );
@@ -164,23 +161,47 @@ class Server extends Listener
         return $this->request->getMethod() != 'HEAD' ? $output : null;
     }
 
-    /**
-     * Gets the server version string.
-     *
-     * @return string
-     * @codeCoverageIgnore
-     */
+   /**
+    * Retrieves (and calls) a resource entity from a given route.
+    *
+    * @param  Router $route
+    * @return Entity
+    */
+    public function setResourceEntity(Router $route)
+    {
+        // get the entity object from a route
+        $this->entity = $this->resources->get($route);
+
+        // attach the early listeners @ pre-processing stage
+        $this->entity->addAllListeners('entity', 'early');
+
+        // set the results.
+        // TODO: create a Response results obj to handles this
+        $this->results = $this->entity->call();
+
+        // attach the late listeners @ post-processing stage
+        $this->entity->addAllListeners('entity', 'late');
+    }
+
+   /**
+    * Gets the server version string.
+    *
+    * @return string
+    *
+    * @codeCoverageIgnore
+    */
     private function getServerVersion($realm, $version)
     {
         return sprintf('%s/%s (%s)', $realm, $version, Server::VERSION);
     }
 
-    /**
-     * Sets and initialise the routing processes.
-     *
-     * @param  Request $request
-     * @return void
-     */
+   /**
+    * Sets and initialise the routing processes.
+    *
+    * @param  Request $request
+    *
+    * @return void
+    */
     public function setRouting(Request $request, array $resources, array $opts=null)
     {
         $path =
@@ -226,27 +247,28 @@ class Server extends Listener
         }
     }
 
-    /**
-     * Returns the route object.
-     *
-     * @return Router
-     */
+   /**
+    * Returns the route object.
+    *
+    * @return Router
+    */
     public function getRoute()
     {
         return $this->route;
     }
 
-    /**
-     * Returns the output format from the request chain.
-     *
-     * @param array $opts Options are:
-     *                              - [default] => string e.g. 'json',
-     *                              - [controller_ext] => boolean,
-     *                              - [override] => false or string use $_REQUEST['format'],
-     *                              - [http_accept] => boolean.
-     * @param  string|false $ext The contoller defined extension.
-     * @return string
-     */
+   /**
+    * Returns the output format from the request chain.
+    *
+    * @param array $opts Options are:
+    *                              - [default] => string e.g. 'json',
+    *                              - [controller_ext] => boolean,
+    *                              - [override] => false or string use $_REQUEST['format'],
+    *                              - [http_accept] => boolean.
+    * @param  string|false $ext The contoller defined extension.
+    *
+    * @return string
+    */
     public function negotiateFormat(array $opts, $ext=false)
     {
         switch (true) {
@@ -275,15 +297,15 @@ class Server extends Listener
 
 /* -- Closure prototyping  -- */
 
-    /**
-     * Proxy to resources::add (shortcut)
-     *
-     * @param  string     $method The HTTP method to match against.
-     * @param  string     $path   The path name to match against.
-     * @param  mixed      $to     Callback that returns the response when matched.
-     * @return Controller
-     * @see  Resources::add
-     */
+   /**
+    * Proxy to resources::add (shortcut)
+    *
+    * @param  string     $method The HTTP method to match against.
+    * @param  string     $path   The path name to match against.
+    * @param  mixed      $to     Callback that returns the response when matched.
+    * @return Controller
+    * @see  Resources::add
+    */
     protected function proxy($method, $path, \Closure $to)
     {
         return $this->resources->add($path,
@@ -294,14 +316,14 @@ class Server extends Listener
         );
     }
 
-    /**
-     * Create / POST request handler
-     *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
-     * @see  Server::proxy
-     * @return Controller Provides a fluent interface.
-     */
+   /**
+    * Create / POST request handler
+    *
+    * @param string $path The path name to match against.
+    * @param mixed  $to   Callback that returns the response when matched.
+    * @see  Server::proxy
+    * @return Controller Provides a fluent interface.
+    */
     public function onCreate($path, $to)
     {
         return $this->proxy('POST', $path, $to);

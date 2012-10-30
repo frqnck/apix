@@ -84,7 +84,7 @@ class Reflection
                     'type'          => $m[1],
                     'name'          => $m[2],
                     'description'   => isset($m[3]) ? trim($m[3]) : null,
-                    #'required'      => $this->isReq
+                    #'required'      => $func->getParamisReq    // <------------------------------------ TODO
                 );
             } else {
                 // other @entries as group
