@@ -266,11 +266,11 @@ $c['services'] = array(
         // username:password:sharedSecret:role:realm
         return array(
             0 => array(
-                'user'=>'franck', 'password'=>'123', 'sharedSecret'=>'pass',
+                'user'=>'franck', 'password'=>'123', 'sharedSecret'=>'pa1ss',
                 'role'=>'admin', 'realm'=>'api.domain.tld'
             ),
             1 => array(
-                'user'=>'test', 'password'=>'t3st', 'sharedSecret'=>'sesame',
+                'user'=>'test', 'password'=>'t3st', 'sharedSecret'=>'se1same',
                 'role'=>'guest', 'realm'=>'api.domain.tld'
             )
         );
@@ -293,17 +293,17 @@ $c['services'] = array(
 $c['listeners'] = array(
     'server' => array(
         'early' => array(
-            # 'Apix\Listener\Mock',
+            #'Apix\Listener\Mock',
         ),
         'late' => array(),
         'exception' => array(
-            # 'Apix\Listener\Log' => array('php://output'),
+            #'Apix\Listener\Log' => array('php://output'),
         )
     ),
     'entity' => array(
         'early' => array(
             $c['services']['digest_auth_plugin'],
-            # $c['services']['basic_auth_plugin'],
+            #$c['services']['basic_auth_plugin'],
         ),
         'late' => array(),
     ),

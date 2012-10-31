@@ -9,6 +9,11 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      */
     protected $observers = array();
 
+    /**
+     * @var array of SplObjectStorage
+     */
+    protected $listeners = array();
+
      /**
      * Attaches a new observer
      *
@@ -34,8 +39,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
         foreach ($this->observers as $key => $attached) {
             if ($attached === $observer) {
                 unset($this->observers[$key]);
-
-                return;
+                #return;
             }
         }
     }
@@ -72,96 +76,72 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
         return count($this->observers);
     }
 
-#    public function __construct() {}
+    /**
+     * Add listeners
+     *
+     * @param array $level
+     */
+    public function setListenersLevel($level, array $periods)
+    {
+        $this->listeners[$level] = $periods;
+    }
 
+    /**
+     * Get a level of listeners.
+     *
+     * @param string $key 
+     */
+    public function getListenersLevel($key)
+    {
+        if(!isset($this->listeners[$key])) {
+            // retrieve from config
+            $this->listeners[$key] = Config::getInstance()->getListeners($key);
+        }
+        return $this->listeners[$key];
+    }
+
+    /**
+     * Adds all the listeners for the current level/type.
+     *
+     * @param string $level     Representing the current level/stage.
+     * @param string $type      Representing the current type/period.
+     */
     public function addAllListeners($level, $type=null)
     {
-#        static $listeners = array();
-
-#        if ($listeners[] === null) {
-            $listeners = Config::getInstance()->getListeners($level);
-#        }
+        //$level = get_called_class();
+        
+        $listeners = $this->getListenersLevel($level);
 
         $stage = is_null($type)
             ? $listeners
             : $listeners[$type];
 
-        if (isset($stage)) {
-            foreach ($stage as $listener => $args) {
-                if (is_int($listener)) {
-                    $call = $args instanceof \Closure ? $args() : new $args();
-                } else {
-                    $args = $args instanceof \Closure ? $args() : $args[0];
-                    $call = new $listener($args);
-                }
-                $this->attach($call);
-            }
+        foreach ($stage as $plugin => $args) {
+            $this->attach(
+                $this->callPlugin($plugin, $args)
+            );
         }
 
-        $this->setNotice($type);
+        ###$this->setNotice($type);
     }
 
     /**
-     * Last event in request / response handling, intended for observers
-     * @var  array
-     * @see  getLastEvent()
-     */
-    protected $_notice = array(
-        'name' => null,
-        'obj' => null
-    );
-
-    /**
-     * Sets the last event
+     * Call the plugin.
      *
-     * Adapters should use this method to set the current state of the request
-     * and notify the observers.
-     *
-     * @param string $name event name
-     * @param mixed  $data some event data
+     * @param mix $plugin
+     * @param mix $args
      */
-    public function setNotice($name, $data=null)
+    private function callPlugin($plugin, $args)
     {
-        $this->_notice = array(
-            'name' => $name,
-            'data' => $data
-        );
+        if (is_int($plugin)) {
+            return $args instanceof \Closure ? $args() : new $args();
+        }
 
-        $this->notify();
-    }
+        // if( !class_exists($plugin) || !is_callable($plugin) ) { 
+        //     throw new \BadMethodCallException("Plugin \"{$plugin}\" not available.");
+        // }
 
-    /**
-     * Returns the last event
-     *
-     * Observers should use this method to access the last change in request.
-     * The following event names are possible:
-     * <ul>
-     *   <li>'connect'                 - after connection to remote server,
-     *                                   data is the destination (string) </li>
-     *   <li>'disconnect'              - after disconnection from server</li>
-     *   <li>'sentHeaders'             - after sending the request headers,
-     *                                   data is the headers sent (string) </li>
-     *   <li>'sentBodyPart'            - after sending a part of the request body,
-     *                                   data is the length of that part (int) </li>
-     *   <li>'sentBody'                - after sending the whole request body,
-     *                                   data is request body length (int) </li>
-     *   <li>'receivedHeaders'         - after receiving the response headers,
-     *                                   data is HTTP_Request2_Response object</li>
-     *   <li>'receivedBodyPart'        - after receiving a part of the response
-     *                                   body, data is that part (string) </li>
-     *   <li>'receivedEncodedBodyPart' - as 'receivedBodyPart', but data is still
-     *                                   encoded by Content-Encoding</li>
-     *   <li>'receivedBody'            - after receiving the complete response
-     *                                   body, data is HTTP_Request2_Response object</li>
-     * </ul>
-     * Different adapters may not send all the event types. Mock adapter does
-     * not send any events to the observers.
-     *
-     * @return array The array has two keys: 'name' and 'data'
-     */
-    public function getNotice()
-    {
-        return $this->_notice;
+        return new $plugin($args);
     }
 
 }

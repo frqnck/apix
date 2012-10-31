@@ -15,20 +15,41 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     $api = new Server;
 
-    $api->onRead('/upload/:what',
+    $api->onRead('/test', 
 
         /**
-         * Upload something...
+         * A test...
+         * Some documentation...
          *
          * @return array  The array to return to the client
-         * @api_role admin
+         * 
+         * @api_role    admin
          */
         function() use ($api) {
             $params = $api->request->getBody();
 
             return array(
                 'body'      => $api->request->getBody(),
-                'params'    => $api->getBodyData()
+                //'params'    => $api->getBodyData()
+            );
+        }
+    );
+
+    $api->onRead('/upload/:what',
+
+        /**
+         * Upload something...
+         *
+         * @return array  The array to return to the client
+         * 
+         * @api_role    admin
+         */
+        function() use ($api) {
+            $params = $api->request->getBody();
+
+            return array(
+                'body'      => $api->request->getBody(),
+                //'params'    => $api->getBodyData()
             );
         }
     )->group('group1');
