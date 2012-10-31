@@ -17,87 +17,108 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         unset($this->listener);
     }
 
-   protected function implementExpectationsForMockObserver($mockObserver, $invokedCount)
+    public function testUpdateIsCalledOnNotifyExactlyTwoTimes()
     {
-        $method = $mockObserver->expects($this->exactly($invokedCount))->method('update');
-        if (0 < $invokedCount) {
-            $method->with($this->isInstanceOf('SplSubject'));
-        }
-    }
-
-    public function testUpdateIsCalledOnNotify()
-    {
-        $observer = $this->getMock('Apix\Listener\Mock', array('update'));
-        #$this->implementExpectationsForMockObserver($observer, 2);
-        $observer->expects($this->exactly(2))
+        $obs = $this->getMock('Apix\Listener\Mock', array('update'));
+        $obs->expects($this->exactly(2))
                  ->method('update');
 
-        $this->listener->attach($observer);
-        $this->listener->notify();
-        $this->listener->notify();
+        $this->listener->attach($obs);
+        
+        $this->listener->notify('123'); // one time
+        $this->listener->notify('abc'); // two time
     }
 
-    public function testAttachOnceAndCountable()
+    public function testSameWillAttachOnlyOnce()
     {
-        $observer = $this->getMock('Apix\Listener\Mock', array('update'));
+        $obs = $this->getMock('Apix\Listener\Mock', array('update'));
 
-        $this->listener->attach($observer);
-        $this->listener->attach($observer);
+        $this->listener->attach($obs);
+        $this->listener->attach($obs);
+        $this->listener->attach($obs);
 
         $this->assertEquals(1, $this->listener->count());
+    }
+
+    public function testDifferentWillBeAccountable()
+    {
+        $obs1 = $this->getMock('Apix\Listener\Mock', array('update'));
+        $this->listener->attach($obs1);
+
+        $obs2 = $this->getMock('Apix\Listener\Mock', array('update'));
+        $this->listener->attach($obs2);
+
+        $this->assertEquals(2, $this->listener->count());
     }
 
     public function testDetachAndCountable()
     {
-        $observer1 = $this->getMock('Apix\Listener\Mock', array('update'));
-        $this->listener->attach($observer1);
-        $this->listener->attach($observer1);
+        $obs1 = $this->getMock('Apix\Listener\Mock', array('update'));
+        $this->listener->attach($obs1);
 
-        $observer2 = $this->getMock('Apix\Listener\Mock', array('update'));
-        $this->listener->attach($observer2);
+        $obs2 = $this->getMock('Apix\Listener\Mock', array('update'));
+        $this->listener->attach($obs2);
 
-        $this->assertEquals(2, $this->listener->count());
-
-        $this->listener->detach($observer2);
+        $this->listener->detach($obs2);
         $this->assertEquals(1, $this->listener->count());
     }
 
-    public function testGetIterator()
+    public function testGetIteratorIsEmptyArray()
     {
         $this->assertSame(array(), $this->listener->getIterator());
+    }
 
-        $observer1 = $this->getMock('Apix\Listener\Mock');
-        $this->listener->attach($observer1);
+    public function testGetIteratorOnAttach()
+    {
+        $obs1 = $this->getMock('Apix\Listener\Mock');
+        $this->listener->attach($obs1);
         $this->assertTrue(count($this->listener->getIterator()) == 1);
 
-        $observer2 = $this->getMock('Apix\Listener\Mock');
-        $this->listener->attach($observer2);
+        $obs2 = $this->getMock('Apix\Listener\Mock');
+        $this->listener->attach($obs2);
         $this->assertTrue(count($this->listener->getIterator()) == 2);
     }
 
-    /**
-     * @covers Observer::update
-     * @covers Subject::setValue
-     * @covers Subject::getValue
-     */
-    public function OfftestUpdate()
+    public function testGetListenersLevelReturnsConfig()
     {
-        $subject  = new Subject();
-        $observer = new Observer();
+        Config::getInstance()->setConfig(
+            array(
+                'listeners' => array(
+                    'unit-test' => array(
+                        'early' => 'but-not-late'
+                    )
+                )
+            )
+        );
 
-        $subject->setValue('Observer Pattern');
+        $plugins = $this->listener->getListenersLevel('unit-test');
+        $this->assertSame('but-not-late', $plugins['early']);
+    }
 
-        self::assertEquals($observer->update($subject), $subject->getValue());
+    public function testAddAllListeners()
+    {
+        $plugins = array(
+            'early' => array(
+                'Apix\Fixtures\ListenerMock',
+                'Apix\Fixtures\ListenerMock' => array('someVal1', 'someVal2')
+            )
+        );
+        $this->listener->setListenersLevel('server', $plugins);
+
+        $this->listener->addAllListeners('server', 'early');
+
+        $this->assertSame(2, $this->listener->count());
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException   \BadMethodCallException
      */
-    public function testGetNonExistentProvider()
+    public function TODOtestThrowsExceptionWhenNotAvailable()
     {
-        $this->markTestIncomplete(
-            'This test has not been implemented yet.'
-        );
+        $plugins = array( 'early' => array('Whatever') );
+        $this->listener->setListenersLevel('server', $plugins);
+
+        $this->listener->addAllListeners('server', 'early');
     }
 
 }
