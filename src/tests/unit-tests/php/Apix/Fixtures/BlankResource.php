@@ -12,7 +12,7 @@ namespace Apix\Fixtures;
  * @api_permission admin
  * @api_randomName classRandomValue
  */
-class BlankResource #extends ResourceAbstract
+class BlankResource
 {
     /*
      * A public var.
