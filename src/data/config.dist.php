@@ -250,7 +250,7 @@ $c['services'] = array(
                     && $user['realm'] == $c['api_realm']
                 ) {
                     // Can be set to password, apiKey, or hashed mixture...
-                    return $adapter->token = $user['sharedSecret'];
+                    return $adapter->token = $user['password'];
                 }
             }
             $adapter->token = false;
@@ -266,11 +266,11 @@ $c['services'] = array(
         // username:password:sharedSecret:role:realm
         return array(
             0 => array(
-                'user'=>'franck', 'password'=>'123', 'sharedSecret'=>'pa1ss',
+                'user'=>'franck', 'password'=>'1234', 'sharedSecret'=>'pass',
                 'role'=>'admin', 'realm'=>'api.domain.tld'
             ),
             1 => array(
-                'user'=>'test', 'password'=>'t3st', 'sharedSecret'=>'se1same',
+                'user'=>'test', 'password'=>'t3st', 'sharedSecret'=>'sesame',
                 'role'=>'guest', 'realm'=>'api.domain.tld'
             )
         );

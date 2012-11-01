@@ -176,7 +176,6 @@ class Server extends Listener
 
         // attach the early listeners @ pre-processing stage
         $this->entity->addAllListeners('entity', 'early');
-
         // set the results.
         // TODO: create a Response results obj to handles this
         $this->results = $this->entity->call();

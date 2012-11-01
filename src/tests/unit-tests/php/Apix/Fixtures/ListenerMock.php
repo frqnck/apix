@@ -25,7 +25,8 @@ class ListenerMock implements \SplObserver
      */
     public function update(\SplSubject $subject)
     {
-        return $subject->getNotice();
+        return $this->value;
+        #return $subject->getNotice();
     }
 
 }
