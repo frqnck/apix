@@ -89,7 +89,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     /**
      * Get a level of listeners.
      *
-     * @param string $key 
+     * @param string $key
      */
     public function getListenersLevel($key)
     {
@@ -109,7 +109,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     public function addAllListeners($level, $type=null)
     {
         //$level = get_called_class();
-        
+
         $listeners = $this->getListenersLevel($level);
 
         $stage = is_null($type)
@@ -120,10 +120,9 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
             $this->attach(
                 $this->callPlugin($plugin, $args)
             );
+            $this->notify();
         }
-
-        ###$this->setNotice($type);
-    }
+   }
 
     /**
      * Call the plugin.
@@ -137,11 +136,81 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
             return $args instanceof \Closure ? $args() : new $args();
         }
 
-        // if( !class_exists($plugin) || !is_callable($plugin) ) { 
+        // if( !class_exists($plugin) || !is_callable($plugin) ) {
         //     throw new \BadMethodCallException("Plugin \"{$plugin}\" not available.");
         // }
 
         return new $plugin($args);
     }
+
+    /* -- Generic stuff -- */
+
+
+    /* -- FOR REF -to rm -- */
+
+        // $this->setNotice($type);
+
+    /**
+     * Last event in request / response handling, intended for observers
+     * @var  array
+     * @see  getLastEvent()
+     */
+    // protected $_notice = array(
+    //     'name' => null,
+    //     'obj' => null
+    // );
+
+    /**
+     * Sets the last event
+     *
+     * Adapters should use this method to set the current state of the request
+     * and notify the observers.
+     *
+     * @param string $name event name
+     * @param mixed  $data some event data
+     */
+    // public function setNotice($name, $data=null)
+    // {
+    //     $this->_notice = array(
+    //         'name' => $name,
+    //         'data' => $data
+    //     );
+
+    //     $this->notify();
+    // }
+
+    /**
+     * Returns the last event
+     *
+     * Observers should use this method to access the last change in request.
+     * The following event names are possible:
+     * <ul>
+     *   <li>'connect'                 - after connection to remote server,
+     *                                   data is the destination (string) </li>
+     *   <li>'disconnect'              - after disconnection from server</li>
+     *   <li>'sentHeaders'             - after sending the request headers,
+     *                                   data is the headers sent (string) </li>
+     *   <li>'sentBodyPart'            - after sending a part of the request body,
+     *                                   data is the length of that part (int) </li>
+     *   <li>'sentBody'                - after sending the whole request body,
+     *                                   data is request body length (int) </li>
+     *   <li>'receivedHeaders'         - after receiving the response headers,
+     *                                   data is HTTP_Request2_Response object</li>
+     *   <li>'receivedBodyPart'        - after receiving a part of the response
+     *                                   body, data is that part (string) </li>
+     *   <li>'receivedEncodedBodyPart' - as 'receivedBodyPart', but data is still
+     *                                   encoded by Content-Encoding</li>
+     *   <li>'receivedBody'            - after receiving the complete response
+     *                                   body, data is HTTP_Request2_Response object</li>
+     * </ul>
+     * Different adapters may not send all the event types. Mock adapter does
+     * not send any events to the observers.
+     *
+     * @return array The array has two keys: 'name' and 'data'
+     */
+    // public function getNotice()
+    // {
+    //     return $this->_notice;
+    // }
 
 }

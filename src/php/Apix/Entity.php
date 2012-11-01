@@ -102,7 +102,7 @@ class Entity extends Listener
     }
 
     /**
-     * Returns the full or just the specified method documentation .
+     * Returns the full class/group or specified method documentation .
      *
      * @param  string $method
      * @return array
@@ -213,16 +213,30 @@ class Entity extends Listener
         return $this->actions;
     }
 
+    /**
+     * Returns the value of an anotation.
+     *
+     * @param  string   $name
+     * @return mix|null
+     */
+    public function getAnnotationValue($name)
+    {
+        $method = $this->route->getMethod();
+        $doc = $this->getDocs($method);
+
+        return isset($doc[$name])
+          ? $doc[$name]
+          : null;
+    }
 
     /* --- ANYTHING BELOW TO BE MOVED ELSEWHERE (plugins) --- */
-
 
     /**
      * Check wether is public or not.
      *
      * @return boolean
      */
-    public function isPublic()
+    public function OFFisPublic()
     {
         $method = $this->route->getMethod();
 

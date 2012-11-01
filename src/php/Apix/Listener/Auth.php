@@ -32,20 +32,29 @@ class Auth implements \SplObserver
 
     }
 
+    public $annotation = 'api_auth_role';
+
     public function update(\SplSubject $entity)
     {
-        // skip if public
-        if ($entity->isPublic()) {
+        $role = $entity->getAnnotationValue($this->annotation);
+
+        // // skip if null or public
+        if (is_null($role) || $role == 'public') {
           return false;
         }
 
+        // // skip if public
+        // if ($this->isPublic()) {
+        //   return false;
+        // }
+
         $username = $this->adapter->authenticate();
         if (!$username) {
-            throw new Exception('Authentication required', 401);
+            throw new \Exception('Authentication required', 401);
         }
 
         // todo set X_REMOTE_USER or X_AUTH_USER
-        //$entity->getResponse()->setHeader('X_REMOTE_USER', $username);
+        #$entity->getResponse()->setHeader('X_REMOTE_USER', $username);
         $_SERVER['X_AUTH_USER'] = $username;
 
         return $username;
