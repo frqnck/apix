@@ -181,28 +181,23 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('route-name-to-redirect-to', $this->entity->getRedirect());
     }
 
-
-    /* --- ANYTHING BELOW TO BE MOVED ELSEWHERE (plugins) --- */
-
-
-    public function testIsPublic()
+    public function testGetAnnotationValue()
     {
-        $this->assertTrue($this->entity->isPublic());
+        $this->assertNull($this->entity->getAnnotationValue('not-exisiting'));
 
         $this->entity = $this->getMock('Apix\Entity', array('getDocs'));
         $this->entity->setRoute($this->route);
-
-        $this->entity->expects($this->exactly(3))
+        $this->entity->expects($this->any())
                 ->method('getDocs')
                 ->will($this->onConsecutiveCalls(
-                    array('api_role'=>'admin'),
-                    array('api_role'=>'public'),
-                    array('api_role'=>null)
+                    array('api_role' => 'admin'),
+                    array('api_role' => 'public'),
+                    array('api_auth_role' => null)
                 ));
 
-        $this->assertFalse($this->entity->isPublic());
-        $this->assertTrue($this->entity->isPublic());
-        $this->assertTrue($this->entity->isPublic());
+        $this->assertSame('admin', $this->entity->getAnnotationValue('api_role'));
+        $this->assertSame('public', $this->entity->getAnnotationValue('api_role'));
+        $this->assertNull($this->entity->getAnnotationValue('api_auth_role'));
      }
 
 }

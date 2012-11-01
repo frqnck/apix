@@ -15,15 +15,14 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     $api = new Server;
 
-    $api->onRead('/test', 
+    $api->onRead('/test',
 
         /**
          * A test...
          * Some documentation...
          *
          * @return array  The array to return to the client
-         * 
-         * @api_role    admin
+         * @api_auth_role   admin
          */
         function() use ($api) {
             $params = $api->request->getBody();
@@ -41,7 +40,7 @@ try {
          * Upload something...
          *
          * @return array  The array to return to the client
-         * 
+         *
          * @api_role    admin
          */
         function() use ($api) {
