@@ -10,42 +10,41 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
      public function setUp()
     {
         $this->listener = new Listener;
+        $this->observer = $this->getMock('Apix\Fixtures\ListenerMock', array('update'));
+
     }
 
     protected function tearDown()
     {
         unset($this->listener);
+        unset($this->observer);
     }
 
     public function testUpdateIsCalledOnNotifyExactlyTwoTimes()
     {
-        $obs = $this->getMock('Apix\Listener\Mock', array('update'));
-        $obs->expects($this->exactly(2))
+        $this->observer->expects($this->exactly(2))
                  ->method('update');
 
-        $this->listener->attach($obs);
-        
+        $this->listener->attach($this->observer);
+
         $this->listener->notify('123'); // one time
         $this->listener->notify('abc'); // two time
     }
 
     public function testSameWillAttachOnlyOnce()
     {
-        $obs = $this->getMock('Apix\Listener\Mock', array('update'));
-
-        $this->listener->attach($obs);
-        $this->listener->attach($obs);
-        $this->listener->attach($obs);
+        $this->listener->attach($this->observer);
+        $this->listener->attach($this->observer);
+        $this->listener->attach($this->observer);
 
         $this->assertEquals(1, $this->listener->count());
     }
 
     public function testDifferentWillBeAccountable()
     {
-        $obs1 = $this->getMock('Apix\Listener\Mock', array('update'));
-        $this->listener->attach($obs1);
+        $this->listener->attach($this->observer);
 
-        $obs2 = $this->getMock('Apix\Listener\Mock', array('update'));
+        $obs2 = $this->getMock('Apix\Fixtures\ListenerMock', array('update'));
         $this->listener->attach($obs2);
 
         $this->assertEquals(2, $this->listener->count());
@@ -53,10 +52,9 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testDetachAndCountable()
     {
-        $obs1 = $this->getMock('Apix\Listener\Mock', array('update'));
-        $this->listener->attach($obs1);
+        $this->listener->attach($this->observer);
 
-        $obs2 = $this->getMock('Apix\Listener\Mock', array('update'));
+        $obs2 = $this->getMock('Apix\Fixtures\ListenerMock', array('update'));
         $this->listener->attach($obs2);
 
         $this->listener->detach($obs2);
@@ -70,11 +68,10 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetIteratorOnAttach()
     {
-        $obs1 = $this->getMock('Apix\Listener\Mock');
-        $this->listener->attach($obs1);
+        $this->listener->attach($this->observer);
         $this->assertTrue(count($this->listener->getIterator()) == 1);
 
-        $obs2 = $this->getMock('Apix\Listener\Mock');
+        $obs2 = $this->getMock('Apix\Fixtures\ListenerMock');
         $this->listener->attach($obs2);
         $this->assertTrue(count($this->listener->getIterator()) == 2);
     }
