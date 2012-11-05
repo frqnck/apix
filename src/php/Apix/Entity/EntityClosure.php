@@ -63,8 +63,10 @@ class EntityClosure extends Entity implements EntityInterface
     /**
      * {@inheritdoc}
      */
-     function underlineCall(Router $route)
+    public function underlineCall(Router $route)
     {
+        static $i=0;
+        echo '(UnderlineCall)->' . ++$i . ' ';
         $method = $this->getMethod($route);
 
         #try {

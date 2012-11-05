@@ -4,25 +4,24 @@ namespace Apix\Listener;
 class Auth implements \SplObserver
 {
 
+    public $annotation = 'api_auth_role';
+
     /**
      * Constructor.
      *
-     * @param object $adapter Can be a file path (default: php://output), a resource,
-     *                        or an instance of the PEAR Log class.
-     * @param array $events Array of events to listen to (default: all events)
+     * @param object $adapter The cache adapter.
      *
-     * @return void
      * @throws \RuntimeException
      */
-    public function __construct($auth=null)
+    public function __construct($adapter=null)
     {
 
         switch (true) {
-            case ($auth instanceof Auth\Adapter):
-              $this->adapter = $auth;
+            case ($adapter instanceof Auth\Adapter):
+              $this->adapter = $adapter;
             break;
 
-            case ($auth instanceof \Zend_Auth):
+            case ($adapter instanceof \Zend_Auth):
               echo "TODO: Zend_Auth";
               exit;
 
@@ -32,24 +31,18 @@ class Auth implements \SplObserver
 
     }
 
-    public $annotation = 'api_auth_role';
-
     public function update(\SplSubject $entity)
     {
+        echo '(a) ';
+
         $role = $entity->getAnnotationValue($this->annotation);
 
-        // // skip if null or public
+        // skip if null or public
         if (is_null($role) || $role == 'public') {
           return false;
         }
 
-        // // skip if public
-        // if ($this->isPublic()) {
-        //   return false;
-        // }
-
-        $username = $this->adapter->authenticate();
-        if (!$username) {
+        if( ! $username = $this->adapter->authenticate() ) {
             throw new \Exception('Authentication required', 401);
         }
 

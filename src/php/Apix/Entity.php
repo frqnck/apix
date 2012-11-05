@@ -48,7 +48,26 @@ class Entity extends Listener
      */
     public function call()
     {
-        return $this->underlineCall($this->route);
+        // attach the early listeners @ pre-processing stage
+        $this->addAllListeners('entity', 'early');
+        
+        $results = $this->_call();
+
+        // attach the late listeners @ post-processing stage
+        $this->addAllListeners('entity', 'late');
+
+        return $results;
+    }
+
+    protected static $results = null;
+
+    public function _call()
+    {
+        if(self::$results === null) {
+            echo '(_call) ';
+            self::$results = $this->underlineCall($this->route);
+        }
+        return self::$results;
     }
 
     /**
