@@ -259,6 +259,10 @@ $c['services'] = array(
         return new Listener\Auth($adapter);
     },
 
+    'cache_plugin' => function() use ($c) {
+            return new Listener\Cache();
+    },
+
     // Returns a user array. This is used by the authentification plugins above.
     // TODO: JON to retrieve the users generic schema and data set from Magento.
     'users' => function()
@@ -302,6 +306,7 @@ $c['listeners'] = array(
     ),
     'entity' => array(
         'early' => array(
+            $c['services']['cache_plugin'],
             $c['services']['digest_auth_plugin'],
             #$c['services']['basic_auth_plugin'],
         ),

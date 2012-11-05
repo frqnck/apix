@@ -28,6 +28,7 @@ try {
             $params = $api->request->getBody();
 
             return array(
+                'test'  => 'test',
                 'body'      => $api->request->getBody(),
                 //'params'    => $api->getBodyData()
             );

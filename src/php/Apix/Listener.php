@@ -18,15 +18,15 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      * Attaches a new observer
      *
      * @param SplObserver $observer Any object implementing SplObserver
+     * @return void|false
      */
     public function attach(\SplObserver $observer)
     {
-        foreach ($this->observers as $attached) {
-            if ($attached === $observer) {
-                return;
-            }
+        if(!in_array($observer, $this->observers)) {
+            $this->observers[] = $observer;
+            return true;
         }
-        $this->observers[] = $observer;
+        return false;
     }
 
     /**
@@ -39,7 +39,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
         foreach ($this->observers as $key => $attached) {
             if ($attached === $observer) {
                 unset($this->observers[$key]);
-                #return;
+                return true;
             }
         }
     }
@@ -108,7 +108,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      */
     public function addAllListeners($level, $type=null)
     {
-        //$level = get_called_class();
+        #if($level == null) echo $level = get_called_class();
 
         $listeners = $this->getListenersLevel($level);
 
@@ -117,10 +117,9 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
             : $listeners[$type];
 
         foreach ($stage as $plugin => $args) {
-            $this->attach(
-                $this->callPlugin($plugin, $args)
-            );
-            $this->notify();
+            $obs = $this->callPlugin($plugin, $args);
+            //$this->attach($obs);
+            $obs->update($this);
         }
    }
 
