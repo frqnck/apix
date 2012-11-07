@@ -38,9 +38,12 @@ class Cache implements \SplObserver
           }
     }
 
-    public function log($action, $ref)
+    function log($action, $ref)
     {
-      // printf("%s %s (%s)\n", __CLASS__, $action, $ref);
+      if(defined('DEBUG')) {
+        $str = sprintf('%s %s (%s)', __CLASS__, $action, $ref);
+        error_log( $str );
+      }
     }
 
     public function update(\SplSubject $entity)
