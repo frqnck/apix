@@ -33,8 +33,6 @@ class Auth implements \SplObserver
 
     public function update(\SplSubject $entity)
     {
-        echo '(a) ';
-
         $role = $entity->getAnnotationValue($this->annotation);
 
         // skip if null or public

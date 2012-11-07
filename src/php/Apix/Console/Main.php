@@ -44,11 +44,12 @@ class Main extends Console
 
     public function run($quiet=false)
     {
-        $this->args[0] = 'php ' . $this->args[0];
+        $args = $this->getArgs();
+        $args[0] = 'php ' . $args[0];
 
-        $cmd = empty($this->args[1])
+        $cmd = empty($args[1])
                 ? '--help'
-                : $this->args[1];
+                : $args[1];
 
         echo $this->version_program . PHP_EOL .PHP_EOL;
 
@@ -146,9 +147,9 @@ class Main extends Console
             break;
 
             default:
-                $this->out('Error: ', $this->args[1], 'bold', 'red');
-                $this->out(sprintf('unknown option/command "%s".' . PHP_EOL, $this->args[1]), 'red');
-                $this->out(sprintf('You should try "%s --help".', $this->args[0]), "green");
+                $this->out('Error: ', $args[1], 'bold', 'red');
+                $this->out(sprintf('unknown option/command "%s".' . PHP_EOL, $args[1]), 'red');
+                $this->out(sprintf('You should try "%s --help".', $args[0]), 'green');
 
         endswitch;
 
@@ -159,8 +160,9 @@ class Main extends Console
 
     public function help()
     {
+        $args = $this->getArgs();
         $help = <<<HELP
-Usage: £{$this->args[0]}£ %[options]%
+Usage: £php {$args[0]}£ %[options]%
 
 Options:
 
@@ -195,6 +197,7 @@ HELP;
             $help = preg_replace("/(£)(.*)(£)/", $this->_out('\2', 'blue', 'bold'), $help);
             $help = preg_replace("/(%)(.*)(%)/", $this->_out('\2', 'green', 'bold'), $help);
         } else {
+            $help = str_replace("£", '', $help);
             $help = str_replace("%", '', $help);
         }
         echo $help;

@@ -33,10 +33,10 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Ouarz\Console
- * @author      Franck Cassedanne <fcassedanne@ouarz.net>
- * @copyright   2011 Franck Cassedanne, Ouarz.net
+ * @author      Franck Cassedanne <htttp://franck.cassedanne.com>
+ * @copyright   2011 Franck Cassedanne
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link        http://ouarz.github.com
+ * @link        http://frqnck.gikthub.com/Console
  * @version     @@PACKAGE_VERSION@@
  */
 
@@ -44,20 +44,20 @@ namespace Apix;
 
 class Console
 {
-    public $args;
+    protected $args;
+
+    protected $options = null;
 
     protected $switches = array(
         'no_colors' => array('--no-colors', '--no-colours'),
-        'verbose' => array('--verbose', '-vv', '-vvv')
+        'verbose'   => array('--verbose', '-vv', '-vvv')
     );
 
-    protected $no_colors = false;
-    protected $verbose = false;
+    public $no_colors = false;
 
-    protected $start = "\033[%sm%s";
-    protected $end = "\033[0m";
+    public $verbose = false;
 
-    protected $options = null;
+    private $prompt = "\033[%sm%s\033[0m";
 
     public function __construct(array $options = null)
     {
@@ -71,9 +71,9 @@ class Console
         $this->args = array_unique($_SERVER['argv']);
 
         foreach ($this->switches as $key => $values) {
-            if (array_intersect($values, $this->args)) {
+            if ($this->hasArgs($values)) {
                 $this->args = array_diff($this->args, $values);
-                reset($this->args); // TODO: seems we have a php bug here???
+                reset($this->args); // due to a php bug?
                 $this->$key = true;
             }
         }
@@ -84,9 +84,19 @@ class Console
         }
     }
 
+    public function getArgs()
+    {
+        return $this->args;
+    }
+
+    public function hasArgs(array $args)
+    {
+        return array_intersect($args, $this->args);
+    }
+
     public function getOptions()
     {
-        if ($this->no_colors == true) {
+        if (true === $this->no_colors) {
             return null;
         }
         $ansi = array_merge(
@@ -119,6 +129,14 @@ class Console
         return $ansi;
     }
 
+    public function out($msg, $styles=null)
+    {
+        $styles = is_array($msg) ? $msg : func_get_args();
+        $msg = array_shift($styles);
+
+        echo $this->_out($msg, $styles);
+    }
+
     public function _out($msg, $styles=null)
     {
         if (!is_array($styles)) {
@@ -129,28 +147,12 @@ class Console
         if (true !== $this->no_colors) {
             foreach ($styles as $style) {
                 if (isset($this->options[$style])) {
-                    $msg = sprintf($this->start, $this->options[$style], $msg);
-                    $msg .= $this->end;
+                    $msg = sprintf($this->prompt, $this->options[$style], $msg);
                 }
             }
         }
 
         return $msg;
     }
-
-    public function out($msg, $styles=null)
-    {
-        $styles = is_array($msg) ? $msg : func_get_args();
-        $msg = array_shift($styles);
-
-        echo $this->_out($msg, $styles);
-    }
-
-    // public function getArgs($default=null)
-    // {
-    //     return empty($_SERVER['argv'][1])
-    //         ? $default
-    //         : trim($_SERVER['argv'][1]);
-    // }
 
 }

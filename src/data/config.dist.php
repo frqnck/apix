@@ -260,7 +260,8 @@ $c['services'] = array(
     },
 
     'cache_plugin' => function() use ($c) {
-            return new Listener\Cache();
+            $adapter = new Listener\Cache\Apc;
+            return new Listener\Cache($adapter);
     },
 
     // Returns a user array. This is used by the authentification plugins above.
