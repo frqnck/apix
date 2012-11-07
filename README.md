@@ -92,10 +92,10 @@ A resource controller may be declared as either:
 
 It will use:
 
-*   variable name to inherit values from the route's path,  
+*   variable name to inherit values from the route's path,
     e.g. `$name` inherited from `/category/:name`.
 
-*   type hinting to inject any of the current scope Apix's objects,  
+*   type hinting to inject any of the current scope Apix's objects,
     e.g. `Request`, `Response`, etc...
 
     See Apix's own [API Documentation] [apidoc] for what's available.
@@ -201,6 +201,20 @@ Here is a self explanatory example:
 
             $api->run();
     ```
+
+## Testing ##
+PHP5.3: status
+PHP5.4: status
+
+The idea is to get 100% code-coverage -- nearly there.
+
+### Unit test ###
+To run unit test simply run # phpunit from the within the main dir.
+
+### Integration test ###
+TODO
+### Functional test ###
+TODO
 
 <pre>
   _|_|    _|_|    _|     _|      _|
