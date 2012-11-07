@@ -72,7 +72,7 @@ class Reflection
 
        # $lines =array_map('trim',explode(PHP_EOL, $str));
 
-        $lines = preg_split("@\r?\n|\r@", $str, null, PREG_SPLIT_NO_EMPTY);
+        $lines = preg_split('@\r?\n|\r@', $str, null, PREG_SPLIT_NO_EMPTY);
 
         // extract the title
         $docs['title'] = array_shift($lines);
@@ -88,20 +88,23 @@ class Reflection
         }
 
         // do all the "@entries"
-        preg_match_all('/@([\w_]+)\s+(.*?)\s*(?=$|@[\w_]+\s)/s', $str, $lines);
+        preg_match_all('/@(?P<key>[\w_]+)\s+(?P<value>.*?)\s*(?=$|@[\w_]+\s)/s', $str, $lines);
 
-        foreach ($lines[2] as $i => $v) {
-            $grp = $lines[1][$i];
+        foreach ($lines['value'] as $i => $v) {
+            $grp = $lines['key'][$i];
 
             if ($grp == 'param') {
                 // "@param string $param description of param"
-                preg_match('/(\S+)\s+\$(\S+)(\s+(.+))?/', $v, $m);
+                preg_match('/(?P<type>\S+)\s+\$(?P<name>\S+)(?P<description>\s+(?:.+))?/', $v, $m);
 
-                $docs['params'][$m[2]] = array(
-                    'type'          => $m[1],
-                    'name'          => $m[2],
-                    'description'   => isset($m[3]) ? trim($m[3]) : null,
-                    'required'      => isset($requireds) && in_array($m[2], $requireds)
+                $docs['params'][$m['name']] = array(
+                    'type'          => $m['type'],
+                    'name'          => $m['name'],
+                    'description'   => isset($m['description'])
+                                        ? trim($m['description'])
+                                        : null,
+                    'required'      => isset($requireds)
+                                        && in_array($m['name'], $requireds)
                 );
 
             } else {

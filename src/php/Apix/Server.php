@@ -174,14 +174,14 @@ class Server extends Listener
         // get the entity object from a route
         $this->entity = $this->resources->get($route);
 
-        // // attach the early listeners @ pre-processing stage
-        // $this->entity->addAllListeners('entity', 'early');
-        
-        // // set the results -- TODO: create a Response results obj to handles this
+        // attach the early listeners @ pre-processing stage
+        $this->entity->addAllListeners('entity', 'early');
+
+        // set the results -- TODO: create a Response results obj to handles this
         $this->results = $this->entity->call($route);
 
-        // // attach the late listeners @ post-processing stage
-        // $this->entity->addAllListeners('entity', 'late');
+        // attach the late listeners @ post-processing stage
+        $this->entity->addAllListeners('entity', 'late');
     }
 
    /**

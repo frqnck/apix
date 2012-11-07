@@ -17,7 +17,7 @@ interface EntityInterface
     public function append(array $defs);
 
     /**
-      * Calls the underline entity.
+     * Calls the underline/internal entity.
      *
      * @param  Router                   $route
      * @return array

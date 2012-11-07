@@ -11,9 +11,12 @@ class SystemCheck extends Console
 
     public function help()
     {
-        if (array_intersect(array('-h', '--help'), $this->args)) {
+        $args = $this->getArgs();
+        $args[0] = 'php ' . $args[0];
+
+        if ( $this->hasArgs(array('-h', '--help')) ) {
             echo <<<HELP
-Usage: {$this->args[0]} [options]
+Usage: {$args[0]} [options]
 
 Options:
    --help | -h      Display this help.
@@ -34,13 +37,15 @@ HELP;
 
     public function run($quiet=false)
     {
+        $args = $this->getArgs();
+
         #$this->out(PHP_EOL);
         $this->out("\tSystem check for " . $this->software_name . "\t", 'cyan', 'bold', 'on_blue');
         $this->out(PHP_EOL . PHP_EOL);
 
         $this->help();
 
-        if (!array_intersect(array('--required', '--optionals'), $this->args)) {
+        if ( !$this->hasArgs(array('--required', '--optionals')) ) {
             $this->args[] = '--all';
         }
 
@@ -70,7 +75,7 @@ HELP;
     public function display($title, array $checks, array $args)
     {
         $this->out($title, 'bold');
-        if (array_intersect($args, $this->args)) {
+        if ( $this->hasArgs($args) ) {
             foreach ($checks as $key => $check) {
                 $this->out(PHP_EOL . PHP_EOL);
                 $this->check($key, $check);

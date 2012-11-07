@@ -22,14 +22,15 @@ try {
          * Some documentation...
          *
          * @return array  The array to return to the client
-         * @api_auth_role   admin
+         * @api_auth    admin
+         * @api_cache   ttl=10secs tags=tag1,tag2 clean=tag3
          */
         function() use ($api) {
             $params = $api->request->getBody();
 
             return array(
                 'test'  => 'test',
-                'body'      => $api->request->getBody(),
+                'body'  => $api->request->getBody(),
                 //'params'    => $api->getBodyData()
             );
         }
