@@ -13,17 +13,18 @@ use Apix\Listener,
 class Entity extends Listener
 {
     protected $docs;
-
     protected $route;
-
     protected $redirect;
-
     protected $actions = null;
-
     protected $defaultActions = array(
         'OPTIONS' => 'help',
         'HEAD' => 'test'
     );
+
+    /**
+     * Holds the output of the resource entity.
+     */
+    protected $output = null;
 
     /**
      * Appends the given array definition and apply generic mappings.
@@ -48,26 +49,11 @@ class Entity extends Listener
      */
     public function call()
     {
-        // attach the early listeners @ pre-processing stage
-        $this->addAllListeners('entity', 'early');
-        
-        $results = $this->_call();
-
-        // attach the late listeners @ post-processing stage
-        $this->addAllListeners('entity', 'late');
-
-        return $results;
-    }
-
-    protected static $results = null;
-
-    public function _call()
-    {
-        if(self::$results === null) {
-            echo '(_call) ';
-            self::$results = $this->underlineCall($this->route);
+        if(null === $this->output) {
+            $this->output = $this->underlineCall($this->route);
         }
-        return self::$results;
+
+        return $this->output;
     }
 
     /**
