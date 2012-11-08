@@ -15,7 +15,7 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     $api = new Server;
 
-    $api->onRead('/test',
+    $api->onRead('/test/:id<\d+>',
 
         /**
          * A test...
@@ -23,9 +23,10 @@ try {
          *
          * @return array  The array to return to the client
          * @api_auth    admin
-         * @api_cache   ttl=10secs tags=tag1,tag2 clean=tag3
+         * @api_cache   tags=tag1,tag2,tag3
+         *              clean=tag9,tag10
          */
-        function() use ($api) {
+        function($id) use ($api) {
             $params = $api->request->getBody();
 
             return array(
