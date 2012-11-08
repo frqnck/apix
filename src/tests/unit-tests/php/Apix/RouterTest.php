@@ -398,7 +398,9 @@ class RouterTest extends \PHPUnit_Framework_TestCase
              array('/:id/test', '/1/test', array('id'=>'1')),
 
              array('/prod/:id<[[:digit:]]>', '/prod/2', array('id'=>'2')),
+             array('/prod/:id<[[:digit:]]>', '/prod/12', false),
              array('/prod/:id<.+>', '/prod/#21_&', array('id'=>'#21_&')),
+             array('/bag/:bag<\w+>', '/bag/of_words', array('bag'=>'of_words')),
         );
     }
 
