@@ -66,7 +66,7 @@ class Apc implements Adapter
     /**
      * {@inheritdoc}
      */
-    public function save($data, $id, array $tags=null, $ttl=false)
+    public function save($data, $id, array $tags=null, $ttl=0)
     {
         $id = $this->mapKey($id);
         $store = array();
@@ -98,7 +98,6 @@ class Apc implements Adapter
                 $tag = $this->mapTag($tag);
                 $ids = apc_fetch($tag, $success);
                 if($success) {
-                    print_r($ids);
                     foreach($ids as $id) {
                         apc_delete($id);
                     }
