@@ -150,7 +150,7 @@ class Router
     }
 
     /**
-     * Tries to match a route to an URI params.
+     * Tries to match a route to an URI params (version with REGEX).
      *
      * @param  string $route
      * @param  string $uri
@@ -171,12 +171,23 @@ class Router
 
         // params
         foreach ($bits as $key => $value) {
-            if (preg_match('/^:[\w]+$/', $value)) {
+
+            if (
+                preg_match('/^:[\w]+$/', $value)) {
                 if (isset($paths[$key])) {
                     $value = substr($value, 1); // rm ':'
                     $result[$value] = $paths[$key];
                 }
-            } elseif (!isset($paths[$key]) || strcmp($value, $paths[$key]) != 0) {
+            //} elseif (!isset($paths[$key]) || strcmp($value, $paths[$key]) != 0) {
+            } else 
+            if ( //Regex based!
+                isset($paths[$key])
+                && preg_match('/^:(?P<key>[\w]+)(?:<(?P<regex>.+)>)?/', $value, $m)
+                && isset($m['regex'])
+                && preg_match('/^'.$m['regex'].'$/', $paths[$key], $n)
+            ) {
+                $result[$m['key']] = $n[0];
+            } elseif (strcmp($value, $paths[$key]) != 0) {
                 return false;
             }
         }
