@@ -300,6 +300,8 @@ class RouterTest extends \PHPUnit_Framework_TestCase
              array('/prefix/:c', 'badprefix/c', false),
              array('prefix/:c', '/prefix/c', false),
              array('prefix/:c', '/prefix/c', false),
+             // TODO regex
+             #array('/:id', '/1/qwert', false),
         );
     }
 
@@ -371,5 +373,33 @@ class RouterTest extends \PHPUnit_Framework_TestCase
         $route->map('/');
         $this->assertSame('/', $route->getName());
    }
+
+    /**
+     * @dataProvider routeRegexParamsProvider
+     */
+    public function testRegexRouteToParamsMatcher($route, $url, $expected)
+    {
+        $router = new Router;
+        $results = $router->routeToParamsMatcher($route, $url);
+        $this->assertSame($expected, $results);
+    }
+
+    public function routeRegexParamsProvider()
+    {
+        return array(
+             array('/:id<[[:digit:]]{1,3}>', '/123', array('id'=>'123')),
+             array('/:id<[[:digit:]]{2,3}>', '/1234', false),
+             array('/:a<[[:digit:]]+>/:b', '/1234/abc', array('a'=>'1234', 'b'=>'abc')),
+             array('/:a<[[:digit:]]>/:b', '/9/z', array('a'=>'9', 'b'=>'z')),
+             array('/:a<[[:digit:]]{1,3}>/:b<[[:alpha:]]+>/:c<[[:alnum:]]+>', '/123/abc/0z', array('a'=>'123','b'=>'abc','c'=>'0z')),
+             array('/:param1<[[:digit:]]+>/:param2<[[:alpha:]]+>/:param3<[[:alnum:]]+>', '/123/abc/0z', array('param1'=>'123','param2'=>'abc','param3'=>'0z')),
+
+             array('/test/:id', '/test/1', array('id'=>'1')),
+             array('/:id/test', '/1/test', array('id'=>'1')),
+
+             array('/prod/:id<[[:digit:]]>', '/prod/2', array('id'=>'2')),
+             array('/prod/:id<.+>', '/prod/#21_&', array('id'=>'#21_&')),
+        );
+    }
 
 }
