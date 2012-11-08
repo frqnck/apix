@@ -186,7 +186,8 @@ class Router
                 && isset($m['regex'])
                 && preg_match('/^'.$m['regex'].'$/', $paths[$key], $n)
             ) {
-                $result[$m['key']] = $n[0];
+                if(count($n)>1) array_shift($n);
+                $result[$m['key']] = implode('', $n);
             } elseif (strcmp($value, $paths[$key]) != 0) {
                 return false;
             }
@@ -350,8 +351,17 @@ class Router
      */
     public function getName()
     {
-        return isset($this->name) ? $this->name
-            : ( isset($this->path) ? $this->path : null );
+        return isset($this->name) ? $this->name : $this->getPath();
+    }
+
+    /**
+     * Returns, if set, the current route path.
+     *
+     * @return string|null
+     */
+    public function getPath()
+    {
+        return isset($this->path) ? $this->path : null;
     }
 
     /**

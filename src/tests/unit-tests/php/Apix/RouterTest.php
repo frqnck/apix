@@ -401,6 +401,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
              array('/prod/:id<[[:digit:]]>', '/prod/12', false),
              array('/prod/:id<.+>', '/prod/#21_&', array('id'=>'#21_&')),
              array('/bag/:bag<\w+>', '/bag/of_words', array('bag'=>'of_words')),
+             array('/phone/:tel<(\d+)-(\d+)-FRANCK>', '/phone/123-345-FRANCK', array('tel'=>'123345')),
         );
     }
 

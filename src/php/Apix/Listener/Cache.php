@@ -5,13 +5,12 @@ class Cache implements \SplObserver
 {
     protected $annotation = 'api_cache';
     protected $adapter;
-    protected $defaults = array(
-      'ttl'     => '10mins', // null stands forever!
-      'tags'    => null,
-      'flush'   => null
+    protected $options = array(
+        'enable'    => true,        // Wether to enable caching at all.
+        'ttl'       => '10mins',    // null stands forever.
+        'flush'     => true,        // flush tags each time (e.g. cron job instead).
+        'tags'      => null,        // default tag(s) to append. TODO!
     );
-
-    const REGEX = '/(?P<key>[^= ]+)=(?P<value>[^= ]+)/i';
 
     /**
      * Constructor.
@@ -22,114 +21,116 @@ class Cache implements \SplObserver
      * @return void
      * @throws \RuntimeException
      */
-    public function __construct($adapter=null)
+    public function __construct($adapter=null, array $options=array())
     {
-          switch (true) {
-              case ($adapter instanceof Cache\Adapter):
-                $this->adapter = $adapter;
-              break;
+        $this->options = $options+$this->options;
 
-              case ($adapter instanceof Zend_Cache):
+        switch (true) {
+            case ($adapter instanceof Cache\Adapter):
                 $this->adapter = $adapter;
-              break;
+            break;
 
-              default:
-                  throw new \RuntimeException('Unable to open the Cache adapter');
-          }
+            case ($adapter instanceof Zend_Cache):
+                $this->adapter = $adapter;
+            break;
+
+            default:
+              throw new \RuntimeException('Unable to open the Cache adapter');
+        }
     }
 
-    function log($action, $ref)
+    function log($msg, $ref=null)
     {
-      if(defined('DEBUG')) {
-        $str = sprintf('%s %s (%s)', __CLASS__, $action, $ref);
-        error_log( $str );
-      }
+        if(defined('DEBUG')) {
+            $str = sprintf('%s %s (%s)', __CLASS__, $msg, $ref);
+            error_log( $str );
+        }
     }
 
     public function update(\SplSubject $entity)
     {
-      // skip if null
-      if (null === $entity->getAnnotationValue($this->annotation)) {
-        return false;
-      }
+        // skip if null
+        if (
+            false === $this->options['enable']
+            || null === $entity->getAnnotationValue($this->annotation)){
+            return false;
+        }
 
-      $this->entity = $entity;
+        $this->entity = $entity;
 
-      // clean tags explicitly
-      if ( $tags = $this->getTag('clean') ) {
-        $this->log('cleaning tags', implode(', ', $tags));
-        $this->adapter->clean($tags);
-      }
+        // clean/purge tags explicitly
+        if ( $this->options['flush'] && $tags = $this->getTagValues('clean') ) {
+            $this->adapter->clean($tags);
+            $this->log('Tags purged', implode(', ', $tags));
+        }
 
-      // the cache id is simply the entity route name for now!
-      $id = $entity->getRoute()->getName();
+        // the cache id is simply the entity route name for now! todo
+        $id = $entity->getRoute()->getPath();
 
-      // Use cache
-      if ($output = $this->adapter->load($id)) {
-        $this->log('loading', $id);
+        // Use cache
+        if ($cache = $this->adapter->load($id)) {
+            $this->log('loading', $id);
 
-        return $output;
-      }
+            return $cache;
+        }
 
-      // retrieve the output...
-      $output = call_user_func_array(
-        array($entity, 'call'),
-        array($entity->getRoute())
-      );
+        // retrieve the output...
+        $data = call_user_func_array(
+            array($entity, 'call'),
+            array($entity->getRoute())
+        );
 
-      // ...and cache it.
-      $ttl = $this->getTtl();
-      $this->log(sprintf('saving for %d seconds.', $ttl), $id);
-      $this->adapter->save($output, $id, $this->getTag('tags'), $ttl);
+        // ...and cache it.
+        $ttl = $this->getTagValues('ttl', $this->options['ttl']);
+        $ttl = $this->getTtl($ttl[0]);
 
-      return $output;
+        $tags = $this->getTagValues('tags');
+        
+        $this->adapter->save($data, $id, $tags, $ttl);
+        $this->log(sprintf('saving for %d secs', $ttl), $id . ': ' . implode(', ', $tags));
+        return $data;
     }
 
     /**
      * Returns the TTL in seconds.
      * @return integer  The TTL in seconds.
      */
-    public function getTtl()
+    public function getTtl($until=null, $from='now')
     {
-      $ttl = $this->getTag('ttl', $this->defaults['ttl']);
-      return strtotime($ttl[0])-strtotime('NOW');
-      // $expiryDate = new \DateTime();
-      // $interval = new \DateInterval($ttl);
-      // return $expiryDate->add($interval);
+        return $until==0 ? null : strtotime($until)-strtotime($from);
+        // $expiryDate = new \DateTime();
+        // $interval = new \DateInterval($ttl);
+        // return $expiryDate->add($interval);
     }
 
     /**
-     * Retuns the specifified tag.
+     * Retuns the value of the specifified subtag.
      *
-     * @param  [type] $key     [description]
-     * @param  [type] $default [description]
-     * @return [type]          [description]
+     * @param  string       $key        The $key to retrieve.
+     * @param  string|null  $default    The default value. 
+     * @return array|null               An indexed array of values or null.
      */
-    public function getTag($key, $default=null)
+    public function getTagValues($key, $default=null)
     {
-      $tags = $this->extractTags();
-      $k=array_search($key, $tags['key']);
-      if(false === $k) {
-        return $default;
-      }
-      return explode(',', $tags['value'][$k]);
+        $default= is_array($default)?$default:array($default); 
+        $tags = $this->extractTags();
+        $k=array_search($key, $tags['key']);
+        return false === $k ? $default : explode(',', $tags['value'][$k]);
     }
 
     /**
-     * Extracts all the tags.
+     * Extracts all the subtags.
      *
      * @return array An associative array
      */
-    public function extractTags()
+    public function extractTags($fresh=false)
     {
       static $matches = null;
-
-      if($matches === null) {
+      if($matches === null || $fresh) {
         $lines = $this->entity->getAnnotationValue($this->annotation);
-
         if(!is_array($lines)) $lines = array($lines);
         foreach($lines as $line) {
-          preg_match_all(self::REGEX, $line, $matches);
+          preg_match_all('/(?P<key>[^= ]+)=(?P<value>[^= ]+)/i', $line, $matches);
         }
       }
       return $matches;
