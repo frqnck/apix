@@ -133,7 +133,7 @@ class ServerTest extends \PHPUnit_Framework_TestCase
         $this->server->setRouting($this->request, array('/whatever' => array()), $options);
 
         $this->assertInstanceOf('Apix\Router', $this->server->route);
-        $this->assertSame($expected['path'], $this->server->route->path); // TODO: getter?
+        $this->assertSame($expected['path'], $this->server->route->getPath()); // TODO: getter?
 
         $this->assertInstanceOf('Apix\Response', $this->server->response);
         $this->assertSame($expected['format'], $this->server->response->getFormat());

@@ -27,17 +27,16 @@ interface Adapter
     /**
      * Removes all the cache items associated with the given tag name.
      *
-     * @param  array  $tags The tags to remove.
-     * @return boolean True on sucess.
+     * @param  array  $tags The array of tags to remove.
      */
     public function clean(array $tags=null);
 
     /**
-     * Remove a specified cache record.
+     * Deletes a specified cache record.
      *
      * @param  string $id The cache id to remove.
      * @return boolean True on sucess.
      */
-    #public function remove($id);
+    #public function delete($id);
 
 }
