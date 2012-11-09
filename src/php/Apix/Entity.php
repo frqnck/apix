@@ -233,29 +233,5 @@ class Entity extends Listener
           ? $doc[$name]
           : null;
     }
-
-    /* --- ANYTHING BELOW TO BE MOVED ELSEWHERE (plugins) --- */
-
-    /**
-     * Check wether is public or not.
-     *
-     * @return boolean
-     */
-    public function OFFisPublic()
-    {
-        $method = $this->route->getMethod();
-
-        $doc = $this->getDocs($method);
-
-        $role = isset($doc['api_role'])
-          ? $doc['api_role']
-          : false;
-
-        if (!$role || $role == 'public') {
-          return true;
-        }
-
-        return false;
-    }
-
+    
 }

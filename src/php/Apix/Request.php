@@ -62,10 +62,6 @@ class Request
      */
     public function __construct()
     {
-        #$request = \Symfony\Component\HttpFoundation\Request::createFromGlobals();
-        #print_r($request->get());
-        #exit;
-
         $this->setHeaders();
         $this->setParams();
         $this->setBody();
@@ -155,10 +151,7 @@ class Request
      */
     public function setParams(array $params = null)
     {
-        if (null === $params) {
-            $params = $_REQUEST;
-        }
-        $this->params = $params;
+        $this->params = null === $params ? $_REQUEST : $params;
     }
 
     public function getParams()
@@ -265,10 +258,9 @@ class Request
 
     public function setBody($body = null)
     {
-        if (null === $body) {
-            $body = file_get_contents($this->bodyStream);
-        }
-        $this->body = $body;
+        $this->body = null === $body
+            ? file_get_contents($this->bodyStream)
+            : $body;
     }
 
     public function hasBody()

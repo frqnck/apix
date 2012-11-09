@@ -22,9 +22,8 @@ try {
          * Some documentation...
          *
          * @return array  The array to return to the client
-         * @api_auth    admin
-         * @api_cache   tags=tag1,tag2,tag3
-         *              clean=tag9,tag10
+         * @api_auth    groups=admin users=franck
+         * @api_cache   ttl=5min tags=tag1,tag2,tag3,v1 flush=tag9,tag10
          */
         function($id) use ($api) {
             $params = $api->request->getBody();
