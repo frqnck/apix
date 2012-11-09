@@ -5,16 +5,9 @@ namespace Apix;
 /**
  * Apix Router class
  *
- * @example     $rules = array('/resource/:keyname/:id' => array('controller'=>'aController', 'action'=>'anAction'));
+ * @example     $rules = array('/resource/:keyname/:id' => array('controller'=>'someController', 'action'=>'someAction'));
  *              $router = Router($rules);
  *              $router->init( $_SERVER['REQUEST_URI'] ); // execute router
- *
- * @todo    maybe add a regex parser
- *          $r = array(
- *            '@^/resource/[\w-]+/list/(.+)/$@i' =>
- *            '@^/resource/[\w-]+/list/$@i'
- *            '@^/resource/[\w-]+/$@i'
- *          );
  */
 class Router
 {

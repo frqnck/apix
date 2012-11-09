@@ -2,7 +2,7 @@
 
 namespace Apix;
 
-class Services //extends Config
+class Services
 {
 
     public static function get($key=null)
