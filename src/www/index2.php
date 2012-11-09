@@ -132,6 +132,6 @@ try {
     // Apix\d( Apix\Config::getInstance()->getRoutes() );
 
 } catch (\Exception $e) {
-    Apix\Exception::startupException($e);
+    Exception::startupException($e);
 }
 exit;
