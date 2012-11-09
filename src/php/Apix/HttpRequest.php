@@ -51,11 +51,15 @@ class HttpRequest extends Request
     public static function getFormat($context)
     {
         switch (true) {
-            // 'application/json'
+            // text/html
+            case (strstr($context, '/html')):
+                return 'html';
+
+            // application/json
             case (strstr($context, '/json')):
                 return 'json';
 
-            // 'text/xml', 'application/xml'
+            // text/xml, application/xml
             case (strstr($context, '/xml')
                 && (!strstr($context, 'html'))):
                 return 'xml';

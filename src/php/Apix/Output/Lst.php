@@ -3,7 +3,7 @@ namespace Apix\Output;
 
 use Apix\Output\Adapter;
 
-class Html extends Adapter
+class Lst extends Adapter
 {
 
     /**
@@ -27,7 +27,7 @@ class Html extends Adapter
 
     protected function _recursivelyAppend(array $results)
     {
-        $out = 'to template<ul>';
+        $out = '<ul>';
         foreach ($results as $k => $v) {
             $out .= "<li>$k: ";
             $out .= is_array($v) ? $this->_recursivelyAppend($v, $k) : $v;
