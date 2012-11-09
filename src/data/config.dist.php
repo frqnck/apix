@@ -11,7 +11,7 @@
 namespace Apix;
 
 // Define the DEBUG constant. Should be set to false in production.
-if(!defined('DEBUG')) define('DEBUG', true);
+if(!defined('DEBUG')) define('DEBUG', false);
 
 $c = array(
 
@@ -83,7 +83,8 @@ $c = array(
         // some headers/footers templates, CSS...
         // - PHP: Does not currently serialize the data as one would expect but
         // just dump the output array for now.
-        'formats'           => array('json', 'xml', 'jsonp', 'html', 'php'),
+        // - LST: Output a HTML unordored/bulleted list.
+        'formats'           => array('json', 'xml', 'jsonp', 'html', 'php', 'lst'),
 
         // Set the defaut output format to either JSON or XML. Note that JSON
         // encoding is by definition UTF-8 only. If a specific encoding is
