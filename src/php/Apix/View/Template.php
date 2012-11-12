@@ -28,22 +28,6 @@ abstract class Template
 	abstract public function render(ViewModel $view);
 
     /**
-     * Returns the template engine object.
-     *
-     * Returns the object instance, as it is its own template engine
-     *
-     * @return Template
-     */
-	static final public function getEngine($name=null)
-	{
-		if(null !== $name) {
-			Template::setEngine($name);
-		}
-
-		return new Template::$engine;
-	}
-
-    /**
      * Sets the template engine object.
      *
      * Returns the object instance, as it is its own template engine
@@ -62,6 +46,21 @@ abstract class Template
 		Template::$engine = $class;
 	}
 
+    /**
+     * Returns the template engine object.
+     *
+     * Returns the object instance, as it is its own template engine
+     *
+     * @return Template
+     */
+	static final public function getEngine($name=null)
+	{
+		if(null !== $name) {
+			Template::setEngine($name);
+		}
+
+		return new Template::$engine;
+	}
 
 	/**
 	 * Sets the name of the template layout.
@@ -72,39 +71,5 @@ abstract class Template
 	{
 		$this->layout = $layout;
 	}
-
-
-
-	/**
-	 * Template directory.
-	 */
-	public static $dir = 'templates';
-
-	/**
-	 * Template extension.
-	 */
-	public static $ext = null;
-
-	// /**
-	//  * Template file path.
- // 	 *
-	//  * @protected
-	//  */
-	// protected $path = null;
-
-
-	// *
-	//  * Create new instance.
-	//  *
-	//  * @param string Filename
- // 	 * @return void
-
-	// public function __construct($path = null)
-	// {
-	// 	if ($path !== NULL) {
-	// 		$this->path($path);
-	// 	}
-	// }
-
 
 }
