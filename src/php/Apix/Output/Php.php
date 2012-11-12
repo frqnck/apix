@@ -1,18 +1,15 @@
 <?php
 namespace Apix\Output;
 
-use Apix\Output\Adapter;
-
-class Php extends Adapter
+class Php extends AbstractOutput
 {
 
     /**
-     * Holds the media type for the output.
-     * @var string
+     * {@inheritdoc}
      * @see http://www.ietf.org/rfc/rfc2046.txt
      * @see http://www.ietf.org/rfc/rfc3676.txt
       */
-    public $contentType = 'text/plain';
+    protected $content_type = 'text/plain';
 
     /**
      * {@inheritdoc}
