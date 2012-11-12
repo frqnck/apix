@@ -5,7 +5,14 @@ define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
 define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
 define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
 
+// phix
 require_once APP_LIBDIR . '/psr0.autoloader.php';
+
+// Composer
+define('APP_SRC', realpath(__DIR__ . '/..'));
+
+define('APP_VENDOR', realpath(__DIR__ . '/../../vendor'));
+require APP_VENDOR . '/autoload.php';
 
 psr0_autoloader_searchFirst(APP_LIBDIR);
 psr0_autoloader_searchFirst(APP_TESTDIR);
@@ -15,15 +22,30 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     $api = new Server;
 
-    $api->onRead('/test/:id<\d+>',
+    $api->onRead('/test/:id',
 
         /**
-         * A test...
-         * Some documentation...
+         * Some short name
+         * Some documentation for this test method.
          *
-         * @return array  The array to return to the client
+         * @param   integer $id Some description describing the parameter.
+         *                      Another line.
+         * @param   integer $test
+         * @return  array  Some infos about the returned data.
+         *
          * @api_auth    groups=admin users=franck
          * @api_cache   ttl=5min tags=tag1,tag2,tag3,v1 flush=tag9,tag10
+         * @see Check this document: <url>http://some_ref</url>
+         * @internal
+         * @example Consider the following example:
+         *          <pre>http://api.domain.tld/hello</pre>*WHAT*...
+         * @example test
+         * @see This is it....
+         * @copyright Zenya.com Ltd.
+         * @todo test ttest
+         * @ignore
+         * @toc Some title for toc
+         * @id myId
          */
         function($id) use ($api) {
             $params = $api->request->getBody();

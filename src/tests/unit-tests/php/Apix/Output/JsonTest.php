@@ -21,7 +21,13 @@ class OutputJsonTest extends \PHPUnit_Framework_TestCase
      */
     public function testContentTypeIsNull()
     {
-        $this->json->contentType = null;
+        $class = new \ReflectionClass($this->json);
+        $prop = $class->getProperty('content_type');
+        $prop->setAccessible(true);
+        $ct = $prop->getValue($this->json);
+        $this->assertEquals('application/json', $ct);
+        
+        $prop->setValue($this->json, null);
         $this->json->getContentType();
     }
 

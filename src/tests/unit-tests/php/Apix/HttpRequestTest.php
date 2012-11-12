@@ -58,7 +58,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('jsonp', $req->getAcceptFormat());
         $this->assertEquals('xml', $req->getAcceptFormat());
         $this->assertEquals('xml', $req->getAcceptFormat());
-        $this->assertEquals(false, $req->getAcceptFormat());
+        $this->assertEquals('html', $req->getAcceptFormat());
     }
 
     /**
