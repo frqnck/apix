@@ -1,17 +1,14 @@
 <?php
 namespace Apix\Output;
 
-use Apix\Output\Adapter;
-
-class Lst extends Adapter
+class Lst extends AbstractOutput
 {
 
     /**
-     * Holds the media type for the output.
-     * @var string
+     * {@inheritdoc}
      * @see http://www.ietf.org/rfc/rfc2854.txt
      */
-    public $contentType = 'text/html';
+    protected $content_type = 'text/html';
 
     /**
      * {@inheritdoc}

@@ -92,7 +92,7 @@ class Compiler
 
         $this->addFile($phar, new \SplFileInfo($root . '/LICENSE.txt'), false);
         $this->addFile($phar, new \SplFileInfo($root . '/README.md'), false);
-        #$this->addFile($phar, new \SplFileInfo($root . '/src/data/config.dist.php'), false);
+        #$this->addFile($phar, new \SplFileInfo($root . '/src/data/distribution/config.dist.php'), false);
 
         if ( ! $latest_git = trim(exec('git log --pretty="%h %ci" -n1 HEAD')) ) {
             throw new \RuntimeException('The git binary cannot be found.');
