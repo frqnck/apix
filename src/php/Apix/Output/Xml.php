@@ -1,27 +1,30 @@
 <?php
 namespace Apix\Output;
 
-use Apix\Output\Adapter;
-
-class Xml extends Adapter
+class Xml extends AbstractOutput
 {
 
     /**
-     * Holds the media type for the output.
-     * @var string
+     * {@inheritdoc}
      * @see http://www.ietf.org/rfc/rfc3023.txt
      */
-    public $contentType = 'text/xml';
+    protected $content_type = 'text/xml';
 
     /**
      * @var	string
      */
-    protected $encoding = 'utf-8'; #'iso-8859-1';
+    #protected $encoding = 'iso-8859-1';
+    protected $encoding = 'utf-8';
 
     /**
      * @var	\SimpleXMLElement
      */
-    protected $xml;
+    private $xml = null;
+
+    /**
+     * @var string
+     */
+    private $item_key = 'item';
 
     /**
      * {@inheritdoc}
@@ -50,9 +53,9 @@ class Xml extends Adapter
     protected function arrayToXml(\SimpleXMLElement $xml, array $array)
     {
         foreach ($array as $k => $v) {
-            // replace numeric index key to 'item' e.g. <results<item>...</item></results>
+            // replace numeric index key to 'item' e.g. <results><item>...</item></results>
             if (is_int($k)) {
-                $k = 'item';
+                $k = $this->item_key;
             }
 
             if (is_array($v)) {

@@ -1,18 +1,16 @@
 <?php
 namespace Apix\Output;
 
-use Apix\Output\Adapter;
 use Apix\Output\Json;
 
-class Jsonp extends Adapter
+class Jsonp extends AbstractOutput
 {
 
     /**
-     * Holds the media type for the output.
-     * @var string
+     * {@inheritdoc}
      * @see http://www.rfc-editor.org/rfc/rfc4329.txt
      */
-    public $contentType = 'application/javascript';
+    protected $content_type = 'application/javascript';
 
     /**
      * {@inheritdoc}

@@ -117,18 +117,18 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     public function testGetStatusPrases()
     {
         // short
-        $this->assertSame('OK', $this->response->getStatusPrases());
-        $this->assertSame('Unauthorized', $this->response->getStatusPrases(401));
+        $this->assertSame('OK', Response::getStatusPrases(200));
+        $this->assertSame('Unauthorized', Response::getStatusPrases(401));
 
         // long
-        $this->assertSame('The request has succeeded.', $this->response->getStatusPrases(null, true));
-        $this->assertSame('Not Authenticated.', $this->response->getStatusPrases(401, true));
+        $this->assertSame('The request has succeeded.', Response::getStatusPrases(200, true));
+        $this->assertSame('Not Authenticated.', Response::getStatusPrases(401, true));
     }
 
     public function testGetStatusAdjective()
     {
-        $this->assertSame('successful', $this->response->getStatusAdjective());
-        $this->assertSame('failed', $this->response->getStatusAdjective(401));
+        $this->assertSame('successful', Response::getStatusAdjective());
+        $this->assertSame('failed', Response::getStatusAdjective(401));
     }
 
     public function testCollate()
@@ -168,12 +168,13 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('debug', $results);
     }
 
-    public function testGenerateAsHtml()
+    public function testGenerateAsLst()
     {
-        $this->response->setFormat('html', 'default');
+        $this->response->setFormats(array('lst'));
+        $this->response->setFormat('lst', 'default');
         $results = array('results');
 
-        // maybe use Apix\Output\Html::validate($str);
+        // maybe use Apix\Output\Lst::validate($str);
         if (extension_loaded('tidy')) {
             $html = "<ul>
   <li>root:
