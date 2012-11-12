@@ -5,36 +5,37 @@ namespace Apix\Resource;
 use Apix\Entity,
     Apix\Server,
     Apix\Request,
-    Apix\Router;
+    Apix\Router,
+    Apix\View\ViewModel;
 
-/**
- * Help resource
- *
- * The Help resource provides in-line referencial to the API resources and methods.
- * By specify a resource and method you can narrow down to specific section.
- * @cacheable true
- */
 class Help
 {
-    public $doc_nodeName = 'documentation';
-
     // only use in verbose mode.
     public $private_nodeName = 'verbose';
 
     /**
-     * Outputs help info for a resource path.
+     * Display the manual of a resource entity
      *
-     * Filters can be use to narrow down to a specified method.
+     * This resource entity provides in-line referencial to all the API resources and methods.
+     * By specify a resource and method you can narrow down to specific section.
      *
-     * @param  Server $server  The main server object.
-     * @param  array  $filters An array of filters.
-     * @return array
-     * @see     self::onHelp
+     * @param  string $path     A string of characters used to identify a resource.
+     * @param  array  $filters  Filters can be use to narrow down the resultset.
      *
-     * @api_link    GET /help/path/to/entity
+     * @example <pre>GET /help/path/to/entity</pre>
+     * @id help
+     * @usage The OPTIONS method represents a request for information about the
+     * communication options available on the request/response chain
+     * identified by the Request-URI. This method allows the client to determine
+     * the options and/or requirements associated with a resource,
+     * or the capabilities of a server, without implying a resource action or
+     * initiating a resource retrieval.
+     * @see <pre>http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2</pre>
      */
     public function onRead(Server $server, array $filters=null)
     {
+        $this->route = $server->getRoute();
+
         $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
         if (!empty($path) && $server->resources->has($path)) {
             $server->getRoute()->setName($path);
@@ -44,7 +45,7 @@ class Help
     }
 
     /**
-     * Outputs help info for a resource entity.
+     * Outputs info for a resource entity.
      *
      * The OPTIONS method represents a request for information about the
      * communication options available on the request/response chain
@@ -53,7 +54,6 @@ class Help
      * or the capabilities of a server, without implying a resource action or
      * initiating a resource retrieval.
      *
-     * @link http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
      *
      * @param  Server $server  The main server object.
      * @param  array  $filters An array of filters.
@@ -64,10 +64,10 @@ class Help
      */
     public function onHelp(Server $server, array $filters=null)
     {
-        $route = $server->getRoute();
+        $this->route = $server->getRoute();
 
-        $entity = $route->getName() != '/' && $route->getName() != '/*'
-            ? $server->resources->get($route, false)
+        $entity = $this->route->getName() != '/' && $this->route->getName() != '/*'
+            ? $server->resources->get($this->route, false)
             : null;
 
         // returns the whole api doc.
@@ -81,7 +81,7 @@ class Help
             }
 
             // insures the top node is set to help.
-            $route->setController('help');
+            $this->route->setController('help');
 
             return $doc;
 
@@ -94,9 +94,9 @@ class Help
             //     return array('doc'=>'Todo: return all the resource doc as per CONTENT_LENGTH and/or TRANSFER_ENCODING');
             // }
 
-        } else {
-            // returns the specified entity doc.
-            return array($this->doc_nodeName => $this->getDocs($route->getName(), $entity, $filters));
+        } else { // returns the specified entity doc.
+            // return array($this->doc_nodeName => $this->getDocs($route->getName(), $entity, $filters));
+            return $this->getDocs($this->route->getName(), $entity, $filters);
         }
 
     }
@@ -114,22 +114,22 @@ class Help
         // $man = $this->getParam('resource');
         // $resource = Zenya_Api_Resource::getInternalAppelation($man);
         // $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
-        // $this->_output = $help->toArray();
+        // $this->view = $help->toArray();
 
         $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
 
-        $out = $entity->getDocs();
+        $method = $this->route->getMethod();
 
-        // unshift associatively (php sucks!)
-        $out = array_reverse($out, true);
-        $out['path'] =  $path;
-        $out = array_reverse($out, true);
+        $docs = $entity->getDocs($method);
+        $docs['method'] = $method;
+        $docs['path'] = $path;
 
         if ($verbose) {
-            $out[$this->private_nodeName] = 'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)';
+            $docs[$this->private_nodeName] = array(
+                'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)'
+            );
         }
-
-        return $out;
+        return $docs;
     }
 
 }

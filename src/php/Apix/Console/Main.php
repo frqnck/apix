@@ -65,7 +65,7 @@ class Main extends Console
             break;
 
             case '--extractdist': case '-e':
-                $src = $this->src . '/src/data/';
+                $src = $this->src . '/src/data/distribution/';
                 $dest = $_SERVER['PWD'];
                 try {
                     $it = new \DirectoryIterator($src);
