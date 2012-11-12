@@ -17,10 +17,10 @@ class Mustache extends Template
         $dir = APP_SRC . '/data/templates/html';
         $opts = array('extension' => '.ms');
         $this->defaultOptions = array(
-            'extension' => '.ms',
-            'loader'          => new \Mustache_Loader_FilesystemLoader($dir, $opts),
-            'partials_loader' => new \Mustache_Loader_FilesystemLoader($dir . '/partials', $opts),
-            'cache' => '/tmp/cache/mustache'
+            'extension'         => '.ms',
+            'loader'            => new \Mustache_Loader_FilesystemLoader($dir, $opts),
+            'partials_loader'   => new \Mustache_Loader_FilesystemLoader($dir . '/partials', $opts),
+            'cache'             => '/tmp/cache/mustache'
         );
 
         $this->options = $this->defaultOptions + $options;
