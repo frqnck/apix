@@ -13,7 +13,8 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "mustache/mustache": "v2.0.2"
+        "mustache/mustache": "v2.0.2",
+        "phly/mustache": "v1.2.0"
     },
 
     "autoload": {
