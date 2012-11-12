@@ -295,9 +295,9 @@ class Response
      * @param  bolean  $long
      * @return string
      */
-    public function getStatusPrases($http_code=null, $long=false)
+    static public function getStatusPrases($http_code=null, $long=false)
     {
-        $http_code = is_null($http_code) ? $this->http_code : $http_code;
+        //$http_code = is_null($http_code) ? $this->http_code : $http_code;
         $type = $long === true ? self::$long_http_phrases : self::$http_phrases;
         $status =  self::$http_phrases[$http_code];
 
@@ -312,10 +312,9 @@ class Response
      * @param  integer $http_code
      * @return string
      */
-    public function getStatusAdjective($http_code = null)
+    static public function getStatusAdjective($http_code = null)
     {
-        $http_code = is_null($http_code) ? $this->http_code : $http_code;
-
+        //$http_code = is_null($http_code) ? $this->http_code : $http_code;
         return floor($http_code/100)<=3 ? 'successful' : 'failed';
     }
 
@@ -334,7 +333,7 @@ class Response
                 'status'    => sprintf(
                                 '%d %s - %s',
                                 $this->getHttpCode(),
-                                $this->getStatusPrases(),
+                                self::getStatusPrases($this->http_code),
                                 $this->getStatusAdjective()
                             ),
                 'client_ip' => $this->request->getIp(true)
