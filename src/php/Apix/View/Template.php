@@ -2,22 +2,109 @@
 namespace Apix\View;
 
 use Apix\View\ViewModel;
+use Apix\View\Template as Template;
 
 abstract class Template
 {
 
 	/**
-	 * Default Template class.
+	 * Default template engine name.
+	 * @var  string
 	 */
-	public static $default_class = 'Apix\View\Template\Mustache';
+	public static $engine = 'Apix\View\Template\Mustache';
+
+	/**
+	 * The name of the template layout.
+     * @var string
+	 */
+	protected $layout = 'default';
+
+	/**
+	 * Renders the model view into the template layout.
+	 *
+	 * @param  ViewModel  $view
+	 * @abstract
+	 */
+	abstract public function render(ViewModel $view);
+
+    /**
+     * Returns the template engine object.
+     *
+     * Returns the object instance, as it is its own template engine
+     *
+     * @return Template
+     */
+	static final public function getEngine($name=null)
+	{
+		if(null !== $name) {
+			Template::setEngine($name);
+		}
+
+		return new Template::$engine;
+	}
+
+    /**
+     * Sets the template engine object.
+     *
+     * Returns the object instance, as it is its own template engine
+     *
+     * @return Template
+     */
+	static final public function setEngine($name=null)
+	{
+		$class = __NAMESPACE__ . '\\Template';
+		$class .= null === $name ? : '\\' . $name;
+		if(!class_exists($class)) {
+			throw new \RuntimeException(
+				sprintf('Template class "%s" does not exist.', $class)
+			);
+		}
+		Template::$engine = $class;
+	}
 
 
 	/**
-	 * Renders the model view into the template.
+	 * Sets the name of the template layout.
 	 *
-	 * @param  ViewModel  $model
-	 * @abstract
+	 * @param  string $layout
 	 */
-	abstract public function render(ViewModel $model);
+	public function setLayout($layout)
+	{
+		$this->layout = $layout;
+	}
+
+
+
+	/**
+	 * Template directory.
+	 */
+	public static $dir = 'templates';
+
+	/**
+	 * Template extension.
+	 */
+	public static $ext = null;
+
+	// /**
+	//  * Template file path.
+ // 	 *
+	//  * @protected
+	//  */
+	// protected $path = null;
+
+
+	// *
+	//  * Create new instance.
+	//  *
+	//  * @param string Filename
+ // 	 * @return void
+
+	// public function __construct($path = null)
+	// {
+	// 	if ($path !== NULL) {
+	// 		$this->path($path);
+	// 	}
+	// }
+
 
 }

@@ -1,9 +1,12 @@
+-
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
+  <title>
+    {{title}}{{^title}}#method_title{{/title}} -- {{id}}{{^id}}@id{{/id}}
+  </title>
   <meta http-equiv='content-type' value='text/html;charset=utf8'>
-  <title>{{title}}{{^title}}#method_title{{/title}} -- {{id}}{{^id}}@id{{/id}}</title>
-  <link href="{{basepath}}/css/apix.css" rel="stylesheet" />
+  <link href="{{ basepath }}/css/apix.css" rel="stylesheet" />
   <style type='text/css'>
     body {margin:0}
     #man, #man code, #man pre, #man tt, #man kbd, #man samp {
