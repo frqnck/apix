@@ -27,18 +27,13 @@ class Mustache extends Template
     }
 
     /**
-     * Renders a template using Mustache.php
-     *
-     * @see View::render()
-     * @param string $template The template name specified in Slim::render()
-     * @return string
+     * {@inheritdoc}
      */
     public function render(ViewModel $model)
     {
-        $template='layout';
         #$template = '<h1> {{title}} </h1> <ul> {{#sites}} <li> {{#url}} {{.}} {{/url}} </li> {{/sites}}  </ul>';
         $m = new \Mustache_Engine($this->options);
-        return $m->render($template, $model);
+        return $m->render($this->layout, $model);
     }
 
 }

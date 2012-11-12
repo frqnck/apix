@@ -38,7 +38,6 @@
         </ul>
     {{/usage}}
 
-
 {{#groups}}
     {{#.}}
       {{> group_definition}}
