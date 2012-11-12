@@ -1,15 +1,10 @@
 <?php
 namespace Apix\View;
 
-use Apix\View\ViewModel; 
+use Apix\View\ViewModel;
 
 class View
 {
-
-	/**
-	 * @var	Template
-	 */
-	protected $template;
 
 	/**
 	 * @var	ViewModel
@@ -17,18 +12,12 @@ class View
 	protected $model;
 
 	/**
-	 * Factory method.
-	 *
-	 * @param   mixed  
-	 * @param   mixed  
-	 * @return  self
+	 * @var	Template
 	 */
-	public static function factory($template = null, $model = null)
-	{
-		return new self($template, $model);
-	}
+	protected $template;
 
 	/**
+	 * Constructor.
 	 * Sets [Template] and [ViewModel]. If a string is passed as $template
 	 * then it will be used a the path to the template and a Template
 	 * instance will be created using [Template::$default_class].
@@ -37,20 +26,13 @@ class View
 	 * will be used to create a ViewModel instance and then the data will
 	 * be set on that object.
 	 *
-	 * @param   mixed  
-	 * @param   mixed  
+	 * @param   mixed
+	 * @param   mixed
 	 * @return  void
 	 */
-	public function __construct($template = null, $model = null)
+	public function __construct($model = null, $template = null)
 	{
-		if ($template !== null) {
-			if (is_string($template)) {
-//				$this->set_filename($template);
-			} else if ($template instanceof Template) {
-				$this->template($template);
-			}
-		}
-
+		// sort out the view model.
 		if($model !== null) {
 			if (is_array($model)) {
 
@@ -61,6 +43,16 @@ class View
 				$this->model($model);
 			}
 		}
+
+		// deal with the template engine.
+		if ($template !== null) {
+			if (is_string($template)) {
+				$this->template()->setLayout($template);
+			} else if ($template instanceof Template) {
+				$this->template($template);
+			}
+		}
+
 	}
 
 	// todo
@@ -68,11 +60,10 @@ class View
 	{
 		$key = key($model);
 		ViewModel::$default_key = $key;
-		
+
 		$class = ViewModel::$default_class . '\\' . ucfirst($key);
-		
 		if(class_exists($class)) {
-			ViewModel::$default_class = ViewModel::$default_class . '\\' . ucfirst($key);
+			ViewModel::$default_class = $class;
 		}
 
 		$this->model()->set($model);
@@ -82,26 +73,26 @@ class View
 	 * Set/Get Template. If getting and no template is set then
 	 * we create an instance using [Template::$default_class].
 	 *
-	 * @param   Template  
+	 * @param   Template
 	 * @return  $this
 	 */
 	public function template(Template $template = null)
 	{
 		if ($template === null) {
+
 			if ($this->template === null) {
-				$class = Template::$default_class;
-				$this->template = new $class;
+				$this->template = Template::getEngine();
 			}
 
 			return $this->template;
 		}
 
 		$this->template = $template;
-		return $this;
+		#return $this;
 	}
 
 	/**
-	 * Get/Set [ViewModel]. If getting and no [ViewModel] set we then 
+	 * Get/Set [ViewModel]. If getting and no [ViewModel] set we then
 	 * create an instance using [ViewModel::$default_class].
 	 *
 	 * @param   ViewModel
@@ -128,22 +119,24 @@ class View
 	 * @param    mixed   Can be Template or string path to template
 	 * @return   string
 	 */
-	public function render($template = null)
+	public function render($layout = null)
 	{
-		if ($template instanceOf Template) {
-			$this->template($template);
-		} 
-		//else if (is_string($template))
-		// {
-		// 	$this->set_filename($template);
-		// }
-		//$this->model()->debug();
-		return (string) $this->template()->render( $this->model() );
+		if ($layout instanceOf Template) {
+			$this->template($layout);
+		} else if (is_string($layout)) {
+			$this->template()->setLayout($layout);
+		}
+		#$this->model()->debug();
+
+		return $this->template()->render( $this->model() );
 	}
 
+
 	/**
-	 * Magic method, render
+	 * Returns a string representaion of the view.
+	 * That magic method does not play nicely with exception so best avoided!
 	 *
+	 * @todo  depreciate this!!!
 	 * @return  string
 	 */
 	public function __toString()

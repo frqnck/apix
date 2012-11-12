@@ -1,5 +1,5 @@
 {
-    "hash": "76c8aea41b6e7e712961281cf4e32cb8",
+    "hash": "bcfbf4971021c51d5608b2020a63aeae",
     "packages": [
         {
             "name": "mustache/mustache",
@@ -40,6 +40,47 @@
             "homepage": "https://github.com/bobthecow/mustache.php",
             "keywords": [
                 "templating",
+                "mustache"
+            ]
+        },
+        {
+            "name": "phly/mustache",
+            "version": "1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/weierophinney/phly_mustache",
+                "reference": "1.2.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/weierophinney/phly_mustache/zipball/1.2.0",
+                "reference": "1.2.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "time": "2012-07-31 20:33:14",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-0": {
+                    "Phly": "library/"
+                }
+            },
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Matthew Weier O'Phinney",
+                    "email": "me@mwop.net",
+                    "homepage": "http://mwop.net/"
+                }
+            ],
+            "description": "PHP 5.3 Mustache Implementation",
+            "homepage": "http://wiki.github.com/weierophinney/phly_mustache/",
+            "keywords": [
                 "mustache"
             ]
         }
