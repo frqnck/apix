@@ -16,40 +16,6 @@ class ViewModel
 	 */
 	public static $default_class = 'Apix\View\ViewModel';
 
-/*
-	public function params()
-	{
-		$many = $this->hasMany('params');
-		return array(
-                'title' => $many ? 'Options' : 'Option',
-                'txt'   => $many
-                			? 'The following options are available:'
-                			: 'The following option is available:',
-                'items' => array_values($this->params)
-        );
-	}
-
-	// deals with groups definitions
-	public function groups()
-	{
-        $skip = array('internal', 'id', 'toc'); // ignore
-        $titles = array(
-            'return'    => 'Return',
-            'example'   =>  $this->hasMany('example') ? 'Examples' : 'Examples',
-            'copyright' => 'Copyright',
-            'see'       => 'See Also',
-            'todo'		=> 'TODO'
-        );
-        $groups = array();
-        foreach($titles as $key => $title) {
-            if(isset($this->{$key})) {
-                $groups[] = array('title' => $title, 'items' => (array) $this->{$key});
-            }
-        }
-        return $groups;
-    }
-*/
-
 	/**
 	 * Assigns a property.
 	 *
@@ -69,7 +35,7 @@ class ViewModel
 	{
 		if (is_array($mix)) {
 			$mix = isset($mix[self::$default_key])
-					? $mix[self::$default_key] 
+					? $mix[self::$default_key]
 					: array();
 
 			foreach ($mix as $name => $value) {
@@ -103,7 +69,7 @@ class ViewModel
 
 	/* generic helpers */
 
-    public function hasMany($name) 
+    public function hasMany($name)
     {
     	if(isset($this->{$name})) {
 	        return count($this->{$name})>1 ? true : false;
@@ -118,5 +84,5 @@ class ViewModel
         print_r($data);
         echo '</pre>';
     }
-	
+
 }

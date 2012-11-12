@@ -20,9 +20,15 @@ class Html extends AbstractOutput
      */
     public function encode(array $data, $rootNode=null)
     {
-        return $this->validate(
-            View::factory(null, $data)
-        );
+        $view = new View($data);
+        $html = $view->render('layout');
+
+        return $this->validate($html);
+
+        // _toString doesn't handle exception!!!!
+        // return $this->validate(
+        //
+        // );
     }
 
     protected function validate($html)

@@ -11,7 +11,7 @@
 namespace Apix;
 
 // Define the DEBUG constant. Should be set to false in production.
-if(!defined('DEBUG')) define('DEBUG', false);
+if(!defined('DEBUG')) define('DEBUG', true);
 
 $c = array(
 
