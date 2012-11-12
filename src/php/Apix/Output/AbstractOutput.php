@@ -6,14 +6,14 @@ namespace Apix\Output;
  *
  * @author Franck Cassedanne <fcassedanne@info.com>
  */
-abstract class Adapter
+abstract class AbstractOutput
 {
 
     /**
      * Holds the media type for the output.
      * @var string
      */
-    protected $contentType = null;
+    protected $content_type = null;
 
     /**
      * Encode an array of data.
@@ -25,18 +25,18 @@ abstract class Adapter
     abstract public function encode(array $data, $rootNode='root');
 
     /**
-     * Returns the current mime/media/content type.
+     * Returns the content-type.
      *
      * @return  string
      * @throws  \RuntimeException If [self::contentType === null]
      */
     public function getContentType()
     {
-        if (null === $this->contentType) {
+        if (null === $this->content_type) {
             throw new \RuntimeException('Content-Type missing from this implementation.');
         }
 
-        return $this->contentType;
+        return $this->content_type;
     }
 
 }

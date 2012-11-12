@@ -1,41 +1,28 @@
 <?php
 namespace Apix\Output;
 
-use Apix\Output\Adapter;
+use Apix\View\Template,
+    Apix\View\View,
+    Apix\View\ViewModel,
+    Apix\Model;
 
-class Html extends Adapter
+class Html extends AbstractOutput
 {
 
     /**
-     * Holds the media type for the output.
-     * @var string
+     * {@inheritdoc}
      * @see http://www.ietf.org/rfc/rfc2854.txt
      */
-    public $contentType = 'text/html';
+    protected $content_type = 'text/html';
 
     /**
      * {@inheritdoc}
      */
-    public function encode(array $data, $rootNode='root')
+    public function encode(array $data, $rootNode=null)
     {
         return $this->validate(
-            $this->_recursivelyAppend(
-                array($rootNode => $data)
-            )
+            View::factory(null, $data)
         );
-    }
-
-    protected function _recursivelyAppend(array $results)
-    {
-        $out = 'to template<ul>';
-        foreach ($results as $k => $v) {
-            $out .= "<li>$k: ";
-            $out .= is_array($v) ? $this->_recursivelyAppend($v, $k) : $v;
-            $out .= '</li>';
-        }
-        $out .= '</ul>';
-
-        return $out;
     }
 
     protected function validate($html)
@@ -63,3 +50,4 @@ class Html extends Adapter
     }
 
 }
+
