@@ -1,10 +1,10 @@
 <?php
 namespace Apix\Listener;
 
-class Auth extends AbstractListener
+class Auth extends AbstractListenerEntity
 {
 
-    public $annotation = 'api_auth';
+    protected $annotation = 'api_auth';
 
     protected $options = array(
         'public_group'  =>  'public'     // name of the public group to skip.
@@ -30,7 +30,7 @@ class Auth extends AbstractListener
         $users = $this->getSubTagValues('users');
 
         // skip if groups and users are null, or public role group.
-        if( 
+        if(
             null === $groups || in_array($this->options['public_group'], $groups)
             && null !== $users
         ) {
