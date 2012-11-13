@@ -92,6 +92,9 @@ class EntityClosure extends Entity implements EntityInterface
         foreach ($this->getActions() as $key => $func) {
           $ref = $this->reflectedFunc($key);
           $docs['methods'][$key] = Reflection::parsePhpDoc($ref); // <----------------------- TODO (required args)
+
+            // temp
+          $docs['methods'][$key]['method'] = $key;
         }
 
         return $docs;
