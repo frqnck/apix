@@ -5,6 +5,18 @@ use Apix\View\ViewModel;
 
 class Help extends ViewModel
 {
+
+    // -- Shared
+    public $help_path = 'http://zenya.dev/index2.php/api/v1/help';
+
+    // -- Shared
+
+    public function __construct()
+    {
+#        echo '<pre>';print_r($this->params);exit;
+    }
+
+
     public function getFullToc()
     {
         return array(
@@ -47,7 +59,7 @@ class Help extends ViewModel
 	// deals with groups definitions
 	public function groups()
 	{
-        $ignore = array('internal', 'id', 'toc', 'todo');
+        $ignore = array('internal', 'id', 'toc', 'todo', 'method');
         $titles = array(
             'return'    => 'Return',
             'example'   =>  $this->hasMany('example') ? 'Examples' : 'Example',
@@ -57,7 +69,9 @@ class Help extends ViewModel
         );
         $groups = array();
         foreach($titles as $key => $title) {
-            if(isset($this->{$key})) {
+            if(isset($this->{$key})
+                #&& !in_array($key, $ignore)
+            ) {
                 $groups[] = array('title' => $title, 'items' => (array) $this->{$key});
             }
         }
