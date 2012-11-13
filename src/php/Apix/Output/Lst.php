@@ -15,10 +15,8 @@ class Lst extends AbstractOutput
      */
     public function encode(array $data, $rootNode='root')
     {
-        return $this->validate(
-            $this->_recursivelyAppend(
-                array($rootNode => $data)
-            )
+        return $this->_recursivelyAppend(
+            array($rootNode => $data)
         );
     }
 
@@ -33,30 +31,6 @@ class Lst extends AbstractOutput
         $out .= '</ul>';
 
         return $out;
-    }
-
-    protected function validate($html)
-    {
-        if (extension_loaded('tidy')) {
-            $tidy = new \tidy();
-            $conf = array(
-                // PHP Bug: commenting out 'indent' (with true or false)
-                // for some weird reason does chnage the Transfer-Encoding!
-                'indent'			=> true,
-                'tidy-mark'			=> false,
-                'clean'				=> true,
-                'output-xhtml'		=> false,
-                'show-body-only'	=> true,
-            );
-            $tidy->parseString($html, $conf, 'UTF8');
-            $tidy->cleanRepair();
-
-            $html = $tidy->value; // with DOCTYPE
-            #return $tidy->html()->value;
-            #return tidy_get_output($tidy);
-        }
-
-        return $html;
     }
 
 }
