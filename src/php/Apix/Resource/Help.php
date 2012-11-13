@@ -61,35 +61,32 @@ class Help
      *
      * @api_link    OPTIONS /path/to/entity
      * @api_link    OPTIONS /*
+     * @private 1
      */
     public function onHelp(Server $server, array $filters=null)
     {
         $this->route = $server->getRoute();
 
         $entity = $this->route->getName() != '/' && $this->route->getName() != '/*'
+            && $this->route->getPath() != '/help'
             ? $server->resources->get($this->route, false)
             : null;
 
         // returns the whole api doc.
         if (null === $entity) {
 
-
             $docs = array();
             foreach ($server->resources->toArray() as $path => $entity) {
                 if (!$entity->hasRedirect()) {
                     #$doc[$path] = $this->getDocs($entity, $filters);
-                    $docs['items'][] = $this->getDocs($path, $entity, $filters);
+                    $docs['items'][] = $this->getDocs(null, $path, $entity, $filters);
                 }
             }
-
-
 
             // insures the top node is set to help.
             $this->route->setController('help');
 
-echo '<pre>';print_r($docs);exit;
-
-            return $docs;
+            $docs['_layout'] = 'toc';
 
             // // set Content-Type (negotiate or default)
             // if(
@@ -102,20 +99,26 @@ echo '<pre>';print_r($docs);exit;
 
         } else { // returns the specified entity doc.
             // return array($this->doc_nodeName => $this->getDocs($route->getName(), $entity, $filters));
-            return $this->getDocs($this->route->getName(), $entity, $filters);
+            $docs = $this->getDocs(
+                $server->request->getParam('method'), $this->route->getName(), $entity, $filters
+            );
+
+            $docs['_layout'] = 'help';
         }
 
+        return $docs;
     }
 
     /**
      * Get an entity documentaion.
      *
+     * @param  string          $method       The Request-method for that entity.
      * @param  string          $path         The Request-URI for that entity.
      * @param  EntityInterface $entity       An Entity object.
      * @param  array           $filters=null An array of filters.
      * @return array           The array documentation.
      */
-    protected function getDocs($path, Entity $entity, array $filters=null)
+    protected function getDocs($method, $path, Entity $entity, array $filters=null)
     {
         // $man = $this->getParam('resource');
         // $resource = Zenya_Api_Resource::getInternalAppelation($man);
@@ -124,22 +127,37 @@ echo '<pre>';print_r($docs);exit;
 
         $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
 
-        // # JUST ONE
-        $method = $this->route->getMethod();
-        $docs = $entity->getDocs($method);
-        $docs['method'] = $method;
+        if(null == $method) {
+            $docs = $entity->getDocs();
+            $docs['methods'] = $this->c($docs['methods'], 'method');
+        } else {
+            $docs = $entity->getDocs($method);
+            #$docs['method'] = $method;
+        }
+
         $docs['path'] = $path;
 
 
-        #echo '<pre>';print_r($docs);exit;
-
+//echo '<pre>';print_r($docs);exit;
 
         if ($verbose) {
             $docs[$this->private_nodeName] = array(
                 'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)'
             );
         }
+
         return $docs;
+    }
+
+    function c(array $a, $name='key')
+    {
+        foreach($a as $k => $k) {
+            $a[$k][$name] = $k;
+            $a[] =  $a[$k];    
+            unset($a[$k]);          
+
+        }
+        return $a;
     }
 
 }
