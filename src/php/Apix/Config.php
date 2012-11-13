@@ -2,7 +2,7 @@
 
 namespace Apix;
 
-class Config #extends \Pimple
+class Config #extends Di
 {
     public $config = array();
 
@@ -161,6 +161,7 @@ class Config #extends \Pimple
      */
     public function retrieve($type, $key=null)
     {
+        // TODO: will optimise this...
         $config = isset($this->config['default'][$type])
                     ? $this->config[$type]+$this->getDefault($type)
                     : $this->config[$type];
@@ -170,7 +171,7 @@ class Config #extends \Pimple
         } elseif (isset($config[$key])) {
             return $config[$key];
         }
-       throw new \RuntimeException( sprintf('"%s" does not exists in %s.', $key, $type) );
+       throw new \RuntimeException( sprintf('"%s" does not exists in "%s".', $key, $type) );
     }
 
     /**

@@ -39,9 +39,7 @@ class Xml extends AbstractOutput
         $xml = new \SimpleXMLElement($str);
         $this->arrayToXml($xml, $data);
 
-        return $this->validate(
-            $xml->asXML()
-        );
+        return $xml->asXML();
     }
 
     /**
@@ -83,35 +81,6 @@ class Xml extends AbstractOutput
                 );
             }
         }
-    }
-
-    /**
-     * Sanitize
-     *
-     * @param  string $xml
-     * @return string
-     */
-    protected function validate($xml)
-    {
-        if (extension_loaded('tidy')) {
-            $tidy = new \tidy();
-            $conf = array(
-                #'clean_output'  => false, // tocheck, 
-                'clean'			=> true,
-                'input-xml'		=> true,
-                'output-xml'	=> true,
-                'indent'		=> true, // TODO: check possible issue/bug here!
-                'wrap'			=> 80,
-            );
-            $tidy->parseString($xml, $conf);
-            $tidy->cleanRepair();
-
-            $xml = $tidy->value; // output with a DOCTYPE
-            #$xml = $tidy->html()->value;
-            #$xml = tidy_get_output($tidy);
-        }
-
-        return $xml;
     }
 
 }
