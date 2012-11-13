@@ -7,8 +7,7 @@ use Apix\Listener,
     Apix\Entity\EntityInterface;
 
 /**
- * Represents a resource.
- *
+ * Represents a resource entity.
  */
 class Entity extends Listener
 {
@@ -22,9 +21,10 @@ class Entity extends Listener
     );
 
     /**
-     * Holds the output of the resource entity.
+     * Holds the results of the resource entity.
+     * @var  array
      */
-    protected $output = null;
+    protected $results = null;
 
     /**
      * Appends the given array definition and apply generic mappings.
@@ -49,11 +49,11 @@ class Entity extends Listener
      */
     public function call()
     {
-        if(null === $this->output) {
-            $this->output = $this->underlineCall($this->route);
+        if(null === $this->results) {
+            $this->results = $this->underlineCall($this->route);
         }
 
-        return $this->output;
+        return $this->results;
     }
 
     /**
@@ -233,5 +233,5 @@ class Entity extends Listener
           ? $doc[$name]
           : null;
     }
-    
+
 }

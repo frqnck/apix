@@ -1,15 +1,15 @@
 <?php
 namespace Apix\Listener;
 
-class Cache extends AbstractListener
+class Cache extends AbstractListenerEntity
 {
     protected $annotation = 'api_cache';
-        
+
     protected $options = array(
         'enable'    => true,        // Wether to enable caching at all.
         'ttl'       => '10mins',    // null stands forever.
         'flush'     => true,        // flush tags each time (e.g. cron job instead).
-        'tags'      => array('v1'), // default tag(s) to append. TODO!
+        'tags'      => array(),     // default tag(s) to append ech time.
     );
 
     /**
@@ -45,7 +45,7 @@ class Cache extends AbstractListener
             || null === $entity->getAnnotationValue($this->annotation)){
             return false;
         }
-        $this->entity = $entity;
+        #$this->entity = $entity;
 
         $this->flushAnnotatedTags( $this->options['flush'] );
 

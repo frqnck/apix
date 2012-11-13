@@ -2,7 +2,12 @@
 
 namespace Apix;
 
-class Response
+Use Apix\Entity\EntityInterface;
+
+/**
+ * Represents a response.
+ */
+class Response extends Listener
 {
 
     /**
@@ -25,16 +30,22 @@ class Response
     protected $encoding = 'UTF-8';
 
     /**
-     * Holds the arrays of HTTP headers
+     * Holds the arrays of HTTP headers.
      * @var  array
      */
     protected $headers = array();
 
     /**
-     * Holds the current HTTP Code
+     * Holds the current HTTP Code.
      * @var  string
      */
     protected $http_code = 200;
+
+    /**
+     * Holds the current output.
+     * @var  string
+     */
+    public $output = null;
 
     /**
      * Associative array of HTTP phrases.
@@ -153,9 +164,10 @@ class Response
      * Sets the output format.
      *
      * @param  string           $format
+     * @param  string           $default
      * @throws \DomainException 406
      */
-    public function setFormat($format, $default)
+    public function setFormat($format, $default=null)
     {
         $format = is_null($format) ? $default : $format;
         if (!in_array(strtolower($format), $this->getFormats())) {
@@ -352,10 +364,14 @@ class Response
                     'output_format' =>  $this->getFormat(),
                     'router_params' =>  $route->getParams(),
                     // plugins?
-                    'memory'        =>  round(memory_get_usage() / (1024 * 1024), 2) . 'MB max. ' . 
+                    'memory'        =>  round(memory_get_usage() / (1024 * 1024), 2) . 'MB max. ' .
                                         round(memory_get_peak_usage() / (1024 * 1024), 2) . 'MB',
-                    'time'          =>  round(microtime(true) - APIX_START_TIME, 3) . ' seconds',
             );
+
+            if(defined('APIX_START_TIME')) {
+                $r['debug']['time'] = round(microtime(true) - APIX_START_TIME, 3) . ' seconds';
+            }
+
             // TEMP: just a shortcut cannot be trusted.
             if(isset($_SERVER['X_AUTH_USER'])) $r['debug']['user'] = $_SERVER['X_AUTH_USER'];
         }
@@ -378,7 +394,32 @@ class Response
         $this->setHeader('Content-Type', $output->getContentType());
         $this->sendAllHttpHeaders($this->getHttpCode(), $version_string);
 
-        return $output->encode($this->collate($route, $results), $rootNode);
+        $this->output = $output->encode($this->collate($route, $results), $rootNode);
+
+        // attach the late listeners @ post-processing stage
+        $this->addAllListeners('response', 'late');
+
+        return $this->output;
+    }
+
+    /**
+     * Returns the response output.
+     *
+     * @return string
+     */
+    public function getOutput()
+    {
+        return $this->output;
+    }
+
+    /**
+     * Sets the response output.
+     *
+     * @param string $string
+     */
+    public function setOutput($string)
+    {
+        $this->output = $string;
     }
 
 }
