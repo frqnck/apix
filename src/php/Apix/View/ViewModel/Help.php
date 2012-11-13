@@ -5,17 +5,11 @@ use Apix\View\ViewModel;
 
 class Help extends ViewModel
 {
+    //public $_layout = 'help';
 
     // -- Shared
     public $help_path = 'http://zenya.dev/index2.php/api/v1/help';
-
     // -- Shared
-
-    public function __construct()
-    {
-#        echo '<pre>';print_r($this->params);exit;
-    }
-
 
     public function getFullToc()
     {
@@ -31,11 +25,11 @@ class Help extends ViewModel
 	{
 		$many = $this->hasMany('params');
 		return array(
-                'title' => $many ? 'Options' : 'Option',
-                'txt'   => $many
-                			? 'The following options are available:'
-                			: 'The following option is available:',
-                'items' => array_values($this->params)
+            'title' => $many ? 'Options' : 'Option',
+            'txt'   => $many
+            			? 'The following options are available:'
+            			: 'The following option is available:',
+            'items' => array_values($this->params)
         );
 	}
 
