@@ -99,6 +99,9 @@ class EntityClass extends Entity implements EntityInterface
           if ( $key = array_search($method->name, $actions) ) {
             $docs['methods'][$key] =
                 Reflection::parsePhpDoc( $method );
+
+            // temp
+            #$docs['methods'][$key]['method'] = $key;
           }
         }
 

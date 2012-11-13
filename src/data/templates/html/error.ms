@@ -1,7 +1,4 @@
 {{> header}}
-
-<h1>Error {{code}}</h1>
-
-<p>{{message}}</p>
-
+    <h1>Thsi is an error page</h1>
+    {{> help}}
 {{> footer}}

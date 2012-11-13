@@ -69,7 +69,4 @@
   <li class='tr'>Sandbox</li>
 </ol>
 
-    <header>
-        <p class="center">API v1 Manual
-        </p>
-    </header>
+    <header><center>page title?</center></header>

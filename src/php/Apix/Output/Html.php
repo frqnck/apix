@@ -21,9 +21,9 @@ class Html extends AbstractOutput
     public function encode(array $data, $rootNode=null)
     {
         $view = new View($data);
-        $html = $view->render('layout');
+        $html = $view->render('help');
 
-        return $this->validate($html);
+        return $html;
 
         // _toString doesn't handle exception!!!!
         // return $this->validate(
@@ -31,29 +31,4 @@ class Html extends AbstractOutput
         // );
     }
 
-    protected function validate($html)
-    {
-        if (extension_loaded('tidy')) {
-            $tidy = new \tidy();
-            $conf = array(
-                // PHP Bug: commenting out 'indent' (with true or false)
-                // for some weird reason does chnage the Transfer-Encoding!
-                'indent'			=> true,
-                'tidy-mark'			=> false,
-                'clean'				=> true,
-                'output-xhtml'		=> false,
-                'show-body-only'	=> true,
-            );
-            $tidy->parseString($html, $conf, 'UTF8');
-            $tidy->cleanRepair();
-
-            $html = $tidy->value; // with DOCTYPE
-            #return $tidy->html()->value;
-            #return tidy_get_output($tidy);
-        }
-
-        return $html;
-    }
-
 }
-
