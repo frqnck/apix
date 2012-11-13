@@ -21,9 +21,7 @@ class Html extends AbstractOutput
     public function encode(array $data, $rootNode=null)
     {
         $view = new View($data);
-        $html = $view->render('help');
-
-        return $html;
+        return $view->render();
 
         // _toString doesn't handle exception!!!!
         // return $this->validate(

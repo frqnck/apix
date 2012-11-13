@@ -125,8 +125,11 @@ class View
 			$this->template($layout);
 		} else if (is_string($layout)) {
 			$this->template()->setLayout($layout);
+		} else {
+			$layout = $this->model()->getLayout();
+			$this->template()->setLayout($layout);
 		}
-		#$this->model()->debug();
+		// $this->model()->debug();
 
 		return $this->template()->render( $this->model() );
 	}
