@@ -71,17 +71,7 @@ try {
          *
          * @api_auth    groups=admin users=franck
          * @api_cache   ttl=5min tags=tag1,tag2,tag3,v1 flush=tag9,tag10
-         * @see Check this document: <url>http://some_ref</url>
-         * @internal
-         * @example Consider the following example:
-         *          <pre>http://api.domain.tld/hello</pre>*WHAT*...
-         * @example test
-         * @see This is it....
-         * @copyright Zenya.com Ltd.
-         * @todo test ttest
-         * @ignore
-         * @toc Some title for toc
-         * @id myId
+         * @toc The title for toc (overide).
          */
         function($id) use ($api) {
             $params = $api->request->getBody();

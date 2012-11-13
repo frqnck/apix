@@ -1,6 +1,6 @@
 <h2>Name</h2>
   <p>
-    {{title}}{{^title}}<def>#method_title</def>{{/title}}
+    {{toc}}{{title}}{{^title}}<def>#method_title</def>{{/title}}
     {{#id}}-- {{id}}{{/id}}{{^id}}-- <def>@id</def>{{/id}}
   </p>
 
@@ -28,14 +28,12 @@
         </ol>
     {{/usage}}
     {{^usage}}
-        <ul>
-            <li><coda>
-                    <b class="uppercase">{{method}}{{^method}}<def>XXX</def>{{/method}}</b>
-                    {{path}}{{^path}}<def>/default-path</def>{{/path}}
-                </coda>
-                e.g. <i>http://www.ouarz.net/api/v2{{path}}{{^path}}<def>/default-path</def>{{/path}}</i>
-            </li>
-        </ul>
+        <p><coda>
+            <b class="uppercase">{{method}}{{^method}}<def>XXX</def>{{/method}}</b>
+            {{path}}{{^path}}<def>/default-path</def>{{/path}}
+        </coda>
+        e.g. <i>http://www.ouarz.net/api/v2{{path}}{{^path}}<def>/default-path</def>{{/path}}</i>
+        </p>
     {{/usage}}
 
 {{#groups}}

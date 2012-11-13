@@ -76,6 +76,11 @@ class ViewModel
     	}
     }
 
+    public function getLayout()
+    {
+    	return $this->_layout;
+    }
+
     public function debug($data=null)
     {
     	$data = null !== $data ? $data : $this;
