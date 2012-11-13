@@ -198,7 +198,7 @@ $c['resources'] = array(
 
     // Handles GET /help/path/to/resource
     '/help/:path' => array(
-        'redirect' => 'OPTIONS',
+        'redirect' => 'OPTIONS'
     ),
 
     // As per RFC2616 section 9.2
