@@ -314,7 +314,10 @@ $c['listeners'] = array(
         ),
         'late' => array(),
     ),
-    'response' => array(),
+    'response' => array(
+        'early' => array(),
+        'late'  => array('Apix\Listener\Tidy'),
+    ),
 );
 
 
@@ -323,7 +326,21 @@ $c['listeners'] = array(
 ///////////////////////////////////////////////////////////////
 
 $c['default'] = array(
-    'listeners' => array(),
+    'listeners' => array(
+        'server' => array(
+            'early' => array(),
+            'late' => array(),
+            'exception' => array()
+        ),
+        'entity' => array(
+            'early' => array(),
+            'late' => array(),
+        ),
+        'response' => array(
+            'early' => array(),
+            'late'  => array()
+        )
+    ),
     'services' => array(),
     'resources' => array(
         // The OPTIONS method represents a request for information about the

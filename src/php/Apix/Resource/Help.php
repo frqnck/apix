@@ -72,18 +72,24 @@ class Help
 
         // returns the whole api doc.
         if (null === $entity) {
-            $doc = array();
+
+
+            $docs = array();
             foreach ($server->resources->toArray() as $path => $entity) {
                 if (!$entity->hasRedirect()) {
                     #$doc[$path] = $this->getDocs($entity, $filters);
-                    $doc[] = $this->getDocs($path, $entity, $filters);
+                    $docs['items'][] = $this->getDocs($path, $entity, $filters);
                 }
             }
+
+
 
             // insures the top node is set to help.
             $this->route->setController('help');
 
-            return $doc;
+echo '<pre>';print_r($docs);exit;
+
+            return $docs;
 
             // // set Content-Type (negotiate or default)
             // if(
@@ -118,11 +124,15 @@ class Help
 
         $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
 
+        // # JUST ONE
         $method = $this->route->getMethod();
-
         $docs = $entity->getDocs($method);
         $docs['method'] = $method;
         $docs['path'] = $path;
+
+
+        #echo '<pre>';print_r($docs);exit;
+
 
         if ($verbose) {
             $docs[$this->private_nodeName] = array(

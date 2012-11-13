@@ -1,11 +1,6 @@
 <?php
 namespace Apix\Output;
 
-/**
- * Interface for response output.
- *
- * @author Franck Cassedanne <fcassedanne@info.com>
- */
 abstract class AbstractOutput
 {
 
