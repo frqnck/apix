@@ -70,6 +70,7 @@ class Reflection
 
         $str = preg_replace($pattern, '', $doc);
 
+
        # $lines =array_map('trim',explode(PHP_EOL, $str));
 
         $lines = preg_split('@\r?\n|\r@', $str, null, PREG_SPLIT_NO_EMPTY);
@@ -80,7 +81,6 @@ class Reflection
         // extract the description
         $docs['description'] = '';
         foreach ($lines as $i => $line) {
-            // extract desc
             if (strlen(trim($line)) && strpos($line, '@') !== 0) {
                 $docs['description'] .= $docs['description'] ? PHP_EOL . $line : $line;
                 unset($lines[$i]);
@@ -98,6 +98,7 @@ class Reflection
                 preg_match('/(?P<type>\S+)\s+\$(?P<name>\S+)(?P<description>\s+(?:.+))?/', $v, $m);
 
                 $docs['params'][$m['name']] = array(
+                #$docs['params'][] = array(
                     'type'          => $m['type'],
                     'name'          => $m['name'],
                     'description'   => isset($m['description'])
@@ -112,6 +113,7 @@ class Reflection
                 $docs[$grp][] = $v;
             }
         }
+
 
         //reduce group
         foreach ($docs as $key => $value) {
