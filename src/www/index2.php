@@ -25,27 +25,23 @@ try {
     $api->onRead('/test/:id',
 
         /**
-         * GET /test/:id
-         * Some documentation for this test method.
+         * Read an entity id (title).
+         * Some documentation for this test method (description).
+         * fsdfs .asdas das
          *
          * @param   integer $id Some description describing the parameter.
-         *                      Another line.
-         * @param   integer $test
+         * @param   integer $testd Some documentation for this param
+         * @param   string $testd Some documentation for this param
+         * @param   array $tests Some documentation for this param
          * @return  array  Some infos about the returned data.
+         * @example Consider the following example: <pre>http://api.domain.tld/hello</pre>
+         * @see See this.
+         * @see Check this document: <url>http://some_ref</url>
+         * @todo test ttest
+         * @toc The toc entry (@toc).
          *
          * @api_auth    groups=admin users=franck
          * @api_cache   ttl=5min tags=tag1,tag2,tag3,v1 flush=tag9,tag10
-         * @see Check this document: <url>http://some_ref</url>
-         * @internal
-         * @example Consider the following example:
-         *          <pre>http://api.domain.tld/hello</pre>*WHAT*...
-         * @example test
-         * @see This is it....
-         * @copyright Zenya.com Ltd.
-         * @todo test ttest
-         * @ignore
-         * @toc Some title for toc
-         * @id myId
          */
         function($id) use ($api) {
             $params = $api->request->getBody();
