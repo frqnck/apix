@@ -47,6 +47,35 @@ class ViewModel
 		return $this;
 	}
 
+    public function get($key)
+    {
+        $v = is_array($this->{$key}) ?  $this->{$key} : (array) $this->{$key};
+        array_walk_recursive($v, function(&$v){$v=ViewModel::htmlizer($v);});
+        return $v;
+    }
+
+    static public function htmlizer(&$v)
+    {
+        $pattern = array(
+          '/((?:[\w\d]+\:\/\/)?(?:[\w\-\d]+\.)+[\w\-\d]+(?:\/[\w\-\d]+)*(?:\/|\.[\w\-\d]+)?(?:\?[\w\-\d]+\=[\w\-\d]+\&?)?(?:\#[\w\-\d]*)?)/', # URL
+          '/([\w\-\d]+\@[\w\-\d]+\.[\w\-\d]+)/', # Email
+          // '/\[([^\]]*)\]/', # Bold
+          // '/\{([^}]*)\}/', # Italics
+          // '/_([^_]*)_/', # Underline
+          '/\s{2}/', # Linebreak
+        );
+        $replace = array(
+          '<a href="$1">$1</a>',
+          '<a href="mailto:$1">$1</a>',
+          // '<b>$1</b>',
+          // '<i>$1</i>',
+          // '<u>$1</u>',
+            '<br />'
+        );
+        return preg_replace($pattern, $replace, $v);
+    }
+
+
 	/**
 	 * Assigns a value by reference. The benefit of binding is that values can
 	 * be altered without re-setting them. It is also possible to bind variables
@@ -69,14 +98,17 @@ class ViewModel
 
 	/* generic helpers */
 
-    public function hasMany($name)
+    public function hasMany($mix)
     {
-    	if(isset($this->{$name})) {
-	        return count($this->{$name})>1 ? true : false;
-    	}
+        if (is_string($mix) && isset($this->{$mix})) {
+            return count($this->{$mix})>1;
+    	} else if(is_array($mix)) {
+            return count($mix)>1;
+        }
+        return false;
     }
 
-    public function getLayout()
+    public function getViewLayout()
     {
     	return $this->_layout;
     }

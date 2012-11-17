@@ -5,7 +5,7 @@
     {{title}}{{^title}}#method_title{{/title}} -- {{id}}{{^id}}@id{{/id}}
   </title>
   <meta http-equiv='content-type' value='text/html;charset=utf8'>
-  <link href="{{ basepath }}/css/apix.css" rel="stylesheet" />
+  <link href="{{basepath}}/css/apix.css" rel="stylesheet">
   <style type='text/css'>
     body {margin:0}
     #man, #man code, #man pre, #man tt, #man kbd, #man samp {
@@ -20,7 +20,7 @@
     #man h2 { font-size:18px; margin-bottom:0; margin-top:10px; line-height:1.3; text-transform:uppercase}
     #man h3 { font-size:16px; margin:0 0 0 4ex; }
     #man p, #man ul, #man ol, #man dl, #man pre { margin:.1em 0 1em 0; }
-    #man pre, #man coda {
+    #man pre, #man .code {
       display:block;
       color:#333231;
       background:#edeceb;
@@ -34,9 +34,6 @@
       margin-top:5px;
     }
     #man > p, #man > ul, #man > ol, #man > dl, #man > pre { margin-left:7ex}
-    #man dt { margin:0; clear:left }
-    #man dt.flush { float:left; width:8ex }
-    #man dd { margin:0 0 0 9ex }
     #man code, #man strong, #man b { font-weight:bold; color:#131211; }
     #man pre code { font-weight:normal; color:#232221; background:inherit }
     #man em, var, u {
@@ -53,20 +50,42 @@
     #man ol.man a { color:#999 }
     #man ol.man a:hover { color:#333231 }
 
-    .uppercase {text-transform:uppercase}
-    .center {text-align:center}
-    def {color:red;}
+    #man dt { margin:0; clear:left }
+    #man dt.flush { float:left; width:8ex }
+    #man dd { margin:0 0 0 9ex }
+
+    #man table {
+      margin-left:7ex;
+      border-collapse:separate;
+      border-spacing:0px .6ex;
+
+    }
+    #man tr {
+      background:#edeceb;
+      margin:0px 0 20px 0;
+    }
+    #man td:first-child {
+      border-left:1.8ex solid #ddd;
+    }
+    #man td {
+      vertical-align:top;
+      min-width:3.5em;
+      padding:5px 7px;
+    }
+    #man td i {font-family:courrier}
+
+    #man .uppercase {text-transform:uppercase}
+    #man .center {text-align:center}
+    #man .default {color:red;}
   </style>
 </head>
 <body>
 <div id='man'>
 
-<h1 class='man-title'>{{title}}{{^title}}<def>#method_title</def>{{/title}}</h1>
+<h1 class='man-title'>{{title}}{{^title}}<span class="default">#method_title</span>{{/title}}</h1>
 
 <ol class='head man'>
   <li class='tl'>Home</li>
   <li class='tc'>API-V1 Manual</li>
   <li class='tr'>Sandbox</li>
 </ol>
-
-    <header><center>page title?</center></header>
