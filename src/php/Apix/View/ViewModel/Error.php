@@ -7,22 +7,24 @@ use Apix\View\ViewModel,
 class Error extends ViewModel
 {
 
+    protected $_layout = 'error';
+
     public $id = null;
 
     public function title()
     {
         return 'Error ' . $this->code;
-    } 
+    }
 
     public function id()
     {
         return Response::getStatusPrases($this->code, false);
-    } 
+    }
 
     public function description()
     {
         return Response::getStatusPrases($this->code, true);
-    } 
+    }
 
 	// deals with groups definitions
 	public function groups()

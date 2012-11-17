@@ -126,8 +126,9 @@ class View
 		} else if (is_string($layout)) {
 			$this->template()->setLayout($layout);
 		} else {
-			$layout = $this->model()->getLayout();
-			$this->template()->setLayout($layout);
+			$this->template()->setLayout(
+				$this->model()->getViewLayout()
+			);
 		}
 		// $this->model()->debug();
 
