@@ -1,6 +1,6 @@
 {{> header}}
 
-    <h1>TOC page</h1>
+    <h1>Table of Contents</h1>
 
 <h2>Introduction</h2>
 <p>This technical documentation describes how to use v1 of the API.</p>
