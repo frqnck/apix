@@ -5,49 +5,51 @@ use Apix\View\ViewModel;
 
 class Help extends ViewModel
 {
+    public function getViewLayout()
+    {
+        if(isset($_GET['debug'])) $this->debug();
+
+        switch(true) {
+            case isset($this->items):
+                return 'man_toc';
+            case isset($this->methods):
+                return 'man_group';
+            default:
+                return 'man_single';
+        }
+    }
+
+    public function params()
+    {
+       if(empty($this->params)) return null;
+       $params = isset($this->params) ? $this->params : array();
+
+        $many = $this->hasMany('params');
+        return array(
+            'title' => $many ? 'Options' : 'Option',
+            'txt'   => $many
+                    ? 'The following request parameters are available:'
+                    : 'The following request parameter is available:',
+            'items' => array_values($params)
+        );
+    }
+
+    public function _def()
+    {
+        return function($t) {
+            return '<span class="default">' . $t . '</span>';
+        };
+    }
+
     //public $_layout = 'help';
 
     // -- Shared
     public $help_path = 'http://zenya.dev/index2.php/api/v1/help';
     // -- Shared
 
-    public function getFullToc()
+    public function description()
     {
-        return array(
-            array('name'=>'test 1', 'url'=>'#1', 'on'=>true),
-            array('name'=>'test 2', 'url'=>'#2', 'on'=>true),
-            array('name'=>'test 3', 'url'=>'#3', 'on'=>true),
-        );
-    }
-
-    // deals with params definitions
-	public function params()
-	{
-		$many = $this->hasMany('params');
-		return array(
-            'title' => $many ? 'Options' : 'Option',
-            'txt'   => $many
-            			? 'The following options are available:'
-            			: 'The following option is available:',
-            'items' => array_values($this->params)
-        );
-	}
-
-    // deals with usage definitions
-    public function usage()
-    {
-        if(!isset($this->usage)) {
-            return null;
-        }
-
-        // if(is_array($this->usage)) {
-            // array_values($this->params)
-            return array('items' => array(
-                'method'    =>  'todo',
-        //         'path'      =>  '/hhh1',
-        //         'txt'       =>  $this->usage
-            ));
-        // }
+        return $this->get('description');
     }
 
 	// deals with groups definitions
@@ -58,17 +60,22 @@ class Help extends ViewModel
             'return'    => 'Return',
             'example'   =>  $this->hasMany('example') ? 'Examples' : 'Example',
             'copyright' => 'Copyright',
-            'see'       => 'See Also',
+            'see'       => 'See also',
             #'link'      => $this->hasMany('link') ? 'Links' : 'Link',
         );
         $groups = array();
+
         foreach($titles as $key => $title) {
             if(isset($this->{$key})
                 #&& !in_array($key, $ignore)
             ) {
-                $groups[] = array('title' => $title, 'items' => (array) $this->{$key});
+                $groups[] = array(
+                    'title' => $title,
+                    'items' => (array) $this->get($key)
+                );
             }
         }
+
         return $groups;
     }
 

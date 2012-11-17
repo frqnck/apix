@@ -314,10 +314,10 @@ $c['listeners'] = array(
         ),
         'late' => array(),
     ),
-    'response' => array(
-        'early' => array(),
-        'late'  => array('Apix\Listener\Tidy'),
-    ),
+    // 'response' => array(
+    //     #'early' => array(),
+    //     #'late'  => array('Apix\Listener\Tidy'),
+    // ),
 );
 
 
