@@ -20,7 +20,7 @@ class Tidy extends AbstractListener
             'clean'         => true
         ),
         'html'      => array(
-            'tidy-mark'     => false,
+            'tidy-mark'     => true,
         ),
         'xml'       => array(
             'input-xml'     => true,

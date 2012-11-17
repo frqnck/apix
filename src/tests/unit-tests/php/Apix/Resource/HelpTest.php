@@ -98,6 +98,7 @@ class HelpTest extends \PHPUnit_Framework_TestCase
 
     protected function genericTest($results)
     {
+        #print_r($results);exit;
         $this->assertSame('/create/:test', $results[2]['path']);
         #$this->assertArrayHasKey('POST', $results[2]['methods']);
 
