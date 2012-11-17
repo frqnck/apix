@@ -1,17 +1,19 @@
-<dl>
+{{#items.0}}
+<table>
   {{#items}}
-    <dt>
-      {{#type}}<i>{{type}}</i>{{/type}}
-      <code><var>{{name}}</var></code>
-      ({{#required}}required{{/required}}{{^required}}optional{{/required}})
-    </dt>
-    <dd>
-      {{#description}}<p>{{description}}</p>{{/description}}
-    </dd>
+  <tr>
+    <td>
+      <var><b>{{name}}</b></var>
+      <sup>{{#required}}*{{/required}}</sup>
+    </td>
+    <td>
+       {{#type}}<i>{{type}}</i>{{/type}}
+    </td>
+    <td>
+      {{#description}}{{description}}{{/description}}
+    </td>
+    </tr>
   {{/items}}
-  {{^items}}
-    <coda>
-      <def>@param undefined</def>
-    </coda>
-  {{/items}}
-</dl>
+</table>
+{{#items.0.required}}<p><sup><b>*</b></sup> indicates a required parameter.</p>{{/items.0.required}}
+{{/items.0}}

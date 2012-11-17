@@ -8,6 +8,10 @@ use Apix\Entity,
     Apix\Router,
     Apix\View\ViewModel;
 
+/**
+ * Help
+ * This resource entity provides in-line referencial to all the API resources and methods.
+*/
 class Help
 {
     // only use in verbose mode.
@@ -37,9 +41,15 @@ class Help
         $this->route = $server->getRoute();
 
         $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
-        if (!empty($path) && $server->resources->has($path)) {
+        if (
+            !empty($path)
+            && $server->resources->has($path)
+        ) {
             $server->getRoute()->setName($path);
         }
+        // else {
+        //     echo 'nno!';
+        // }
 
         return $this->onHelp($server, $filters);
     }
@@ -72,7 +82,7 @@ class Help
             ? $server->resources->get($this->route, false)
             : null;
 
-        // returns the whole api doc.
+        // TOC of all entities.
         if (null === $entity) {
 
             $docs = array();
@@ -86,7 +96,6 @@ class Help
             // insures the top node is set to help.
             $this->route->setController('help');
 
-            $docs['_layout'] = 'toc';
 
             // // set Content-Type (negotiate or default)
             // if(
@@ -97,13 +106,13 @@ class Help
             //     return array('doc'=>'Todo: return all the resource doc as per CONTENT_LENGTH and/or TRANSFER_ENCODING');
             // }
 
-        } else { // returns the specified entity doc.
+        // Manual for the specified entity doc.
+        } else {
             // return array($this->doc_nodeName => $this->getDocs($route->getName(), $entity, $filters));
+
             $docs = $this->getDocs(
                 $server->request->getParam('method'), $this->route->getName(), $entity, $filters
             );
-
-            $docs['_layout'] = 'help';
         }
 
         return $docs;
@@ -127,18 +136,14 @@ class Help
 
         $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
 
-        if(null == $method) {
+        if(null == $method || !$entity->hasMethod($method) ) {
             $docs = $entity->getDocs();
             $docs['methods'] = $this->c($docs['methods'], 'method');
         } else {
             $docs = $entity->getDocs($method);
-            #$docs['method'] = $method;
         }
 
         $docs['path'] = $path;
-
-
-//echo '<pre>';print_r($docs);exit;
 
         if ($verbose) {
             $docs[$this->private_nodeName] = array(
@@ -149,12 +154,14 @@ class Help
         return $docs;
     }
 
+
+    // model view!
     function c(array $a, $name='key')
     {
         foreach($a as $k => $k) {
             $a[$k][$name] = $k;
-            $a[] =  $a[$k];    
-            unset($a[$k]);          
+            $a[] =  $a[$k];
+            unset($a[$k]);
 
         }
         return $a;
