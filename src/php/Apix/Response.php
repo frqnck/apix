@@ -158,6 +158,9 @@ class Response extends Listener
 
         $this->sign = $sign;
         $this->debug = $debug;
+
+        // attach the early listeners @ post-processing stage
+        $this->addAllListeners('response', 'early');
     }
 
     /**
@@ -311,7 +314,7 @@ class Response extends Listener
     {
         //$http_code = is_null($http_code) ? $this->http_code : $http_code;
         $type = $long === true ? self::$long_http_phrases : self::$http_phrases;
-        $status =  self::$http_phrases[$http_code];
+        $status = self::$http_phrases[$http_code];
 
         return $long === true
             ? isset($type[$http_code]) ? $type[$http_code] : $http_code . ' ' . $status

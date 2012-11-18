@@ -39,7 +39,16 @@ class OutputJsonTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('{"r":[1,2]}', $json);
     }
 
+    public function testEncodeAsPerRfc4627()
+    {
+        $data = array('<>\'&"');
+        $json = $this->json->encode($data, 'r');
+
+        $this->assertEquals('{"r":["\u003C\u003E\u0027\u0026\u0022"]}', $json);
+    }
+
     /**
+     * TODO: SKIPPED for now!!!
      * @depends php54
      */
     public function testEncodeWithPhp54()
