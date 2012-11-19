@@ -25,12 +25,11 @@ class Streaming extends AbstractListener
         
         $this->callback = function() use ($response)
         {
-            ini_set("zlib.output_compression", 0);
+            ini_set('zlib.output_compression', 1);
             apache_setenv('no-gzip', '1');
 
-
             // while (ob_get_level()) {
-            //     ob_end_flush();
+                // ob_end_flush();
             // }
             if (ob_get_length() === false) {
                 ob_start();
