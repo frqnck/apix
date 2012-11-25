@@ -1,57 +1,8 @@
 <?php
 namespace Apix\Listener\Cache;
 
-class Apc implements Adapter
+class Apc extends AbstractCache
 {
-
-    protected $key_prefix;
-    protected $tag_prefix;
-
-    /**
-     * Constructor.
-     *
-     * @param string $key_prefix Prefix APC keys.
-     * @param string $tag_prefix Prefix APC keys to simulate tags.
-     */
-    public function __construct($key_prefix='[apixKey] ', $tag_prefix='[apixTag] ')
-    {
-        $this->key_prefix = $key_prefix;
-        $this->tag_prefix = $tag_prefix;
-    }
-
-    /**
-     * Returns a prefixed and sanitased cache id.
-     *
-     * @param  string $id The cache Id.
-     * @return string
-     */
-    public function mapKey($id)
-    {
-        return $this->sanitise($this->key_prefix . $id);
-    }
-
-    /**
-     * Returns a prefixed and sanitased cache tag.
-     *
-     * @param  string $tag The cache tag.
-     * @return string
-     */
-    public function mapTag($tag)
-    {
-        return $this->sanitise($this->tag_prefix . $tag);
-    }
-
-    /**
-     * Returns a sanitased string for id/tagging purpose.
-     *
-     * @param  string $id The string to sanitise.
-     * @return string
-     */
-    public function sanitise($id)
-    {
-        return $id; // Probably not required anymore!
-        // return str_replace(array('/', '\\', ' '), '_', $id);
-    }
 
     /**
      * {@inheritdoc}
@@ -70,7 +21,7 @@ class Apc implements Adapter
     {
         $id = $this->mapKey($id);
         $store = array();
-        // APC does not natively support tags so lets simulate.
+        // APC does not natively support tags so lets simulate, shall we.
         if(!empty($tags)) {
             foreach($tags as $tag) {
                 $tag = $this->mapTag($tag);
