@@ -96,16 +96,13 @@ class Server extends Listener
     */
     public function run()
     {
-        $c = Config::getInstance();
-
-        // set the routing
-        $this->setRouting(
-            $this->request,
-            $this->resources->toArray(),
-            $this->config['routing']
-        );
-
         try {
+            // set the routing
+            $this->setRouting(
+                $this->request,
+                $this->resources->toArray(),
+                $this->config['routing']
+            );
 
             // attach the early listeners @ pre-processing stage
             $this->addAllListeners('server', 'early');
@@ -123,7 +120,12 @@ class Server extends Listener
             );
 
             // set the error controller!
-            if ( !in_array($this->route->getController(), array_keys( $this->resources->toArray() )) ) {
+            if (
+                !in_array(
+                    $this->route->getController(),
+                    array_keys($this->resources->toArray())
+                )
+            ) {
                $this->route->setController('error');
                $this->results = $this->results['error'];
             }
@@ -205,10 +207,9 @@ class Server extends Listener
     */
     public function setRouting(Request $request, array $resources, array $opts=null)
     {
-        $path =
-            // Get path without the route prefix
-            isset($opts['path_prefix']) ? preg_replace($opts['path_prefix'], '', $request->getUri())
-            : $request->getUri();
+        $path = isset($opts['path_prefix'])
+                ? preg_replace($opts['path_prefix'], '', $request->getUri())
+                : $request->getUri();
 
         if ($path == '') {
             $path = '/';
@@ -228,17 +229,15 @@ class Server extends Listener
         $this->route = new Router(
             $resources,
             array(
-                'method'            => $request->getMethod(),
-                'path'              => $path,
-                #'controller_name'   => null,    // TODO: TEMP!?
-                #'controller_args'   => &$this,  // TODO: TEMP!?
-                'server'            => &$this
+                'method'    => $request->getMethod(),
+                'path'      => $path,
+                'server'    => & $this
             )
         );
 
         // Set the response format...
         if (null !== $opts) {
-            $this->negotiateFormat($opts, isset($ext)?$ext:false);
+            $this->negotiateFormat($opts, isset($ext) ? $ext : false);
         }
 
         $this->route->map($path, $request->getParams());
@@ -295,6 +294,13 @@ class Server extends Listener
             $this->response->setHeader('Vary', 'Accept');
         }
     }
+
+
+
+
+
+
+
 
 /* -- Closure prototyping  -- */
 

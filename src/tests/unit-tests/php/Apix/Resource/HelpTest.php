@@ -87,24 +87,23 @@ class HelpTest extends \PHPUnit_Framework_TestCase
             );
 
         $results = $this->help->onRead($this->api);
-        //$res = $results[$this->help];
 
         $this->assertArrayHasKey('path', $results);
 
-        $this->assertEquals(5, count($results));
-        #$this->assertArrayHasKey('GET', $res['methods']);
-        #$this->assertArrayHasKey('PATCH', $res['methods']);
+        $this->assertEquals(4, count($results));
+        $this->assertArrayHasKey('GET', $results['methods']);
+        $this->assertArrayHasKey('PATCH', $results['methods']);
     }
 
-    protected function genericTest($results)
+    protected function genericTest($items)
     {
-        #print_r($results);exit;
-        $this->assertSame('/create/:test', $results[2]['path']);
-        #$this->assertArrayHasKey('POST', $results[2]['methods']);
+        #print_r($items);exit;
+        $this->assertSame('/create/:test', $items[2]['path']);
+        #$this->assertArrayHasKey('POST', $items[2]['methods']);
 
-        $this->assertSame('/unit/:test', $results[3]['path']);
-        #$this->assertArrayHasKey('GET', $results[3]['methods']);
-        #$this->assertArrayHasKey('PATCH', $results[3]['methods']);
+        $this->assertSame('/unit/:test', $items[3]['path']);
+        #$this->assertArrayHasKey('GET', $items[3]['methods']);
+        #$this->assertArrayHasKey('PATCH', $items[3]['methods']);
     }
 
     public function testOnReadReturnsArrayForAllEntities()
@@ -114,9 +113,9 @@ class HelpTest extends \PHPUnit_Framework_TestCase
             ->will( $this->onConsecutiveCalls('/') );
 
         $results = $this->help->onRead($this->api);
-        $this->assertTrue( count($results)>1 );
 
-        $this->genericTest($results);
+        $this->assertTrue( count($results['items'])>1 );
+        $this->genericTest($results['items']);
     }
 
     public function testOnHelpRetrieveAllTheEntities()
@@ -127,7 +126,7 @@ class HelpTest extends \PHPUnit_Framework_TestCase
 
         $results = $this->help->onHelp($this->api);
 
-        $this->genericTest($results);
+        $this->genericTest($results['items']);
     }
 
     public function testVerboseOutput()

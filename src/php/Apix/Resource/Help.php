@@ -47,9 +47,6 @@ class Help
         ) {
             $server->getRoute()->setName($path);
         }
-        // else {
-        //     echo 'nno!';
-        // }
 
         return $this->onHelp($server, $filters);
     }
@@ -136,11 +133,15 @@ class Help
 
         $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
 
-        if(null == $method || !$entity->hasMethod($method) ) {
-            $docs = $entity->getDocs();
-            $docs['methods'] = $this->c($docs['methods'], 'method');
-        } else {
+        if(null !== $method || $entity->hasMethod($method) ) {
+
+            // get specified method.
             $docs = $entity->getDocs($method);
+
+        } else {
+
+            // get all docs.
+            $docs = $entity->getDocs();
         }
 
         $docs['path'] = $path;
@@ -152,19 +153,6 @@ class Help
         }
 
         return $docs;
-    }
-
-
-    // model view!
-    function c(array $a, $name='key')
-    {
-        foreach($a as $k => $k) {
-            $a[$k][$name] = $k;
-            $a[] =  $a[$k];
-            unset($a[$k]);
-
-        }
-        return $a;
     }
 
 }

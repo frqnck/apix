@@ -172,12 +172,16 @@ class Response extends Listener
      */
     public function setFormat($format, $default=null)
     {
-        $format = is_null($format) ? $default : $format;
-        if (!in_array(strtolower($format), $this->getFormats())) {
+        $format = strtolower($format);
+        if (!in_array($format, $this->getFormats())) {
             $this->format = strtolower($default);
-            throw new \DomainException("Format ({$format}) not supported.", 406); // maybe 404?
+            throw new \DomainException(
+                sprintf('Format (%s) not supported.', $format),
+                406 // maybe 404?
+            );
         }
-        $this->format = strtolower($format);
+
+        $this->format = $format;
     }
 
     /**
@@ -327,9 +331,8 @@ class Response extends Listener
      * @param  integer $http_code
      * @return string
      */
-    static public function getStatusAdjective($http_code = null)
+    static public function getStatusAdjective($http_code)
     {
-        //$http_code = is_null($http_code) ? $this->http_code : $http_code;
         return floor($http_code/100)<=3 ? 'successful' : 'failed';
     }
 
@@ -349,7 +352,7 @@ class Response extends Listener
                                 '%d %s - %s',
                                 $this->getHttpCode(),
                                 self::getStatusPrases($this->http_code),
-                                $this->getStatusAdjective()
+                                $this->getStatusAdjective($this->http_code)
                             ),
                 'client_ip' => $this->request->getIp(true)
             );

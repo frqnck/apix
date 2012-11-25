@@ -5,6 +5,16 @@ use Apix\View\ViewModel;
 
 class Help extends ViewModel
 {
+
+    // -- Shared
+    public $help_path = 'http://zenya.dev/index2.php/api/v1/help';
+    // -- Shared
+
+    /**
+     * Gets the view layout.
+     *
+     * @return string
+     */
     public function getViewLayout()
     {
         if(isset($_GET['debug'])) $this->debug();
@@ -19,10 +29,34 @@ class Help extends ViewModel
         }
     }
 
+    public function items()
+    {
+        // remove index key for mustashe.
+        // TODO: make this a view helper.
+        foreach($this->items as $item) {
+            foreach($item['methods'] as $k => $v) {
+                $item['methods'][$k]['method'] = $k;
+                $item['methods'][] = $item['methods'][$k];
+                unset($item['methods'][$k]);
+            }
+            $this->items[] = $item;
+        }
+
+        return $this->items;
+    }
+
+    /**
+     * Deals with parameter' definitions.
+     *
+     * @return array
+     */
     public function params()
     {
-       if(empty($this->params)) return null;
-       $params = isset($this->params) ? $this->params : array();
+        if(empty($this->params)) {
+            return null;
+        }
+
+        $params = isset($this->params) ? $this->params : array();
 
         $many = $this->hasMany('params');
         return array(
@@ -34,39 +68,26 @@ class Help extends ViewModel
         );
     }
 
-    public function _def()
-    {
-        return function($t) {
-            return '<span class="default">' . $t . '</span>';
-        };
-    }
-
-    //public $_layout = 'help';
-
-    // -- Shared
-    public $help_path = 'http://zenya.dev/index2.php/api/v1/help';
-    // -- Shared
-
-    public function description()
-    {
-        return $this->get('description');
-    }
-
-	// deals with groups definitions
+    /**
+     * Deals with group' definitions.
+     *
+     * @return array
+     */
 	public function groups()
 	{
-        $ignore = array('internal', 'id', 'toc', 'todo', 'method');
+        #$ignore = array('internal', 'id', 'toc', 'todo', 'method');
         $titles = array(
-            'return'    => 'Return',
-            'example'   =>  $this->hasMany('example') ? 'Examples' : 'Example',
-            'copyright' => 'Copyright',
-            'see'       => 'See also',
-            #'link'      => $this->hasMany('link') ? 'Links' : 'Link',
+            'return'        => 'Response',
+            'example'       => $this->hasMany('example') ? 'Examples' : 'Example',
+            'copyright'     => 'Copyright',
+            'see'           => 'See also',
+            'link'          => $this->hasMany('link') ? 'Links' : 'Link',
         );
         $groups = array();
 
         foreach($titles as $key => $title) {
-            if(isset($this->{$key})
+            if(
+                isset($this->{$key})
                 #&& !in_array($key, $ignore)
             ) {
                 $groups[] = array(
@@ -77,6 +98,18 @@ class Help extends ViewModel
         }
 
         return $groups;
+    }
+
+    /**
+     * _def - view helper.
+     *
+     * @return string
+     */
+    public function _def()
+    {
+        return function($t) {
+            return '<span class="default">' . $t . '</span>';
+        };
     }
 
 }
