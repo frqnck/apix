@@ -6,10 +6,10 @@ class Cache extends AbstractListenerEntity
     protected $annotation = 'api_cache';
 
     protected $options = array(
-        'enable'    => true,        // Wether to enable caching at all.
-        'ttl'       => '10mins',    // null stands forever.
-        'flush'     => true,        // flush tags each time (e.g. cron job instead).
-        'tags'      => array(),     // default tag(s) to append ech time.
+        'enable'    => true,      // wether to enable caching at all
+        'ttl'       => '10mins',  // null stands forever
+        'flush'     => true,      // wether to flush tags at runtime (cron job?)
+        'tags'      => array(),   // tags to append everytime time e.g. v1, dev
     );
 
     /**
@@ -18,11 +18,14 @@ class Cache extends AbstractListenerEntity
      * @param Cache\Adapter $adapter
      * @param array $options Array of options.
      */
-    public function __construct(Cache\Adapter $adapter, array $options=array())
+    public function __construct(Cache\Adapter $adapter, array $options=null)
     {
         $this->adapter = $adapter;
-        $this->options = $options+$this->options;
-    }
+
+        if(null !== $options) {
+            $this->options = $options+$this->options;
+        }
+   }
 
     /**
      * Flush the tags explicitly
