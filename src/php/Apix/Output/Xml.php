@@ -11,76 +11,52 @@ class Xml extends AbstractOutput
     protected $content_type = 'text/xml';
 
     /**
-     * @var	string
+     * @var string
      */
-    #protected $encoding = 'iso-8859-1';
-    protected $encoding = 'utf-8';
+    protected $version = '1.0';
 
     /**
-     * @var	\SimpleXMLElement
+     * @var	string
      */
-    private $xml = null;
+    protected $encoding = 'UTF-8';
 
     /**
      * @var string
      */
-    private $item_key = 'item';
+    protected $item_key = 'item';
 
     /**
+     * @var string
+     */
+    protected $items_key = 'items';
+
+    /**
+     * Factory encoder.
+     * @codeCoverageIgnore
      * {@inheritdoc}
      */
-    public function encode(array $data, $rootNode="root")
+    public function encode(array $data, $rootNode='root')
     {
-        $str = sprintf('<?xml version="1.0" encoding="%s"?><%s />',
-            $this->encoding,
-            $rootNode
-        );
-
-        $xml = new \SimpleXMLElement($str);
-        $this->arrayToXml($xml, $data);
-
-        return $xml->asXML();
+        if (true && extension_loaded('xmlwriter')) {
+            $xml = new Xml\XmlWriter;
+        } else {
+            // SimpleXml is a default PHP extension
+            $xml = new Xml\SimpleXml;
+        }
+        return $xml->encode($data, $rootNode);
     }
 
     /**
-     * Array to XML conversion
+     * Converts a boolean value to its string representation.
      *
-     * @param \SimpleXMLElement $xml
-     * @param array             $array
+     * @param  mixed $var
+     * @return string|mixed String Either 'True', 'False' as string or the initial value as is.
      */
-    protected function arrayToXml(\SimpleXMLElement $xml, array $array)
+    public function booleanString($var)
     {
-        foreach ($array as $k => $v) {
-            // replace numeric index key to 'item' e.g. <results><item>...</item></results>
-            if (is_int($k)) {
-                $k = $this->item_key;
-            }
-
-            if (is_array($v)) {
-
-                // @codeCoverageIgnoreStart
-                // Attributes needs to be reviewd!!!
-                #if ($k == '@attributes') {
-                #    foreach ($v as $k => $v) {
-                #        $xml->addAttribute($k, $v);
-                #    }
-                // @codeCoverageIgnoreStart
-                #} else {
-                    $child = $xml->addChild($k);
-                    $this->arrayToXml($child, $v);
-                #}
-            } else {
-                // $xml->addAttribute(
-                //     $k,
-                //     htmlspecialchars($v, ENT_QUOTES, $this->encoding)
-                // )
-                $xml->addChild(
-                    $k,
-                    htmlspecialchars($v, ENT_QUOTES, $this->encoding)
-                    #htmlentities($v, ENT_NOQUOTES, $this->encoding)
-                );
-            }
-        }
+        return is_bool($var)
+                ? ($var ? 'True' : 'False')
+                : $var;
     }
 
 }
