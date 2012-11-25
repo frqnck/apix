@@ -34,6 +34,7 @@ class Redis extends AbstractCache
         $id = $this->mapKey($id);
 
 		$bool = $redis->setex($id, $ttl, $data);
+		
 		if(!empty($tags) && $bool) {
 			$redis = $this->adapter->multi($this->options['atomicity']);
 
@@ -56,15 +57,25 @@ class Redis extends AbstractCache
 
 			foreach($tags as $tag) {
 				$tag = $this->mapTag($tag);
-				
 				$items = $this->adapter->sMembers($tag);
-				foreach ($items as $item) {
-					$redis->del($item);
-				}
-				$redis->del($tag);
+				$items[] = $tag;
+				$count = $redis->del($items);
 			}
 			$redis->exec();
+
+	    	return $count ? true : false;
     	}
+
     }
 
-} 
+    /**
+     * {@inheritdoc}
+     */
+    public function delete($id)
+    {
+		$id = $this->mapKey($id);
+
+		return $this->adapter->del($id) ? true : false;
+    }
+
+}
