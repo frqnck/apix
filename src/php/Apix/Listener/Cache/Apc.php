@@ -17,7 +17,7 @@ class Apc extends AbstractCache
     /**
      * {@inheritdoc}
      */
-    public function save($data, $id, array $tags=null, $ttl=0)
+    public function save($data, $id, array $tags=null, $ttl=null)
     {
         $id = $this->mapKey($id);
         $store = array();
@@ -35,7 +35,8 @@ class Apc extends AbstractCache
             }
         }
         $store[$id] = $data;
-        return apc_store($store, null, $ttl);
+
+        return !in_array(false, apc_store($store, null, $ttl));
     }
 
     /**
@@ -70,6 +71,24 @@ class Apc extends AbstractCache
         $id = $this->mapKey($id);
 
         return apc_delete($id);
+    }
+
+
+    function expire($key)
+    {
+        $caches = apc_cache_info('user');
+        if (!empty($caches['cache_list'])) {
+            foreach ($caches['cache_list'] as $cache) {
+                if ($cache['info'] != $key)
+                    continue;
+
+                return $cache['ttl'] == 0
+                        ? 0
+                        : $cache['creation_time']+$cache['ttl'];
+            }
+        }
+
+        return false;
     }
 
 }
