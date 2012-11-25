@@ -17,52 +17,39 @@ class Streaming extends AbstractListener
         #$this->options = $options+$this->options;
     }
 
+    static public function ob()
+    {
+        apache_setenv('no-gzip', '1');
+        // ini_set('zlib.output_compression', 0);
+
+        while (ob_get_level()) {
+            ob_end_flush();
+        }
+        if (ob_get_length() === false) {
+            ob_start();
+        }
+    }
+
     public function update(\SplSubject $response)
     {
         if ($this->streamed) {
             return;
         }
-        
+
         $this->callback = function() use ($response)
         {
-            ini_set('zlib.output_compression', 1);
-            apache_setenv('no-gzip', '1');
-
-            // while (ob_get_level()) {
-                // ob_end_flush();
-            // }
-            if (ob_get_length() === false) {
-                ob_start();
-            }
-
             header('Content-type: text/html; charset=utf-8');
             echo 'Begin ...<br>';
 
             for( $i = 0 ; $i < 10 ; $i++ )
             {
-                echo $i . '<br>';
+                echo $i . '<hr>';
                 ob_flush();
                 flush();
                 sleep(1);
             }
+            sleep(1);
             echo 'End ...<br />';
-            exit;
-
-            return;
-
-            // This example reads from stdin and processes characters one by one
-            $fd = fopen("file:///tmp/test.txt", "r");
-            while ( !feof($fd) )
-            {
-                // read chars one at a time
-                $char = fread($fd, 1);
-
-                // and process everything but newlines
-                if ($char && $char != "\n")
-                    echo $char;
-            }
-
-            echo '----CB-- ' . $response->getOutput();
             exit;
         };
 

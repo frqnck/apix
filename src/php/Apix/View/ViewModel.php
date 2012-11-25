@@ -3,6 +3,10 @@ namespace Apix\View;
 
 use Apix\View\ViewModel as Model;
 
+/**
+ * Model View ViewModel (MVVM)
+ * @see  http://en.wikipedia.org/wiki/Model_View_ViewModel
+ */
 class ViewModel
 {
 
@@ -54,25 +58,19 @@ class ViewModel
         return $v;
     }
 
-    static public function htmlizer(&$v)
+    static public function htmlizer($string)
     {
         $pattern = array(
           '/((?:[\w\d]+\:\/\/)?(?:[\w\-\d]+\.)+[\w\-\d]+(?:\/[\w\-\d]+)*(?:\/|\.[\w\-\d]+)?(?:\?[\w\-\d]+\=[\w\-\d]+\&?)?(?:\#[\w\-\d]*)?)/', # URL
-          '/([\w\-\d]+\@[\w\-\d]+\.[\w\-\d]+)/', # Email
-          // '/\[([^\]]*)\]/', # Bold
-          // '/\{([^}]*)\}/', # Italics
-          // '/_([^_]*)_/', # Underline
-          '/\s{2}/', # Linebreak
+          '/([\w\-\d]+\@[\w\-\d]+\.[\w\-\d]+)/', # email
+          '/\s{2}/', # line break
         );
         $replace = array(
-          '<a href="$1">$1</a>',
-          '<a href="mailto:$1">$1</a>',
-          // '<b>$1</b>',
-          // '<i>$1</i>',
-          // '<u>$1</u>',
+            '<a href="$1">$1</a>',
+            '<a href="mailto:$1">$1</a>',
             '<br />'
         );
-        return preg_replace($pattern, $replace, $v);
+        return preg_replace($pattern, $replace, $string);
     }
 
 

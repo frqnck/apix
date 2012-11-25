@@ -16,25 +16,52 @@ class OutputXmlTest extends \PHPUnit_Framework_TestCase
         unset($this->xml);
     }
 
-    public function testEncode()
+    public function assertXml($str, $xml)
     {
-        $data = array(1, 2);
-        $xml = $this->xml->encode($data, 'r');
+        $this->assertEquals(
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+            . PHP_EOL . $str . PHP_EOL,
+            $xml
+        );
+    }
 
-        $this->assertEquals("<?xml version=\"1.0\" encoding=\"utf-8\"?>".PHP_EOL.'<r><item>1</item><item>2</item></r>'.PHP_EOL, $xml);
+    public function testContentIsSet()
+    {
+        $this->assertEquals(
+            'text/xml',
+            $this->xml->getContentType()
+        );
     }
 
     /**
-     * @covers Apix\Output\Xml::arrayToXml
+     * @expectedException   \RuntimeException
      */
-    public function testEncodeAttributes()
+    public function testContentTypeIsNull()
     {
-        $this->markTestIncomplete('TODO: testEncodeAttributes');
+        $ref = new \ReflectionClass($this->xml);
+        $prop = $ref->getProperty('content_type');
+        $prop->setAccessible(true);
+        $prop->setValue($this->xml, null);
+        $this->xml->getContentType();
+    }
 
-        // todo
-        $data = array('@attributes'=>'vattributes');
-        $xml = $this->xml->encode($data, 'r');
-        print_r($xml);exit;
+    public function testBooleanString()
+    {
+        $this->assertEquals(
+            'True', $this->xml->booleanString(true)
+        );
+        $this->assertEquals(
+            'False', $this->xml->booleanString(false)
+        );
+        $this->assertEquals(
+            0, $this->xml->booleanString(0)
+        );
+        $this->assertEquals(
+            1, $this->xml->booleanString(1)
+        );
+        $this->assertEquals(
+            -1, $this->xml->booleanString(-1)
+        );
     }
 
 }
