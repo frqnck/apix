@@ -43,19 +43,33 @@ class Apc extends AbstractCache
      */
     public function clean(array $tags=null)
     {
-        // APC does not natively support tags so lets simulate.
         if(!empty($tags)) {
+            $rmed = array();
+            // APC does not natively support tags so lets simulate.
             foreach($tags as $tag) {
                 $tag = $this->mapTag($tag);
                 $ids = apc_fetch($tag, $success);
                 if($success) {
                     foreach($ids as $id) {
-                        apc_delete($id);
+                        $rmed[] = apc_delete($id);
                     }
-                    apc_delete($tag);
+                    $rmed[] = apc_delete($tag);
                 }
             }
+            return in_array(false, $rmed);
         }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete($id)
+    {
+        $id = $this->mapKey($id);
+
+        return apc_delete($id);
     }
 
 }
