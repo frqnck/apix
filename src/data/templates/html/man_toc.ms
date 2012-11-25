@@ -11,7 +11,6 @@
 {{#items}}
 {{#methods}}
 {{#toc}}
-
     <li>
     	<a href='{{help_path}}{{path}}?method={{method}}' title="{{method}} {{path}}">
 			{{toc}}

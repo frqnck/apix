@@ -22,10 +22,10 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     $api = new Server;
 
-    $api->onRead('/test/:id',
+    $api->onRead('/test/:id<\d*>',
 
         /**
-         * Read an entity id (title).
+         * Read an enti2ty id (title).
          * Some documentation for this test method (description).
          * fsdfs .asdas das
          *
@@ -33,12 +33,13 @@ try {
          * @param   integer $testd Some documentation for this param
          * @param   string $testd Some documentation for this param
          * @param   array $tests Some documentation for this param
-         * @return  array  Some infos about the returned data.
          * @example Consider the following example: <pre>http://api.domain.tld/hello</pre>
          * @see See this.
          * @see Check this document: <url>http://some_ref</url>
          * @todo test ttest
          * @toc The toc entry (@toc).
+         *
+         * @return  boolean Indicates whether the action was successful.
          *
          * @api_auth    groups=admin users=franck
          * @api_cache   ttl=5min tags=tag1,tag2,tag3,v1 flush=tag9,tag10
@@ -48,13 +49,14 @@ try {
 
             return array(
                 'test'  => 'test',
+                'xml' =>array('&"\'<> ?|\\-_+=@£$€*/":;[]{}'),
                 'body'  => $api->request->getBody(),
                 //'params'    => $api->getBodyData()
             );
         }
     );
 
-    $api->onCreate('/test/:id',
+    $api->onRead('/test/me/:t',
 
         /**
          * POST /test/:id
@@ -69,14 +71,37 @@ try {
          * @api_cache   ttl=5min tags=tag1,tag2,tag3,v1 flush=tag9,tag10
          * @toc The title for toc (overide).
          */
-        function($id) use ($api) {
-            $params = $api->request->getBody();
+        function($t)
+        {
 
-            return array(
-                'test'  => 'test',
-                'body'  => $api->request->getBody(),
-                //'params'    => $api->getBodyData()
-            );
+$start = microtime(true);
+header('Cache-Control: no-cache, must-revalidate');
+header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+header('Content-type: text/xml');
+
+$x = new \XmlWriter();
+$x->openURI('php://output');
+$x->startDocument('1.0', 'utf-8');
+$x->startElement('Products');
+#$x->setIndent(true);
+for ($i = 0; $i < 10; $i++) {
+    $x->startElement('Word');
+    $x->writeAttribute('Id', $i);
+    $x->writeAttribute('Value', md5(uniqid()));
+    $x->endElement();
+}
+$x->endElement();
+$x->flush();
+
+// $stop = microtime(true);
+// $seconds = $stop - $start;
+// echo "Start: " . $start . PHP_EOL;
+// echo "Stop: " . $stop . PHP_EOL;
+// echo "Seconds: " . $seconds . PHP_EOL;
+// echo "Memory peak: " . memory_get_peak_usage() / 1048576 . 'MB' . PHP_EOL;
+
+            exit;
+            return $words;
         }
     );
 

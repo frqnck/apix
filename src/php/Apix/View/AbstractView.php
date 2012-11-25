@@ -1,7 +1,7 @@
 <?php
 namespace Apix\View;
 
-use Apix\View\ViewModel as ViewModel; 
+use Apix\View\ViewModel as ViewModel;
 
 class AbstractViewOff extends \ArrayObject
 {
