@@ -5,7 +5,7 @@ abstract class AbstractOutput
 {
 
     /**
-     * Holds the media type for the output.
+     * Holds the media-type .
      * @var string
      */
     protected $content_type = null;
@@ -23,12 +23,12 @@ abstract class AbstractOutput
      * Returns the content-type.
      *
      * @return  string
-     * @throws  \RuntimeException If [self::contentType === null]
+     * @throws  \RuntimeException If self::contentType === null
      */
     public function getContentType()
     {
         if (null === $this->content_type) {
-            throw new \RuntimeException('Content-Type missing from this implementation.');
+            throw new \RuntimeException('Missing a content-type.');
         }
 
         return $this->content_type;

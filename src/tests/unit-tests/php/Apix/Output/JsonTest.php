@@ -16,17 +16,22 @@ class OutputJsonTest extends \PHPUnit_Framework_TestCase
         unset($this->json);
     }
 
+    public function testContentIsSet()
+    {
+        $this->assertEquals(
+            'application/json',
+            $this->json->getContentType()
+        );
+    }
+
     /**
      * @expectedException   \RuntimeException
      */
     public function testContentTypeIsNull()
     {
-        $class = new \ReflectionClass($this->json);
-        $prop = $class->getProperty('content_type');
+        $ref = new \ReflectionClass($this->json);
+        $prop = $ref->getProperty('content_type');
         $prop->setAccessible(true);
-        $ct = $prop->getValue($this->json);
-        $this->assertEquals('application/json', $ct);
-        
         $prop->setValue($this->json, null);
         $this->json->getContentType();
     }
