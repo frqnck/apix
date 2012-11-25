@@ -45,7 +45,7 @@ class Cache extends AbstractListenerEntity
             || null === $entity->getAnnotationValue($this->annotation)){
             return false;
         }
-        #$this->entity = $entity;
+        $this->entity = $entity;
 
         $this->flushAnnotatedTags( $this->options['flush'] );
 
