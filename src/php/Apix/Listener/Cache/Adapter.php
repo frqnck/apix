@@ -25,7 +25,7 @@ interface Adapter
     public function save($data, $id, array $tags=null, $ttl=false);
 
     /**
-     * Removes all the cache items associated with the given tag name.
+     * Removes all the cached items associated with the given tag names.
      *
      * @param  array  $tags The array of tags to remove.
      */
@@ -36,6 +36,7 @@ interface Adapter
      *
      * @param  string $id The cache id to remove.
      * @return boolean True on sucess.
+     * @todo
      */
     #public function delete($id);
 
