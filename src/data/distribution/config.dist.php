@@ -215,8 +215,9 @@ $c['resources'] = array(
 // define some generic/shared code...
 $c['services'] = array(
 
+    // Example implementing Listener\Auth\Basic'
+    // -----------------------------------------
     // The Basic Authentification mechanism is generally use with SSL.
-    // Example implementing 'Listener\Auth' and 'Listener\Auth\Basic' adapter.
     'basic_auth_plugin' => function() use ($c)
     {
         $adapter = new Listener\Auth\Basic($c['api_realm']);
@@ -237,16 +238,18 @@ $c['services'] = array(
         return new Listener\Auth($adapter);
     },
 
-    // The Digest Authentification mechanism is use to encrypt and salt the
-    // username/pass without the overhead of SSL.
-    // Example implementing 'Listener\Auth' and 'Listener\Auth\Digest' adapter.
-    'digest_auth_plugin' => function() use ($c) {
+    // Example implementing 'Listener\Auth\Digest'
+    // -------------------------------------------
+    // The Digest Authentification mechanism is use to encrypt and salt the user
+    // credentials without the overhead of SSL.
+    'digest_auth_plugin' => function() use ($c)
+    {
         $adapter = new Listener\Auth\Digest($c['api_realm']);
         $adapter->setToken = function(array $digest) use ($c, $adapter)
         {
             $users = Services::get('users');
             foreach ($users as $user) {
-                if ( // this should be altered accordingly!
+                if (
                     $user['user'] == $digest['username']
                     && $user['realm'] == $c['api_realm']
                 ) {
@@ -261,8 +264,8 @@ $c['services'] = array(
     },
 
     'cache_plugin' => function() use ($c) {
-            $adapter = new Listener\Cache\Apc;
-            return new Listener\Cache($adapter);
+        $adapter = new Listener\Cache\Apc;
+        return new Listener\Cache($adapter);
     },
 
     // Returns a user array. This is used by the authentification plugins above.
@@ -272,11 +275,11 @@ $c['services'] = array(
         // username:password:sharedSecret:role:realm
         return array(
             0 => array(
-                'user'=>'franck', 'password'=>'1234', 'sharedSecret'=>'pass',
+                'user'=>'franck', 'password'=>'123', 'sharedSecret'=>'pass',
                 'role'=>'admin', 'realm'=>'api.domain.tld'
             ),
             1 => array(
-                'user'=>'test', 'password'=>'t3st', 'sharedSecret'=>'sesame',
+                'user'=>'test', 'password'=>'t3sted', 'sharedSecret'=>'sesame',
                 'role'=>'guest', 'realm'=>'api.domain.tld'
             )
         );
@@ -299,6 +302,7 @@ $c['services'] = array(
 $c['listeners'] = array(
     'server' => array(
         'early' => array(
+            'Apix\Listener\ViewModel',
             #'Apix\Listener\Mock',
         ),
         'late' => array(),
@@ -308,18 +312,18 @@ $c['listeners'] = array(
     ),
     'entity' => array(
         'early' => array(
-            $c['services']['cache_plugin'],
             $c['services']['digest_auth_plugin'],
             #$c['services']['basic_auth_plugin'],
+            $c['services']['cache_plugin'],
         ),
         'late' => array(),
     ),
     'response' => array(
         'early' => array(
-            'Apix\Listener\Streaming',
+            #'Apix\Listener\Streaming',
         ),
         'late'  => array(
-            'Apix\Listener\Tidy'
+            #'Apix\Listener\Tidy'
         ),
     ),
 );

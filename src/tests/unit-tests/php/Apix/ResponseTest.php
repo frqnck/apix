@@ -127,7 +127,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testGetStatusAdjective()
     {
-        $this->assertSame('successful', Response::getStatusAdjective());
+        $this->assertSame('successful', Response::getStatusAdjective(201));
         $this->assertSame('failed', Response::getStatusAdjective(401));
     }
 
@@ -200,7 +200,7 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $xml = '<root><resource><item>results</item></resource></root>' . PHP_EOL;
 
         $this->assertSame(
-            '<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL . $xml,
+            '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . $xml,
             $this->response->generate($this->route, $results)
         );
     }
