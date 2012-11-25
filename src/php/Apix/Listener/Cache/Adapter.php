@@ -32,12 +32,11 @@ interface Adapter
     public function clean(array $tags=null);
 
     /**
-     * Deletes a specified cache record.
+     * Deletes the specified cache record.
      *
      * @param  string $id The cache id to remove.
      * @return boolean True on sucess.
-     * @todo
      */
-    #public function delete($id);
+    public function delete($id);
 
 }
