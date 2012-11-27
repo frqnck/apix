@@ -1,94 +1,158 @@
 <?php
 namespace Apix\Listener\Cache;
 
+/**
+ * APC wrapper with emulated tag support.
+ */
 class Apc extends AbstractCache
 {
 
     /**
+     * Constructor.
+     */
+    public function __construct(array $options=array())
+    {
+        $options['tagging'] = isset($options['tagging'])
+                                && false === $options['tagging']
+                                ? false
+                                : true;
+
+        parent::__construct(null, $options);
+    }
+
+    /**
+     * get(key)
+     *
      * {@inheritdoc}
      */
-    public function load($id)
+    public function load($key, $type='key')
     {
-        $cached = apc_fetch($this->mapKey($id), $success);
+        $key = $type=='tag' ? $this->mapTag($key) : $this->mapKey($key);
+        $cached = apc_fetch($key, $success);
 
         return false === $success ? null : $cached;
     }
 
     /**
+     * set(key, val)
+     *
      * {@inheritdoc}
+     *
+     * APC does not support natively cache-tags so we simulate them.
      */
-    public function save($data, $id, array $tags=null, $ttl=null)
+    public function save($data, $key, array $tags=null, $ttl=null)
     {
-        $id = $this->mapKey($id);
+        $key = $this->mapKey($key);
         $store = array();
-        // APC does not natively support tags so lets simulate, shall we.
-        if(!empty($tags)) {
+        if($this->options['tagging'] && !empty($tags)) {
             foreach($tags as $tag) {
                 $tag = $this->mapTag($tag);
-                $ids = apc_fetch($tag, $success);
+                $keys = apc_fetch($tag, $success);
                 if(false === $success) {
-                    $store[$tag] = array($id);
+                    $store[$tag] = array($key);
                 } else {
-                    $ids[] = $id;
-                    $store[$tag] = array_unique($ids);
+                    $keys[] = $key;
+                    $store[$tag] = array_unique($keys);
                 }
             }
         }
-        $store[$id] = $data;
+        $store[$key] = $data;
 
         return !in_array(false, apc_store($store, null, $ttl));
     }
 
     /**
      * {@inheritdoc}
+     *
+     * APC does not support natively cache-tags so we simulate them.
      */
-    public function clean(array $tags=null)
+    public function delete($key)
     {
-        if(!empty($tags)) {
-            $rmed = array();
-            // APC does not natively support tags so lets simulate.
-            foreach($tags as $tag) {
-                $tag = $this->mapTag($tag);
-                $ids = apc_fetch($tag, $success);
-                if($success) {
-                    foreach($ids as $id) {
-                        $rmed[] = apc_delete($id);
+        $key = $this->mapKey($key);
+
+        if($success = apc_delete($key) && $this->options['tagging']) {
+
+            $iterator = $this->iterator(
+                '/^' . preg_quote($this->options['tag_prefix']) . '/',
+                APC_ITER_VALUE
+            );
+            foreach ($iterator as $tag => $keys) {
+                if( ($key = array_search($key, $keys['value'])) !== false ) {
+                    unset($keys['value'][$key]);
+                    if(empty($keys['value'])) {
+                        apc_delete($tag);
+                    } else {
+                        apc_store($tag, $keys['value']);
                     }
-                    $rmed[] = apc_delete($tag);
                 }
+                continue;
             }
-            return in_array(false, $rmed);
         }
 
-        return false;
+        return $success;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * APC does not support natively cache-tags so we simulate them.
      */
-    public function delete($id)
+    public function clean(array $tags)
     {
-        $id = $this->mapKey($id);
-
-        return apc_delete($id);
-    }
-
-
-    function expire($key)
-    {
-        $caches = apc_cache_info('user');
-        if (!empty($caches['cache_list'])) {
-            foreach ($caches['cache_list'] as $cache) {
-                if ($cache['info'] != $key)
-                    continue;
-
-                return $cache['ttl'] == 0
-                        ? 0
-                        : $cache['creation_time']+$cache['ttl'];
+        $rmed = array();
+        foreach($tags as $tag) {
+            $tag = $this->mapTag($tag);
+            $keys = apc_fetch($tag, $success);
+            if($success) {
+                foreach($keys as $key) {
+                    $rmed[] = apc_delete($key);
+                }
+                $rmed[] = apc_delete($tag);
             }
         }
+        return in_array(false, $rmed);
+    }
 
+    /**
+     * Flush all cached items.
+     */
+    public function flush()
+    {
+        $iterator = $this->iterator(
+            '/^' . preg_quote($this->options['key_prefix'])
+            .'|' . preg_quote($this->options['tag_prefix']) . '/',
+            APC_ITER_KEY
+        );
+
+        foreach ($iterator as $key => $data) {
+            apc_delete($key);
+        }
+    }
+
+    /**
+     * Returns some internal informations about an cached item.
+     *
+     * @return array|false
+     */
+    public function getInternalInfos($key)
+    {
+        $iterator = $this->iterator(
+            '/^' . preg_quote($this->options['key_prefix']) . '/'
+        );
+
+        $key = $this->mapKey($key);
+        foreach ($iterator as $k => $v) {
+            if ($k != $key)
+                continue;
+
+            return $v;
+        }
         return false;
+    }
+
+    protected function iterator($search=null, $format=APC_ITER_ALL)
+    {
+        return new \APCIterator('user', $search, $format, 100, APC_LIST_ACTIVE);
     }
 
 }
