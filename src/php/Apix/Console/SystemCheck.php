@@ -7,7 +7,7 @@ use Apix\Console;
 class SystemCheck extends Console
 {
 
-    public $software_name = "apix-server";
+    public $software_name = 'apix-server';
 
     public function help()
     {
@@ -183,8 +183,8 @@ HELP;
                 'fail' => ini_get('apc.enable_cli'),
                 'verbose' => 'off',
                 'msgs' => array(
-                    "The apc.enable_cli setting is incorrect.",
-                    "Add the following to the end of your 'php.ini':",
+                    "The apc.enable_cli should be set to Off.",
+                    "Add the following to your 'php.ini':",
                     "    apc.enable_cli = Off"
                 ),
             ),
