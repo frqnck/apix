@@ -1,10 +1,11 @@
 <?php
 namespace Apix\Listener;
 
-use Apix\HttpRequest;
-use Apix\Response;
+use Apix\HttpRequest,
+    Apix\Response,
+    Apix\ApixTestCase;
 
-class TidyTest extends \PHPUnit_Framework_TestCase
+class TidyTest extends ApixTestCase
 {
 
     protected $tidy, $response;
