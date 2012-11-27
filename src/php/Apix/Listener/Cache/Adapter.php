@@ -25,7 +25,7 @@ interface Adapter
     public function save($data, $key, array $tags=null, $ttl=false);
 
     /**
-     * Removes all the cached items associated with the given tag names.
+     * Removes all the cached entries associated with the given tag names.
      *
      * @param  array  $tags     The array of tags to remove.
      */
@@ -38,5 +38,13 @@ interface Adapter
      * @return boolean          True on sucess.
      */
     public function delete($key);
+
+    /**
+     * Flush all the cached entries.
+     *
+     * @param   boolean $all    Wether to flush the whole database (caution).
+     * @return  boolean         Returns TRUE on success or FALSE on failure.
+     */
+     public function flush($all=false);
 
 }
