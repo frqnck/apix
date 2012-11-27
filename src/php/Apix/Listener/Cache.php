@@ -10,8 +10,8 @@ class Cache extends AbstractListenerEntity
         'ttl'        => '10mins',    // null stands forever
         'flush'      => true,        // wether to flush tags at runtime (cron job?)
         'tags'       => array(),     // tags to append everytime time e.g. v1, dev
-        'key_prefix' => 'apix-key:', // Caching prefix for keys.
-        'tag_prefix' => 'apix-tag:', // Caching prefix for tags
+        'prefix_key' => 'apix-cache-key:', // prefix cache keys
+        'prefix_tag' => 'apix-cache-tag:', // prefix cache tags
     );
 
     /**
