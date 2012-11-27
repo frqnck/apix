@@ -9,9 +9,15 @@ class Redis extends AbstractCache
      */
     public function __construct(\Redis $redis, array $options=array())
     {
- 		$options['atomicity'] = true === $options['atomicity']
- 								? Redis::MULTI
- 								: Redis::PIPELINE; 
+        $options['atomicity'] = !isset($options['atomicity'])
+                                || true === $options['atomicity']
+ 								? \Redis::MULTI
+ 								: \Redis::PIPELINE;
+
+        // $options['flush_all'] = isset($options['flush_all'])
+        //                         && true === $options['flush_all']
+        //                         ? true
+        //                         : false;
 
         parent::__construct($redis, $options);
     }
@@ -19,63 +25,104 @@ class Redis extends AbstractCache
     /**
      * {@inheritdoc}
      */
-    public function load($id)
+    public function load($key, $type='key')
     {
-        $cache = $this->adapter->get($this->mapKey($id));
-
+        if( $type == 'tag' ){
+            $cache = $this->adapter->sMembers(
+                $this->mapTag($key)
+            );
+            return empty($cache) ? null : $cache;
+        }
+        $cache = $this->adapter->get(
+            $this->mapKey($key)
+        );
         return false === $cache ? null : $cache;
 	}
 
     /**
      * {@inheritdoc}
      */
-    public function save($data, $id, array $tags=null, $ttl=0)
+    public function save($data, $key, array $tags=null, $ttl=null)
     {
-        $id = $this->mapKey($id);
+        $key = $this->mapKey($key);
 
-		$bool = $redis->setex($id, $ttl, $data);
-		
-		if(!empty($tags) && $bool) {
+        if(null === $ttl || 0 === $ttl) {
+            $success = $this->adapter->set($key, $data);
+        } else {
+            $success = $this->adapter->setex($key, $ttl, $data);
+        }
+
+		if($success && !empty($tags)) {
 			$redis = $this->adapter->multi($this->options['atomicity']);
-
 			foreach ($tags as $tag) {
-				$redis->sAdd($this->mapTag($tag), $id);
+				$redis->sAdd($this->mapTag($tag), $key);
 			}
 			$redis->exec();
 		}
-		
-		return $bool;
+
+		return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function clean(array $tags=null)
+    public function clean(array $tags)
     {
+        #$items = array();
+		foreach($tags as $tag) {
+            $keys = $this->load($tag, 'tag');
+            array_walk_recursive(
+                $keys,
+                function($key) use (&$items) { $items[] = $key; }
+            );
+            $items[] = $this->mapTag($tag);
+		}
+
+    	return $this->adapter->del($items) ? true : false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete($key)
+    {
+		$key = $this->mapKey($key);
+
+        $tags = $this->adapter->keys($this->mapTag('*'));
         if(!empty($tags)) {
-			$redis = $this->adapter->multi($this->options['atomicity']);
+            $redis = $this->adapter->multi($this->options['atomicity']);
+            foreach ($tags as $tag) {
+                $redis->sRem($tag, $key);
+            }
+            $redis->exec();
+        }
 
-			foreach($tags as $tag) {
-				$tag = $this->mapTag($tag);
-				$items = $this->adapter->sMembers($tag);
-				$items[] = $tag;
-				$count = $redis->del($items);
-			}
-			$redis->exec();
-
-	    	return $count ? true : false;
-    	}
-
+        return $this->adapter->del($key) ? true : false;
     }
 
     /**
-     * {@inheritdoc}
+     * Flush all cached items.
      */
-    public function delete($id)
+    public function flush($all=false)
     {
-		$id = $this->mapKey($id);
+        if(true === $all) {
+            return $this->adapter->flushAll();
+        }
+        $items = array_merge(
+            $this->adapter->keys($this->mapTag('*')),
+            $this->adapter->keys($this->mapKey('*'))
+        );
+        return $this->adapter->del($items) ? true : false;
+    }
 
-		return $this->adapter->del($id) ? true : false;
+    /**
+     * Returns some internal informations about an cached item.
+     *
+     * @return array|false
+     */
+    public function getInternal($key)
+    {
+        return false;
     }
 
 }
