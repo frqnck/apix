@@ -29,8 +29,8 @@ class Log implements \SplObserver
     /**
      * Constructor.
      *
-     * @param mixed $target Can be a file path (default: php://output), a resource,
-     *                      or an instance of the PEAR Log class.
+     * @param mixed $target Can be a file path (default: php://output), a
+     *                      resource, or an instance of the PEAR Log class.
      * @param array $events Array of events to listen to (default: all events)
      *
      * @return void

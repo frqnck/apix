@@ -70,12 +70,15 @@ class XmlWriterTest extends OutputXmlTest
      * @todo Quotes handling is different between XmlWriter and SimpleXML
      *       XmlWriter: double-quotes are converted (wrongly &quot;).
      *       SimpleXml: double-quotes are NOT converted
+     *
+     * @see https://bugs.php.net/bug.php?id=63589
      */
     public function testSpecialCharsQuotes()
     {
+        $this->markTestSkipped("XmlWriter should not convert double-quotes. Bug #63589");
         $this->assertXml(
-            '<r><item>&quot;\'&quot;</item></r>',
-            $this->xml->encode(array('"\'"'), 'r')
+            '<r><item>\'"</item></r>',
+            $this->xml->encode(array('\'"'), 'r')
         );
     }
 

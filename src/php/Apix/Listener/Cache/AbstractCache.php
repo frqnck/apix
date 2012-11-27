@@ -16,10 +16,10 @@ abstract class AbstractCache implements Adapter
      * @param Cache\Adapter $adapter
      * @param array $options Array of options.
      */
-    public function __construct(stdClass $adapter=null, array $options=null)
+    public function __construct($adapter=null, array $options=null)
     {
         $this->adapter = $adapter;
-        
+
         if(null !== $options) {
 	        $this->options = $options+$this->options;
     	}
@@ -28,18 +28,18 @@ abstract class AbstractCache implements Adapter
     /**
      * Returns a prefixed and sanitased cache id.
      *
-     * @param  string $id The cache Id.
+     * @param  string $key  The base key to prefix.
      * @return string
      */
-    public function mapKey($id)
+    public function mapKey($key)
     {
-        return $this->sanitise($this->options['key_prefix'] . $id);
+        return $this->sanitise($this->options['key_prefix'] . $key);
     }
 
     /**
      * Returns a prefixed and sanitased cache tag.
      *
-     * @param  string $tag The cache tag.
+     * @param  string $tag  The base tag to prefix.
      * @return string
      */
     public function mapTag($tag)
@@ -48,15 +48,15 @@ abstract class AbstractCache implements Adapter
     }
 
     /**
-     * Returns a sanitased string for id/tagging purpose.
+     * Returns a sanitased string keying/tagging purpose.
      *
-     * @param  string $id The string to sanitise.
+     * @param  string $key   The string to sanitise.
      * @return string
      */
-    public function sanitise($id)
+    public function sanitise($key)
     {
-        return $id;
-        // return str_replace(array('/', '\\', ' '), '_', $id);
+        return $key;
+        // return str_replace(array('/', '\\', ' '), '_', $key);
     }
 
 }

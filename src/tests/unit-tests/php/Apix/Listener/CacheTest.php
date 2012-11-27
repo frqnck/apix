@@ -65,7 +65,7 @@ class CacheTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('load')
             ->will($this->returnValue('loaded'));
-        $this->assertEquals('loaded', 
+        $this->assertEquals('loaded',
             $this->cache->update($this->cache->entity)
         );
     }

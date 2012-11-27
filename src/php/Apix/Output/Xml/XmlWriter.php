@@ -28,6 +28,7 @@ class XmlWriter extends Xml
      *
      * @param \XmlWriter        $xml
      * @param array             $array
+     * @see https://bugs.php.net/bug.php?id=63589
      */
     protected function arrayToXmlWriter(\XmlWriter $x, array $array)
     {
@@ -44,7 +45,7 @@ class XmlWriter extends Xml
                 if (is_int($k)) {
                     $k = $this->item_key;
                 }
-                $x->writeElement($k, $v);
+                $x->writeElement($k, $v); // XmlWriter bug
             }
         }
     }
