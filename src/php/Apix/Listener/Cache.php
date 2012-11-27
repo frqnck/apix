@@ -6,10 +6,12 @@ class Cache extends AbstractListenerEntity
     protected $annotation = 'api_cache';
 
     protected $options = array(
-        'enable'    => true,      // wether to enable caching at all
-        'ttl'       => '10mins',  // null stands forever
-        'flush'     => true,      // wether to flush tags at runtime (cron job?)
-        'tags'      => array(),   // tags to append everytime time e.g. v1, dev
+        'enable'     => true,        // wether to enable caching at all
+        'ttl'        => '10mins',    // null stands forever
+        'flush'      => true,        // wether to flush tags at runtime (cron job?)
+        'tags'       => array(),     // tags to append everytime time e.g. v1, dev
+        'key_prefix' => 'apix-key:', // Caching prefix for keys.
+        'tag_prefix' => 'apix-tag:', // Caching prefix for tags
     );
 
     /**
@@ -78,7 +80,10 @@ class Cache extends AbstractListenerEntity
         $tags = array_unique($tags);
 
         $this->adapter->save($data, $id, $tags, $ttl);
-        $this->log(sprintf('saving for %d secs', $ttl), $id . ': ' . implode(', ', $tags));
+        $this->log(
+            sprintf('saving for %d secs', $ttl),
+            $id . ': ' . implode(', ', $tags)
+        );
         return $data;
     }
 
