@@ -6,15 +6,15 @@ abstract class AbstractCache implements Adapter
     protected $adapter;
 
     protected $options = array(
-        'key_prefix' => '[apixKey] ', // Caching prefix for keys.
-        'tag_prefix' => '[apixTag] ', // Caching prefix for tags
+        'prefix_key' => 'apix-cache-key:', // prefix cache keys
+        'prefix_tag' => 'apix-cache-tag:', // prefix cache tags
     );
 
     /**
      * Constructor.
      *
-     * @param Cache\Adapter $adapter
-     * @param array $options Array of options.
+     * @param object|null   $adapter    Generally an object.
+     * @param array         $options    Array of options.
      */
     public function __construct($adapter=null, array $options=null)
     {
@@ -33,7 +33,7 @@ abstract class AbstractCache implements Adapter
      */
     public function mapKey($key)
     {
-        return $this->sanitise($this->options['key_prefix'] . $key);
+        return $this->sanitise($this->options['prefix_key'] . $key);
     }
 
     /**
@@ -44,7 +44,7 @@ abstract class AbstractCache implements Adapter
      */
     public function mapTag($tag)
     {
-        return $this->sanitise($this->options['tag_prefix'] . $tag);
+        return $this->sanitise($this->options['prefix_tag'] . $tag);
     }
 
     /**

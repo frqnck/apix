@@ -6,6 +6,9 @@ class Redis extends AbstractCache
 
     /**
      * Constructor.
+     *
+     * @param   \Redis  $redis      The redis database to instantiate.
+     * @param   array   $options    Array of options.
      */
     public function __construct(\Redis $redis, array $options=array())
     {
@@ -13,11 +16,6 @@ class Redis extends AbstractCache
                                 || true === $options['atomicity']
  								? \Redis::MULTI
  								: \Redis::PIPELINE;
-
-        // $options['flush_all'] = isset($options['flush_all'])
-        //                         && true === $options['flush_all']
-        //                         ? true
-        //                         : false;
 
         parent::__construct($redis, $options);
     }
@@ -68,7 +66,7 @@ class Redis extends AbstractCache
      */
     public function clean(array $tags)
     {
-        #$items = array();
+        $items = array();
 		foreach($tags as $tag) {
             $keys = $this->load($tag, 'tag');
             array_walk_recursive(
@@ -101,7 +99,7 @@ class Redis extends AbstractCache
     }
 
     /**
-     * Flush all cached items.
+     * {@inheritdoc}
      */
     public function flush($all=false)
     {
@@ -113,16 +111,6 @@ class Redis extends AbstractCache
             $this->adapter->keys($this->mapKey('*'))
         );
         return $this->adapter->del($items) ? true : false;
-    }
-
-    /**
-     * Returns some internal informations about an cached item.
-     *
-     * @return array|false
-     */
-    public function getInternal($key)
-    {
-        return false;
     }
 
 }
