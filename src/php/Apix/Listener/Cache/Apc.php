@@ -73,7 +73,7 @@ class Apc extends AbstractCache
         if($success = apc_delete($key) && $this->options['tagging']) {
 
             $iterator = $this->iterator(
-                '/^' . preg_quote($this->options['tag_prefix']) . '/',
+                '/^' . preg_quote($this->options['prefix_tag']) . '/',
                 APC_ITER_VALUE
             );
             foreach ($iterator as $tag => $keys) {
@@ -110,23 +110,37 @@ class Apc extends AbstractCache
                 $rmed[] = apc_delete($tag);
             }
         }
-        return in_array(false, $rmed);
+        return !in_array(false, $rmed);
     }
 
     /**
-     * Flush all cached items.
+     * {@inheritdoc}
+     *
+     * APC does not support natively cache-tags so we simulate them.
      */
-    public function flush()
+    public function flush($all=false)
     {
+        if(true === $all) {
+            return apc_clear_cache('user');
+        }
+
         $iterator = $this->iterator(
-            '/^' . preg_quote($this->options['key_prefix'])
-            .'|' . preg_quote($this->options['tag_prefix']) . '/',
+            '/^' . preg_quote($this->options['prefix_key'])
+            .'|' . preg_quote($this->options['prefix_tag']) . '/',
             APC_ITER_KEY
         );
 
+        $rmed = array();
         foreach ($iterator as $key => $data) {
-            apc_delete($key);
+            $rmed[] = apc_delete($key);
         }
+
+        return !in_array(false, $rmed);
+    }
+
+    protected function iterator($search=null, $format=APC_ITER_ALL)
+    {
+        return new \APCIterator('user', $search, $format, 100, APC_LIST_ACTIVE);
     }
 
     /**
@@ -137,7 +151,7 @@ class Apc extends AbstractCache
     public function getInternalInfos($key)
     {
         $iterator = $this->iterator(
-            '/^' . preg_quote($this->options['key_prefix']) . '/'
+            '/^' . preg_quote($this->options['prefix_key']) . '/'
         );
 
         $key = $this->mapKey($key);
@@ -148,11 +162,6 @@ class Apc extends AbstractCache
             return $v;
         }
         return false;
-    }
-
-    protected function iterator($search=null, $format=APC_ITER_ALL)
-    {
-        return new \APCIterator('user', $search, $format, 100, APC_LIST_ACTIVE);
     }
 
 }
