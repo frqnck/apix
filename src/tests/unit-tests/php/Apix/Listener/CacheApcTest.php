@@ -9,29 +9,36 @@ use Apix\ApixTestCase;
 class CacheApcTest extends ApixTestCase
 {
 
-    protected $cache;
+    protected $cache = null;
 
     public function setUp()
     {
         if(!extension_loaded('apc')) {
-            $this->markTestSkipped(
+            self::markTestSkipped(
                 'The APC extension is required in order to run this unit test'
             );
         }
 
         if(!ini_get('apc.enable_cli')) {
-            $this->markTestSkipped(
+            self::markTestSkipped(
                 'apc.enable_cli MUST be enable in order to run this unit test'
             );
         }
 
-        $this->cache = new Apc;
+        $this->cache = new Apc(
+            array(
+                'prefix_key' => 'unittest-apix-key:',
+                'prefix_tag' => 'unittest-apix-tag:'
+            )
+        );
     }
 
-    protected function tearDown()
+    public function tearDown()
     {
-        apc_clear_cache('user');
-        unset($this->cache);
+        if(null !== $this->cache) {
+            $this->cache->flush();
+            unset($this->cache);
+        }
     }
 
     public function testLoadReturnsNullWhenEmpty()
@@ -92,19 +99,34 @@ class CacheApcTest extends ApixTestCase
         $this->assertEquals('strData2', $this->cache->load('id2'));
     }
 
-    public function testFlush()
+    public function testFlushSelected()
     {
-        apc_add('foo', 'bar');
         $this->cache->save('strData1', 'id1', array('tag1', 'tag2'));
         $this->cache->save('strData2', 'id2', array('tag2', 'tag3'));
         $this->cache->save('strData3', 'id3', array('tag3', 'tag4'));
 
+        apc_add('foo', 'bar');
         $this->cache->flush();
+        $this->assertEquals('bar', apc_fetch('foo'));
 
         $this->assertNull($this->cache->load('id3'));
         $this->assertNull($this->cache->load('tag1', 'tag'));
-        $this->assertEquals('bar', apc_fetch('foo'));
     }
+
+    public function testFlushAll()
+    {
+        $this->cache->save('strData1', 'id1', array('tag1', 'tag2'));
+        $this->cache->save('strData2', 'id2', array('tag2', 'tag3'));
+        $this->cache->save('strData3', 'id3', array('tag3', 'tag4'));
+
+        apc_add('foo', 'bar');
+        $this->cache->flush(true);
+        $this->assertEquals(false, apc_fetch('foo'));
+
+        $this->assertNull($this->cache->load('id3'));
+        $this->assertNull($this->cache->load('tag1', 'tag'));
+    }
+
 
     public function testDelete()
     {
@@ -136,7 +158,8 @@ class CacheApcTest extends ApixTestCase
         );
         $this->cache->save('ttl-1', 'ttlId', null, -1);
         // $this->assertSame('ttl-1', apc_fetch($this->cache->mapKey('ttlId')));
-        $this->assertNull( $this->cache->load('ttlId'), "Shoudl be null!!!!!!");
+        // $this->assertSame('ttl-1', $this->cache->load('ttlId'));
+        $this->assertNull( $this->cache->load('ttlId'), "Should be null");
     }
 
     public function testGetInternalInfos()
