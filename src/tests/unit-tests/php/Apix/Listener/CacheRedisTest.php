@@ -5,7 +5,6 @@ use Apix\ApixTestCase;
 
 class CacheRedisTest extends ApixTestCase
 {
-
     protected $cache;
 
     const HOST = '127.0.0.1';
@@ -30,13 +29,13 @@ class CacheRedisTest extends ApixTestCase
         $this->cache = new Redis(
             $this->redis,
             array(
-                'key_prefix' => 'unittest-apix-key:',
-                'tag_prefix' => 'unittest-apix-tag:'
+                'prefix_key' => 'unittest-apix-key:',
+                'prefix_tag' => 'unittest-apix-tag:'
             )
         );
     }
 
-    protected function tearDown()
+    public function tearDown()
     {
         $this->cache->flush();
         unset($this->cache);
@@ -103,21 +102,23 @@ class CacheRedisTest extends ApixTestCase
         $this->cache->save('strData2', 'id2', array('tag2', 'tag3'));
         $this->cache->save('strData3', 'id3', array('tag3', 'tag4'));
 
-        $this->redis->set('test', 'testValue');
+        $this->redis->set('foo', 'bar');
         $this->cache->flush();
-        $this->assertTrue($this->redis->exists('test'));
+        $this->assertTrue($this->redis->exists('foo'));
 
         $this->assertNull($this->cache->load('id3'));
         $this->assertNull($this->cache->load('tag1', 'tag'));
     }
 
-    public function testFlush()
+    public function testFlushAll()
     {
         $this->cache->save('strData1', 'id1', array('tag1', 'tag2'));
         $this->cache->save('strData2', 'id2', array('tag2', 'tag3'));
         $this->cache->save('strData3', 'id3', array('tag3', 'tag4'));
 
+        $this->redis->set('foo', 'bar');
         $this->cache->flush(true);
+        $this->assertFalse($this->redis->exists('foo'));
 
         $this->assertNull($this->cache->load('id3'));
         $this->assertNull($this->cache->load('tag1', 'tag'));
@@ -154,19 +155,5 @@ class CacheRedisTest extends ApixTestCase
 
         $this->assertNull( $this->cache->load('ttlId'), "Should be null");
     }
-
-    // public function testGetInternalInfos()
-    // {
-    //     $this->cache->save('someData', 'someId', null, 69);
-    //     $infos = $this->cache->getInternalInfos('someId');
-    //     $this->assertSame(69, $infos['ttl']);
-    // }
-
-    // public function testGetInternalInfosReturnFalseWhenNonExistant()
-    // {
-    //     $this->assertFalse(
-    //         $this->cache->getInternalInfos('non-existant')
-    //     );
-    // }
 
 }

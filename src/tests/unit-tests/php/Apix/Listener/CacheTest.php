@@ -1,7 +1,9 @@
 <?php
 namespace Apix\Listener;
 
-class CacheTest extends \PHPUnit_Framework_TestCase
+use Apix\ApixTestCase;
+
+class CacheTest extends ApixTestCase
 {
 
     protected $cache, $adapter;
