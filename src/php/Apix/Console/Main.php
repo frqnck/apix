@@ -42,7 +42,7 @@ class Main extends Console
         $this->src_file = $name;
     }
 
-    public function run($quiet=false)
+    public function run()
     {
         $args = $this->getArgs();
         $args[0] = 'php ' . $args[0];
@@ -91,12 +91,18 @@ class Main extends Console
 
             case '-c': case '--check':
 
-        $args = $this->getArgs();
-print_r($args);
                 try {
                     $input = new Input\Json;
                     $url = $this->src_url . '/version/' . $this->src_file;
+                    $url .= '/current/' . $this->version;
                     $r = $input->decode(trim($this->getContents($url)), true);
+
+                    if($this->verbose) {
+                        $this->outRegex("Contacting...\n<brown>${url}</brown>\n\n");
+                    }
+                    if($this->verbos3) {
+                        print_r($r);
+                    }
 
                     $latest = $r['apix']['version'][$this->src_file];
                     if (empty($latest)) {
@@ -104,9 +110,9 @@ print_r($args);
                     }
 
                     if ($latest != $this->version) {
-                        printf("A newer version is available (%s).", $latest);
+                        $this->out(sprintf("A newer version is available (%s).", $latest));
                     } else {
-                        print("You are using the latest version.");
+                        $this->out("You are using the latest version.");
                     }
                 } catch (\Exception $e) {
                     $this->error($e);
@@ -129,6 +135,7 @@ print_r($args);
 
             case '-s': case '--syscheck':
                 $syscheck = new SystemCheck;
+                $syscheck->setArgs(array('--all', '--no-credits'));
                 $syscheck->run();
                 break;
 
@@ -163,46 +170,26 @@ print_r($args);
     public function help()
     {
         $args = $this->getArgs();
-        $help = <<<HELP
-Usage: £php {$args[0]}£ %[options]%
+        $args[0] = 'php ' . $args[0];
 
-Options:
-
-   %--readme | -r%        Display the README file.
-
-   %--extractdist | -e%   Extract the latest distribution data.
-
-   %--check | -c%         Check for updates.
-
-   %--selfupdate%         Upgrade Apix to the latest version available.
-
-   %--version | -v%       Display the version information and exit.
-
-   %--help | -h%          Display this help.
-
-   %--info | -i%          PHP information and configuration.
-
-   %--license%            Display the software license.
-
-   %--syscheck | -s%      Run a system check.
-
-   %--tests | -t%         Run some unit & functional tests.
-
-   %--no-colors%          Don't use colors in the outputs.
-
-   %--verbose | -vv%      Add some verbosity to the outputs.
-
-
-HELP;
-
-        if (!$this->no_colors) {
-            $help = preg_replace("/(£)(.*)(£)/", $this->_out('\2', 'blue', 'bold'), $help);
-            $help = preg_replace("/(%)(.*)(%)/", $this->_out('\2', 'green', 'bold'), $help);
-        } else {
-            $help = str_replace("£", '', $help);
-            $help = str_replace("%", '', $help);
-        }
-        echo $help;
+        $this->outRegex(
+<<<HELP
+<bold>Usage:</bold> <brown>{$args[0]}</brown> [OPTIONS]\r\n
+<bold>Options:</bold>\r
+   --readme <brown>|</brown> -r\t<brown>Display the README file</brown>
+   --extractdist <brown>|</brown> -e\t<brown>Extract the latest distribution data</brown>
+   --check <brown>|</brown> -c\t\t<brown>Check for updates</brown>
+   --selfupdate\t\t<brown>Upgrade Apix to the latest version available</brown>
+   --version <brown>|</brown> -v\t<brown>Display the version information and exit</brown>
+   --info <brown>|</brown> -i\t\t<brown>PHP information and configuration</brown>
+   --license\t\t<brown>Display the software license</brown>
+   --syscheck <brown>|</brown> -s\t<brown>Run a system check</brown>
+   --tests <brown>|</brown> -t\t\t<brown>Run some unit & functional tests</brown>
+   --no-colors\t\t<brown>Don't use colors in the outputs</brown>
+   --verbose <brown>|</brown> -vv\t<brown>Add some verbosity to the outputs</brown>
+   --help <brown>|</brown> -h\t\t<brown>Display this help</brown>\n\n
+HELP
+        );
         exit;
     }
 
