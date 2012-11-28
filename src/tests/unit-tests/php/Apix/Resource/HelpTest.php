@@ -10,7 +10,9 @@ class HelpTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->request = $this->getMockBuilder('Apix\HttpRequest')->disableOriginalConstructor()->getMock();
+        $this->request = $this->getMockBuilder('Apix\HttpRequest')
+                              ->disableOriginalConstructor()
+                              ->getMock();
 
         $this->api = new Server(false, $this->request);
 
