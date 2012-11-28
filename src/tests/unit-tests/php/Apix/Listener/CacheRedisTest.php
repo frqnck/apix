@@ -37,8 +37,10 @@ class CacheRedisTest extends ApixTestCase
 
     public function tearDown()
     {
-        $this->cache->flush();
-        unset($this->cache);
+        if(null !== $this->cache) {
+            $this->cache->flush();
+            unset($this->cache);
+        }
     }
 
     public function testLoadReturnsNullWhenEmpty()
