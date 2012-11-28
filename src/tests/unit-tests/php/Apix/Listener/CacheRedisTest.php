@@ -18,15 +18,19 @@ class CacheRedisTest extends ApixTestCase
                 'The Redis extension is required in order to run this unit test.'
             );
         }
-        // version_compare($this->version, "2.4.0", "ge")
 
-        $this->redis = new \Redis();
-        $this->redis->connect(self::HOST, self::PORT);
-        if(self::AUTH) {
-            $this->assertTrue($this->redis->auth(self::AUTH));
+        try{
+            $this->redis = new \Redis();
+            $this->redis->connect(self::HOST, self::PORT);
+            if(self::AUTH) {
+                $this->redis->auth(self::AUTH);
+            }
+            $this->redis->ping();
+        } catch(\Exception $e) {
+            $this->markTestSkipped( $e->getMessage() );
         }
 
-        $this->cache = new Redis(
+       $this->cache = new Redis(
             $this->redis,
             array(
                 'prefix_key' => 'unittest-apix-key:',
@@ -39,6 +43,7 @@ class CacheRedisTest extends ApixTestCase
     {
         if(null !== $this->cache) {
             $this->cache->flush();
+            $this->redis->close();
             unset($this->cache);
         }
     }
