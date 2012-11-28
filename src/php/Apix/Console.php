@@ -50,27 +50,34 @@ class Console
 
     protected $switches = array(
         'no_colors' => array('--no-colors', '--no-colours'),
-        'verbose'   => array('--verbose', '-vv', '-vvv')
+        'verbose'   => array('--verbose', '-vv'),
+        'verbos3'  => array('--verbos3', '-vvv')
     );
 
     public $no_colors = false;
 
     public $verbose = false;
+    public $verbos3 = false;
 
 #    private $prompt = "\033[%sm%s\033[0m";
    private $prompt = "\x1b[%sm%s\x1b[0m";
 
     public function __construct(array $options = null)
     {
-        $this->init();
-
+        $this->setArgs();
         $this->options = null === $options ? $this->getOptions() : $options;
     }
 
-    public function init()
+    public function setArgs(array $args = null)
     {
-        $this->args = array_unique($_SERVER['argv']);
+        $this->args = array_unique(
+            null === $args ? $_SERVER['argv'] : $args
+        );
+        $this->initSwitches();
+    }
 
+    public function initSwitches()
+    {
         foreach ($this->switches as $key => $values) {
             if ($this->hasArgs($values)) {
                 $this->args = array_diff($this->args, $values);
@@ -78,7 +85,9 @@ class Console
                 $this->$key = true;
             }
         }
-
+        if($this->verbos3) {
+           $this->verbose = true; 
+        }
         // check env variables.
         if (false === $this->no_colors) {
             $this->no_colors = exec('tput colors 2> /dev/null') > 2 ? 0 : 1;
@@ -140,6 +149,26 @@ class Console
         echo $this->_out($msg, $styles);
     }
 
+    public function outRegex($msg)
+    {
+        $pat = '@<(?<name>[^>]+)>(?<value>[^<]+)</\1>@';
+
+        if (true === $this->no_colors) {
+            echo preg_replace($pat, '\2', $msg);
+        } else {
+            preg_match_all($pat, $msg, $tags, PREG_SET_ORDER);
+            foreach($tags as $tag) {
+                $msg = str_replace(
+                    $tag[0],
+                    $this->_out($tag['value'], $tag['name']),
+                    $msg
+                );
+                #$help = preg_replace($pat, $this->_out("$2 $1", "$1", 'bold'), $msg);
+            }
+            echo $msg;
+        }
+    }
+
     public function _out($msg, $styles=null)
     {
         if (!is_array($styles)) {
@@ -158,25 +187,7 @@ class Console
         return $msg;
     }
 
-    public function outRegex($msg)
-    {
-        $pat = '@<(?<name>[^>]+)>(?<value>[^<]+)</\1>@';
 
-        if (true === $this->no_colors) {
-            return preg_replace($pat, '\2', $msg);
-        }
-
-        preg_match_all($pat, $msg, $tags, PREG_SET_ORDER);
-        foreach($tags as $tag) {
-            $msg = str_replace(
-                $tag[0],
-                $this->_out($tag['value'], $tag['name']),
-                $msg
-            );
-            #$help = preg_replace($pat, $this->_out("$2 $1", "$1", 'bold'), $msg);
-        }
-        echo $msg;
-    }
 
 
 
