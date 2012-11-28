@@ -57,7 +57,8 @@ class Console
 
     public $verbose = false;
 
-    private $prompt = "\033[%sm%s\033[0m";
+#    private $prompt = "\033[%sm%s\033[0m";
+   private $prompt = "\x1b[%sm%s\x1b[0m";
 
     public function __construct(array $options = null)
     {
@@ -126,6 +127,8 @@ class Console
             )
         );
 
+        $ansi['dark_gray'] = 90;
+        #print_r($ansi);exit;
         return $ansi;
     }
 
@@ -153,6 +156,47 @@ class Console
         }
 
         return $msg;
+    }
+
+    public function outRegex($msg)
+    {
+        $pat = '@<(?<name>[^>]+)>(?<value>[^<]+)</\1>@';
+
+        if (true === $this->no_colors) {
+            return preg_replace($pat, '\2', $msg);
+        }
+
+        preg_match_all($pat, $msg, $tags, PREG_SET_ORDER);
+        foreach($tags as $tag) {
+            $msg = str_replace(
+                $tag[0],
+                $this->_out($tag['value'], $tag['name']),
+                $msg
+            );
+            #$help = preg_replace($pat, $this->_out("$2 $1", "$1", 'bold'), $msg);
+        }
+        echo $msg;
+    }
+
+
+
+        // $obj = new \stdClass;
+        // $obj->name = 'name';
+        // $obj->params = 'params';
+        // $obj->summary = 'summary';
+        // $obj->since = 'since';
+        // $obj->group = 'group';
+
+        // $this->cliOutputCommandHelp($obj);
+    #private $prompt = "\x1b[%sm%s\x1b[0m";
+    public function cliOutputCommandHelp($help)
+    {
+        echo "not connected> help keys\r\n";
+        printf("\r\n  \x1b[1m%s\x1b[0m \x1b[90m%s\x1b[0m\r\n", ucfirst($help->name), $help->params);
+        printf("  \x1b[33msummary:\x1b[0m %s\r\n", $help->summary);
+        printf("  \x1b[33msince:\x1b[0m %s\r\n", $help->since);
+        printf("  \x1b[33mgroup:\x1b[0m %s\r\n", $help->group);
+        echo "\r\nnot connected> help keys\r\n";
     }
 
 }

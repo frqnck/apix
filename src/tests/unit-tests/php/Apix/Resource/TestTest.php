@@ -1,13 +1,14 @@
 <?php
-
 namespace Apix\Resource;
+
+use Apix\Fixtures\BlankResource;
 
 class TestTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
      * @covers Apix\Resource::__construct
-     * @expectedException			Apix\Resource\Exception
+     * @expectedException			\InvalidArgumentException
      * @expectedExceptionMessage	Invalid resource's method (POST) specified.
      * @expectedExceptionCode		405
      */
@@ -27,7 +28,7 @@ class TestTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @covers Apix\Resource::__construct
-     * @expectedException			Apix\Resource\Exception
+     * @expectedException			BadMethodCallException
      * @expectedExceptionMessage	Required GET parameter "paramName" missing in action.
      * @expectedExceptionCode		400
      */
