@@ -2,82 +2,97 @@
 
 namespace Apix\Console;
 
-use Apix\Console;
+use Apix\Console,
+    Apix\Server;
 
 class SystemCheck extends Console
 {
-
-    public $software_name = 'apix-server';
 
     public function help()
     {
         $args = $this->getArgs();
         $args[0] = 'php ' . $args[0];
 
-        if ( $this->hasArgs(array('-h', '--help')) ) {
-            echo <<<HELP
-Usage: {$args[0]} [options]
-
-Options:
-   --help | -h      Display this help.
-
-   --no-colors      Don't use colors in the outputs.
-
-   --required       Run only the required checks.
-
-   --optionals       Run only the optionals checks.
-
-   --all            Run all the checks (default).
-
-
+        $help = <<<HELP
+<bold>Usage:</bold> {$args[0]} [OPTIONS]\r\n
+<bold>Options:</bold>\r
+   --all\t<brown>Run all the checks</brown>\r
+   --required\t<brown>Run only the required checks</brown>\r
+   --optionals\t<brown>Run only the optionals checks</brown>\r
+   --no-colors\t<brown>Don't use colors in the outputs</brown>\r
+   --verbose <brown>\tAdd some verbosity to the outputs</brown>\r
+   --help <brown>|</brown> -h\t<brown>Display this help</brown>\n\n
 HELP;
-        exit;
-        }
+
+        echo $this->outRegex($help);
     }
 
     public function run($quiet=false)
     {
-        $args = $this->getArgs();
+        if( ! $this->hasArgs(array('--no-credit')) ){
+            $this->out(
+                sprintf("Apix System Check %s by Franck Cassedanne.\n\n", Server::VERSION)
+            );
+        }
 
-        #$this->out(PHP_EOL);
-        $this->out("\tSystem check for " . $this->software_name . "\t", 'cyan', 'bold', 'on_blue');
-        $this->out(PHP_EOL . PHP_EOL);
+        if (
+            !$this->hasArgs(array('--required', '--optionals', '--all'))
+        ){
+            $this->help();
+            exit;
+        }
 
-        $this->help();
+        $this->out("Checking your system...\n\n", 'bold');
 
         if ( !$this->hasArgs(array('--required', '--optionals')) ) {
             $this->args[] = '--all';
         }
 
+        $required = $this->getRequired();
         $this->display(
             'Minimum requirements (required to pass): ',
-            $this->getRequired(),
+            $required,
             array('--required', '--all')
         );
 
         $this->out(PHP_EOL . PHP_EOL);
 
+        $optionals = $this->getOptionals();
         $this->display(
             'Optionals (recommended to pass): ',
-            $this->getOptionals(),
+            $optionals,
             array('--optionals', '--all')
         );
 
-        $this->out(PHP_EOL . PHP_EOL);
+        $this->out(PHP_EOL.PHP_EOL);
 
-        // if () {
-        //     $this->out(PHP_EOL . PHP_EOL . "All your PHP Settings are extensions are fine. Well done, you are ready to roll!" . PHP_EOL . PHP_EOL, 'success');
-        // } else {
-        //     $this->out(PHP_EOL . PHP_EOL . "All your PHP Settings are extensions are fine. Well done, you are ready to roll!" . PHP_EOL . PHP_EOL, 'success');
-        // }
+        $req = true;
+        foreach($required as $k=>$v) {
+            if($v['fail'] === true) $req = true;
+        }
+
+        $opt = false;
+        foreach($optionals as $k=>$v) {
+            if($v['fail'] === true) $opt = true;
+        }
+
+        echo " -----------------------------------------------------------------------\n\n";
+        if ($req) {
+            $this->out("  <red>Warning!</red> Minimum system requirements not met. Good luck.", 'regex');
+        } else if($opt) {
+            $this->out("   Except a few optionals, your PHP settings and extensions are fine.\n\n   Well done, you are ready to roll!");
+        } else {
+            $this->out("   All your PHP Settings and extensions are fine.\n   Well done, you are ready to roll!");
+        }
+        echo "\n\n -----------------------------------------------------------------------\n";
     }
 
     public function display($title, array $checks, array $args)
     {
-        $this->out($title, 'bold');
+        $this->out($title);
         if ( $this->hasArgs($args) ) {
             foreach ($checks as $key => $check) {
-                $this->out(PHP_EOL . PHP_EOL);
+                $this->out(PHP_EOL);
                 $this->check($key, $check);
             }
         } else {
@@ -87,22 +102,18 @@ HELP;
 
     public function check($key, $check)
     {
-        $this->out("   - {$key}");
+        $this->out("   - {$key}", 'brown');
         if ($check['fail'] !== true) {
             if ($this->verbose > 0 && isset($check['verbose'])) {
                 $this->out(sprintf(' (%s): ', $check['verbose']));
-            } else {
-                $this->out(': ');
             }
-            $this->out('pass', 'success');
+            $this->out('   [pass]', 'success');
         } else {
-            $this->out(': ');
-            $this->out('failed', 'failed');
-            $this->out(PHP_EOL);
+            $this->out('   [failed]', 'failed');
             foreach ($check['msgs'] as $msg) {
                 $this->out(PHP_EOL);
-                $this->out('     ---> ','red');
-                $this->out($msg, 'red');
+                $this->out("\t");
+                $this->out($msg, 'failed');
             }
         }
     }
@@ -179,9 +190,8 @@ HELP;
 
         $optionals = array(
             // APC
-            'apc_cli' => array(
+            'apc_cli disabled' => array(
                 'fail' => ini_get('apc.enable_cli'),
-                'verbose' => 'off',
                 'msgs' => array(
                     "The apc.enable_cli should be set to Off.",
                     "Add the following to your 'php.ini':",
@@ -192,7 +202,6 @@ HELP;
             // sigchild
             'sigchild' => array(
                 'fail' => false !== strpos($config[1], '--enable-sigchild'),
-                'verbose' => 'off',
                 'msgs' => array(
                     "PHP was compiled with --enable-sigchild which can cause issues on some platforms.",
                     "Recompile it without this flag if possible, see also:",
@@ -201,9 +210,8 @@ HELP;
             ),
 
             // tidy
-            'tidy' => array(
+            'Tidy' => array(
                 'fail' => !extension_loaded('tidy'),
-                'verbose' => 'off',
                 'msgs' => array(
                     "You may want to enable the Tidy extension.",
                 )
@@ -224,9 +232,15 @@ HELP;
 
     public function out($msg, $type=null)
     {
-        $msg = str_replace("{software.name}", $this->software_name, $msg);
+
+        $software_name = 'apix-server';
+        $msg = str_replace("{software.name}", $software_name, $msg);
 
         switch ($type):
+            case 'regex':
+               parent::outRegex($msg);
+            break;
+
             case 'error':
                parent::out($msg, 'red');
             break;
