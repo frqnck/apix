@@ -91,6 +91,8 @@ class Main extends Console
 
             case '-c': case '--check':
 
+        $args = $this->getArgs();
+print_r($args);
                 try {
                     $input = new Input\Json;
                     $url = $this->src_url . '/version/' . $this->src_file;
