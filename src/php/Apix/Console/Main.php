@@ -20,13 +20,14 @@ class Main extends Console
 
     public function __construct(array $options = null)
     {
-#        $this->src_url = 'http://zenya.dev/index3.php/api/v1';
+        #$this->src_url = 'http://zenya.dev/index3.php/api/v1';
         $this->src_url = 'http://test.dev/index.php/api/v1';
 
         $this->src = realpath(__DIR__ . '/../../../../../');
 
         $this->version = Server::VERSION;
-        $this->version_program = sprintf('Apix Server %s by Franck Cassedanne.', $this->version);
+        $this->version_program =
+            sprintf('Apix Server %s by Franck Cassedanne.', $this->version);
 
         parent::__construct($options);
     }
