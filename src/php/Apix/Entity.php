@@ -92,6 +92,7 @@ class Entity extends Listener
     public function getDefaultAction($method)
     {
         if (isset($this->defaultActions[$method])) {
+            #return $method;
             return $this->defaultActions[$method];
         }
     }

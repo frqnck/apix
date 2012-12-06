@@ -1,21 +1,21 @@
 <?php
 namespace Apix\Listener\Cache;
 
-use Apix\ApixTestCase;
+use Apix\TestCase;
 
-class CacheRedisTest extends ApixTestCase
+class CacheRedisTest extends TestCase
 {
     protected $cache;
 
     const HOST = '127.0.0.1';
     const PORT = 6379;
-    const AUTH = NULL; //replace with a string to use Redis authentication
+    const AUTH = NULL;
 
     public function setUp()
     {
         if(!extension_loaded('redis')) {
             $this->markTestSkipped(
-                'The Redis extension is required in order to run this unit test.'
+                'The Redis extension is required to run this unit test.'
             );
         }
 

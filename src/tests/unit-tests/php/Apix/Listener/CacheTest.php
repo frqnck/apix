@@ -1,9 +1,9 @@
 <?php
 namespace Apix\Listener;
 
-use Apix\ApixTestCase;
+use Apix\TestCase;
 
-class CacheTest extends ApixTestCase
+class CacheTest extends TestCase
 {
 
     protected $cache, $adapter;
@@ -19,17 +19,20 @@ class CacheTest extends ApixTestCase
         unset($this->cache);
     }
 
-    protected function mock($str)
+    protected function mock($return)
     {
 		$entity = $this->getMock('Apix\Entity');
+
         $entity->expects($this->any())
         	->method('getAnnotationValue')
-            ->will($this->returnValue($str));
+            ->will($this->returnValue($return));
 
-        $route = $this->getMock('Apix\Router');
         $entity->expects($this->any())
             ->method('getRoute')
-            ->will($this->returnValue($route));
+            ->will($this->returnValue(
+                    $this->getMock('Apix\Router')
+                )
+            );
 
 		$this->cache->entity = $entity;
 	}
@@ -63,11 +66,14 @@ class CacheTest extends ApixTestCase
     public function testUpdateLoadFromCache()
     {
         $this->mock('x');
+
         $this->adapter
             ->expects($this->once())
             ->method('load')
             ->will($this->returnValue('loaded'));
-        $this->assertEquals('loaded',
+
+        $this->assertEquals(
+            'loaded',
             $this->cache->update($this->cache->entity)
         );
     }
@@ -75,9 +81,11 @@ class CacheTest extends ApixTestCase
     public function testUpdateSaveToCache()
     {
         $this->mock('x');
+
         $this->adapter
             ->expects($this->once())
             ->method('save');
+
         $this->cache->update($this->cache->entity);
     }
 
@@ -109,11 +117,19 @@ class CacheTest extends ApixTestCase
     public function subtagsProvider()
     {
         return array(
-            array('a=1 b=2 c=3', array('keys'=>array('a', 'b', 'c'), 'values'=>array(1, 2, 3))),
+            array(
+                'a=1 b=2 c=3',
+                array('keys'=>array('a', 'b', 'c'), 'values'=>array(1, 2, 3))
+            ),
             array('z=zz', array('keys'=>array('z'), 'values'=>array('zz'))),
-            array("a=1\tb=2\tc=3", array('keys'=>array('a', 'b', 'c'), 'values'=>array(1, 2, 3))),
-            array("a=1\nb=2\nc=3", array('keys'=>array('a', 'b', 'c'), 'values'=>array(1, 2, 3))),
-
+            array(
+                "a=1\tb=2\tc=3",
+                array('keys'=>array('a', 'b', 'c'), 'values'=>array(1, 2, 3))
+            ),
+            array(
+                "a=1\nb=2\nc=3",
+                array('keys'=>array('a', 'b', 'c'), 'values'=>array(1, 2, 3))
+            ),
             array('a=1', array('keys'=>array('a'), 'values'=>array(1))),
             array('b=2', array('keys'=>array('b'), 'values'=>array(2))),
         );
@@ -145,10 +161,6 @@ class CacheTest extends ApixTestCase
 	        $values = $this->cache->getSubTagValues($result['k'], null, true);
 	        $this->assertEquals($result['exp'], $values);
  		}
-    }
-
-    public function testLog()
-    {
     }
 
 }

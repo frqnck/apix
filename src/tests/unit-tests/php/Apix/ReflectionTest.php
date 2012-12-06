@@ -2,8 +2,9 @@
 namespace Apix;
 
 use Apix\Fixtures\DocbookClass;
+use Apix\TestCase;
 
-class ReflectionTest extends \PHPUnit_Framework_TestCase
+class ReflectionTest extends TestCase
 {
 
     /**
@@ -16,10 +17,15 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
         $class = new DocbookClass;
 
         $this->reflected = new \ReflectionClass($class);
-        
-        $this->class = Reflection::parsePhpDoc($this->reflected->getDocComment());
 
-        $this->method = Reflection::parsePhpDoc($this->reflected->getMethod('methodNameOne'));
+        $this->class = Reflection::parsePhpDoc(
+            $this->reflected->getDocComment()
+        );
+
+        $this->method = Reflection::parsePhpDoc(
+            $this->reflected->getMethod('methodNameOne'),
+            array()
+        );
     }
 
     protected function tearDown()
@@ -38,12 +44,12 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Class title', $this->class['title']);
 
         $this->assertSame(
-            'Class description 1st line' . PHP_EOL .'Class description 2nd line',
+            "Class description 1st line\nClass description 2nd line",
              $this->class['description']
         );
     }
 
-    /* Not-too-use, just checking it actually work */
+    /* Not-in-use, just checking it actually work */
     public function testClassDocBookParamsIsAlwayaAnArray()
     {
         $params = $this->class['params'];
@@ -78,7 +84,7 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Method one title', $this->method['title']);
 
         $this->assertSame(
-            'Method description 1st line' . PHP_EOL .'Method description 2nd line',
+            "Method description 1st line\nMethod description 2nd line",
             $this->method['description']
         );
     }
@@ -100,7 +106,7 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testMethodDocBookWithOPtionalParam()
+    public function testMethodDocBookWithOptionalParam()
     {
         $params = $this->method['params'];
 
@@ -116,6 +122,41 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
             $params['optional']
         );
     }
+
+    public function testGetRequiredParams()
+    {
+        $requireds = Reflection::getRequiredParams(
+            $this->reflected->getMethod('methodNameOne')
+        );
+
+        $this->assertSame(
+            array('namedInteger','namedString','namedBoolean'),
+            $requireds
+        );
+    }
+
+    public function testMethodDocBookWithRequiredParam()
+    {
+        $method = Reflection::parsePhpDoc(
+            $this->reflected->getMethod('methodNameTwo'),
+            array('required')
+        );
+
+        $params = $method['params'];
+
+        $this->assertInternalType('array', $params);
+
+        $this->assertSame(
+            array(
+                'type'          => 'array',
+                'name'          => 'required',
+                'description'   => 'something required',
+                'required'      => true
+            ),
+            $params['required']
+        );
+    }
+
 
     public function testMethodGroupsAsArray()
     {
@@ -147,34 +188,24 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
     {
         $src = Reflection::getSource($this->reflected);
 
-        $this->assertRegExp('/^class Docbook/', $src, "Source should start by 'class ...'");
-        $this->assertRegExp('/\s+}\n\n}$/', $src, "Source should end by '...}'");
+        $this->assertRegExp('/^class Docbook/', $src,
+            "Source should start by 'class ...'"
+        );
+        $this->assertRegExp('/\s+}\n\n}$/', $src,
+            "Source should end by '...}'"
+        );
     }
 
     public function testGetSourceOfMethod()
     {
-        $src = Reflection::getSource($this->reflected->getMethod('methodNameOne'));
-
-        $this->assertRegExp('/^\s+public function methodNameOne/', $src, "Source should start by 'public function methodNameOne'");
-        $this->assertRegExp('/\s+}$/', $src, "Source should end by '...}'");
-    }
-
-    public function testSpecialCharacteres()
-    {
-        $this->markTestIncomplete('TODO: allow to use wildcard within doc (fix regex)');
-        $this->assertSame('OPTIONS /*/etc...', $this->method['api_link']);
-    }
-
-    public function testGetRequiredParams()
-    {
-        $requireds = Reflection::getRequiredParams(
+        $src = Reflection::getSource(
             $this->reflected->getMethod('methodNameOne')
         );
 
-        $this->assertSame(
-            array('namedInteger','namedString','namedBoolean'),
-            $requireds
+        $this->assertRegExp('/^\s+public function methodNameOne/', $src,
+            "Source should start by 'public function methodNameOne'"
         );
+        $this->assertRegExp('/\s+}$/', $src, "Source should end by '...}'");
     }
 
     /* TODO Prefix handler */
@@ -183,5 +214,12 @@ class ReflectionTest extends \PHPUnit_Framework_TestCase
         $r = new Reflection('api_');
         $this->assertSame($r->getPrefix(), 'api_');
     }
+
+    // /* TODO Prefix handler */
+    // public function testSpecialCharacters()
+    // {
+    //     $this->markTestIncomplete('TODO: allow to use wildcard within doc (fix regex)');
+    //     $this->assertSame('OPTIONS /*/etc...', $this->method['api_link']);
+    // }
 
 }
