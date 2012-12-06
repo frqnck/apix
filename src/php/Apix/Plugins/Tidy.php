@@ -1,7 +1,7 @@
 <?php
-namespace Apix\Listener;
+namespace Apix\Plugins;
 
-class Tidy extends AbstractListener
+class Tidy extends PluginAbstract
 {
 
     public static $hook = array('response', 'late');

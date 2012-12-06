@@ -1,5 +1,5 @@
 <?php
-namespace Apix\Listener\Cache;
+namespace Apix\Plugins\Cache;
 
 abstract class AbstractCache implements Adapter
 {
