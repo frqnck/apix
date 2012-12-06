@@ -60,7 +60,7 @@ class Server extends Listener
 
         $this->initSet($this->config);
 
-        // load all the plugins
+        // Load all the plugins
         $this->loadPlugins($c->get('plugins'));
 
         // Set the current request
@@ -86,7 +86,6 @@ class Server extends Listener
                 $key, $values
             );
         }
-
 
     }
 

@@ -261,26 +261,22 @@ class Config #extends Di
         return $this->getConfigFromFile($file);
     }
 
-    /**
-     * Returns the specified plugin (or all if unspecified).
-     *
-     * @param string $key=null The plugin key to retrieve.
-     * @see     self::retrieve
-     */
-    public function addListener($key, $mix, $level, $type)
-    {
-        $this->config['listeners'][$level][$type][$key] = $mix;
-    }
 
-    /**
-     * Returns the specified plugin (or all if unspecified).
-     *
-     * @param string $key=null The plugin key to retrieve.
-     * @see     self::retrieve
-     */
-    public function getListeners($key=null)
-    {
-        return $this->retrieve('listeners', $key);
-    }
+
+    // public function addListener($key, $mix, $level, $type)
+    // {
+    //     $this->config['listeners'][$level][$type][$key] = $mix;
+    // }
+
+    // *
+    //  * Returns the specified plugin (or all if unspecified).
+    //  *
+    //  * @param string $key=null The plugin key to retrieve.
+    //  * @see     self::retrieve
+
+    // public function getListeners($key=null)
+    // {
+    //     return $this->retrieve('listeners', $key);
+    // }
 
 }

@@ -1,7 +1,7 @@
 <?php
-namespace Apix\Listener;
+namespace Apix\Plugins;
 
-abstract class AbstractListenerEntity extends AbstractListener
+abstract class PluginAbstractEntity extends PluginAbstract
 {
     protected $annotation;
 
