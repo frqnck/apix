@@ -2,6 +2,7 @@
 
 namespace Apix;
 
+//Pluggable
 class Listener implements \SplSubject, \IteratorAggregate, \Countable
 {
     /**
@@ -10,7 +11,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     protected $observers = array();
 
     /**
-     * @var array of SplObjectStorage
+     * @var array
      */
     protected $listeners = array();
 
@@ -29,8 +30,6 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
         }
         $this->observers[] = $observer;
     }
-
-
 
     /**
      * Detaches an existing observer
@@ -99,30 +98,33 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
             // retrieve from config
             $this->listeners[$key] = Config::getInstance()->getListeners($key);
         }
+
+        // echo '<pre>';print_r($this->listeners[$key]);
         return $this->listeners[$key];
     }
 
     /**
-     * Adds all the listeners for the current level/type.
+     * Calls the listeners of the current level and type.
      *
      * @param string $level     Representing the current level/stage.
      * @param string $type      Representing the current type/period.
      */
-    public function addAllListeners($level, $type=null)
+    public function hook($level, $type=null)
     {
         #if($level == null) echo $level = get_called_class();
 
-        $listeners = $this->getListenersLevel($level);
+        $plugins = $this->getListenersLevel($level);
+#        if(null !== $plugins) {
+            $stage = is_null($type)
+                ? $plugins
+                : $plugins[$type];
 
-        $stage = is_null($type)
-            ? $listeners
-            : $listeners[$type];
-
-        foreach ($stage as $plugin => $args) {
-            $obs = $this->callPlugin($plugin, $args);
-            $this->attach($obs);
-            $obs->update($this);
-        }
+            foreach ($stage as $plugin => $args) {
+                $obs = $this->callPlugin($plugin, $args);
+                $this->attach($obs);
+                $obs->update($this);
+            }
+#        }
    }
 
     /**
@@ -134,14 +136,96 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     private function callPlugin($plugin, $args)
     {
         if (is_int($plugin)) {
-            return $args instanceof \Closure ? $args() : new $args();
+            return $args instanceof \Closure
+                    ? $args()
+                    : new $args();
         }
 
         // if( !class_exists($plugin) || !is_callable($plugin) ) {
-        //     throw new \BadMethodCallException("Plugin \"{$plugin}\" not available.");
+        //     throw new \BadMethodCallException("Plugin \"{$plugin}\" not callable.");
+        // }
+
+        $args = $args instanceof \Closure
+                ? $args()
+                : $args;
+
+
+        // if(is_array($args)) {
+        //     #return call_user_func_array($plugin, extract($args));
+
+        //     $reflect  = new \ReflectionClass($plugin);
+        //     return $reflect->newInstanceArgs($args);
         // }
 
         return new $plugin($args);
+    }
+
+    /**
+    * Load all the plugins
+    *
+    * @param array $plugins Array of plugins to load.
+    */
+    public function loadPlugins(array $plugins)
+    {
+        foreach ($plugins as $key => $mix) {
+          $this->loadPlugin($key, $mix);
+        }
+    }
+
+    protected $plugins = array();
+
+    /**
+    * Load the specified plugin
+    *
+    * @param string $name The plugin name to load.
+    * @return boolean True on success, false if not loaded or failure.
+    */
+    public function loadPlugin($key, $mix)
+    {
+        // plugin already loaded
+        $name = is_int($key) ? $mix : $key;
+
+        if (isset($this->plugins[$name])) {
+            return true;
+        }
+
+        if(!isset($name::$hook)) {
+            return false;
+        }
+        $hook = $name::$hook;
+
+        // $args = $args instanceof \Closure
+        //         ? $args()
+        //         : $args;
+
+        // if( is_callable($mix) ) {
+        //      $mix = $mix();
+        // }
+
+        Config::getInstance()->addListener(
+            $key,
+            $mix,
+            $hook[0],   // level
+            $hook[1]    // type
+        );
+
+        // $this->listeners[$level][$type][] = $name;
+
+//         // $plugin = new $name($this);
+//         // check inheritance...
+//         if (is_subclass_of($plugin, 'Apix\Listener\AbstractListener'))
+//         {
+//            // $plugin->init();
+// echo '+ ' . $level;
+//             return true;
+//         } else {
+//             // throw new \Exception(
+//             //     sprintf('%s is not a working plugin class found'), $name)
+//             // );
+//         echo 'Error';
+//         }
+
+        // return false;
     }
 
 }

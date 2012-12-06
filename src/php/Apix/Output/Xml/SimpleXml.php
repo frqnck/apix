@@ -17,6 +17,7 @@ class SimpleXml extends Xml
             $this->encoding,
             $rootNode
         );
+
         $x = new \SimpleXMLElement($str);
         $this->arrayToSimpleXml($x, $data);
 

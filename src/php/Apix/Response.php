@@ -118,7 +118,6 @@ class Response extends Listener
         507 => 'Insufficient Storage',
         509 => 'Bandwidth Limit Exceeded',
         510 => 'Not Extended'
-
     );
 
     /**
@@ -143,8 +142,7 @@ class Response extends Listener
         403 => 'Access to this ressource has been denied.',
         404 => 'No ressource found at the Request-URI.',
         501 => 'This resource entity is not (yet) implemented. Try again later.',
-        503 => 'The service is currently unable to handle the request due to a temporary overloading or maintenance of the server. Try again later.',
-
+        503 => 'The service is currently unable to handle the request due to a temporary overloading or maintenance of the server. Try again later.'
     );
 
     /**
@@ -152,15 +150,47 @@ class Response extends Listener
      */
     protected $request;
 
-    public function __construct(Request $request, $sign=false, $debug=false)
+   /**
+     * Returns the request object.
+     *
+     * @return Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+
+    /**
+     * @var Apix\Router
+     */
+    protected $route;
+
+    /**
+     * Sets the route object.
+     */
+    public function setRoute(Router $route)
+    {
+        $this->route = $route;
+    }
+
+    /**
+     * Returns the route object.
+     *
+     * @return Router
+     */
+    public function getRoute()
+    {
+        return $this->route;
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param Request $request
+     */
+    public function __construct(Request $request)
     {
         $this->request = $request;
-
-        $this->sign = $sign;
-        $this->debug = $debug;
-
-        // attach the early listeners @ post-processing stage
-        $this->addAllListeners('response', 'early');
     }
 
     /**
@@ -232,8 +262,7 @@ class Response extends Listener
     /**
      * Returns the header array.
      *
-     * @param string $key
-     * @param string $value
+     * @return array
      */
     public function getHeaders()
     {
@@ -337,52 +366,13 @@ class Response extends Listener
     }
 
     /**
-     * Returns an array representation of the output.
+     * Returns a collated array representation of the output.
      *
      * @return array
      */
-    public function collate(Router $route, $results)
+    public function collate(array $results)
     {
-        $r = array($route->getController() => $results);
-
-        if ($this->sign === true) {
-            $r['signature'] = array(
-                'resource'  => sprintf('%s %s', $route->getMethod(), $route->getName()),
-                'status'    => sprintf(
-                                '%d %s - %s',
-                                $this->getHttpCode(),
-                                self::getStatusPrases($this->http_code),
-                                $this->getStatusAdjective($this->http_code)
-                            ),
-                'client_ip' => $this->request->getIp(true)
-            );
-        }
-
-        if ($this->debug === true) {
-            $r['debug'] = array(
-                    'timestamp'     =>  gmdate('Y-m-d H:i:s') . ' UTC',
-                    'request'       =>  sprintf('%s %s%s',
-                                            $this->request->getMethod(),
-                                            $this->request->getRequestUri(),
-                                            isset($_SERVER['SERVER_PROTOCOL']) ? ' ' . $_SERVER['SERVER_PROTOCOL'] : null
-                                        ),
-                    'headers'	    =>  $this->getHeaders(),
-                    'output_format' =>  $this->getFormat(),
-                    'router_params' =>  $route->getParams(),
-                    // plugins?
-                    'memory'        =>  round(memory_get_usage() / (1024 * 1024), 2) . 'MB max. ' .
-                                        round(memory_get_peak_usage() / (1024 * 1024), 2) . 'MB',
-            );
-
-            if(defined('APIX_START_TIME')) {
-                $r['debug']['time'] = round(microtime(true) - APIX_START_TIME, 3) . ' seconds';
-            }
-
-            // TEMP: just a shortcut cannot be trusted.
-            if(isset($_SERVER['X_AUTH_USER'])) $r['debug']['user'] = $_SERVER['X_AUTH_USER'];
-        }
-
-        return $r;
+        return array($this->route->getController() => $results);
     }
 
     /**
@@ -393,19 +383,27 @@ class Response extends Listener
      * @param  string $rootNode
      * @return string
      */
-    public function generate(Router $route, array $results, $version_string='ouarz', $rootNode='root')
+    public function generate(array $results, $version_string='ouarz', $rootNode='root')
     {
+        $this->results = $this->collate($results);
+
+        // early listeners @ post-response
+        $this->hook('response', 'early');
+
         $renderer = __NAMESPACE__ . '\Output\\' . ucfirst($this->getFormat());
-        $output = new $renderer($this->encoding);
-        $this->setHeader('Content-Type', $output->getContentType());
+        $view = new $renderer($this->encoding);
+        $this->setHeader('Content-Type', $view->getContentType());
         $this->sendAllHttpHeaders($this->getHttpCode(), $version_string);
 
-        $this->output = $output->encode($this->collate($route, $results), $rootNode);
+        if(null === $this->output) {
+            $this->output = $view->encode(
+                $this->results,
+                $rootNode
+            );
+        }
 
-        // attach the late listeners @ post-processing stage
-        $this->addAllListeners('response', 'late');
-
-        return $this->output;
+        // late listeners @ post-response
+        $this->hook('response', 'late');
     }
 
     /**

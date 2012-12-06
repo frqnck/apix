@@ -8,6 +8,7 @@ class OutputPhpTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->data = array(1, 2, 'abc');
         $this->php = new Output\Php;
     }
 
@@ -18,11 +19,27 @@ class OutputPhpTest extends \PHPUnit_Framework_TestCase
 
     public function testEncode()
     {
-        $data = array(1, 2, 'abc');
-        $php = $this->php->encode($data, 'apix');
+        $this->assertEquals(
+            serialize($this->data),
+            $this->php->encode($this->data)
+        );
+    }
 
-        $r = array('apix'=>$data);
-        $this->assertEquals(print_r($r, true), $php);
+    public function testEncodeWithRootNode()
+    {
+        $this->assertEquals(
+            serialize(array('root'=>$this->data)),
+            $this->php->encode($this->data, 'root')
+        );
+    }
+
+    public function testEncodeWithDump()
+    {
+        $this->php->debug = true;
+        $this->assertEquals(
+            print_r($this->data, true),
+            $this->php->encode($this->data)
+        );
     }
 
 }

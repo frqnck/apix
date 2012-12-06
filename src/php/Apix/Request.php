@@ -124,8 +124,8 @@ class Request
      * Gets a specified param.
      *
      * @param  string   $key
-     * @param  boolean  $raw        Set to true to get the raw URL encoded value.
-     * @param  string   $filter     POSIX character classes e.g. alnum, alpha, digit.
+     * @param  boolean  $raw        Set to true to get the raw URL encoded value
+     * @param  string   $filter     POSIX character classes e.g. alnum, alpha
      * @return mixed
      */
     public function getParam($key, $raw=false, $filter=null)
@@ -277,9 +277,9 @@ class Request
 
     public function getBody($cache=true)
     {
-        static $decodedBody = null;
-        if ($cache && null !== $decodedBody) {
-            return $decodedBody;
+        static $decoded = null;
+        if ($cache && null !== $decoded) {
+            return $decoded;
         }
 
         // Decode any content-encoding (gzip or deflate) if needed
@@ -288,20 +288,20 @@ class Request
             // Handle gzip encoding
             case 'gzip':
                 require_once 'HTTP/Request2.php';
-                $decodedBody = \HTTP_Request2_Response::decodeGzip($this->body);
+                $decoded = \HTTP_Request2_Response::decodeGzip($this->body);
                 break;
 
             // Handle deflate encoding
             case 'deflate':
                 require_once 'HTTP/Request2.php';
-                $decodedBody = \HTTP_Request2_Response::decodeDeflate($this->body);
+                $decoded = \HTTP_Request2_Response::decodeDeflate($this->body);
                 break;
 
             default:
                 return $this->body;
         }
 
-        return $decodedBody;
+        return $decoded;
     }
 
 }

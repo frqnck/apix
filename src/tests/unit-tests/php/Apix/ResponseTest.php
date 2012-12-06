@@ -2,7 +2,9 @@
 
 namespace Apix;
 
-class ResponseTest extends \PHPUnit_Framework_TestCase
+use Apix\TestCase;
+
+class ResponseTest extends TestCase
 {
 
     /**
@@ -25,6 +27,8 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->route->expects($this->any())
             ->method('getController')
             ->will($this->returnValue('resource'));
+
+        $this->response->setRoute($this->route);
     }
 
     protected function tearDown()
@@ -38,6 +42,16 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
      */
     public function testConstructor()
     {
+    }
+
+    public function testGetRequest()
+    {
+        $this->assertInstanceOf('Apix\Request', $this->response->getRequest());
+    }
+
+    public function testGetRoute()
+    {
+        $this->assertInstanceOf('Apix\Router', $this->response->getRoute());
     }
 
     public function testGetSetFormat()
@@ -83,7 +97,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->response->setHeader('Vary', 'Accept-Encoding', false);
         $this->response->setHeader('X-HTTP-Method-Override', 'PUT');
 
-        $this->assertSame('PUT', $this->response->getHeader('X-HTTP-Method-Override'));
+        $this->assertSame(
+            'PUT',
+            $this->response->getHeader('X-HTTP-Method-Override')
+        );
 
         $this->assertSame(
             $headers,
@@ -93,7 +110,10 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
 
     public function testSendHeader()
     {
-        $this->assertSame(array(404, 'org'), $this->response->sendHeader(404, 'org'));
+        $this->assertSame(
+            array(404, 'org'),
+            $this->response->sendHeader(404, 'org')
+        );
     }
 
     public function testSendAllHttpHeaders()
@@ -121,8 +141,14 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('Unauthorized', Response::getStatusPrases(401));
 
         // long
-        $this->assertSame('The request has succeeded.', Response::getStatusPrases(200, true));
-        $this->assertSame('Not Authenticated.', Response::getStatusPrases(401, true));
+        $this->assertSame(
+            'The request has succeeded.',
+            Response::getStatusPrases(200, true)
+        );
+        $this->assertSame(
+            'Not Authenticated.',
+            Response::getStatusPrases(401, true)
+        );
     }
 
     public function testGetStatusAdjective()
@@ -135,73 +161,42 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame(
             array('resource' => array('results')),
-            $this->response->collate($this->route, array('results'))
+            $this->response->collate(array('results'))
         );
     }
 
-    public function testCollateWithDebug()
+    public function testGenerateAsHtml()
     {
-        $this->response->debug = true;
-        $results = $this->response->collate($this->route, array('results'));
-        $this->assertArrayHasKey('debug', $results);
-        $this->assertArrayHasKey('timestamp', $results['debug']);
-        #$this->assertSame('REQUEST_METHOD /', $results['debug']['request']);
-        $this->assertSame(array('results'), $results['resource']);
-    }
-
-    public function testCollateWithSignature()
-    {
-        $this->response->sign = true;
-        $results = $this->response->collate($this->route, array('results'));
-
-        $this->assertArrayHasKey('signature', $results);
-    }
-
-    public function testCollateWithDebugAndSignature()
-    {
-        $this->response->debug=true;
-        $this->response->sign=true;
-        $results = $this->response->collate($this->route, array('results'));
-
-        $this->assertArrayHasKey('resource', $results);
-        $this->assertArrayHasKey('signature', $results);
-        $this->assertArrayHasKey('debug', $results);
-    }
-
-    public function testGenerateAsLst()
-    {
-        $this->response->setFormats(array('lst'));
-        $this->response->setFormat('lst');
-        $results = array('results');
-
-        $html = '<ul><li>root: <ul><li>resource: <ul><li>0: results</li></ul></li></ul></li></ul>';
-
+        #$this->response->setFormats(array('html'));
+        $this->response->setFormat('html');
+        $this->response->generate(array('results'));
         $this->assertSame(
-            $html,
-            $this->response->generate($this->route, $results)
+            '<ul><li>root: <ul><li>resource: '
+            . '<ul><li>0: results</li></ul></li></ul></li></ul>',
+            $this->response->getOutput()
         );
     }
 
     public function testGenerateAsJson()
     {
         $this->response->setFormat('json');
-        $results = array('results');
+        $this->response->generate(array('results'));
         $this->assertSame(
             '{"root":{"resource":["results"]}}',
-            $this->response->generate($this->route, $results)
+            $this->response->getOutput()
         );
     }
 
     public function testGenerateAsXml()
     {
         $this->response->setFormat('xml');
-        $results = array('results');
+        $this->response->generate(array('results'));
 
-        $xml = '<root><resource><item>results</item></resource></root>' . PHP_EOL;
+        $xml = "<root><resource><item>results</item></resource></root>\n";
 
         $this->assertSame(
             '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . $xml,
-            $this->response->generate($this->route, $results)
+            $this->response->getOutput()
         );
     }
 
@@ -215,8 +210,46 @@ class ResponseTest extends \PHPUnit_Framework_TestCase
         $results = array('results');
         $this->assertSame(
             '{"root":{"resource":["results"]}}',
-            $this->response->generate($this->route, $results)
+            $this->response->generate($results)
         );
     }
+
+    public function testSetterAndGetterOutput()
+    {
+        $this->response->setOutput('foo');
+        $this->assertEquals('foo', $this->response->getOutput());
+    }
+
+/* -- EXTENSION -- */
+
+    public function OfftestCollateWithDebug()
+    {
+        $this->response->debug = true;
+        $results = $this->response->collate(array('results'));
+        $this->assertArrayHasKey('debug', $results);
+        $this->assertArrayHasKey('timestamp', $results['debug']);
+        #$this->assertSame('REQUEST_METHOD /', $results['debug']['request']);
+        $this->assertSame(array('results'), $results['resource']);
+    }
+
+    public function OfftestCollateWithSignature()
+    {
+        $this->response->sign = true;
+        $results = $this->response->collate(array('results'));
+
+        $this->assertArrayHasKey('signature', $results);
+    }
+
+    public function OfftestCollateWithDebugAndSignature()
+    {
+        $this->response->debug=true;
+        $this->response->sign=true;
+        $results = $this->response->collate(array('results'));
+
+        $this->assertArrayHasKey('resource', $results);
+        $this->assertArrayHasKey('signature', $results);
+        $this->assertArrayHasKey('debug', $results);
+    }
+
 
 }
