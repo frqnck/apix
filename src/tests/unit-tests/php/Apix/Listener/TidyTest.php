@@ -3,9 +3,9 @@ namespace Apix\Listener;
 
 use Apix\HttpRequest,
     Apix\Response,
-    Apix\ApixTestCase;
+    Apix\TestCase;
 
-class TidyTest extends ApixTestCase
+class TidyTest extends TestCase
 {
 
     protected $tidy, $response;
@@ -18,8 +18,9 @@ class TidyTest extends ApixTestCase
             );
         }
 
-        $request = HttpRequest::GetInstance();
-        $this->response = new Response($request);
+        $this->response = new Response(
+            HttpRequest::GetInstance()
+        );
         $this->response->unit_test = true;
 
         $this->route = $this->getMock('Apix\Router');
@@ -31,6 +32,8 @@ class TidyTest extends ApixTestCase
         $this->route->expects($this->any())
             ->method('getController')
             ->will($this->returnValue('resource'));
+
+        $this->response->setRoute($this->route);
 
         $options = array(
             'enable'    => true,
@@ -53,7 +56,7 @@ class TidyTest extends ApixTestCase
 
     public function testIsDisable()
     {
-        $t = new Tidy( array('enable'=>false) );
+        $t = new Tidy( array('enable' => false) );
         $this->assertFalse( $t->update($this->response) );
     }
 
@@ -61,7 +64,7 @@ class TidyTest extends ApixTestCase
     {
         $this->response->setFormat('xml');
         $results = array('results');
-        $this->response->generate($this->route, $results);
+        $this->response->generate($results);
 
         $this->tidy->update($this->response);
 
@@ -73,12 +76,11 @@ class TidyTest extends ApixTestCase
         );
     }
 
-    public function testGenerateAsLst()
+    public function testGenerateAsHtml()
     {
-        $this->response->setFormats(array('lst'));
-        $this->response->setFormat('lst');
+        $this->response->setFormat('html');
         $results = array('results');
-        $this->response->generate($this->route, $results);
+        $this->response->generate($results);
 
         $this->tidy->update($this->response);
 

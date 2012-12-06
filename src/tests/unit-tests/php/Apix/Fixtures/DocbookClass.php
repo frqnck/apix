@@ -49,11 +49,12 @@ class DocbookClass
      * Method two description 2nd line
      *
      * @param string $arg1     an integer
-     * @param array  $optional something optional (here an array)
+     * @param array  $required something required
+     * @param array  $optional something optional
      * @api_public false
      * @api_version 1.0
      */
-    public static function methodNameTwo($arg1, $optional=null)
+    public static function methodNameTwo($arg1, $required, $optional=null)
     {
         return array($arg1, $optional);
     }

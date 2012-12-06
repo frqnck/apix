@@ -8,7 +8,7 @@ abstract class Template
 {
 
 	/**
-	 * Default template engine name.
+	 * Name of the templating engine.
 	 * @var  string
 	 */
 	public static $engine = 'Apix\View\Template\Mustache';

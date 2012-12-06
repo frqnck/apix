@@ -108,7 +108,7 @@ class ViewModel
 
     public function getViewLayout()
     {
-    	return $this->_layout;
+        return $this->_layout;
     }
 
     public function debug($data=null)

@@ -40,13 +40,16 @@ class Help
     {
         $this->route = $server->getRoute();
 
-        $path = preg_replace('@^.*help(\.\w+)?@i', '', $server->request->getUri());
-        if (
-            !empty($path)
-            && $server->resources->has($path)
-        ) {
+        $path = preg_replace('@^.*help(\.\w+)?@', '', $server->request->getUri());
+
+        # $path = rawurldecode($path);
+
+        // if (
+        //     !empty($path)
+        //     && $server->resources->has($path)
+        // ) {
             $server->getRoute()->setName($path);
-        }
+        // }
 
         return $this->onHelp($server, $filters);
     }

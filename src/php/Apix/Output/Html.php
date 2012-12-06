@@ -20,11 +20,30 @@ class Html extends AbstractOutput
      */
     public function encode(array $data, $rootNode=null)
     {
-        $view = new View($data);
+        if(null !== $rootNode) {
+            $data = array($rootNode => $data);
+        }
 
-        #return $view; // _toString doesn't handle exception too well!!!
+        return $this->recursivelyAppend($data);
+    }
 
-        return $view->render();
+    /**
+     * Append the data recursively...
+     *
+     * @param   array   $results
+     * @return  string
+     */
+    protected function recursivelyAppend(array $results)
+    {
+        $out = '<ul>';
+        foreach ($results as $k => $v) {
+            $out .= "<li>$k: ";
+            $out .= is_array($v) ? $this->recursivelyAppend($v, $k) : $v;
+            $out .= '</li>';
+        }
+        $out .= '</ul>';
+
+        return $out;
     }
 
 }
