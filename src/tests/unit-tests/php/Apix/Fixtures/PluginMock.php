@@ -1,8 +1,11 @@
 <?php
 namespace Apix\Fixtures;
 
-class ListenerMock implements \SplObserver
+use Apix\Plugins\PluginAbstract;
+
+class PluginMock extends PluginAbstract
 {
+    static public $hook = array('level', 'type');
 
     public $value = null;
     public $integer = 0;

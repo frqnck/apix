@@ -1,9 +1,9 @@
 <?php
-namespace Apix\Listener;
+namespace Apix\Plugins;
 
 use Apix\Response;
 
-class OutputSign extends AbstractListener
+class OutputSign extends PluginAbstract
 {
 
     public static $hook = array('response', 'early');

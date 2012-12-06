@@ -4,7 +4,9 @@ namespace Apix;
 
 use Apix\Server;
 
-define('APIX_START_TIME', microtime(true));
+if(!defined('APIX_START_TIME')) {
+    define('APIX_START_TIME', microtime(true));
+}
 
 class App extends Server
 {
