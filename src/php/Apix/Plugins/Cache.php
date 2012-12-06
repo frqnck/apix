@@ -1,7 +1,7 @@
 <?php
-namespace Apix\Listener;
+namespace Apix\Plugins;
 
-class Cache extends AbstractListenerEntity
+class Cache extends PluginAbstractEntity
 {
 
     public static $hook = array('entity', 'early');
@@ -9,7 +9,7 @@ class Cache extends AbstractListenerEntity
     protected $annotation = 'api_cache';
 
     protected $options = array(
-        'adapter'    => 'Apix\Listener\Cache\Adapter',
+        'adapter'    => 'Apix\Plugins\Cache\Adapter',
         'enable'     => true,              // wether to enable or not
         'ttl'        => '10mins',          // set the TTL, null stands forever
         'flush'      => true,              // wether to flush tags at runtime (cron job?)
@@ -78,17 +78,16 @@ class Cache extends AbstractListenerEntity
 
     /**
      * Returns the time-to-live interval in seconds.
+     * Inputs strings are date/time strtotime formatted.
+     * @see http://php.net/strtotime
      *
-     * @param string $until A date/time string. @see http://php.net/strtotime
-     * @param string $from A date/time string. @see http://php.net/strtotime
-     * @return integer  The TTL in seconds.
+     * @param   string  $until
+     * @param   string      $from
+     * @return  integer     The TTL in seconds.
      */
     public function getTtlInternval($until=null, $from='now')
     {
-        return $until==0 ? null : strtotime($until)-strtotime($from);
-        // $expiryDate = new \DateTime();
-        // $interval = new \DateInterval($ttl);
-        // return $expiryDate->add($interval);
+        return $until == 0 ? null : strtotime($until)-strtotime($from);
     }
 
 }
