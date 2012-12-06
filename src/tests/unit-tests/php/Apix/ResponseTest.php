@@ -37,13 +37,6 @@ class ResponseTest extends TestCase
         unset($this->route);
     }
 
-    /**
-     * @covers Apix\Response::__construct
-     */
-    public function testConstructor()
-    {
-    }
-
     public function testGetRequest()
     {
         $this->assertInstanceOf('Apix\Request', $this->response->getRequest());
@@ -167,7 +160,6 @@ class ResponseTest extends TestCase
 
     public function testGenerateAsHtml()
     {
-        #$this->response->setFormats(array('html'));
         $this->response->setFormat('html');
         $this->response->generate(array('results'));
         $this->assertSame(
@@ -219,37 +211,5 @@ class ResponseTest extends TestCase
         $this->response->setOutput('foo');
         $this->assertEquals('foo', $this->response->getOutput());
     }
-
-/* -- EXTENSION -- */
-
-    public function OfftestCollateWithDebug()
-    {
-        $this->response->debug = true;
-        $results = $this->response->collate(array('results'));
-        $this->assertArrayHasKey('debug', $results);
-        $this->assertArrayHasKey('timestamp', $results['debug']);
-        #$this->assertSame('REQUEST_METHOD /', $results['debug']['request']);
-        $this->assertSame(array('results'), $results['resource']);
-    }
-
-    public function OfftestCollateWithSignature()
-    {
-        $this->response->sign = true;
-        $results = $this->response->collate(array('results'));
-
-        $this->assertArrayHasKey('signature', $results);
-    }
-
-    public function OfftestCollateWithDebugAndSignature()
-    {
-        $this->response->debug=true;
-        $this->response->sign=true;
-        $results = $this->response->collate(array('results'));
-
-        $this->assertArrayHasKey('resource', $results);
-        $this->assertArrayHasKey('signature', $results);
-        $this->assertArrayHasKey('debug', $results);
-    }
-
 
 }

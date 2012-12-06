@@ -1,9 +1,9 @@
 <?php
-namespace Apix\Listener;
+namespace Apix\Plugins;
 
 use Apix\Response;
 
-class OutputDebug extends AbstractListener
+class OutputDebug extends PluginAbstract
 {
 
     public static $hook = array('response', 'early');
@@ -22,16 +22,25 @@ class OutputDebug extends AbstractListener
         $request = $response->getRequest();
         $route = $response->getRoute();
 
+        $headers = $response->getHeaders();
+
+        if(isset($_SERVER['X_AUTH_USER'])) {
+            $headers['X_AUTH_USER'] = $_SERVER['X_AUTH_USER'];
+        }
+
+        if(isset($_SERVER['X_AUTH_KEY'])) {
+            $headers['X_AUTH_KEY'] = $_SERVER['X_AUTH_KEY'];
+        }
+
         $debug = array(
             'timestamp'     => gmdate($this->options['timestamp']),
             'request'       => sprintf('%s %s%s',
                                     $request->getMethod(),
                                     $request->getRequestUri(),
                                     isset($_SERVER['SERVER_PROTOCOL'])
-                                        ? ' ' . $_SERVER['SERVER_PROTOCOL']
-                                        : null
+                                    ? ' ' . $_SERVER['SERVER_PROTOCOL'] : null
                                ),
-            'headers'       => $response->getHeaders(),
+            'headers'       => $headers,
             'output_format' => $response->getFormat(),
             'router_params' => $route->getParams(),
             'plugins'       => 'todo',
@@ -41,17 +50,10 @@ class OutputDebug extends AbstractListener
         );
 
         if(defined('APIX_START_TIME')) {
-            $debug['time'] = round(microtime(true) - APIX_START_TIME, 3) . ' seconds';
+            $debug['timing'] = round(microtime(true) - APIX_START_TIME, 3) . ' seconds';
         }
 
-        // X-Auth-Key
-        if(isset($_SERVER['X_AUTH_USER'])) {
-            $debug['user'] = $_SERVER['X_AUTH_USER'];
-        }
-
-        static $i = 0;
-        ++$i;
-        $response->results['debug'.$i] = $debug;
+        $response->results['debug'] = $debug;
     }
 
     public function convert($int)
