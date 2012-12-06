@@ -4,13 +4,14 @@ namespace Apix\Listener;
 class Tidy extends AbstractListener
 {
 
+    public static $hook = array('response', 'late');
+
     /**
+     * @var array Options for tidy.
      * @see http://tidy.sourceforge.net/docs/quickref.html
-     * @var array
      */
     protected $options = array(
-        'enable'    => true,        // Wether to enable output tidying at all.
-
+        'enable'    => true,        // wether to enable or not
         'generic'   => array(
             // PHP Bug: commenting out 'indent' (with true or false)
             // for some weird reason does chnage the Transfer-Encoding!
@@ -27,17 +28,6 @@ class Tidy extends AbstractListener
             'output-xml'    => true,
         )
     );
-
-    /**
-     * Constructor.
-     *
-     * @param Cache\Adapter $adapter
-     * @param array $options Array of options.
-     */
-    public function __construct(array $options=array())
-    {
-        $this->options = $options+$this->options;
-    }
 
     public function update(\SplSubject $response)
     {

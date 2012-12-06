@@ -133,6 +133,28 @@ class Config #extends Di
     }
 
     /**
+     * Sets as new a mixed value to a specified key.
+     *
+     * @param   string   $key    The key to set.
+     * @param   mixed    $mix    The mixed value to set.
+     */
+    public function set($key, $mix)
+    {
+        $this->config[$key] = $mix;
+    }
+
+    /**
+     * Adds the mixed value to a specified key.
+     *
+     * @param   string   $key    The key to add to.
+     * @param   mixed    $mix    The mixed value to add.
+     */
+    public function add($key, $mix)
+    {
+        $this->config[$key][] = $mix;
+    }
+
+    /**
      * Returns the specified default config value using its index key.
      * If the index key is not set then it will return the whole default config property.
      *
@@ -183,17 +205,6 @@ class Config #extends Di
     public function getResources($key=null)
     {
         return $this->retrieve('resources', $key);
-    }
-
-    /**
-     * Returns the specified plugin (or all if unspecified).
-     *
-     * @param string $key=null The plugin key to retrieve.
-     * @see     self::retrieve
-     */
-    public function getListeners($key=null)
-    {
-        return $this->retrieve('listeners', $key);
     }
 
     /**
@@ -248,6 +259,28 @@ class Config #extends Di
         // add the distribution file
         $file = realpath(__DIR__ . '/../../data/distribution/config.dist.php');
         return $this->getConfigFromFile($file);
+    }
+
+    /**
+     * Returns the specified plugin (or all if unspecified).
+     *
+     * @param string $key=null The plugin key to retrieve.
+     * @see     self::retrieve
+     */
+    public function addListener($key, $mix, $level, $type)
+    {
+        $this->config['listeners'][$level][$type][$key] = $mix;
+    }
+
+    /**
+     * Returns the specified plugin (or all if unspecified).
+     *
+     * @param string $key=null The plugin key to retrieve.
+     * @see     self::retrieve
+     */
+    public function getListeners($key=null)
+    {
+        return $this->retrieve('listeners', $key);
     }
 
 }

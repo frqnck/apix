@@ -15,9 +15,10 @@ class XmlWriter extends Xml
         $x = new \XmlWriter();
         $x->openMemory();
         $x->startDocument($this->version, $this->encoding);
+        if(null !== $rootNode) {
             $x->startElement($rootNode);
-                $this->arrayToXmlWriter($x, $data);
-            $x->endElement();
+        }
+        $this->arrayToXmlWriter($x, $data);
         $x->endDocument();
 
         return $x->outputMemory(true);
