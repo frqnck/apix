@@ -1,5 +1,5 @@
 <?php
-namespace Apix\Listener;
+namespace Apix\Plugins;
 
 use Apix\HttpRequest,
     Apix\Response,

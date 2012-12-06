@@ -1,12 +1,12 @@
 <?php
-namespace Apix\Listener;
+namespace Apix\Plugins;
 
-class Auth extends AbstractListenerEntity
+class Auth extends PluginAbstractEntity
 {
     public static $hook = array('entity', 'early');
 
     protected $options = array(
-        'adapter'       => 'Apix\Listener\Auth\Adapter',
+        'adapter'       => 'Apix\Plugins\Auth\Adapter',
         'enable'        => true,        // wether to enable or not
         'public_group'  => 'public',    // public group to skip auth
     );
