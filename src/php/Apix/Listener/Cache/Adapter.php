@@ -20,7 +20,7 @@ interface Adapter
      * @param  array    $tags   The cache tags for this entry.
      * @param  int      $ttl    The time to live in seconds, if set to null the
      *                          cache is valid forever.
-     * @return boolean          True on sucess.
+     * @return boolean          Returns True on success.
      */
     public function save($data, $key, array $tags=null, $ttl=false);
 
@@ -35,15 +35,15 @@ interface Adapter
      * Deletes the specified cache record.
      *
      * @param  string $key      The cache id to remove.
-     * @return boolean          True on sucess.
+     * @return boolean          Returns True on success.
      */
     public function delete($key);
 
     /**
      * Flush all the cached entries.
      *
-     * @param   boolean $all    Wether to flush the whole database (caution).
-     * @return  boolean         Returns TRUE on success or FALSE on failure.
+     * @param   boolean $all    Wether to flush the whole database.
+     * @return  boolean         Returns True on success.
      */
      public function flush($all=false);
 

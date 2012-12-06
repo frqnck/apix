@@ -10,7 +10,7 @@ class Redis extends AbstractCache
      * @param   \Redis  $redis      The redis database to instantiate.
      * @param   array   $options    Array of options.
      */
-    public function __construct(\Redis $redis, array $options=array())
+    public function __construct(\Redis $redis, array $options=null)
     {
         $options['atomicity'] = !isset($options['atomicity'])
                                 || true === $options['atomicity']
@@ -69,10 +69,12 @@ class Redis extends AbstractCache
         $items = array();
 		foreach($tags as $tag) {
             $keys = $this->load($tag, 'tag');
-            array_walk_recursive(
-                $keys,
-                function($key) use (&$items) { $items[] = $key; }
-            );
+            if(is_array($keys)) {
+                array_walk_recursive(
+                    $keys,
+                    function($key) use (&$items) { $items[] = $key; }
+                );
+            }
             $items[] = $this->mapTag($tag);
 		}
 

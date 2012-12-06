@@ -37,7 +37,7 @@ class Xml extends AbstractOutput
      */
     public function encode(array $data, $rootNode='root')
     {
-        if (true && extension_loaded('xmlwriter')) {
+        if (extension_loaded('xmlwriter')) {
             $xml = new Xml\XmlWriter;
         } else {
             // SimpleXml is a default PHP extension

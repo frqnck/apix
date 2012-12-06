@@ -29,9 +29,14 @@ class Help extends ViewModel
         }
     }
 
+    /**
+     * Deals with the items definitions.
+     * move the index key to comply with the Mustashe.
+     *
+     * @return array
+     */
     public function items()
     {
-        // remove index key for mustashe.
         // TODO: make this a view helper.
         foreach($this->items as $item) {
             foreach($item['methods'] as $k => $v) {
@@ -39,6 +44,9 @@ class Help extends ViewModel
                 $item['methods'][] = $item['methods'][$k];
                 unset($item['methods'][$k]);
             }
+
+            // $item['path'] = isset($item['path']) ? urlencode($item['path']) : null;
+
             $this->items[] = $item;
         }
 
@@ -46,7 +54,7 @@ class Help extends ViewModel
     }
 
     /**
-     * Deals with parameter' definitions.
+     * Deals with the parameters definitions.
      *
      * @return array
      */
@@ -69,7 +77,7 @@ class Help extends ViewModel
     }
 
     /**
-     * Deals with group' definitions.
+     * Deals with the groups definitions.
      *
      * @return array
      */
