@@ -1,5 +1,5 @@
 <?php
-namespace Apix;
+//namespace Apix;
 
 define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
 define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
@@ -20,9 +20,9 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 
 # Test server
 try {
-    $api = new Server;
+    $api = new Apix\App;
 
-    $api->onRead('/test/:id<\d*>',
+    $api->onRead('/test/:id', //<[[:digit:]]{1,3}>
 
         /**
          * Read an enti2ty id (title).
@@ -48,8 +48,8 @@ try {
             $params = $api->request->getBody();
 
             return array(
-                'test'  => 'test',
-                'xml' =>array('&"\'<> ?|\\-_+=@£$€*/":;[]{}'),
+                'test'  => 'value',
+                #'xml' =>array('&"\'<> ?|\\-_+=@£$€*/":;[]{}'),
                 'body'  => $api->request->getBody(),
                 //'params'    => $api->getBodyData()
             );

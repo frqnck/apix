@@ -3,24 +3,15 @@ namespace Apix\Listener;
 
 class Auth extends AbstractListenerEntity
 {
-
-    protected $annotation = 'api_auth';
+    public static $hook = array('entity', 'early');
 
     protected $options = array(
-        'public_group'  =>  'public'     // name of the public group to skip.
+        'adapter'       => 'Apix\Listener\Auth\Adapter',
+        'enable'        => true,        // wether to enable or not
+        'public_group'  => 'public',    // public group to skip auth
     );
 
-    /**
-     * Constructor.
-     *
-     * @param Cache\Adapter $adapter
-     * @param array $options Array of options.
-     */
-    public function __construct(Auth\Adapter $adapter, array $options=array())
-    {
-        $this->adapter = $adapter;
-        $this->options = $options+$this->options;
-    }
+    protected $annotation = 'api_auth';
 
     public function update(\SplSubject $entity)
     {

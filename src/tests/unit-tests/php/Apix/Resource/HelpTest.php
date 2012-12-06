@@ -1,9 +1,10 @@
 <?php
 namespace Apix;
 
-use Apix\Server;
+use Apix\Server,
+    Apix\TestCase;
 
-class HelpTest extends \PHPUnit_Framework_TestCase
+class HelpTest extends TestCase
 {
 
     protected $request, $api, $help;
@@ -14,7 +15,7 @@ class HelpTest extends \PHPUnit_Framework_TestCase
                               ->disableOriginalConstructor()
                               ->getMock();
 
-        $this->api = new Server(false, $this->request);
+        $this->api = new App(false, $this->request);
 
         $this->api->onCreate('/create/:test',
             /**

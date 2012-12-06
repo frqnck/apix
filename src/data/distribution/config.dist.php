@@ -40,17 +40,6 @@ $c = array(
     // nodes (may) also live within that node if enable further down below.
     'output_rootNode'   => 'apix',
 
-    // Wether or not to output the entity signatures within the response-body.
-    // This might be useful to some clients/users. Could also be made optional
-    // using a request variable as shown below:
-    // 'output_sign' => isset($_REQUEST['_sign']) ? $_REQUEST['_sign'] : false,
-    'output_sign'       => true,
-
-    // Wether or not to output the debugging in the response-body. Should be set
-    // to false on production servers. Beware this settign affects page
-    // cachability.
-    'output_debug'      => DEBUG,
-
     // The array of available data formats for input representation:
     // - POST: Body post data.
     // - JSON: Light text-based open standard designed for human-readable data
@@ -79,12 +68,10 @@ $c = array(
         // - JSONP: Output JSON embeded within a javascript callback. Javascript
         // clients can set the callback name using the GET/POST variable named
         // 'callback' or default to the 'output_rootNode' value set above.
-        // - HTML: Might eventually be useful for white labeling purposes using
-        // some headers/footers templates, CSS...
+        // - HTML: Output an HTML bulleted list.
         // - PHP: Does not currently serialize the data as one would expect but
         // just dump the output array for now.
-        // - LST: Output a HTML unordored/bulleted list.
-        'formats'           => array('json', 'xml', 'jsonp', 'html', 'php', 'lst'),
+        'formats'           => array('json', 'xml', 'jsonp', 'html', 'php'),
 
         // Set the defaut output format to either JSON or XML. Note that JSON
         // encoding is by definition UTF-8 only. If a specific encoding is
@@ -171,7 +158,6 @@ $c = array(
 
 );
 
-
 // Resources definitions
 // ---------------------
 // route path string (with named variable) to resource definition.
@@ -235,7 +221,7 @@ $c['services'] = array(
             $adapter->token = false;
         };
 
-        return new Listener\Auth($adapter);
+        return $adapter;
     },
 
     // Example implementing 'Listener\Auth\Digest'
@@ -260,12 +246,8 @@ $c['services'] = array(
             $adapter->token = false;
         };
 
-        return new Listener\Auth($adapter);
-    },
-
-    'cache_plugin' => function() use ($c) {
-        $adapter = new Listener\Cache\Apc;
-        return new Listener\Cache($adapter);
+        return $adapter;
+        #return new Listener\Auth($adapter);
     },
 
     // Returns a user array. This is used by the authentification plugins above.
@@ -299,10 +281,12 @@ $c['services'] = array(
 // - late: elements defined withtin will fire @ post-processing
 // - exception: elements defined withtin will fire durring an error/exception
 // Each periods can have one or many listeners firing in succesion.
-$c['listeners'] = array(
+$c['listeners'] = array();
+
+
+$c['listeners_off'] = array(
     'server' => array(
         'early' => array(
-            'Apix\Listener\ViewModel',
             #'Apix\Listener\Mock',
         ),
         'late' => array(),
@@ -310,30 +294,70 @@ $c['listeners'] = array(
             #'Apix\Listener\Log' => array('php://output'),
         )
     ),
+
     'entity' => array(
         'early' => array(
-            $c['services']['digest_auth_plugin'],
+            #$c['services']['digest_auth_plugin'],
             #$c['services']['basic_auth_plugin'],
-            $c['services']['cache_plugin'],
+            #$c['services']['cache_plugin'],
         ),
         'late' => array(),
     ),
+
     'response' => array(
         'early' => array(
             #'Apix\Listener\Streaming',
+            #'Apix\Listener\OutputDebug',
         ),
         'late'  => array(
-            #'Apix\Listener\Tidy'
+            #
         ),
     ),
 );
 
+$c['plugins'] = array(
+
+    // Plugin use to output the entity signatures within the response-body.
+    // This might be useful to some clients/users. Could also be made optional
+    // using a request variable as shown below:
+    // 'output_sign' => isset($_REQUEST['_sign']) ? $_REQUEST['_sign'] : false,
+    #'Apix\Listener\OutputSign',
+
+    // Wether or not to output the debugging in the response-body. Should be set
+    // to false on production servers. Beware this settign affects page
+    // cachability.
+    #'Apix\Listener\OutputDebug',
+
+    // Wether or not to output the debugging in the response-body. Should be set
+    // to false on production servers. Beware this settign affects page
+    // cachability.
+    // 'Apix\Listener\Tidy',
+
+
+
+    #'Apix\Listener\Auth' => array('adapter' => $c['services']['basic_auth_plugin'] ),
+    #'Apix\Listener\Auth' => array('adapter' => $c['services']['digest_auth_plugin'] ),
+
+    // 'Apix\Listener\Cache' => array(
+    //     'adapter' => function() use ($c) {
+    //         #return new Listener\Cache\Apc;
+
+    //         $redis = new \Redis();
+    //         $redis->connect('127.0.0.1', 6379);
+    //         return new Listener\Cache\Redis($redis);
+    //     }
+    // ),
+
+    #'Apix\Listener\Manual',
+    #'Apix\Listener\Streaming',
+);
 
 ///////////////////////////////////////////////////////////////
 // Anything below that point should not need to be modified. //
 ///////////////////////////////////////////////////////////////
 
 $c['default'] = array(
+
     'listeners' => array(
         'server' => array(
             'early' => array(),
@@ -349,6 +373,7 @@ $c['default'] = array(
             'late'  => array()
         )
     ),
+
     'services' => array(),
     'resources' => array(
         // The OPTIONS method represents a request for information about the

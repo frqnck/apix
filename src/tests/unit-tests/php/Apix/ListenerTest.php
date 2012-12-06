@@ -92,7 +92,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('but-not-late', $plugins['early']);
     }
 
-    public function testAddAllListeners()
+    public function testhook()
     {
         $plugins = array(
             'early' => array(
@@ -102,7 +102,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         );
         $this->listener->setListenersLevel('server', $plugins);
 
-        $this->listener->addAllListeners('server', 'early');
+        $this->listener->hook('server', 'early');
 
         $this->assertSame(2, $this->listener->count());
     }
@@ -115,7 +115,7 @@ class ListenerTest extends \PHPUnit_Framework_TestCase
         $plugins = array( 'early' => array('Whatever') );
         $this->listener->setListenersLevel('server', $plugins);
 
-        $this->listener->addAllListeners('server', 'early');
+        $this->listener->hook('server', 'early');
     }
 
 }

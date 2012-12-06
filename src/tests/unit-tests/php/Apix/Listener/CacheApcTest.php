@@ -1,12 +1,12 @@
 <?php
 namespace Apix\Listener\Cache;
 
-use Apix\ApixTestCase;
+use Apix\TestCase;
 
 /*
     php -d apc.enable_cli=1 `which phpunit` -v src/tests/unit-tests/php/Apix/Listener/CacheApcTest.php
  */
-class CacheApcTest extends ApixTestCase
+class CacheApcTest extends TestCase
 {
 
     protected $cache = null;
