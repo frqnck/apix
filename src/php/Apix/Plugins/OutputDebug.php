@@ -15,7 +15,7 @@ class OutputDebug extends PluginAbstract
 
     public function update(\SplSubject $response)
     {
-        if ( false === $this->options['enable'] ) {
+        if (false === $this->options['enable']) {
             return false;
         }
 
@@ -24,11 +24,11 @@ class OutputDebug extends PluginAbstract
 
         $headers = $response->getHeaders();
 
-        if(isset($_SERVER['X_AUTH_USER'])) {
+        if (isset($_SERVER['X_AUTH_USER'])) {
             $headers['X_AUTH_USER'] = $_SERVER['X_AUTH_USER'];
         }
 
-        if(isset($_SERVER['X_AUTH_KEY'])) {
+        if (isset($_SERVER['X_AUTH_KEY'])) {
             $headers['X_AUTH_KEY'] = $_SERVER['X_AUTH_KEY'];
         }
 
@@ -49,7 +49,7 @@ class OutputDebug extends PluginAbstract
 
         );
 
-        if(defined('APIX_START_TIME')) {
+        if (defined('APIX_START_TIME')) {
             $debug['timing'] = round(microtime(true) - APIX_START_TIME, 3) . ' seconds';
         }
 
@@ -59,6 +59,7 @@ class OutputDebug extends PluginAbstract
     public function convert($int)
     {
         $unit = array('B','kB','MB','GB','TB','PB');
+
         return round($int/pow(1024,($i=floor(log($int,1024)))), 2) . $unit[$i];
     }
 

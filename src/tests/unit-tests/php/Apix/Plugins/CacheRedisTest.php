@@ -13,20 +13,20 @@ class CacheRedisTest extends TestCase
 
     public function setUp()
     {
-        if(!extension_loaded('redis')) {
+        if (!extension_loaded('redis')) {
             $this->markTestSkipped(
                 'The Redis extension is required to run this unit test.'
             );
         }
 
-        try{
+        try {
             $this->redis = new \Redis();
             $this->redis->connect(self::HOST, self::PORT);
-            if(self::AUTH) {
+            if (self::AUTH) {
                 $this->redis->auth(self::AUTH);
             }
             $this->redis->ping();
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $this->markTestSkipped( $e->getMessage() );
         }
 
@@ -41,7 +41,7 @@ class CacheRedisTest extends TestCase
 
     public function tearDown()
     {
-        if(null !== $this->cache) {
+        if (null !== $this->cache) {
             $this->cache->flush();
             $this->redis->close();
             unset($this->cache);

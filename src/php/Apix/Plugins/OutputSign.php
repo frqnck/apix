@@ -14,7 +14,7 @@ class OutputSign extends PluginAbstract
 
     public function update(\SplSubject $response)
     {
-        if ( false === $this->options['enable'] ) {
+        if (false === $this->options['enable']) {
             return false;
         }
 

@@ -101,15 +101,22 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testRetrieveMany()
     {
-        $default = $this->config->get('resources')+$this->config->getDefault('resources');
+        $defaults = $this->config->get('resources');
+        $defaults += $this->config->getDefault('resources');
 
-        $this->assertSame($default, $this->config->retrieve('resources'));
+        $this->assertSame(
+            $defaults,
+            $this->config->retrieve('resources')
+        );
     }
 
     public function testRetrieveOne()
     {
-        $default = $this->config->getDefault('resources');
-        $this->assertSame($default['OPTIONS'], $this->config->retrieve('resources', 'OPTIONS'));
+        $defaults = $this->config->getDefault('resources');
+        $this->assertSame(
+            $defaults['OPTIONS'],
+            $this->config->retrieve('resources', 'OPTIONS')
+        );
     }
 
     /**
@@ -117,15 +124,15 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
      */
     public function testRetrieveThrowRuntimeException()
     {
-        $default = $this->config->getDefault('resources');
         $this->config->retrieve('resources', 'not-existant');
     }
 
     public function testGetManyResources()
     {
-        $default = $this->config->get('resources')+$this->config->getDefault('resources');
+        $defaults = $this->config->get('resources');
+        $defaults += $this->config->getDefault('resources');
 
-        $this->assertSame($default, $this->config->getResources());
+        $this->assertSame($defaults, $this->config->getResources());
     }
 
     public function testGetManyServices()
@@ -176,6 +183,16 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('some_value', $this->config->getInjected('some_key'));
     }
 
+    /**
+     * TEMP: testGetAndSetInject
+     */
+    public function testSetItem()
+    {
+       $c = Config::getInstance();
+       $c->set('plugins', array());
+        $this->assertEmpty($c->get('plugins'));
+    }
+
     public function TODO_testEmptyConfigSetAnAssociativeArrayOfEmptyArray()
     {
         $this->config->setConfig(
@@ -184,15 +201,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(), $this->config->get('resources'));
         $this->assertEquals(array(), $this->config->get('services'));
         $this->assertEquals(array(), $this->config->get('listeners'));
-    }
-
-
-
-    public function OFF_testGetManyPlugins()
-    {
-        $default = $this->config->get('listeners')+$this->config->getDefault('listeners');
-
-        $this->assertSame($default, $this->config->getListeners());
     }
 
 }

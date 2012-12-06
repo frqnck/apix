@@ -343,7 +343,7 @@ class Response extends Listener
      * @param  bolean  $long
      * @return string
      */
-    static public function getStatusPrases($http_code=null, $long=false)
+    public static function getStatusPrases($http_code=null, $long=false)
     {
         //$http_code = is_null($http_code) ? $this->http_code : $http_code;
         $type = $long === true ? self::$long_http_phrases : self::$http_phrases;
@@ -360,7 +360,7 @@ class Response extends Listener
      * @param  integer $http_code
      * @return string
      */
-    static public function getStatusAdjective($http_code)
+    public static function getStatusAdjective($http_code)
     {
         return floor($http_code/100)<=3 ? 'successful' : 'failed';
     }
@@ -395,7 +395,7 @@ class Response extends Listener
         $this->setHeader('Content-Type', $view->getContentType());
         $this->sendAllHttpHeaders($this->getHttpCode(), $version_string);
 
-        if(null === $this->output) {
+        if (null === $this->output) {
             $this->output = $view->encode(
                 $this->results,
                 $rootNode
