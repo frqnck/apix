@@ -75,7 +75,7 @@ class EntityClosure extends Entity implements EntityInterface
 
         $params = $this->getValidatedParams($method, $route->getMethod(), $route->getParams());
 
-        #$this->addAllListeners('resource', 'early');
+        #$this->hook('resource', 'early');
 
         return call_user_func_array($action, $params);
     }

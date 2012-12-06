@@ -3,6 +3,7 @@ namespace Apix\Output;
 
 class Php extends AbstractOutput
 {
+    public $debug = false;
 
     /**
      * {@inheritdoc}
@@ -14,21 +15,25 @@ class Php extends AbstractOutput
     /**
      * {@inheritdoc}
      */
-    public function encode(array $data, $rootNode='root')
+    public function encode(array $data, $rootNode=null)
     {
-        return $this->dump(array($rootNode=>$data));
+        if(null !== $rootNode) {
+            $data = array($rootNode => $data);
+        }
+
+        return false === $this->debug
+                ? $this->serialize($data)
+                : $this->dump($data);
+    }
+
+    public function serialize($data)
+    {
+        return serialize($data);
     }
 
     public function dump($data)
     {
         return print_r($data, true);
     }
-
-    // public function htmldump($data, $height="9em")
-    // {
-    //     echo "<pre style=\"border: 1px solid #000; height: {$height}; overflow: auto; margin: 0.5em;\">";
-    //     var_export($data);
-    //     echo "</pre>\n";
-    // }
 
 }

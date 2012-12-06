@@ -4,6 +4,8 @@ namespace Apix\Listener;
 class Streaming extends AbstractListener
 {
 
+    public static $hook = array('response', 'early');
+
     public $streamed = false;
     public $callback = null;
 
@@ -12,9 +14,9 @@ class Streaming extends AbstractListener
      *
      * @param array $options Array of options.
      */
-    public function __construct(array $options=array())
+    public function __construct(array $options=null)
     {
-        #$this->options = $options+$this->options;
+        // $this->setOptions($options);
     }
 
     static public function ob()
