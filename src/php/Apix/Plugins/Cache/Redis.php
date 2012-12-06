@@ -1,5 +1,5 @@
 <?php
-namespace Apix\Listener\Cache;
+namespace Apix\Plugins\Cache;
 
 class Redis extends AbstractCache
 {

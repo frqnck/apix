@@ -1,7 +1,7 @@
 <?php
-namespace Apix\Listener;
+namespace Apix\Plugins;
 
-class Streaming extends AbstractListener
+class Streaming extends PluginAbstract
 {
 
     public static $hook = array('response', 'early');
