@@ -31,21 +31,23 @@ class Tidy extends PluginAbstract
 
     public function update(\SplSubject $response)
     {
-        if ( false === $this->options['enable'] ){
+        if (false === $this->options['enable']) {
             $this->log('Disabled');
+
             return false;
         }
 
         // @codeCoverageIgnoreStart
         if (!extension_loaded('tidy')) {
             $this->log('The Tidy extension is not available.');
+
             return false;
         }
         // @codeCoverageIgnoreEnd
 
         $format = $response->getFormat();
 
-        switch($format) {
+        switch ($format) {
 
             case 'lst':
             case 'html':
@@ -68,7 +70,7 @@ class Tidy extends PluginAbstract
      * Tidy, sanitize the response output.
      *
      * @param  string $string
-     * @param  array $options
+     * @param  array  $options
      * @return string
      */
     protected function tidy($string, array $options)

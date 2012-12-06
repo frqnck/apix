@@ -42,9 +42,15 @@ class OutputDebugSignTest extends TestCase
         $this->assertFalse( $d->update($this->response) );
     }
 
+    public function testSignatureIsDisable()
+    {
+        $d = new OutputSign( array('enable' => false) );
+        $this->assertFalse( $d->update($this->response) );
+    }
+
     public function testOutpuDebug()
     {
-        if(!defined('APIX_START_TIME')) {
+        if (!defined('APIX_START_TIME')) {
             define('APIX_START_TIME', 0);
         }
         $_SERVER['X_AUTH_USER'] = 'UNIT-TEST-USER';

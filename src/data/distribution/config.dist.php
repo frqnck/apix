@@ -95,7 +95,9 @@ $c = array(
         // set the format from a request parameter, or any other arbitrary
         // methods, etc... Using REQUEST is considered un-RESTful but also can
         // be handy in many cases e.g. forms handling.
-        'format_override'   => isset($_REQUEST['_format']) ? $_REQUEST['_format'] : false,
+        'format_override'   => isset($_REQUEST['_format'])
+                                ? $_REQUEST['_format']
+                                : false,
     ),
 
     // Init is an associative array of specific PHP directives. They are
@@ -104,7 +106,7 @@ $c = array(
     // these at runtime so it is recommneded that most of these (if not all) be
     // set directly in PHP.ini/vhost file on productions servers -- and then
     // commented out. TODO: comparaison benchmark!?
-    'init'                  => array(
+    'init'              => array(
         // Weter to display errors (should be set to false in production).
         'display_errors'            => DEBUG,
 
@@ -178,8 +180,6 @@ $c = array(
 //      )
 //
 // See the server guide for more details on the subject.
-//
-// Use below to register some definitions.
 $c['resources'] = array(
 
     // Handles GET /help/path/to/resource
@@ -204,17 +204,15 @@ $c['services'] = array(
     // Example implementing Plugins\Auth\Basic'
     // -----------------------------------------
     // The Basic Authentification mechanism is generally use with SSL.
-    'basic_auth_plugin' => function() use ($c)
-    {
+    'basic_auth_plugin' => function() use ($c) {
         $adapter = new Plugins\Auth\Basic($c['api_realm']);
-        $adapter->setToken = function(array $basic) use ($c, $adapter)
-        {
+        $adapter->setToken = function(array $basic) use ($c, $adapter) {
             $users = Services::get('users');
             foreach ($users as $user) {
                 if (
                     $user['user'] == $basic['username']
                     && $user['sharedSecret'] == $basic['password']
-                ) {
+) {
                     return $adapter->token = true;
                 }
             }
@@ -228,17 +226,15 @@ $c['services'] = array(
     // -------------------------------------------
     // The Digest Authentification mechanism is use to encrypt and salt the user
     // credentials without the overhead of SSL.
-    'digest_auth_plugin' => function() use ($c)
-    {
+    'digest_auth_plugin' => function() use ($c) {
         $adapter = new Plugins\Auth\Digest($c['api_realm']);
-        $adapter->setToken = function(array $digest) use ($c, $adapter)
-        {
+        $adapter->setToken = function(array $digest) use ($c, $adapter) {
             $users = Services::get('users');
             foreach ($users as $user) {
                 if (
                     $user['user'] == $digest['username']
                     && $user['realm'] == $c['api_realm']
-                ) {
+) {
                     // Can be set to password, apiKey, or hashed mixture...
                     return $adapter->token = $user['password'];
                 }
@@ -247,13 +243,11 @@ $c['services'] = array(
         };
 
         return $adapter;
-        #return new Plugins\Auth($adapter);
     },
 
     // Returns a user array. This is used by the authentification plugins above.
     // TODO: JON to retrieve the users generic schema and data set from Magento.
-    'users' => function()
-    {
+    'users' => function() {
         // username:password:sharedSecret:role:realm
         return array(
             0 => array(
@@ -268,7 +262,6 @@ $c['services'] = array(
     },
 
 );
-
 
 // Plugins definitions
 // ---------------------
@@ -310,6 +303,7 @@ $c['plugins'] = array(
 
             $redis = new \Redis();
             $redis->connect('127.0.0.1', 6379);
+
             return new Plugins\Cache\Redis($redis);
         }
     ),
@@ -326,21 +320,21 @@ $c['plugins'] = array(
 
 $c['default'] = array(
 
-    'listeners' => array(
-        'server' => array(
-            'early' => array(),
-            'late' => array(),
-            'exception' => array()
-        ),
-        'entity' => array(
-            'early' => array(),
-            'late' => array(),
-        ),
-        'response' => array(
-            'early' => array(),
-            'late'  => array()
-        )
-    ),
+    // 'listeners' => array(
+    //     'server' => array(
+    //         'early' => array(),
+    //         'late' => array(),
+    //         'exception' => array()
+    //     ),
+    //     'entity' => array(
+    //         'early' => array(),
+    //         'late' => array(),
+    //     ),
+    //     'response' => array(
+    //         'early' => array(),
+    //         'late'  => array()
+    //     )
+    // ),
 
     'services' => array(),
     'resources' => array(
