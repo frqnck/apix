@@ -68,7 +68,8 @@ class TidyTest extends TestCase
 
         $this->tidy->update($this->response);
 
-        $xml = "<root>\n  <resource>\n    <item>results</item>\n  </resource>\n</root>";
+        $xml = "<root>\n  <resource>\n";
+        $xml .= "    <item>results</item>\n  </resource>\n</root>";
 
         $this->assertSame(
             '<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL . $xml,

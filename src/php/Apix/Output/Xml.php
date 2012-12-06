@@ -43,13 +43,14 @@ class Xml extends AbstractOutput
             // SimpleXml is a default PHP extension
             $xml = new Xml\SimpleXml;
         }
+
         return $xml->encode($data, $rootNode);
     }
 
     /**
      * Converts a boolean value to its string representation.
      *
-     * @param  mixed $var
+     * @param  mixed        $var
      * @return string|mixed String Either 'True', 'False' as string or the initial value as is.
      */
     public function booleanString($var)

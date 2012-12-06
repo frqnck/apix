@@ -15,7 +15,7 @@ class XmlWriter extends Xml
         $x = new \XmlWriter();
         $x->openMemory();
         $x->startDocument($this->version, $this->encoding);
-        if(null !== $rootNode) {
+        if (null !== $rootNode) {
             $x->startElement($rootNode);
         }
         $this->arrayToXmlWriter($x, $data);
@@ -27,8 +27,8 @@ class XmlWriter extends Xml
     /**
      * Array to XMLWriter
      *
-     * @param \XmlWriter        $xml
-     * @param array             $array
+     * @param \XmlWriter $xml
+     * @param array      $array
      * @see https://bugs.php.net/bug.php?id=63589
      */
     protected function arrayToXmlWriter(\XmlWriter $x, array $array)

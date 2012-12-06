@@ -13,22 +13,22 @@ abstract class AbstractCache implements Adapter
     /**
      * Constructor.
      *
-     * @param object|null   $adapter    Generally an object.
-     * @param array         $options    Array of options.
+     * @param object|null $adapter Generally an object.
+     * @param array       $options Array of options.
      */
     public function __construct($adapter=null, array $options=null)
     {
         $this->adapter = $adapter;
 
-        if(null !== $options) {
-	        $this->options = $options+$this->options;
-    	}
+        if (null !== $options) {
+            $this->options = $options+$this->options;
+        }
     }
 
     /**
      * Returns a prefixed and sanitased cache id.
      *
-     * @param  string $key  The base key to prefix.
+     * @param  string $key The base key to prefix.
      * @return string
      */
     public function mapKey($key)
@@ -39,7 +39,7 @@ abstract class AbstractCache implements Adapter
     /**
      * Returns a prefixed and sanitased cache tag.
      *
-     * @param  string $tag  The base tag to prefix.
+     * @param  string $tag The base tag to prefix.
      * @return string
      */
     public function mapTag($tag)
@@ -50,7 +50,7 @@ abstract class AbstractCache implements Adapter
     /**
      * Returns a sanitased string keying/tagging purpose.
      *
-     * @param  string $key   The string to sanitise.
+     * @param  string $key The string to sanitise.
      * @return string
      */
     public function sanitise($key)
