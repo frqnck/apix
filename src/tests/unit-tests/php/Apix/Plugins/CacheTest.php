@@ -1,5 +1,5 @@
 <?php
-namespace Apix\Listener;
+namespace Apix\Plugins;
 
 use Apix\TestCase;
 
@@ -10,7 +10,7 @@ class CacheTest extends TestCase
 
     public function setUp()
     {
-		$this->adapter = $this->getMock('Apix\Listener\Cache\Adapter');
+		$this->adapter = $this->getMock('Apix\Plugins\Cache\Adapter');
         $this->cache = new Cache($this->adapter);
     }
 

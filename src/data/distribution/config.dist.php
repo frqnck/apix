@@ -201,12 +201,12 @@ $c['resources'] = array(
 // define some generic/shared code...
 $c['services'] = array(
 
-    // Example implementing Listener\Auth\Basic'
+    // Example implementing Plugins\Auth\Basic'
     // -----------------------------------------
     // The Basic Authentification mechanism is generally use with SSL.
     'basic_auth_plugin' => function() use ($c)
     {
-        $adapter = new Listener\Auth\Basic($c['api_realm']);
+        $adapter = new Plugins\Auth\Basic($c['api_realm']);
         $adapter->setToken = function(array $basic) use ($c, $adapter)
         {
             $users = Services::get('users');
@@ -224,13 +224,13 @@ $c['services'] = array(
         return $adapter;
     },
 
-    // Example implementing 'Listener\Auth\Digest'
+    // Example implementing 'Plugins\Auth\Digest'
     // -------------------------------------------
     // The Digest Authentification mechanism is use to encrypt and salt the user
     // credentials without the overhead of SSL.
     'digest_auth_plugin' => function() use ($c)
     {
-        $adapter = new Listener\Auth\Digest($c['api_realm']);
+        $adapter = new Plugins\Auth\Digest($c['api_realm']);
         $adapter->setToken = function(array $digest) use ($c, $adapter)
         {
             $users = Services::get('users');
@@ -247,7 +247,7 @@ $c['services'] = array(
         };
 
         return $adapter;
-        #return new Listener\Auth($adapter);
+        #return new Plugins\Auth($adapter);
     },
 
     // Returns a user array. This is used by the authentification plugins above.
@@ -270,7 +270,7 @@ $c['services'] = array(
 );
 
 
-// Listeners definitions
+// Plugins definitions
 // ---------------------
 // There are various key stages taking place durring the ....:
 // - server: the gluing kernel.
@@ -281,75 +281,43 @@ $c['services'] = array(
 // - late: elements defined withtin will fire @ post-processing
 // - exception: elements defined withtin will fire durring an error/exception
 // Each periods can have one or many listeners firing in succesion.
-$c['listeners'] = array();
-
-
-$c['listeners_off'] = array(
-    'server' => array(
-        'early' => array(
-            #'Apix\Listener\Mock',
-        ),
-        'late' => array(),
-        'exception' => array(
-            #'Apix\Listener\Log' => array('php://output'),
-        )
-    ),
-
-    'entity' => array(
-        'early' => array(
-            #$c['services']['digest_auth_plugin'],
-            #$c['services']['basic_auth_plugin'],
-            #$c['services']['cache_plugin'],
-        ),
-        'late' => array(),
-    ),
-
-    'response' => array(
-        'early' => array(
-            #'Apix\Listener\Streaming',
-            #'Apix\Listener\OutputDebug',
-        ),
-        'late'  => array(
-            #
-        ),
-    ),
-);
 
 $c['plugins'] = array(
 
-    // Plugin use to output the entity signatures within the response-body.
-    // This might be useful to some clients/users. Could also be made optional
-    // using a request variable as shown below:
-    // 'output_sign' => isset($_REQUEST['_sign']) ? $_REQUEST['_sign'] : false,
-    #'Apix\Listener\OutputSign',
+    // Add the entity signature within the response-body.
+    'Apix\Plugins\OutputSign' => array(
+        'enable' => true
+        // 'enable' => isset($_REQUEST['_sign']) ? $_REQUEST['_sign'] : false
+    ),
 
-    // Wether or not to output the debugging in the response-body. Should be set
-    // to false on production servers. Beware this settign affects page
-    // cachability.
-    #'Apix\Listener\OutputDebug',
+    // Add some debugging information within the response-body.
+    // Should be set to false in production. This plugin affects cachability.
+    'Apix\Plugins\OutputDebug' => array('enable' => true),
 
-    // Wether or not to output the debugging in the response-body. Should be set
-    // to false on production servers. Beware this settign affects page
-    // cachability.
-    // 'Apix\Listener\Tidy',
+    // Validate, correct, and pretty-print XML and HTML outputs.
+    // Many options are available (see Tidy::$options)
+    'Apix\Plugins\Tidy',
 
+    'Apix\Plugins\Auth' => array(
+        #'adapter' => $c['services']['digest_auth_plugin'],
+        'adapter' => $c['services']['basic_auth_plugin'],
+    ),
 
+    'Apix\Plugins\Cache' => array(
+        'enable'    => true,
+        'adapter'   => function() use ($c) {
+            #return new Plugins\Cache\Apc;
 
-    #'Apix\Listener\Auth' => array('adapter' => $c['services']['basic_auth_plugin'] ),
-    #'Apix\Listener\Auth' => array('adapter' => $c['services']['digest_auth_plugin'] ),
+            $redis = new \Redis();
+            $redis->connect('127.0.0.1', 6379);
+            return new Plugins\Cache\Redis($redis);
+        }
+    ),
 
-    // 'Apix\Listener\Cache' => array(
-    //     'adapter' => function() use ($c) {
-    //         #return new Listener\Cache\Apc;
-
-    //         $redis = new \Redis();
-    //         $redis->connect('127.0.0.1', 6379);
-    //         return new Listener\Cache\Redis($redis);
-    //     }
-    // ),
-
-    #'Apix\Listener\Manual',
-    #'Apix\Listener\Streaming',
+    #'Apix\Plugins\Mock',
+    #'Apix\Plugins\Log' => array('php://output'),
+    #'Apix\Plugins\Manual',
+    #'Apix\Plugins\Streaming',
 );
 
 ///////////////////////////////////////////////////////////////
