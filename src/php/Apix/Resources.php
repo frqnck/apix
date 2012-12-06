@@ -106,9 +106,12 @@ class Resources
      */
     public function getResource($name)
     {
+        #echo '<pre>';print_r($this->resources);
+
         if (isset($this->resources[$name])) {
             return $this->resources[$name];
         }
+
         throw new \DomainException(
             sprintf('Invalid resource entity specified (%s).', $name), 404
         );
@@ -134,6 +137,7 @@ class Resources
 
         // handles the default actions but do not override a local action definition.
         if ($follow===true) {
+
             $method = $route->getMethod();
 
             if ( $method == 'HEAD' && $entity->hasMethod('GET') ) {

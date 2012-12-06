@@ -35,10 +35,10 @@ class Reflection
      * @param  \Reflection|string $mix  A reflection object or a PHPDoc string.
      * @return array
      */
-    public function getPhpDocString($mix)
-    {
-        return $mix instanceOf \Reflector ? $mix->getDocComment() : $mix;
-    }
+    // public function getPhpDocString($mix)
+    // {
+    //     return $mix instanceOf \Reflector ? $mix->getDocComment() : $mix;
+    // }
 
     /**
      * Extract PHPDOCs
@@ -104,8 +104,7 @@ class Reflection
                     'description'   => isset($m['description'])
                                         ? trim($m['description'])
                                         : null,
-                    'required'      => isset($requireds)
-                                        && in_array($m['name'], $requireds)
+                    'required'      => isset($requireds) && in_array($m['name'], $requireds)
                 );
 
             } else {
@@ -113,7 +112,6 @@ class Reflection
                 $docs[$grp][] = $v;
             }
         }
-
 
         //reduce group
         foreach ($docs as $key => $value) {

@@ -10,49 +10,73 @@ use Apix\Listener,
     Apix\HttpRequest,
     Apix\Response;
 
-define('APIX_START_TIME', microtime(true));
-
 class Server extends Listener
 {
     const VERSION = '@package_version@';
 
-    public $config = array(); // todo chnage this!
-    public $entity = null;
-    public $request = null;
-    public $resources = null;
-    public $response = null;
+    /**
+     * @todo review this.
+     * @var array
+     */
+    public $config = array();
 
+    /**
+     * @var Request
+     */
+    public $request = null;
+
+    /**
+     * @var Route
+     */
     public $route = null;
+
+    /**
+     * @var Resources
+     */
+    public $resources = null;
+
+    /**
+     * @var Entity
+     */
+    public $entity = null;
+
+    /**
+     * @var Response
+     */
+    public $response = null;
 
     /**
      * Constructor.
      *
      * @return void
      */
-    public function __construct($config=null, Request $request=null, Response $response=null)
-    {
+    public function __construct(
+        $config=null, Request $request=null, Response $response=null
+    ) {
+
         // Set and intialise the config
         $c = $config instanceOf Config ? $config : Config::getInstance($config);
         $this->config = $c->get();
 
         $this->initSet($this->config);
 
+        // load all the plugins
+        $this->loadPlugins($c->get('plugins'));
+
         // Set the current request
-        $this->request = $request === null ? HttpRequest::getInstance() : $request;
+        $this->request =    null === $request
+                            ? HttpRequest::getInstance()
+                            : $request;
 
         if ($this->request instanceOf HttpRequest) {
             $this->request->setFormats($this->config['input_formats']);
         }
 
         // Initialise the response
-        $this->response =
-            $response !== null
-                ? $response
-                : new Response(
-                    $this->request,
-                    $this->config['output_sign'],
-                    $this->config['output_debug']
-                );
+        $this->response =   null === $response
+                            ? new Response($this->request)
+                            : $response;
+
         $this->response->setFormats($this->config['routing']['formats']);
 
         // Add all the resources from config.
@@ -62,17 +86,18 @@ class Server extends Listener
                 $key, $values
             );
         }
+
+
     }
 
-   /**
+    /**
      * Deals with PHP inits and error handlers.
      *
      * @param  array $configs The config entries to initialise.
      * @return void
-     *
      * @codeCoverageIgnore
      */
-    public function initSet(array $configs)
+    private function initSet(array $configs)
     {
         if(!defined('UNIT_TEST') && isset($configs['init'])
             ) {
@@ -88,12 +113,11 @@ class Server extends Listener
     }
 
     /**
-    * Run the show...
-    *
-    * @throws \InvalidArgumentException 404
-    *
-    * @codeCoverageIgnore
-    */
+     * Run the show...
+     *
+     * @throws \InvalidArgumentException 404
+     * @codeCoverageIgnore
+     */
     public function run()
     {
         try {
@@ -103,11 +127,22 @@ class Server extends Listener
                 $this->resources->toArray(),
                 $this->config['routing']
             );
+            $this->response->setRoute($this->route);
 
-            // attach the early listeners @ pre-processing stage
-            $this->addAllListeners('server', 'early');
+            // early listeners @ pre-server
+            $this->hook('server', 'early');
 
-            $this->setResourceEntity($this->route);
+            // get the entity object from a route
+            $this->entity = $this->resources->get($this->route);
+
+            // early listeners @ pre-entity
+            $this->entity->hook('entity', 'early');
+
+            // set the results -- TODO: create a Response results obj
+            $this->results = $this->entity->call($this->route);
+
+            // late listeners @ post-entity
+            $this->entity->hook('entity', 'late');
 
         } catch (\Exception $e) {
 
@@ -130,16 +165,18 @@ class Server extends Listener
                $this->results = $this->results['error'];
             }
 
-            // attach the listeners @ exception stage
-            $this->addAllListeners('server', 'exception');
+            // listeners @ server exception stage
+            $this->hook('server', 'exception');
         }
 
         switch ($this->response->getHttpCode()) {
             case 401;
-                // TODO
-                #$this->response->setHeader('WWW-Authenticate',
-                #    sprintf('%s realm="%s"', $this->config['auth']['type'], $this->config['org'])
-                #);
+                // $this->response->setHeader('WWW-Authenticate',
+                //    sprintf( '%s realm="%s"',
+                //             $this->config['auth']['type'],
+                //             $this->config['org']
+                //     )
+                // );
             break;
 
             case 405:
@@ -152,50 +189,32 @@ class Server extends Listener
 
         }
 
-        $output = $this->response->generate(
-                $this->route,
-                $this->results,
-                $this->getServerVersion($this->config['api_realm'], $this->config['api_version']),
-                $this->config['output_rootNode']
-            );
+        $this->response->generate(
+            $this->results,
+            $this->getServerVersion($this->config),
+            $this->config['output_rootNode']
+        );
 
-        // attach the late listeners @ post-processing stage
-        $this->addAllListeners('server', 'late');
+        // late listeners @ post-server
+        $this->hook('server', 'late');
 
-        return $this->request->getMethod() != 'HEAD' ? $output : null;
-    }
-
-   /**
-    * Retrieves (and calls) a resource entity from a given route.
-    *
-    * @param  Router $route
-    * @return Entity
-    */
-    public function setResourceEntity(Router $route)
-    {
-        // get the entity object from a route
-        $this->entity = $this->resources->get($route);
-
-        // attach the early listeners @ pre-processing stage
-        $this->entity->addAllListeners('entity', 'early');
-
-        // set the results -- TODO: create a Response results obj to handles this
-        $this->results = $this->entity->call($route);
-
-        // attach the late listeners @ post-processing stage
-        $this->entity->addAllListeners('entity', 'late');
+        return $this->request->getMethod() == 'HEAD'
+                        ? null
+                        : $this->response->getOutput();
     }
 
    /**
     * Gets the server version string.
     *
     * @return string
-    *
-    * @codeCoverageIgnore
     */
-    private function getServerVersion($realm, $version)
+    public function getServerVersion(array $config)
     {
-        return sprintf('%s/%s (%s)', $realm, $version, Server::VERSION);
+        return sprintf('%s/%s (%s)',
+            $config['api_realm'],
+            $config['api_version'],
+            Server::VERSION
+        );
     }
 
    /**
@@ -205,8 +224,9 @@ class Server extends Listener
     *
     * @return void
     */
-    public function setRouting(Request $request, array $resources, array $opts=null)
-    {
+    public function setRouting(
+        Request $request, array $resources, array $opts=null
+    ) {
         $path = isset($opts['path_prefix'])
                 ? preg_replace($opts['path_prefix'], '', $request->getUri())
                 : $request->getUri();
@@ -258,13 +278,24 @@ class Server extends Listener
     }
 
    /**
+    * Returns the response object.
+    *
+    * @return Response
+    */
+    public function getResponse()
+    {
+        return $this->response;
+    }
+
+
+   /**
     * Returns the output format from the request chain.
     *
-    * @param array $opts Options are:
-    *                              - [default] => string e.g. 'json',
-    *                              - [controller_ext] => boolean,
-    *                              - [override] => false or string use $_REQUEST['format'],
-    *                              - [http_accept] => boolean.
+    * @param array $opts    Options are:
+    *                          - [default] => string e.g. 'json',
+    *                          - [controller_ext] => boolean,
+    *                          - [override] => false or $_REQUEST['format'],
+    *                          - [http_accept] => boolean.
     * @param  string|false $ext The contoller defined extension.
     *
     * @return string
@@ -294,159 +325,5 @@ class Server extends Listener
             $this->response->setHeader('Vary', 'Accept');
         }
     }
-
-
-
-
-
-
-
-
-/* -- Closure prototyping  -- */
-
-   /**
-    * Proxy to resources::add (shortcut)
-    *
-    * @param  string     $method The HTTP method to match against.
-    * @param  string     $path   The path name to match against.
-    * @param  mixed      $to     Callback that returns the response when matched.
-    * @return Controller
-    * @see  Resources::add
-    */
-    protected function proxy($method, $path, \Closure $to)
-    {
-        return $this->resources->add($path,
-            array(
-                'action' => $to,
-                'method' => $method
-            )
-        );
-    }
-
-   /**
-    * Create / POST request handler
-    *
-    * @param string $path The path name to match against.
-    * @param mixed  $to   Callback that returns the response when matched.
-    * @see  Server::proxy
-    * @return Controller Provides a fluent interface.
-    */
-    public function onCreate($path, $to)
-    {
-        return $this->proxy('POST', $path, $to);
-    }
-
-    /**
-     * Read / GET request handler
-     *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
-     * @see  Server::proxy
-     * @return Controller Provides a fluent interface.
-     */
-    public function onRead($path, $to)
-    {
-        return $this->proxy('GET', $path, $to);
-    }
-
-    /**
-     * Update / PUT request handler
-     *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
-     * @see  Server::proxy
-     * @return Controller Provides a fluent interface.
-     */
-    public function onUpdate($path, $to)
-    {
-        return $this->proxy('PUT', $path, $to);
-    }
-
-    /**
-     * Modify / PATCH request handler
-     *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
-     * @see  Server::proxy
-     * @return Controller Provides a fluent interface.
-     */
-    public function onModify($path, $to)
-    {
-        return $this->proxy('PATCH', $path, $to);
-    }
-
-    /**
-     * Delete / DELETE request handler
-     *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
-     * @see  Server::proxy
-     * @return Controller Provides a fluent interface.
-     */
-    public function onDelete($path, $to)
-    {
-        return $this->proxy('DELETE', $path, $to);
-    }
-
-    /**
-     * Help / OPTIONS request handler
-     *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
-     * @see  Server::proxy
-     * @return Controller Provides a fluent interface.
-     */
-    public function onHelp($path, $to)
-    {
-        return $this->proxy('OPTIONS', $path, $to);
-    }
-
-    /**
-     * Test / HEAD request handler
-     *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
-     * @see  Server::proxy
-     * @return Controller Provides a fluent interface.
-     */
-    public function onTest($path, $to)
-    {
-        return $this->proxy('HEAD', $path, $to);
-    }
-
-    /**
-     * Test Read from a group.
-     *
-     * @param  array  $opts Options are:
-     * @return string
-     */
-    public function setGroup($name)
-    {
-        $class = new \ReflectionClass($this);
-        $method = $class->getMethod('setGroup');
-    var_dump($class);
-
-        $class = new \ReflectionFunction();
-        //$method = $class->getMethod('setGroup');
-    var_dump($class);
-
-        $doc = $method->getDocComment();
-
-        $this->group = array(
-            'name'  => $name,
-            'doc'   => $doc
-        );
-    }
-
-    // *
-    //  * Shortcut to HttpRequest::getBodyData
-    //  *
-    //  * @see  HttpRequest::getBodyData
-    //  * @return array
-
-    // public function getBodyData()
-    // {
-    //     return HttpRequest::getBodyData($this->request);
-    // }
 
 }
