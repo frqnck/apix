@@ -172,7 +172,7 @@ class Router
                     $result[$value] = $paths[$key];
                 }
             //} elseif (!isset($paths[$key]) || strcmp($value, $paths[$key]) != 0) {
-            } else 
+            } else
             if ( //Regex based!
                 isset($paths[$key])
                 && preg_match('/^:(?P<key>[\w]+)(?:<(?P<regex>.+)>)?/', $value, $m)

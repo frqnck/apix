@@ -29,7 +29,7 @@ HELP
 
     public function run()
     {
-        if( ! $this->hasArgs(array('--no-credits')) ){
+        if ( ! $this->hasArgs(array('--no-credits')) ) {
             $this->out(
                 sprintf(
                     "Apix System Check %s by Franck Cassedanne.\n\n",
@@ -67,17 +67,17 @@ HELP
 
         $this->out(PHP_EOL.PHP_EOL);
 
-        if($this->hasArgs(array('--required', '--optionals'))) {
+        if ($this->hasArgs(array('--required', '--optionals'))) {
             exit;
         }
 
         $req = false;
-        foreach($required as $k=>$v) {
+        foreach ($required as $k=>$v) {
             if($v['fail'] === true) $req = true;
         }
 
         $opt = false;
-        foreach($optionals as $k=>$v) {
+        foreach ($optionals as $k=>$v) {
             if($v['fail'] === true) $opt = true;
         }
         $opt = false;
@@ -85,7 +85,7 @@ HELP
         if ($req) {
             $summary = "<red>Warning!</red>";
             $summary .= " Minimum system requirements not met. Good luck.";
-        } else if($opt) {
+        } elseif ($opt) {
             $summary = "Except a few optionals, your system is fine.";
             $summary .= " <green>Well done!</green>";
         } else {

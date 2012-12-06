@@ -24,9 +24,10 @@ class Json extends AbstractOutput
         }
         // @codeCoverageIgnoreEnd
 
-        if(null !== $rootNode) {
+        if (null !== $rootNode) {
             $data = array($rootNode => $data);
         }
+
         return json_encode($data, $options);
     }
 

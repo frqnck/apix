@@ -10,7 +10,7 @@ class CacheTest extends TestCase
 
     public function setUp()
     {
-		$this->adapter = $this->getMock('Apix\Plugins\Cache\Adapter');
+        $this->adapter = $this->getMock('Apix\Plugins\Cache\Adapter');
         $this->cache = new Cache($this->adapter);
     }
 
@@ -21,10 +21,10 @@ class CacheTest extends TestCase
 
     protected function mock($return)
     {
-		$entity = $this->getMock('Apix\Entity');
+        $entity = $this->getMock('Apix\Entity');
 
         $entity->expects($this->any())
-        	->method('getAnnotationValue')
+            ->method('getAnnotationValue')
             ->will($this->returnValue($return));
 
         $entity->expects($this->any())
@@ -34,8 +34,8 @@ class CacheTest extends TestCase
                 )
             );
 
-		$this->cache->entity = $entity;
-	}
+        $this->cache->entity = $entity;
+    }
 
     public function testUpdateSkipWithoutAnnotation()
     {
@@ -101,16 +101,16 @@ class CacheTest extends TestCase
 
     public function testGetTtlInternval()
     {
-		$ttl = $this->cache->getTtlInternval('+1minute');
+        $ttl = $this->cache->getTtlInternval('+1minute');
         $this->assertEquals('60', $ttl);
 
-		$ttl = $this->cache->getTtlInternval('1min');
+        $ttl = $this->cache->getTtlInternval('1min');
         $this->assertEquals('60', $ttl);
 
-		$ttl = $this->cache->getTtlInternval('100sec');
+        $ttl = $this->cache->getTtlInternval('100sec');
         $this->assertEquals('100', $ttl);
 
-		$ttl = $this->cache->getTtlInternval('100sec');
+        $ttl = $this->cache->getTtlInternval('100sec');
         $this->assertEquals('100', $ttl);
     }
 
@@ -140,27 +140,27 @@ class CacheTest extends TestCase
      */
     public function testExtractSubTags($annotation, $expected)
     {
-    	$this->mock($annotation);
+        $this->mock($annotation);
         $tags = $this->cache->extractSubTags();
         $tags = array(
-        	'keys'=>$tags['keys'],
-        	'values'=>$tags['values']
-		);
+            'keys'=>$tags['keys'],
+            'values'=>$tags['values']
+        );
         $this->assertEquals($expected, $tags);
     }
 
     public function testGetSubTagValues()
     {
-    	$this->mock('a=1 b=2,3,4 c=5,6,7');
- 		$results = array(
- 			array('k'=>'a', 'exp'=>array(1)),
- 			array('k'=>'b', 'exp'=>array(2,3,4)),
- 			array('k'=>'c', 'exp'=>array(5,6,7)),
- 		);
- 		foreach($results as $result) {
-	        $values = $this->cache->getSubTagValues($result['k'], null, true);
-	        $this->assertEquals($result['exp'], $values);
- 		}
+        $this->mock('a=1 b=2,3,4 c=5,6,7');
+         $results = array(
+             array('k'=>'a', 'exp'=>array(1)),
+             array('k'=>'b', 'exp'=>array(2,3,4)),
+             array('k'=>'c', 'exp'=>array(5,6,7)),
+         );
+         foreach ($results as $result) {
+            $values = $this->cache->getSubTagValues($result['k'], null, true);
+            $this->assertEquals($result['exp'], $values);
+         }
     }
 
 }

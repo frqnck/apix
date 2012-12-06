@@ -71,8 +71,7 @@ try {
          * @api_cache   ttl=5min tags=tag1,tag2,tag3,v1 flush=tag9,tag10
          * @toc The title for toc (overide).
          */
-        function($t)
-        {
+        function($t) {
 
 $start = microtime(true);
 header('Cache-Control: no-cache, must-revalidate');
@@ -101,11 +100,10 @@ $x->flush();
 // echo "Memory peak: " . memory_get_peak_usage() / 1048576 . 'MB' . PHP_EOL;
 
             exit;
+
             return $words;
         }
     );
-
-
 
     $api->onRead('/upload/:what',
 
@@ -125,9 +123,6 @@ $x->flush();
             );
         }
     )->group('group1');
-
-
-
 
     /**
      * group.
@@ -157,7 +152,6 @@ $x->flush();
         }
 
     )->group('group1');
-
 
     $api->onRead('/keywordoos/:cat_id/:optional',
 

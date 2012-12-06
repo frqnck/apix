@@ -61,7 +61,7 @@ class Config #extends Di
 
                 // add from the HOME dir
                 // $file = getenv('HOME') . '/.apix/config.php';
-                // if(file_exists($file)) {
+                // if (file_exists($file)) {
                 //     $config = $this->getConfigFromFile($file);
                 // }
 
@@ -135,8 +135,8 @@ class Config #extends Di
     /**
      * Sets as new a mixed value to a specified key.
      *
-     * @param   string   $key    The key to set.
-     * @param   mixed    $mix    The mixed value to set.
+     * @param string $key The key to set.
+     * @param mixed  $mix The mixed value to set.
      */
     public function set($key, $mix)
     {
@@ -146,8 +146,8 @@ class Config #extends Di
     /**
      * Adds the mixed value to a specified key.
      *
-     * @param   string   $key    The key to add to.
-     * @param   mixed    $mix    The mixed value to add.
+     * @param string $key The key to add to.
+     * @param mixed  $mix The mixed value to add.
      */
     public function add($key, $mix)
     {
@@ -258,10 +258,9 @@ class Config #extends Di
     {
         // add the distribution file
         $file = realpath(__DIR__ . '/../../data/distribution/config.dist.php');
+
         return $this->getConfigFromFile($file);
     }
-
-
 
     // public function addListener($key, $mix, $level, $type)
     // {

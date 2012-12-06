@@ -7,15 +7,15 @@ class Redis extends AbstractCache
     /**
      * Constructor.
      *
-     * @param   \Redis  $redis      The redis database to instantiate.
-     * @param   array   $options    Array of options.
+     * @param \Redis $redis   The redis database to instantiate.
+     * @param array  $options Array of options.
      */
     public function __construct(\Redis $redis, array $options=null)
     {
         $options['atomicity'] = !isset($options['atomicity'])
                                 || true === $options['atomicity']
- 								? \Redis::MULTI
- 								: \Redis::PIPELINE;
+                                 ? \Redis::MULTI
+                                 : \Redis::PIPELINE;
 
         parent::__construct($redis, $options);
     }
@@ -25,17 +25,19 @@ class Redis extends AbstractCache
      */
     public function load($key, $type='key')
     {
-        if( $type == 'tag' ){
+        if ($type == 'tag') {
             $cache = $this->adapter->sMembers(
                 $this->mapTag($key)
             );
+
             return empty($cache) ? null : $cache;
         }
         $cache = $this->adapter->get(
             $this->mapKey($key)
         );
+
         return false === $cache ? null : $cache;
-	}
+    }
 
     /**
      * {@inheritdoc}
@@ -44,21 +46,21 @@ class Redis extends AbstractCache
     {
         $key = $this->mapKey($key);
 
-        if(null === $ttl || 0 === $ttl) {
+        if (null === $ttl || 0 === $ttl) {
             $success = $this->adapter->set($key, $data);
         } else {
             $success = $this->adapter->setex($key, $ttl, $data);
         }
 
-		if($success && !empty($tags)) {
-			$redis = $this->adapter->multi($this->options['atomicity']);
-			foreach ($tags as $tag) {
-				$redis->sAdd($this->mapTag($tag), $key);
-			}
-			$redis->exec();
-		}
+        if ($success && !empty($tags)) {
+            $redis = $this->adapter->multi($this->options['atomicity']);
+            foreach ($tags as $tag) {
+                $redis->sAdd($this->mapTag($tag), $key);
+            }
+            $redis->exec();
+        }
 
-		return $success;
+        return $success;
     }
 
     /**
@@ -67,18 +69,18 @@ class Redis extends AbstractCache
     public function clean(array $tags)
     {
         $items = array();
-		foreach($tags as $tag) {
+        foreach ($tags as $tag) {
             $keys = $this->load($tag, 'tag');
-            if(is_array($keys)) {
+            if (is_array($keys)) {
                 array_walk_recursive(
                     $keys,
                     function($key) use (&$items) { $items[] = $key; }
                 );
             }
             $items[] = $this->mapTag($tag);
-		}
+        }
 
-    	return $this->adapter->del($items) ? true : false;
+        return $this->adapter->del($items) ? true : false;
     }
 
     /**
@@ -86,10 +88,10 @@ class Redis extends AbstractCache
      */
     public function delete($key)
     {
-		$key = $this->mapKey($key);
+        $key = $this->mapKey($key);
 
         $tags = $this->adapter->keys($this->mapTag('*'));
-        if(!empty($tags)) {
+        if (!empty($tags)) {
             $redis = $this->adapter->multi($this->options['atomicity']);
             foreach ($tags as $tag) {
                 $redis->sRem($tag, $key);
@@ -105,13 +107,14 @@ class Redis extends AbstractCache
      */
     public function flush($all=false)
     {
-        if(true === $all) {
+        if (true === $all) {
             return $this->adapter->flushAll();
         }
         $items = array_merge(
             $this->adapter->keys($this->mapTag('*')),
             $this->adapter->keys($this->mapKey('*'))
         );
+
         return $this->adapter->del($items) ? true : false;
     }
 

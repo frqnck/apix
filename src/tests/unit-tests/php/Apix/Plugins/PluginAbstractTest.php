@@ -11,7 +11,8 @@ class PluginAbstractTest extends TestCase
 
     public function setUp()
     {
-		$this->plugin = $this->getMockForAbstractClass('Apix\Plugins\PluginAbstract');
+        $this->plugin =
+            $this->getMockForAbstractClass('Apix\Plugins\PluginAbstract');
     }
 
     protected function tearDown()

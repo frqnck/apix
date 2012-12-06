@@ -123,9 +123,9 @@ class Request
     /**
      * Gets a specified param.
      *
-     * @param  string   $key
-     * @param  boolean  $raw        Set to true to get the raw URL encoded value
-     * @param  string   $filter     POSIX character classes e.g. alnum, alpha
+     * @param  string  $key
+     * @param  boolean $raw    Set to true to get the raw URL encoded value
+     * @param  string  $filter POSIX character classes e.g. alnum, alpha
      * @return mixed
      */
     public function getParam($key, $raw=false, $filter=null)

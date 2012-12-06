@@ -29,12 +29,12 @@ class Auth extends PluginAbstractEntity
         }
 
         // authenticate
-        if( ! $username = $this->adapter->authenticate() ) {
+        if ( ! $username = $this->adapter->authenticate() ) {
             throw new \Exception('Authentication required', 401);
         }
 
         // check user
-        if(null !== $users && !in_array($username, $users)) {
+        if (null !== $users && !in_array($username, $users)) {
             $this->log('Access unauthorised', $username);
             throw new \Exception('Access unauthorised.', 401);
         }
@@ -44,10 +44,8 @@ class Auth extends PluginAbstractEntity
         $_SERVER['X_AUTH_USER'] = $username;
 
         #$this->log('Access granted', $username);
+
         return $username;
-
-
-
 
         $s = new \Zenya_Model_Session;
 
