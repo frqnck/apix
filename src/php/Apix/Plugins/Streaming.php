@@ -19,7 +19,7 @@ class Streaming extends PluginAbstract
         // $this->setOptions($options);
     }
 
-    static public function ob()
+    public static function ob()
     {
         apache_setenv('no-gzip', '1');
         // ini_set('zlib.output_compression', 0);
@@ -38,13 +38,11 @@ class Streaming extends PluginAbstract
             return;
         }
 
-        $this->callback = function() use ($response)
-        {
+        $this->callback = function() use ($response) {
             header('Content-type: text/html; charset=utf-8');
             echo 'Begin ...<br>';
 
-            for( $i = 0 ; $i < 10 ; $i++ )
-            {
+            for ($i = 0 ; $i < 10 ; $i++) {
                 echo $i . '<hr>';
                 ob_flush();
                 flush();

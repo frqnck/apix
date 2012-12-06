@@ -26,19 +26,20 @@ class Error extends ViewModel
         return Response::getStatusPrases($this->code, true);
     }
 
-	// deals with groups definitions
-	public function groups()
-	{
+    // deals with groups definitions
+    public function groups()
+    {
         $titles = array(
             'message'    => 'Message',
             'code'       => 'Code'
         );
         $groups = array();
-        foreach($titles as $key => $title) {
-            if(isset($this->{$key})) {
+        foreach ($titles as $key => $title) {
+            if (isset($this->{$key})) {
                 $groups[] = array('title' => $title, 'items' => (array) $this->{$key});
             }
         }
+
         return $groups;
     }
 

@@ -14,6 +14,10 @@ class ResponseTest extends TestCase
 
     protected function setUp()
     {
+        // Empty the plugins array from the main config.
+        $config = Config::getInstance();
+        $config->set('plugins', array());
+
         $request = HttpRequest::GetInstance();
         $this->response = new Response($request);
         $this->response->unit_test = true;
@@ -116,8 +120,6 @@ class ResponseTest extends TestCase
             array(array('X-Powered-By: org', true, 404), array('Vary: Accept')),
             $this->response->sendAllHttpHeaders(404, 'org')
         );
-
-        #$this->assertSame( $headers, headers_list() );
     }
 
     public function testGetSetHttpCode()
@@ -184,10 +186,9 @@ class ResponseTest extends TestCase
         $this->response->setFormat('xml');
         $this->response->generate(array('results'));
 
-        $xml = "<root><resource><item>results</item></resource></root>\n";
-
         $this->assertSame(
-            '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL . $xml,
+            '<?xml version="1.0" encoding="UTF-8"?>'.PHP_EOL
+            .'<root><resource><item>results</item></resource></root>'.PHP_EOL,
             $this->response->getOutput()
         );
     }

@@ -4,7 +4,7 @@ namespace Apix;
 
 use Apix\Server;
 
-if(!defined('APIX_START_TIME')) {
+if (!defined('APIX_START_TIME')) {
     define('APIX_START_TIME', microtime(true));
 }
 

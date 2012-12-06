@@ -157,7 +157,6 @@ class ReflectionTest extends TestCase
         );
     }
 
-
     public function testMethodGroupsAsArray()
     {
         $grp = $this->method['rndGrouping'];

@@ -22,7 +22,7 @@ class Jsonp extends AbstractOutput
                         : $rootNode;
         $cb = null === $cb ? 'apix' : $cb;
 
-        if(!$this->isValidIdentifier($cb)) {
+        if (!$this->isValidIdentifier($cb)) {
             throw new \InvalidArgumentException(
                 sprintf('Invalid callback name (%s) used.', $cb)
             );
@@ -39,8 +39,8 @@ class Jsonp extends AbstractOutput
      * @see http://www.geekality.net/2011/08/03/valid-javascript-identifier/
      * @see http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-262.pdf
      *
-     * @param   string  $subject
-     * @return  boolean
+     * @param  string  $subject
+     * @return boolean
      */
     public function isValidIdentifier($subject)
     {

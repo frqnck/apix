@@ -100,7 +100,7 @@ class Resources
     /**
      * Gets the specified resource entity.
      *
-     * @param  string                 $name     The resource name to retrieve.
+     * @param  string                 $name The resource name to retrieve.
      * @throws /DomainException       404
      * @return Entity/EntityInterface
      */

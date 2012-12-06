@@ -29,8 +29,8 @@ class Entity extends Listener
     /**
      * Appends the given array definition and apply generic mappings.
      *
-     * @param   array $def An entity array definition.
-     * @return  void
+     * @param  array $def An entity array definition.
+     * @return void
      * @see     EntityInterface::_append
      */
     final public function _append(array $def)
@@ -43,13 +43,13 @@ class Entity extends Listener
     /**
      * Call the resource entity.
      *
-     * @return  array
-     * @throws  Apix\Exception
+     * @return array
+     * @throws Apix\Exception
      * @see     EntityInterface::_call
      */
     public function call()
     {
-        if(null === $this->results) {
+        if (null === $this->results) {
             $this->results = $this->underlineCall($this->route);
         }
 
@@ -93,6 +93,7 @@ class Entity extends Listener
     {
         if (isset($this->defaultActions[$method])) {
             #return $method;
+
             return $this->defaultActions[$method];
         }
     }
