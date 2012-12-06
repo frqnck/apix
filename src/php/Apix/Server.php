@@ -286,7 +286,6 @@ class Server extends Listener
         return $this->response;
     }
 
-
    /**
     * Returns the output format from the request chain.
     *

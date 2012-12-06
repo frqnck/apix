@@ -43,8 +43,8 @@ class SoftwareDownload
     /**
      * Returns the lastest version number of :software
      *
-     * @param       string      $software   The name of the software.
-     * @return      array                   The array to return to the client.
+     * @param  string $software The name of the software.
+     * @return array  The array to return to the client.
      * @api_role    public                  This API does not need ACL/AUTH (default).
      * @api_cache   10w softy               This will be cached for a maximum of 10 weeks.
      *                                      and tagged as 'softy'.
@@ -60,8 +60,8 @@ class SoftwareDownload
     /**
      * Returns the :software data to be downloaded by the client.
      *
-     * @param       string      $software   The name of the software.
-     * @return      string                  Output the binary & quit.
+     * @param  string $software The name of the software.
+     * @return string Output the binary & quit.
      * @api_cache   10w softy               Cache for a maximum of 10 weeks
      *                                      and tagged as 'softy'.
      */
@@ -86,9 +86,9 @@ class SoftwareDownload
     /**
      * Upload a new :software
      *
-     * @param               Request  $request   The current Apix Request object.
-     * @param               string   $software  The name of the software.
-     * @return              array               An array to return to the client.
+     * @param  Request $request  The current Apix Request object.
+     * @param  string  $software The name of the software.
+     * @return array   An array to return to the client.
      * @api_role            admin               This API has an ACL for admin.
      * @api_purge_cache     mySoftware          Purge the cache of all the
      *                                          'softy' tagged entries.

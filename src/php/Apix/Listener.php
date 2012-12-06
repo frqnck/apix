@@ -13,12 +13,12 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     /**
      * @var array of plugins
      */
-    static protected $plugins = array();
+    protected static $plugins = array();
 
      /**
      * Attaches a new observer
      *
-     * @param \SplObserver   $observer   Any object implementing SplObserver
+     * @param  \SplObserver $observer Any object implementing SplObserver
      * @return void|false
      */
     public function attach(\SplObserver $observer)
@@ -34,7 +34,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     /**
      * Detaches an existing observer
      *
-     * @param \SplObserver  $observer   Any object implementing SplObserver
+     * @param \SplObserver $observer Any object implementing SplObserver
      */
     public function detach(\SplObserver $observer)
     {
@@ -58,7 +58,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     }
 
     /**
-     * IteratorAggregate
+     * Gets the IteratorAggregate
      *
      * @return \Iterator
      */
@@ -78,10 +78,11 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     }
 
     /**
-     * Sets the plugins at the specified level.
+     * Sets the plugins at the specified level
      *
-     * @param   array   $key        The level key.
-     * @param   array   $plugins    The array of plugins.
+     * @param  array $key     The level key
+     * @param  array $plugins An array of plugins
+     * @return void
      */
     public function setPluginsAtLevel($key, array $plugins)
     {
@@ -89,13 +90,14 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     }
 
     /**
-     * Gets the plugins at the specified level.
+     * Gets the plugins at the specified level
      *
-     * @param string $key
+     * @param  string      $key
+     * @return array|false An array of plugins
      */
     public function getPluginsAtLevel($key)
     {
-        if(!isset(self::$plugins[$key])) {
+        if (!isset(self::$plugins[$key])) {
             return false;
         }
 
@@ -103,15 +105,15 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     }
 
     /**
-     * Calls the plugins of the specified level and type.
+     * Calls the plugins of the specified level and type
      *
-     * @param   string    $level
-     * @param   string    $type
+     * @param string $level
+     * @param string $type
      */
     public function hook($level, $type)
     {
         $plugins = $this->getPluginsAtLevel($level);
-        if(isset($plugins[$type])) {
+        if (isset($plugins[$type])) {
             foreach ($plugins[$type] as $plugin => $args) {
                 $obs = $this->callPlugin($plugin, $args);
                 $this->attach($obs);
@@ -121,10 +123,10 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
    }
 
     /**
-     * Calss and executes the plugin.
+     * Calls and executes the plugin
      *
-     * @param   mix     $plugin
-     * @param   mix     $args
+     * @param mix $plugin
+     * @param mix $args
      */
     private function callPlugin($plugin, $args)
     {
@@ -142,22 +144,24 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     }
 
     /**
-     * Load the specified plugin.
+     * Load the specified plugin
      *
-     * @param string $name The plugin name to load.
-     * @return boolean True on success, false otherwise.
+     * @param  string           $name The plugin name to load
+     * @return boolean          True on success, false otherwise
+     * @throws RuntimeException If the plugin does not exists
+     * @throws DomainException  If the plugin does not have a $hook property.
      */
     public function loadPlugin($key, $mix)
     {
         $name = is_int($key) ? $mix : $key;
 
-       if( !class_exists($name) ) {
+       if ( !class_exists($name) ) {
             throw new \RuntimeException(
                 sprintf('Plugin class "%s" not found', $name)
             );
         }
 
-        if(!isset($name::$hook)) {
+        if (!isset($name::$hook)) {
             throw new \DomainException(
                 sprintf(
                     'Plugin class "%s" does not have the expected '
@@ -176,9 +180,9 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     }
 
     /**
-     * Load all the plugins.
+     * Load all the plugins
      *
-     * @param    array   $plugins    The array of plugins to load.
+     * @param array $plugins The array of plugins to load
      */
     public function loadPlugins(array $plugins)
     {

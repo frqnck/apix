@@ -10,16 +10,16 @@ abstract class PluginAbstract implements \SplObserver
     /**
      * Constructor.
      *
-     * @param   array     $options  List of options, if $options is an object,
+     * @param array $options List of options, if $options is an object,
      *                              set it as the plugin adapter.
      */
     public function __construct($options=null)
     {
-        if( is_object($options) ) {
+        if ( is_object($options) ) {
             $options = array('adapter' => $options);
         }
 
-        if(isset($this->options['adapter']) || isset($options['adapter'])) {
+        if (isset($this->options['adapter']) || isset($options['adapter'])) {
             $this->setAdapter($options);
         }
 
@@ -33,7 +33,7 @@ abstract class PluginAbstract implements \SplObserver
      */
     public function setOptions(array $options=null)
     {
-        if(null !== $options) {
+        if (null !== $options) {
             $this->options = $options+$this->options;
         }
     }
@@ -51,7 +51,7 @@ abstract class PluginAbstract implements \SplObserver
     /**
      * Sets the plugin adapter.
      *
-     * @param   mix     $adapter
+     * @param mix $adapter
      */
     public function setAdapter(array $options)
     {
@@ -59,7 +59,7 @@ abstract class PluginAbstract implements \SplObserver
                     ? $options['adapter']
                     : null;
 
-        // if( null === $adapter) {
+        // if (null === $adapter) {
         //     throw new \RuntimeException(
         //         sprintf('%s missing an implement.', get_called_class())
         //     );
@@ -98,9 +98,9 @@ abstract class PluginAbstract implements \SplObserver
     */
     #abstract function init();
 
-    function log($msg, $ref=null)
+    public function log($msg, $ref=null)
     {
-        if(defined('DEBUG') && !defined('UNIT_TEST')) {
+        if (defined('DEBUG') && !defined('UNIT_TEST')) {
             $str = sprintf('%s %s (%s)', get_class($this), $msg, $ref);
             error_log( $str );
         }

@@ -85,8 +85,8 @@ class Console
                 $this->$key = true;
             }
         }
-        if($this->verbos3) {
-           $this->verbose = true; 
+        if ($this->verbos3) {
+           $this->verbose = true;
         }
         // check env variables.
         if (false === $this->no_colors) {
@@ -138,6 +138,7 @@ class Console
 
         $ansi['dark_gray'] = 90;
         #print_r($ansi);exit;
+
         return $ansi;
     }
 
@@ -157,7 +158,7 @@ class Console
             echo preg_replace($pat, '\2', $msg);
         } else {
             preg_match_all($pat, $msg, $tags, PREG_SET_ORDER);
-            foreach($tags as $tag) {
+            foreach ($tags as $tag) {
                 $msg = str_replace(
                     $tag[0],
                     $this->_out($tag['value'], $tag['name']),
@@ -186,10 +187,6 @@ class Console
 
         return $msg;
     }
-
-
-
-
 
         // $obj = new \stdClass;
         // $obj->name = 'name';
