@@ -15,13 +15,13 @@ class CacheApcTest extends TestCase
 
     public function setUp()
     {
-        if(!extension_loaded('apc')) {
+        if (!extension_loaded('apc')) {
             self::markTestSkipped(
                 'The APC extension is required in order to run this unit test'
             );
         }
 
-        if(!ini_get('apc.enable_cli')) {
+        if (!ini_get('apc.enable_cli')) {
             self::markTestSkipped(
                 'apc.enable_cli MUST be enable in order to run this unit test'
             );
@@ -37,7 +37,7 @@ class CacheApcTest extends TestCase
 
     public function tearDown()
     {
-        if(null !== $this->cache) {
+        if (null !== $this->cache) {
             $this->cache->flush();
             unset($this->cache);
         }
@@ -128,7 +128,6 @@ class CacheApcTest extends TestCase
         $this->assertNull($this->cache->load('id3'));
         $this->assertNull($this->cache->load('tag1', 'tag'));
     }
-
 
     public function testDelete()
     {

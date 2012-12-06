@@ -44,11 +44,11 @@ class Apc extends AbstractCache
     {
         $key = $this->mapKey($key);
         $store = array();
-        if($this->options['tagging'] && !empty($tags)) {
-            foreach($tags as $tag) {
+        if ($this->options['tagging'] && !empty($tags)) {
+            foreach ($tags as $tag) {
                 $tag = $this->mapTag($tag);
                 $keys = apc_fetch($tag, $success);
-                if(false === $success) {
+                if (false === $success) {
                     $store[$tag] = array($key);
                 } else {
                     $keys[] = $key;
@@ -70,16 +70,16 @@ class Apc extends AbstractCache
     {
         $key = $this->mapKey($key);
 
-        if($success = apc_delete($key) && $this->options['tagging']) {
+        if ($success = apc_delete($key) && $this->options['tagging']) {
 
             $iterator = $this->iterator(
                 '/^' . preg_quote($this->options['prefix_tag']) . '/',
                 APC_ITER_VALUE
             );
             foreach ($iterator as $tag => $keys) {
-                if( ($key = array_search($key, $keys['value'])) !== false ) {
+                if ( ($key = array_search($key, $keys['value'])) !== false ) {
                     unset($keys['value'][$key]);
-                    if(empty($keys['value'])) {
+                    if (empty($keys['value'])) {
                         apc_delete($tag);
                     } else {
                         apc_store($tag, $keys['value']);
@@ -100,16 +100,17 @@ class Apc extends AbstractCache
     public function clean(array $tags)
     {
         $rmed = array();
-        foreach($tags as $tag) {
+        foreach ($tags as $tag) {
             $tag = $this->mapTag($tag);
             $keys = apc_fetch($tag, $success);
-            if($success) {
-                foreach($keys as $key) {
+            if ($success) {
+                foreach ($keys as $key) {
                     $rmed[] = apc_delete($key);
                 }
                 $rmed[] = apc_delete($tag);
             }
         }
+
         return !in_array(false, $rmed);
     }
 
@@ -120,7 +121,7 @@ class Apc extends AbstractCache
      */
     public function flush($all=false)
     {
-        if(true === $all) {
+        if (true === $all) {
             return apc_clear_cache('user');
         }
 
@@ -161,6 +162,7 @@ class Apc extends AbstractCache
 
             return $v;
         }
+
         return false;
     }
 

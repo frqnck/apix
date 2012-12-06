@@ -12,7 +12,7 @@ class Reflection
     /**
      * Constructor
      *
-     * @param string|null $prefix    [optional default:null]
+     * @param string|null $prefix [optional default:null]
      */
     public function __construct($prefix='null')
     {
@@ -30,9 +30,9 @@ class Reflection
     }
 
     /**
-     * Returns the PHPDoc string.
+     * Returns the PHPDoc string
      *
-     * @param  \Reflection|string $mix  A reflection object or a PHPDoc string.
+     * @param  \Reflection|string $mix A reflection object or a PHPDoc string
      * @return array
      */
     // public function getPhpDocString($mix)
@@ -43,12 +43,12 @@ class Reflection
     /**
      * Extract PHPDOCs
      *
-     * @param  \Reflection|string $mix  A reflection object or a PHPDoc string to parse.
+     * @param  \Reflection|string $mix A reflection object or a PHPDoc string
      * @return array
      */
     public static function parsePhpDoc($mix, array $requireds=null)
     {
-        if($mix instanceOf \Reflector) {
+        if ($mix instanceOf \Reflector) {
             $doc = $mix->getDocComment();
             $requireds = self::getRequiredParams($mix);
         } else {
@@ -69,7 +69,6 @@ class Reflection
         $pattern = '@(\r+|\t+)? *\* *@';
 
         $str = preg_replace($pattern, '', $doc);
-
 
        # $lines =array_map('trim',explode(PHP_EOL, $str));
 
@@ -126,10 +125,10 @@ class Reflection
     }
 
     /**
-     * Returns the required parameters.
+     * Returns the required parameters
      *
-     * @param  \ReflectionFunctionAbstract $refMethod   A reflected method/function to introspect.
-     * @return array                                    The array of required parameters
+     * @param  \ReflectionFunctionAbstract $ref A reflected method/function to introspect
+     * @return array                       The array of required parameters
      */
     public static function getRequiredParams(\ReflectionFunctionAbstract $ref)
     {
@@ -140,11 +139,12 @@ class Reflection
                 $params[] = $name;
             }
         }
+
         return $params;
     }
 
     /**
-     * Extract source code.
+     * Extract source code
      *
      * @param  \Reflector $ref
      * @return array

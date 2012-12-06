@@ -98,10 +98,10 @@ class Main extends Console
                     $url .= '/current/' . $this->version;
                     $r = $input->decode(trim($this->getContents($url)), true);
 
-                    if($this->verbose) {
+                    if ($this->verbose) {
                         $this->outRegex("Contacting...\n<brown>${url}</brown>\n\n");
                     }
-                    if($this->verbos3) {
+                    if ($this->verbos3) {
                         print_r($r);
                     }
 

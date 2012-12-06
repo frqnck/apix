@@ -20,7 +20,7 @@ class Html extends AbstractOutput
      */
     public function encode(array $data, $rootNode=null)
     {
-        if(null !== $rootNode) {
+        if (null !== $rootNode) {
             $data = array($rootNode => $data);
         }
 
@@ -30,8 +30,8 @@ class Html extends AbstractOutput
     /**
      * Append the data recursively...
      *
-     * @param   array   $results
-     * @return  string
+     * @param  array  $results
+     * @return string
      */
     protected function recursivelyAppend(array $results)
     {

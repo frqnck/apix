@@ -17,7 +17,7 @@ class Php extends AbstractOutput
      */
     public function encode(array $data, $rootNode=null)
     {
-        if(null !== $rootNode) {
+        if (null !== $rootNode) {
             $data = array($rootNode => $data);
         }
 

@@ -49,6 +49,7 @@ class Cache extends PluginAbstractEntity
         // Use cache
         if ($cache = $this->adapter->load($id)) {
             $this->log('loading', $id);
+
             return $cache;
         }
 
@@ -73,6 +74,7 @@ class Cache extends PluginAbstractEntity
             sprintf('saving for %d secs', $ttl),
             $id . ': ' . implode(', ', $tags)
         );
+
         return $data;
     }
 
@@ -81,9 +83,9 @@ class Cache extends PluginAbstractEntity
      * Inputs strings are date/time strtotime formatted.
      * @see http://php.net/strtotime
      *
-     * @param   string  $until
-     * @param   string      $from
-     * @return  integer     The TTL in seconds.
+     * @param  string  $until
+     * @param  string  $from
+     * @return integer The TTL in seconds.
      */
     public function getTtlInternval($until=null, $from='now')
     {

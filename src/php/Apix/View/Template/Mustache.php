@@ -33,6 +33,7 @@ class Mustache extends Template
     {
         #$template = '<h1> {{title}} </h1> <ul> {{#sites}} <li> {{#url}} {{.}} {{/url}} </li> {{/sites}}  </ul>';
         $m = new \Mustache_Engine($this->options);
+
         return $m->render($this->layout, $model);
     }
 

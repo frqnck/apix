@@ -19,7 +19,7 @@ class Help extends ViewModel
     {
         if(isset($_GET['debug'])) $this->debug();
 
-        switch(true) {
+        switch (true) {
             case isset($this->items):
                 return 'man_toc';
             case isset($this->methods):
@@ -38,8 +38,8 @@ class Help extends ViewModel
     public function items()
     {
         // TODO: make this a view helper.
-        foreach($this->items as $item) {
-            foreach($item['methods'] as $k => $v) {
+        foreach ($this->items as $item) {
+            foreach ($item['methods'] as $k => $v) {
                 $item['methods'][$k]['method'] = $k;
                 $item['methods'][] = $item['methods'][$k];
                 unset($item['methods'][$k]);
@@ -60,13 +60,14 @@ class Help extends ViewModel
      */
     public function params()
     {
-        if(empty($this->params)) {
+        if (empty($this->params)) {
             return null;
         }
 
         $params = isset($this->params) ? $this->params : array();
 
         $many = $this->hasMany('params');
+
         return array(
             'title' => $many ? 'Options' : 'Option',
             'txt'   => $many
@@ -81,8 +82,8 @@ class Help extends ViewModel
      *
      * @return array
      */
-	public function groups()
-	{
+    public function groups()
+    {
         #$ignore = array('internal', 'id', 'toc', 'todo', 'method');
         $titles = array(
             'return'        => 'Response',
@@ -93,7 +94,7 @@ class Help extends ViewModel
         );
         $groups = array();
 
-        foreach($titles as $key => $title) {
+        foreach ($titles as $key => $title) {
             if(
                 isset($this->{$key})
                 #&& !in_array($key, $ignore)

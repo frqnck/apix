@@ -23,8 +23,8 @@ class Help
      * This resource entity provides in-line referencial to all the API resources and methods.
      * By specify a resource and method you can narrow down to specific section.
      *
-     * @param  string $path     A string of characters used to identify a resource.
-     * @param  array  $filters  Filters can be use to narrow down the resultset.
+     * @param string $path    A string of characters used to identify a resource.
+     * @param array  $filters Filters can be use to narrow down the resultset.
      *
      * @example <pre>GET /help/path/to/entity</pre>
      * @id help
@@ -50,7 +50,6 @@ class Help
         // ) {
             $server->getRoute()->setName($path);
         // }
-
         return $this->onHelp($server, $filters);
     }
 
@@ -96,7 +95,6 @@ class Help
             // insures the top node is set to help.
             $this->route->setController('help');
 
-
             // // set Content-Type (negotiate or default)
             // if(
             //      $request->hasHeader('CONTENT_LENGTH')
@@ -136,7 +134,7 @@ class Help
 
         $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
 
-        if(null !== $method || $entity->hasMethod($method) ) {
+        if (null !== $method || $entity->hasMethod($method) ) {
 
             // get specified method.
             $docs = $entity->getDocs($method);
