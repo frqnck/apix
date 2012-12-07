@@ -9,7 +9,10 @@ class OutputSign extends PluginAbstract
     public static $hook = array('response', 'early');
 
     protected $options = array(
-        'enable'   => true,               // wether to enable or not
+        'enable'   => true,         // wether to enable or not
+        'name'     => 'signature',  // the header name
+        'prepend'  => true,         // wether to prepend the signature
+        'extras'    => null,        // extras to inject, string or array
     );
 
     public function update(\SplSubject $response)
@@ -22,7 +25,7 @@ class OutputSign extends PluginAbstract
         $route = $response->getRoute();
         $http_code = $response->getHttpCode();
 
-        $signature = array(
+        $data = array(
             'resource'  => sprintf(
                             '%s %s',
                             $route->getMethod(),
@@ -37,7 +40,16 @@ class OutputSign extends PluginAbstract
             'client_ip' => $request->getIp(true)
         );
 
-        $response->results['signature'] = $signature;
+        if (null !== $this->options['extras']) {
+            $data['extras'] = $this->options['extras'];
+        }
+
+        $name = $this->options['name'];
+        if (true === $this->options['prepend']) {
+            $response->results = array($name=>$data);
+        } else {
+            $response->results[$name] = $data;
+        }
     }
 
 }
