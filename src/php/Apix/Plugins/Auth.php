@@ -47,6 +47,8 @@ class Auth extends PluginAbstractEntity
 
         return $username;
 
+
+
         $s = new \Zenya_Model_Session;
 
         if ($request->hasHeader('X-session_id')) {
