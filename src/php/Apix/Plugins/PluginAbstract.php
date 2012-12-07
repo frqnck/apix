@@ -8,10 +8,9 @@ abstract class PluginAbstract implements \SplObserver
     protected $options = array();
 
     /**
-     * Constructor.
+     * Constructor
      *
-     * @param array $options List of options, if $options is an object,
-     *                              set it as the plugin adapter.
+     * @param mix $options Array of options if it is an object set as an adapter
      */
     public function __construct($options=null)
     {
@@ -27,7 +26,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Sets and merge with the plugin defaults options.
+     * Sets and merge with the plugin defaults options
      *
      * @param array $options
      */
@@ -39,7 +38,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Gets the plugin options.
+     * Gets the plugin options
      *
      * @return mix
      */
@@ -49,7 +48,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Sets the plugin adapter.
+     * Sets the plugin adapter
      *
      * @param mix $adapter
      */
@@ -84,7 +83,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Gets the plugin adapter.
+     * Gets the plugin adapter
      *
      * @return mix
      */
@@ -94,11 +93,9 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-    * Initialization method, needs to be implemented by the plugin itself
+    * Log shortcut
     */
-    #abstract function init();
-
-    public function log($msg, $ref=null)
+    public function log($msg, $ref=null, $level='debug')
     {
         if (defined('DEBUG') && !defined('UNIT_TEST')) {
             $str = sprintf('%s %s (%s)', get_class($this), $msg, $ref);
