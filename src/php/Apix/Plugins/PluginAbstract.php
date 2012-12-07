@@ -93,8 +93,8 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-    * Log shortcut
-    */
+     * Log shortcut
+     */
     public function log($msg, $ref=null, $level='debug')
     {
         if (defined('DEBUG') && !defined('UNIT_TEST')) {

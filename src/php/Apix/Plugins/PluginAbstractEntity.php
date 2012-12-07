@@ -55,7 +55,7 @@ abstract class PluginAbstractEntity extends PluginAbstract
     /**
      * Sets this plugin entity
      *
-     * @param Entity    $entity
+     * @param  Entity $entity
      * @return void
      */
     public function setEntity(Entity $entity)

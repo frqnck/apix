@@ -17,6 +17,7 @@ class CacheTest extends TestCase
     protected function tearDown()
     {
         unset($this->cache);
+        unset($this->adapter);
     }
 
     protected function mock($return)
@@ -35,6 +36,8 @@ class CacheTest extends TestCase
             );
 
         $this->cache->setEntity($entity);
+
+        return $entity;
     }
 
     public function testUpdateSkipWithoutAnnotation()
@@ -53,7 +56,7 @@ class CacheTest extends TestCase
         );
     }
 
-    public function testUpdateSkipWhenDisable()
+    public function testItWillSkipWhenDisable()
     {
         $cache = new Cache($this->adapter, array('enable'=>false));
         $this->assertFalse(
@@ -63,22 +66,22 @@ class CacheTest extends TestCase
         );
     }
 
-    public function testUpdateLoadFromCache()
+    public function testItWillLoadFromCache()
     {
         $this->mock('x');
 
         $this->adapter
             ->expects($this->once())
             ->method('load')
-            ->will($this->returnValue('loaded'));
+            ->will($this->returnValue('loaded from cache'));
 
         $this->assertEquals(
-            'loaded',
+            'loaded from cache',
             $this->cache->update($this->cache->getEntity())
         );
     }
 
-    public function testUpdateSaveToCache()
+    public function testItWillSaveToCache()
     {
         $this->mock('x');
 
@@ -89,7 +92,7 @@ class CacheTest extends TestCase
         $this->cache->update($this->cache->getEntity());
     }
 
-    public function testFlushAnnotatedTags()
+    public function testItWillFlushAnnotatedTags()
     {
         $this->mock('flush=tag1');
         $this->adapter
@@ -99,19 +102,28 @@ class CacheTest extends TestCase
         $this->cache->flushAnnotatedTags(false);
     }
 
-    public function testGetTtlInternval()
+    public function timingProvider()
     {
-        $ttl = $this->cache->getTtlInternval('+1minute');
-        $this->assertEquals('60', $ttl);
+        return array(
+            array('+1minute', 60),
+            array('1min', 60),
+            array('100sec', 100),
+            array('+1minute', 60),
+            array('2days', 172800),
+            array('48hours', 172800),
+            array('1week', 604800)
+        );
+    }
 
-        $ttl = $this->cache->getTtlInternval('1min');
-        $this->assertEquals('60', $ttl);
-
-        $ttl = $this->cache->getTtlInternval('100sec');
-        $this->assertEquals('100', $ttl);
-
-        $ttl = $this->cache->getTtlInternval('100sec');
-        $this->assertEquals('100', $ttl);
+    /**
+     * @dataProvider timingProvider
+     */
+    public function testTimeInternval($timeString, $seconds)
+    {
+        $this->assertEquals(
+            $seconds,
+            Cache::timeInternval($timeString)
+        );
     }
 
     public function subtagsProvider()
@@ -143,8 +155,8 @@ class CacheTest extends TestCase
         $this->mock($annotation);
         $tags = $this->cache->extractSubTags();
         $tags = array(
-            'keys'=>$tags['keys'],
-            'values'=>$tags['values']
+            'keys'   => $tags['keys'],
+            'values' => $tags['values']
         );
         $this->assertEquals($expected, $tags);
     }
@@ -161,6 +173,37 @@ class CacheTest extends TestCase
             $values = $this->cache->getSubTagValues($result['k'], null, true);
             $this->assertEquals($result['exp'], $values);
          }
+    }
+
+    public function testLogException()
+    {
+        $this->adapter
+            ->expects($this->once())
+            ->method('save')
+            ->will(
+                $this->throwException(new \Exception('exception'))
+            );
+
+        $this->cache = new Cache($this->adapter);
+
+        $this->mock('x');
+
+        $log= $this->getMock('Apix\Plugins\Log', array('logd'));
+        $log->expects($this->once())
+            ->method('logd')
+            ->will($this->returnArgument(0));
+            // ->with(
+            //     $this->equalTo('error'),
+            //     $this->anything(),
+            //     $this->equalTo('ERROR')
+            // );
+
+
+
+        $this->assertEquals(
+            'temp-execption',
+            $this->cache->update($this->cache->getEntity())
+        );
     }
 
 }
