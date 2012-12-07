@@ -1,15 +1,17 @@
 <?php
 namespace Apix\Plugins;
 
-class Log implements \SplObserver
+use Monolog\Logger as Monolog,
+    Monolog\Handler\StreamHandler;
+
+class Logger extends PluginAbstract
 {
 
-    /**
-     * The log target, it can be a a resource or a PEAR Log instance.
-     *
-     * @var resource|Log $target
-     */
-    protected $target = null;
+    protected $options = array(
+        'adapter'       => 'Apix\Plugins\Log\Adapter',
+        'enable'        => true,        // wether to enable or not
+        'public_group'  => 'public',    // public group to skip auth
+    );
 
     /**
      * The events to log.
@@ -35,7 +37,7 @@ class Log implements \SplObserver
      *
      * @return void
      */
-    public function __construct($target = 'php://output', array $events = array())
+    public function OFF__construct($target = 'php://output', array $events = array())
     {
         if (!empty($events)) {
             $this->events = $events;
@@ -65,7 +67,10 @@ class Log implements \SplObserver
 
         #$this->log('* Connected to ' . $notice['name']);
 
-return;
+        return;
+
+
+
 
         if (!in_array($notice['name'], $this->notices)) {
             return;
@@ -116,13 +121,45 @@ return;
      *
      * @return void
      */
-    protected function log($str)
+    protected function OFflog($str)
     {
         if ($this->target instanceof Log) {
             $this->target->debug($str);
         } elseif (is_resource($this->target)) {
             fwrite($this->target, $str . "\r\n");
         }
+    }
+
+    /**
+     * Log shortcut
+     */
+    public function logd($msg)
+    {
+        echo $msg;
+    }
+    /**
+     * Log shortcut
+     */
+    public function log($msg, $level='debug', $context=null)
+    {
+        #if (defined('DEBUG') && !defined('UNIT_TEST')) {}
+
+        if(null !== $context) {
+            $str = sprintf('%s %s (%s)', get_class($this), $msg, $context);
+        } else {
+            $str = sprintf('%s %s', get_class($this), $msg);
+        }
+
+        $log = new Monolog('myLog');
+        $log->pushHandler(new StreamHandler('/tmp/mono_log', Monolog::WARNING));
+
+        // add records to the log
+        $log->addWarning($str, array('qqq', 'qwerty'));
+        $log->addError('Bar');
+        $log->addInfo('Bar');
+        $log->addError('Bar');
+
+        return true;
     }
 
 }
