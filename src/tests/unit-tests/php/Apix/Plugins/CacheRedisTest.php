@@ -5,11 +5,16 @@ use Apix\TestCase;
 
 class CacheRedisTest extends TestCase
 {
-    protected $cache;
-
     const HOST = '127.0.0.1';
     const PORT = 6379;
     const AUTH = NULL;
+
+    protected $cache;
+
+    protected $options = array(
+            'prefix_key' => 'unittest-apix-key:',
+            'prefix_tag' => 'unittest-apix-tag:'
+        );
 
     public function setUp()
     {
@@ -30,13 +35,7 @@ class CacheRedisTest extends TestCase
             $this->markTestSkipped( $e->getMessage() );
         }
 
-       $this->cache = new Redis(
-            $this->redis,
-            array(
-                'prefix_key' => 'unittest-apix-key:',
-                'prefix_tag' => 'unittest-apix-tag:'
-            )
-        );
+       $this->cache = new Redis($this->redis, $this->options);
     }
 
     public function tearDown()
