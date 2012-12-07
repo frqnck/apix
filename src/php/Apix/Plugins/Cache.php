@@ -55,7 +55,7 @@ class Cache extends PluginAbstractEntity
 
             // ...and cache it for later usage.
             $ttl = $this->getSubTagValues('ttl', array($this->options['ttl']));
-            $sec = $this->getTtlInternval($ttl[0]);
+            $sec = self::timeInternval($ttl[0]);
 
             $tags = array_merge(
                 $this->options['tags'],
@@ -70,7 +70,12 @@ class Cache extends PluginAbstractEntity
             );
 
         } catch (\Exception $e) {
-            $this->log('error', $e->getMessage(), 'ERROR');
+            $l = new Log();
+            $l->logd('errro');
+
+            #$l->log('error', $e->getMessage(), 'ERROR');
+            #$this->log('error', $e->getMessage(), 'ERROR');
+            $data = isset($data) ? $data : 'temp-execption';
         }
 
         return $data;
@@ -90,17 +95,18 @@ class Cache extends PluginAbstractEntity
     }
 
     /**
-     * Returns the time-to-live interval in seconds.
+     * Returns the time interval in seconds.
+     *
      * Inputs strings are date/time strtotime formatted.
      * @see http://php.net/strtotime
      *
-     * @param  string  $until
-     * @param  string  $from
-     * @return integer The TTL in seconds.
+     * @param  string  $end   The end time.
+     * @param  string  $start The start time, default to 'now'.
+     * @return integer The interval in seconds.
      */
-    public function getTtlInternval($until=null, $from='now')
+    public static function timeInternval($end=null, $start='now')
     {
-        return $until == 0 ? null : strtotime($until)-strtotime($from);
+        return 0 == $end ? null : strtotime($end)-strtotime($start);
     }
 
 }
