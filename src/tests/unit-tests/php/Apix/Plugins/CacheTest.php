@@ -34,14 +34,14 @@ class CacheTest extends TestCase
                 )
             );
 
-        $this->cache->entity = $entity;
+        $this->cache->setEntity($entity);
     }
 
     public function testUpdateSkipWithoutAnnotation()
     {
         $this->mock(null);
         $this->assertFalse(
-            $this->cache->update($this->cache->entity)
+            $this->cache->update($this->cache->getEntity())
         );
     }
 
@@ -49,7 +49,7 @@ class CacheTest extends TestCase
     {
         $this->mock('x');
         $this->assertNull(
-            $this->cache->update($this->cache->entity)
+            $this->cache->update($this->cache->getEntity())
         );
     }
 
@@ -74,7 +74,7 @@ class CacheTest extends TestCase
 
         $this->assertEquals(
             'loaded',
-            $this->cache->update($this->cache->entity)
+            $this->cache->update($this->cache->getEntity())
         );
     }
 
@@ -86,7 +86,7 @@ class CacheTest extends TestCase
             ->expects($this->once())
             ->method('save');
 
-        $this->cache->update($this->cache->entity);
+        $this->cache->update($this->cache->getEntity());
     }
 
     public function testFlushAnnotatedTags()
