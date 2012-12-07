@@ -1,6 +1,8 @@
 <?php
 namespace Apix\Plugins;
 
+use Apix\Entity;
+
 class Cache extends PluginAbstractEntity
 {
 
@@ -12,25 +14,15 @@ class Cache extends PluginAbstractEntity
         'adapter'    => 'Apix\Plugins\Cache\Adapter',
         'enable'     => true,              // wether to enable or not
         'ttl'        => '10mins',          // set the TTL, null stands forever
-        'flush'      => true,              // wether to flush tags at runtime (cron job?)
-        'tags'       => array(),           // tags to append everytime time e.g. v1, dev
+        'flush'      => true,              // flush tags at runtime (cronjob)
+        'tags'       => array(),           // default tags to append (v1, dev)
         'prefix_key' => 'apix-cache-key:', // prefix cache keys
         'prefix_tag' => 'apix-cache-tag:', // prefix cache tags
     );
 
     /**
-     * Flush the tags explicitly
-     *
-     * @param boolean $enable Wether to flush or not.
+     * @{@inheritdoc}
      */
-    public function flushAnnotatedTags($enable)
-    {
-        if ( $enable && $tags = $this->getSubTagValues('flush') ) {
-            $this->adapter->clean($tags);
-            $this->log('Tags purged', implode(', ', $tags));
-        }
-    }
-
     public function update(\SplSubject $entity)
     {
         // skip if null
@@ -39,43 +31,62 @@ class Cache extends PluginAbstractEntity
             || null === $entity->getAnnotationValue($this->annotation)){
             return false;
         }
-        $this->entity = $entity;
 
-        $this->flushAnnotatedTags( $this->options['flush'] );
+        $this->setEntity($entity);
 
-        // the cache id is simply the entity route name for now! todo
-        $id = $entity->getRoute()->getPath();
+        try {
+            $this->flushAnnotatedTags($this->options['flush']);
 
-        // Use cache
-        if ($cache = $this->adapter->load($id)) {
-            $this->log('loading', $id);
+            // the cache id is simply the entity route name for now!
+            $id = $entity->getRoute()->getPath();
 
-            return $cache;
+            // use the cache if present
+            if ($cache = $this->adapter->load($id)) {
+                $this->log('loading', $id);
+
+                return $cache;
+            }
+
+            // else call and retrieve the method's output...
+            $data = call_user_func_array(
+                array($entity, 'call'),
+                array($entity->getRoute())
+            );
+
+            // ...and cache it for later usage.
+            $ttl = $this->getSubTagValues('ttl', array($this->options['ttl']));
+            $sec = $this->getTtlInternval($ttl[0]);
+
+            $tags = array_merge(
+                $this->options['tags'],
+                $this->getSubTagValues('tags', array())
+            );
+            $tags = array_unique($tags);
+
+            $this->adapter->save($data, $id, $tags, $sec);
+            $this->log(
+                sprintf('saving for %ds', $sec, $ttl[0]),
+                $id . ' -- ' . implode(', ', $tags)
+            );
+
+        } catch (\Exception $e) {
+            $this->log('error', $e->getMessage(), 'ERROR');
         }
 
-        // retrieve the output...
-        $data = call_user_func_array(
-            array($entity, 'call'),
-            array($entity->getRoute())
-        );
-
-        // ...and cache it.
-        $ttl = $this->getSubTagValues('ttl', array($this->options['ttl']));
-        $ttl = $this->getTtlInternval($ttl[0]);
-
-        $tags = array_merge(
-            $this->options['tags'],
-            $this->getSubTagValues('tags', array())
-        );
-        $tags = array_unique($tags);
-
-        $this->adapter->save($data, $id, $tags, $ttl);
-        $this->log(
-            sprintf('saving for %d secs', $ttl),
-            $id . ': ' . implode(', ', $tags)
-        );
-
         return $data;
+    }
+
+    /**
+     * Flush the tags explicitly
+     *
+     * @param boolean $enable Wether to flush or not
+     */
+    public function flushAnnotatedTags($enable)
+    {
+        if ( $enable && $tags = $this->getSubTagValues('flush') ) {
+            $this->adapter->clean($tags);
+            $this->log('Tags purged', implode(', ', $tags));
+        }
     }
 
     /**
