@@ -30,14 +30,18 @@ class Auth extends PluginAbstractEntity
         }
 
         // authenticate
-        if ( ! $username = $this->adapter->authenticate() ) {
-            $this->log('Login failed1', $username, 'INFO');
+        $username = $this->adapter->authenticate();
+
+        if (!$username) {
+            $this->log('Login failed', $username, 'INFO');
+            $this->adapter->send();
             throw new \Exception('Authentication required', 401);
+            exit;
         }
 
         // Check the user is authorised
         if (null !== $users && !in_array($username, $users)) {
-            $this->log('Login failed', $username, 'INFO');
+            $this->log('Login unauthorised', $username, 'INFO');
             throw new \Exception('Access unauthorised.', 401);
         }
 
@@ -48,7 +52,6 @@ class Auth extends PluginAbstractEntity
         $_SERVER['X_AUTH_USER'] = $username;
 
         return $username;
-
 
 
 

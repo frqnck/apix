@@ -42,13 +42,13 @@ try {
          * @return  boolean Indicates whether the action was successful.
          *
          * @api_auth    groups=admin users=franck
-         * @api_cache   ttl=5min tags=tag1,tag2,tag3,v1 flush=tag9,tag10
+         * @api_cache   ttl=5mins tags=tag1,tag2,tag3 flush=tag9,tag10
          */
         function($id) use ($api) {
             $params = $api->request->getBody();
 
             return array(
-                'test'  => 'value',
+                'test'  => ' 111value11s',
                 #'xml' =>array('&"\'<> ?|\\-_+=@£$€*/":;[]{}'),
                 'body'  => $api->request->getBody(),
                 //'params'    => $api->getBodyData()
