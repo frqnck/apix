@@ -5,30 +5,29 @@ abstract class AbstractAuth implements Adapter
 {
 
     /**
-     * @var boolean Holds
+     * @var mixed Holds an auth token.
      */
-    public $token = null;
+    protected $token;
 
     /**
-     * Returns the auth token
+     * Returns an auth token to match against.
      *
-     * @param array The digest/basic array
-     * @return string The token to match with the digest password
+     * @param  array           $auth_data An array of authentification data.
+     * @return boolean|string.
      */
-    public function getToken(array $data)
+    public function getToken(array $auth_data)
     {
       if ( is_callable($this->token) ) {
-        $token = call_user_func_array($this->token, array($data));
-        $this->setToken($token);
+        $this->token = call_user_func_array($this->token, array($auth_data));
       }
 
       return $this->token;
     }
 
     /**
-     * Sets the auth token
+     * Sets an auth token
      *
-     * @return string The token to macth with the digest password
+     * @return mixed $token    An auth token, can be a closure or a boolean.
      */
     public function setToken($token)
     {
