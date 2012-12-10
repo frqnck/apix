@@ -58,6 +58,14 @@ class CacheApcTest extends TestCase
         $this->assertEquals( 'strData', apc_fetch($id) );
     }
 
+    public function testSaveAndLoadArray()
+    {
+        $data = array('arrayData');
+        $this->assertTrue($this->cache->save($data, 'id'));
+
+        $this->assertEquals($data, $this->cache->load('id'));
+    }
+
     public function testSaveWithTags()
     {
         $this->assertTrue(

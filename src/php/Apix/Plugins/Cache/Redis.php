@@ -4,6 +4,8 @@ namespace Apix\Plugins\Cache;
 class Redis extends AbstractCache
 {
 
+
+
     /**
      * Constructor.
      *
@@ -17,7 +19,14 @@ class Redis extends AbstractCache
                                  ? \Redis::MULTI
                                  : \Redis::PIPELINE;
 
+        $this->options['serializer'] = 'igBinary'; // none, php, igBinary.
+
         parent::__construct($redis, $options);
+
+        $redis->setOption(
+            \Redis::OPT_SERIALIZER,
+            $this->getSerializer($this->options['serializer'])
+        );
     }
 
     /**
@@ -116,6 +125,25 @@ class Redis extends AbstractCache
         );
 
         return $this->adapter->del($items) ? true : false;
+    }
+
+    /**
+     * Returns a Redis constant
+     *
+     * @param  string $name Can be php, igBinary or none.
+     * @return integer Corresponding to a Redis constant.
+     */
+    public function getSerializer($name)
+    {
+        switch($name) {
+            case 'igBinary':
+                return \Redis::SERIALIZER_IGBINARY;
+            case 'php':
+                return \Redis::SERIALIZER_PHP;
+            case 'none':
+            default:
+                return \Redis::SERIALIZER_NONE;
+        }
     }
 
 }

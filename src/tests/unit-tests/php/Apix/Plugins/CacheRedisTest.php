@@ -12,9 +12,10 @@ class CacheRedisTest extends TestCase
     protected $cache;
 
     protected $options = array(
-            'prefix_key' => 'unittest-apix-key:',
-            'prefix_tag' => 'unittest-apix-tag:'
-        );
+        'prefix_key' => 'unittest-apix-key:',
+        'prefix_tag' => 'unittest-apix-tag:',
+        'serializer' => 'php' // null, php, igBinary.
+    );
 
     public function setUp()
     {
@@ -54,9 +55,25 @@ class CacheRedisTest extends TestCase
 
     public function testSaveAndLoad()
     {
-        $this->assertTrue( $this->cache->save('strData', 'id') );
+        $this->assertTrue($this->cache->save('strData', 'id'));
 
-        $this->assertEquals( 'strData', $this->cache->load('id') );
+        $this->assertEquals('strData', $this->cache->load('id'));
+    }
+
+    public function testSaveAndLoadArray()
+    {
+        $options = array(
+            'prefix_key' => 'unittest-apix-key:',
+            'prefix_tag' => 'unittest-apix-tag:',
+            'serializer' => 'php' // null, php, igBinary.
+        );
+
+        $this->cache = new Redis($this->redis, $options);
+
+        $data = array('arrayData');
+        $this->assertTrue($this->cache->save($data, 'id'));
+
+        $this->assertEquals($data, $this->cache->load('id'));
     }
 
     public function testSaveWithTags()
@@ -160,6 +177,22 @@ class CacheRedisTest extends TestCase
         // sleep(1);
 
         $this->assertNull( $this->cache->load('ttlId'), "Should be null");
+    }
+
+    public function testGetSerializer()
+    {
+        $this->assertSame(
+            \Redis::SERIALIZER_PHP,
+            $this->cache->getSerializer('php')
+        );
+        $this->assertSame(
+            \Redis::SERIALIZER_IGBINARY,
+            $this->cache->getSerializer('igBinary')
+        );
+        $this->assertSame(
+            \Redis::SERIALIZER_NONE,
+            $this->cache->getSerializer(null)
+        );
     }
 
 }
