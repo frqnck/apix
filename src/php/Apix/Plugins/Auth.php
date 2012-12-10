@@ -20,9 +20,10 @@ class Auth extends PluginAbstractEntity
         $groups = $this->getSubTagValues('groups');
         $users = $this->getSubTagValues('users');
 
-        // skip if groups and users are null, or public role group.
+        // skip if groups and users are null, or if the group is public.
         if(
-            null === $groups || in_array($this->options['public_group'], $groups)
+            null === $groups
+            || in_array($this->options['public_group'], $groups)
             && null !== $users
         ) {
             return false;
@@ -30,22 +31,25 @@ class Auth extends PluginAbstractEntity
 
         // authenticate
         if ( ! $username = $this->adapter->authenticate() ) {
+            $this->log('Login failed1', $username, 'INFO');
             throw new \Exception('Authentication required', 401);
         }
 
-        // check user
+        // Check the user is authorised
         if (null !== $users && !in_array($username, $users)) {
-            $this->log('Access unauthorised', $username);
+            $this->log('Login failed', $username, 'INFO');
             throw new \Exception('Access unauthorised.', 401);
         }
+
+        $this->log('Login', $username, 'NOTICE');
 
         // todo set X_REMOTE_USER or X_AUTH_USER
         #$entity->getResponse()->setHeader('X_REMOTE_USER', $username);
         $_SERVER['X_AUTH_USER'] = $username;
 
-        #$this->log('Access granted', $username);
-
         return $username;
+
+
 
 
 

@@ -24,7 +24,7 @@ if (
  *
  * @link http://www.peej.co.uk/files/httpdigest.phps
  */
-class Basic implements Adapter
+class Basic extends AbstractAuth
 {
     /**
      * @var string The authentication realm.
@@ -37,11 +37,6 @@ class Basic implements Adapter
     public $baseURL = '/';
 
     /**
-     * @var boolean Holds
-     */
-    public $token = null;
-
-    /**
      * Constructor
      *
      * The constructor that sets the $this->realm
@@ -52,21 +47,6 @@ class Basic implements Adapter
     public function __construct($realm = null)
     {
         $this->realm = $realm !== null ? $realm : $_SERVER['SERVER_NAME'];
-    }
-
-    /**
-     * Returns the token
-     *
-     * @param array Teh digest array
-     * @return string The token to macth with the digest password
-     */
-    public function getToken(array $user)
-    {
-      if (is_null($this->token)) {
-        call_user_func_array($this->setToken, array($user));
-      }
-
-      return $this->token;
     }
 
     /**
