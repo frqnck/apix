@@ -181,6 +181,7 @@ class Server extends Listener
                 );
 
         }
+
         $this->response->generate(
             $this->results,
             $this->getServerVersion($this->config),
