@@ -4,8 +4,6 @@ namespace Apix\Plugins\Cache;
 class Redis extends AbstractCache
 {
 
-
-
     /**
      * Constructor.
      *
