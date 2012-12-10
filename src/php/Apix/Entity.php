@@ -21,10 +21,10 @@ class Entity extends Listener
     );
 
     /**
-     * Holds the results of the resource entity.
+     * Holds the array of results of an entity.
      * @var  array
      */
-    protected $results = null;
+    public $results = null;
 
     /**
      * Appends the given array definition and apply generic mappings.
@@ -44,15 +44,23 @@ class Entity extends Listener
      * Call the resource entity.
      *
      * @return array
-     * @throws Apix\Exception
-     * @see     EntityInterface::_call
+     * @see     EntityInterface::underlineCall
      */
-    public function call()
+    public function call($direct=false)
     {
+        // early listeners @ pre-entity
+        if(!$direct) {
+            $this->hook('entity', 'early');
+        }
+
         if (null === $this->results) {
             $this->results = $this->underlineCall($this->route);
         }
 
+        // late listeners @ post-entity
+        if(!$direct) {
+            $this->hook('entity', 'late');
+        }
         return $this->results;
     }
 

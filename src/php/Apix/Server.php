@@ -134,14 +134,8 @@ class Server extends Listener
             // get the entity object from a route
             $this->entity = $this->resources->get($this->route);
 
-            // early listeners @ pre-entity
-            $this->entity->hook('entity', 'early');
-
             // set the results -- TODO: create a Response results obj
-            $this->results = $this->entity->call($this->route);
-
-            // late listeners @ post-entity
-            $this->entity->hook('entity', 'late');
+            $this->results = $this->entity->call();
 
         } catch (\Exception $e) {
 
