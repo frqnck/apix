@@ -231,7 +231,6 @@ $c['plugins'] = array(
 
     'Apix\Plugins\Cache' => array(
         'enable'    => DEBUG,
-
             // use APC by defaut.
         'adapter'   => function() use ($c) {
             $redis = new \Redis();
