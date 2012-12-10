@@ -69,11 +69,6 @@ class EntityClass extends Entity implements EntityInterface
 
         $params = $this->getValidatedParams($method, $route->getMethod(), $route->getParams());
 
-        // late listeners @ post-processing
-        #$this->hook('resource', 'early');
-
-        #echo '<pre>';print_r($this->toArray());exit;
-
         return call_user_func_array(
           array(
             new $name($args),
