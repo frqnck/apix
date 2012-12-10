@@ -24,7 +24,7 @@ if (
  *
  * @link http://www.peej.co.uk/files/httpdigest.phps
  */
-class Digest implements Adapter
+class Digest extends AbstractAuth
 {
 
     /**
@@ -58,11 +58,6 @@ class Digest implements Adapter
     public $nonceLife = 300;
 
     /**
-     * @var string The token to macth with the digest password
-     */
-    public $token = null;
-
-    /**
      * Constructor
      *
      * The constructor that sets the $this->realm
@@ -76,21 +71,6 @@ class Digest implements Adapter
 
         $this->privateKey = $privateKey;
         $this->opaque = $opaque;
-    }
-
-    /**
-     * Returns the token to match
-     *
-     * @param array Teh digest array
-     * @return string The token to macth with the digest password
-     */
-    public function getToken(array $digest)
-    {
-      if (is_null($this->token)) {
-        call_user_func_array($this->setToken, array($digest));
-      }
-
-      return $this->token;
     }
 
     /**

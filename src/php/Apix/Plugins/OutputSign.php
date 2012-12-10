@@ -9,9 +9,9 @@ class OutputSign extends PluginAbstract
     public static $hook = array('response', 'early');
 
     protected $options = array(
-        'enable'   => true,         // wether to enable or not
-        'name'     => 'signature',  // the header name
-        'prepend'  => true,         // wether to prepend the signature
+        'enable'    => true,        // wether to enable or not
+        'name'      => 'signature', // the header name
+        'prepend'   => false,       // wether to prepend the signature
         'extras'    => null,        // extras to inject, string or array
     );
 
@@ -46,7 +46,7 @@ class OutputSign extends PluginAbstract
 
         $name = $this->options['name'];
         if (true === $this->options['prepend']) {
-            $response->results = array($name=>$data);
+            $response->results = array($name=>$data)+$response->results;
         } else {
             $response->results[$name] = $data;
         }
