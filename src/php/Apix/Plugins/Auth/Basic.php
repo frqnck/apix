@@ -82,7 +82,7 @@ class Basic extends AbstractAuth
             isset($_SERVER['PHP_AUTH_USER'])
         ) {
             $user = array('username'=>$_SERVER['PHP_AUTH_USER'], 'password'=>$_SERVER['PHP_AUTH_PW']);
-            if ($this->getToken($user) === true) {
+            if (true === $this->getToken($user)) {
                 return $_SERVER['PHP_AUTH_USER'];
             }
         }

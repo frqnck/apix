@@ -17,7 +17,7 @@ class Cache extends PluginAbstractEntity
     protected $options = array(
         'enable'     => true,                     // wether to enable or not
         'adapter'    => 'Apix\Plugins\Cache\Apc', // instantiate by default
-        'ttl'        => '10mins',          // the lifetime, null stands forever
+        'ttl'        => null, //'10mins',          // the lifetime, null stands forever
         'flush'      => true,              // flush tags at runtime (cronjob)
         'tags'       => array(),           // default tags to append (v1, dev)
         'prefix_key' => 'apix-cache-key:', // prefix cache keys
@@ -47,14 +47,13 @@ class Cache extends PluginAbstractEntity
             // use the cache if present
             if ($cache = $this->adapter->load($id)) {
                 $this->log('loading', $id, 'DEBUG');
-
-                return $cache;
+                return $entity->results = $cache;
             }
 
             // else call and retrieve the method's output...
             $data = call_user_func_array(
                 array($entity, 'call'),
-                array($entity->getRoute())
+                array(true)
             );
 
             // ...and cache it for later usage.
