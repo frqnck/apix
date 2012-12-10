@@ -16,7 +16,7 @@ abstract class PluginAbstract implements \SplObserver
     {
         $this->setOptions($options);
 
-        if(isset($this->options['adapter'])) {
+        if (isset($this->options['adapter'])) {
             $this->setAdapter($this->options['adapter']);
         }
     }
@@ -53,7 +53,7 @@ abstract class PluginAbstract implements \SplObserver
      */
     public function setAdapter($adapter)
     {
-        if(is_string($adapter)) {
+        if (is_string($adapter)) {
             $this->adapter = new $adapter;
         } else {
             $this->adapter = $adapter instanceof \Closure
