@@ -153,7 +153,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      */
     public function loadPlugin($key, $mix)
     {
-        $name = is_int($key) ? $mix : $key;
+       $name = is_int($key) ? $mix : $key;
 
        if ( !class_exists($name) ) {
             throw new \RuntimeException(
@@ -187,7 +187,7 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
     public function loadPlugins(array $plugins)
     {
         foreach ($plugins as $key => $mix) {
-          $this->loadPlugin($key, $mix);
+            $this->loadPlugin($key, $mix);
         }
     }
 
