@@ -13,7 +13,7 @@ class OutputDebug extends PluginAbstract
         'name'       => 'debug',            // the header name
         'prepend'    => false,              // wether to prepend the debugging
         'timestamp'  => 'D, d M Y H:i:s T', // stamp format, default to RFC1123
-        'extras'   => null,                 // extras to inject, string or array
+        'extras'     => null,                 // extras to inject, string or array
     );
 
     public function update(\SplSubject $response)

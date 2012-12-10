@@ -69,9 +69,6 @@ class Logger extends PluginAbstract
 
         return;
 
-
-
-
         if (!in_array($notice['name'], $this->notices)) {
             return;
         }
@@ -144,7 +141,7 @@ class Logger extends PluginAbstract
     {
         #if (defined('DEBUG') && !defined('UNIT_TEST')) {}
 
-        if(null !== $context) {
+        if (null !== $context) {
             $str = sprintf('%s %s (%s)', get_class($this), $msg, $context);
         } else {
             $str = sprintf('%s %s', get_class($this), $msg);
