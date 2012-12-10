@@ -230,15 +230,14 @@ $c['plugins'] = array(
     'Apix\Plugins\Auth' => array('adapter' => $c['services']['auth']),
 
     'Apix\Plugins\Cache' => array(
-        'enable'    => true,
-        // 'adapter'   => function() use ($c) {
-        //     #return new Plugins\Cache\Apc;
+        'enable'    => DEBUG,
 
-        //     // $redis = new \Redis();
-        //     // $redis->connect('127.0.0.1', 6379);
-
-        //     // return new Plugins\Cache\Redis($redis);
-        // }
+            // use APC by defaut.
+        'adapter'   => function() use ($c) {
+            $redis = new \Redis();
+            $redis->connect('127.0.0.1', 6379);
+            return new Plugins\Cache\Redis($redis);
+        }
     ),
 
     #'Apix\Plugins\Mock',
