@@ -146,42 +146,40 @@ $c['services'] = array(
     // Auth examples (see plugins definition)
     'auth' => function() use ($c) {
         $basic = false; // set to: False to use Digest, True to use Basic.
-        if($basic) {
+        if ($basic) {
             // Example implementing Plugins\Auth\Basic'
             // ----------------------------------------
             // The Basic Authentification mechanism is generally use with SSL.
             $adapter = new Plugins\Auth\Basic($c['api_realm']);
-            $adapter->token = function(array $current) use ($c) {
+            $adapter->setToken(function(array $current) use ($c) {
                 $users = Services::get('users');
                 foreach ($users as $user) {
-                    if (
-                            $current['username'] == $user['user']
-                        &&  $current['password'] == $user['api_key']
-                    ) {
+                    if ($current['username'] == $user['user']
+                        && $current['password'] == $user['api_key']) {
                         return true;
                     }
                 }
+
                 return false;
-            };
+            });
         } else {
             // Example implementing 'Plugins\Auth\Digest'
             // -------------------------------------------
             // The Digest Authentification mechanism is use to encrypt and salt
             // the user's credentials without the overhead of SSL.
             $adapter = new Plugins\Auth\Digest($c['api_realm']);
-            $adapter->token = function(array $current) use ($c) {
+            $adapter->setToken(function(array $current) use ($c) {
                 $users = Services::get('users');
                 foreach ($users as $user) {
-                if (
-                        $user['user'] == $current['username']
-                    &&  $user['realm'] == $c['api_realm']
-                ) {
+                if ($user['user'] == $current['username']
+                    && $user['realm'] == $c['api_realm']) {
                         // Digest match againt this token!
                         return $user['api_key'];
                     }
                 }
+
                 return false;
-            };
+            });
         }
 
         return $adapter;
@@ -193,18 +191,17 @@ $c['services'] = array(
         // username:password:sharedSecret:role:realm
         return array(
             0 => array(
-                'user'=>'franck', 'password'=>'pass', 'api_key'=>'1234',
-                'role'=>'admin', 'realm'=>'api.domain.tld'
+                'user' => 'franck', 'password' => 'pass', 'api_key' => '1234',
+                'role' => 'admin', 'realm' => 'api.domain.tld'
             ),
             1 => array(
-                'user'=>'test', 'password'=>'sesame', 'api_key'=>'123abc',
-                'role'=>'guest', 'realm'=>'api.domain.tld'
+                'user' => 'test', 'password' => 'sesame', 'api_key' => '123abc',
+                'role' => 'guest', 'realm' => 'api.domain.tld'
             )
         );
     }
 
 );
-
 
 // Plugins definitions
 // ---------------------
@@ -219,7 +216,7 @@ $c['services'] = array(
 // Each periods can have one or many listeners firing in succesion.
 $c['plugins'] = array(
 
-    // Add the entity signature within the response-body.
+    // Add the entity signature as part of the response-body.
     'Apix\Plugins\OutputSign',
 
     // Add some debugging information within the response-body.
@@ -249,7 +246,6 @@ $c['plugins'] = array(
     #'Apix\Plugins\Manual',
     #'Apix\Plugins\Streaming',
 );
-
 
 // Init is an associative array of specific PHP directives. They are
 // recommended settings for most generic REST API server and should be set
@@ -308,7 +304,6 @@ $c['init'] = array(
     'variables_order'           => 'GPS',
     'request_order'             => 'GP'
 );
-
 
 ///////////////////////////////////////////////////////////////
 // Anything below that point should not need to be modified. //
