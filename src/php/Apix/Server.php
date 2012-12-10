@@ -145,7 +145,7 @@ class Server extends Listener
 
         } catch (\Exception $e) {
 
-            $http_code =  $e->getCode()>199 ? $e->getCode() : 500;
+            $http_code = $e->getCode()>199 ? $e->getCode() : 500;
             $this->response->setHttpCode($http_code);
 
             $this->results['error'] = array(
@@ -187,7 +187,6 @@ class Server extends Listener
                 );
 
         }
-
         $this->response->generate(
             $this->results,
             $this->getServerVersion($this->config),

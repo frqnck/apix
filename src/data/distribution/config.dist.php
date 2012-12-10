@@ -98,64 +98,6 @@ $c = array(
         'format_override'   => isset($_REQUEST['_format'])
                                 ? $_REQUEST['_format']
                                 : false,
-    ),
-
-    // Init is an associative array of specific PHP directives. They are
-    // recommended settings for most generic REST API server and should be set
-    // as required. There is most probably a performance penalty setting most of
-    // these at runtime so it is recommneded that most of these (if not all) be
-    // set directly in PHP.ini/vhost file on productions servers -- and then
-    // commented out. TODO: comparaison benchmark!?
-    'init'              => array(
-        // Weter to display errors (should be set to false in production).
-        'display_errors'            => DEBUG,
-
-        // Enable or disable php error logging.
-        'init_log_errors'           => true,
-
-        // Path to the error log file.
-        'error_log'                 => '/tmp/apix-server-errors.log',
-
-        /////////////////////////////////////////////////////////////////////
-        // Anything below should be set in PHP.ini on productions servers. //
-        /////////////////////////////////////////////////////////////////////
-
-        // Enable or disable html_errors
-        'html_errors'               => false,
-
-        // Whether to transparently compress outputs using GZIP.
-        // Once enable, this will also add a 'Vary: Accept-Encoding' header.
-        'zlib.output_compression'   => true,
-
-        // Maximum amount of memory a script may consume.
-        'memory_limit'              => '64M',
-
-        // The timeout in seconds.
-        // BEWARE web servers such as Apache have also their own timout settings
-        // that may interfere. See your web server manual for specific details.
-        'max_execution_time'        => 15,
-
-        ////////////////////////////////////////////////////////////////////////
-        // These below might not always get set depending on the environment. //
-        // Consider setting these in PHP.ini on productions servers...        //
-        ////////////////////////////////////////////////////////////////////////
-
-        // Maximum amount of time each script may spend parsing request data.
-        'post_max_size'             => '8M',
-
-        // Maximum amount of time each script may spend parsing request data.
-        'max_input_time'            => 30,
-
-        // Maximum amount of GET/POST input variables.
-        'max_input_vars'            => 100,
-
-        // Maximum input variable nesting level.
-        'max_input_nesting_level'   => 64,
-
-        // Determines which super global are registered and in which order these
-        // variables are populated.
-        'variables_order'           => 'GPS',
-        'request_order'             => 'GP'
     )
 
 );
@@ -201,46 +143,46 @@ $c['resources'] = array(
 // define some generic/shared code...
 $c['services'] = array(
 
-    // Example implementing Plugins\Auth\Basic'
-    // -----------------------------------------
-    // The Basic Authentification mechanism is generally use with SSL.
-    'basic_auth_plugin' => function() use ($c) {
-        $adapter = new Plugins\Auth\Basic($c['api_realm']);
-        $adapter->setToken = function(array $basic) use ($c, $adapter) {
-            $users = Services::get('users');
-            foreach ($users as $user) {
-                if (
-                    $user['user'] == $basic['username']
-                    && $user['sharedSecret'] == $basic['password']
-) {
-                    return $adapter->token = true;
+    // Auth examples (see plugins definition)
+    'auth' => function() use ($c) {
+        $basic = false; // set to: False to use Digest, True to use Basic.
+        if($basic) {
+            // Example implementing Plugins\Auth\Basic'
+            // ----------------------------------------
+            // The Basic Authentification mechanism is generally use with SSL.
+            $adapter = new Plugins\Auth\Basic($c['api_realm']);
+            $adapter->token = function(array $current) use ($c) {
+                $users = Services::get('users');
+                foreach ($users as $user) {
+                    if (
+                            $current['username'] == $user['user']
+                        &&  $current['password'] == $user['api_key']
+                    ) {
+                        return true;
+                    }
                 }
-            }
-            $adapter->token = false;
-        };
-
-        return $adapter;
-    },
-
-    // Example implementing 'Plugins\Auth\Digest'
-    // -------------------------------------------
-    // The Digest Authentification mechanism is use to encrypt and salt the user
-    // credentials without the overhead of SSL.
-    'digest_auth_plugin' => function() use ($c) {
-        $adapter = new Plugins\Auth\Digest($c['api_realm']);
-        $adapter->setToken = function(array $digest) use ($c, $adapter) {
-            $users = Services::get('users');
-            foreach ($users as $user) {
+                return false;
+            };
+        } else {
+            // Example implementing 'Plugins\Auth\Digest'
+            // -------------------------------------------
+            // The Digest Authentification mechanism is use to encrypt and salt
+            // the user's credentials without the overhead of SSL.
+            $adapter = new Plugins\Auth\Digest($c['api_realm']);
+            $adapter->token = function(array $current) use ($c) {
+                $users = Services::get('users');
+                foreach ($users as $user) {
                 if (
-                    $user['user'] == $digest['username']
-                    && $user['realm'] == $c['api_realm']
-) {
-                    // Can be set to password, apiKey, or hashed mixture...
-                    return $adapter->token = $user['password'];
+                        $user['user'] == $current['username']
+                    &&  $user['realm'] == $c['api_realm']
+                ) {
+                        // Digest match againt this token!
+                        return $user['api_key'];
+                    }
                 }
-            }
-            $adapter->token = false;
-        };
+                return false;
+            };
+        }
 
         return $adapter;
     },
@@ -251,17 +193,18 @@ $c['services'] = array(
         // username:password:sharedSecret:role:realm
         return array(
             0 => array(
-                'user'=>'franck', 'password'=>'123', 'sharedSecret'=>'pass',
+                'user'=>'franck', 'password'=>'pass', 'api_key'=>'1234',
                 'role'=>'admin', 'realm'=>'api.domain.tld'
             ),
             1 => array(
-                'user'=>'test', 'password'=>'t3sted', 'sharedSecret'=>'sesame',
+                'user'=>'test', 'password'=>'sesame', 'api_key'=>'123abc',
                 'role'=>'guest', 'realm'=>'api.domain.tld'
             )
         );
-    },
+    }
 
 );
+
 
 // Plugins definitions
 // ---------------------
@@ -274,38 +217,31 @@ $c['services'] = array(
 // - late: elements defined withtin will fire @ post-processing
 // - exception: elements defined withtin will fire durring an error/exception
 // Each periods can have one or many listeners firing in succesion.
-
 $c['plugins'] = array(
 
     // Add the entity signature within the response-body.
-    'Apix\Plugins\OutputSign' => array(
-        'enable' => true
-        // 'enable' => isset($_REQUEST['_sign']) ? $_REQUEST['_sign'] : false
-    ),
+    'Apix\Plugins\OutputSign',
 
     // Add some debugging information within the response-body.
     // Should be set to false in production. This plugin affects cachability.
-    'Apix\Plugins\OutputDebug' => array('enable' => true),
+    'Apix\Plugins\OutputDebug' => array('enable' => DEBUG),
 
     // Validate, correct, and pretty-print XML and HTML outputs.
     // Many options are available (see Tidy::$options)
     'Apix\Plugins\Tidy',
 
-    'Apix\Plugins\Auth' => array(
-        #'adapter' => $c['services']['digest_auth_plugin'],
-        'adapter' => $c['services']['basic_auth_plugin'],
-    ),
+    'Apix\Plugins\Auth' => array('adapter' => $c['services']['auth']),
 
     'Apix\Plugins\Cache' => array(
         'enable'    => true,
-        'adapter'   => function() use ($c) {
-            #return new Plugins\Cache\Apc;
+        // 'adapter'   => function() use ($c) {
+        //     #return new Plugins\Cache\Apc;
 
-            $redis = new \Redis();
-            $redis->connect('127.0.0.1', 6379);
+        //     // $redis = new \Redis();
+        //     // $redis->connect('127.0.0.1', 6379);
 
-            return new Plugins\Cache\Redis($redis);
-        }
+        //     // return new Plugins\Cache\Redis($redis);
+        // }
     ),
 
     #'Apix\Plugins\Mock',
@@ -313,6 +249,66 @@ $c['plugins'] = array(
     #'Apix\Plugins\Manual',
     #'Apix\Plugins\Streaming',
 );
+
+
+// Init is an associative array of specific PHP directives. They are
+// recommended settings for most generic REST API server and should be set
+// as required. There is most probably a performance penalty setting most of
+// these at runtime so it is recommneded that most of these (if not all) be
+// set directly in PHP.ini/vhost file on productions servers -- and then
+// commented out. TODO: comparaison benchmark!?
+$c['init'] = array(
+    // Weter to display errors (should be set to false in production).
+    'display_errors'            => DEBUG,
+
+    // Enable or disable php error logging.
+    'init_log_errors'           => true,
+
+    // Path to the error log file.
+    'error_log'                 => '/tmp/apix-server-errors.log',
+
+    /////////////////////////////////////////////////////////////////////
+    // Anything below should be set in PHP.ini on productions servers. //
+    /////////////////////////////////////////////////////////////////////
+
+    // Enable or disable html_errors
+    'html_errors'               => false,
+
+    // Whether to transparently compress outputs using GZIP.
+    // Once enable, this will also add a 'Vary: Accept-Encoding' header.
+    'zlib.output_compression'   => true,
+
+    // Maximum amount of memory a script may consume.
+    'memory_limit'              => '64M',
+
+    // The timeout in seconds.
+    // BEWARE web servers such as Apache have also their own timout settings
+    // that may interfere. See your web server manual for specific details.
+    'max_execution_time'        => 15,
+
+    ////////////////////////////////////////////////////////////////////////
+    // These below might not always get set depending on the environment. //
+    // Consider setting these in PHP.ini on productions servers...        //
+    ////////////////////////////////////////////////////////////////////////
+
+    // Maximum amount of time each script may spend parsing request data.
+    'post_max_size'             => '8M',
+
+    // Maximum amount of time each script may spend parsing request data.
+    'max_input_time'            => 30,
+
+    // Maximum amount of GET/POST input variables.
+    'max_input_vars'            => 100,
+
+    // Maximum input variable nesting level.
+    'max_input_nesting_level'   => 64,
+
+    // Determines which super global are registered and in which order these
+    // variables are then populated.
+    'variables_order'           => 'GPS',
+    'request_order'             => 'GP'
+);
+
 
 ///////////////////////////////////////////////////////////////
 // Anything below that point should not need to be modified. //

@@ -14,25 +14,24 @@ abstract class PluginAbstract implements \SplObserver
      */
     public function __construct($options=null)
     {
-        if ( is_object($options) ) {
-            $options = array('adapter' => $options);
-        }
-
-        if (isset($this->options['adapter']) || isset($options['adapter'])) {
-            $this->setAdapter($options);
-        }
-
         $this->setOptions($options);
+
+        if(isset($this->options['adapter'])) {
+            $this->setAdapter($this->options['adapter']);
+        }
     }
 
     /**
      * Sets and merge with the plugin defaults options
      *
-     * @param array $options
+     * @param mix $options Array of options if it is an object set as an adapter
      */
-    public function setOptions(array $options=null)
+    public function setOptions($options=null)
     {
         if (null !== $options) {
+            if (is_object($options)) {
+                $options = array('adapter' => $options);
+            }
             $this->options = $options+$this->options;
         }
     }
@@ -50,36 +49,28 @@ abstract class PluginAbstract implements \SplObserver
     /**
      * Sets the plugin adapter
      *
-     * @param mix $adapter
+     * @param closure|object $adapter
      */
-    public function setAdapter(array $options)
+    public function setAdapter($adapter)
     {
-        $adapter = isset($options['adapter'])
-                    ? $options['adapter']
-                    : null;
-
-        // if (null === $adapter) {
-        //     throw new \RuntimeException(
-        //         sprintf('%s missing an implement.', get_called_class())
-        //     );
-        // }
-
-        $adapter = $adapter instanceof \Closure
-                ? $adapter()
-                : $adapter;
-
-        // todo: instantiate if string?! new $adapter
-
-        if(
-            isset($this->options['adapter'])
-            && !$adapter instanceof $this->options['adapter']
-        ) {
-            throw new \RuntimeException(
-                sprintf('%s not implemented.', $this->options['adapter'])
-            );
+        if(is_string($adapter)) {
+            $this->adapter = new $adapter;
+        } else {
+            $this->adapter = $adapter instanceof \Closure
+                                ? $adapter()
+                                : $adapter;
         }
 
-        $this->adapter = $adapter;
+        // Checks an adapter comply to a hook interface
+        if(
+            isset(static::$hook)
+            && isset(static::$hook['interface'])
+            && !is_subclass_of($this->adapter, static::$hook['interface'])
+        ) {
+            throw new \RuntimeException(
+                sprintf('%s not implemented.', static::$hook['interface'])
+            );
+        }
     }
 
     /**
