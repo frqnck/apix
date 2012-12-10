@@ -6,14 +6,18 @@ use Apix\Entity;
 class Cache extends PluginAbstractEntity
 {
 
-    public static $hook = array('entity', 'early');
+    public static $hook = array(
+        'entity',
+        'early',
+        'interface' => 'Apix\Plugins\Cache\Adapter'
+    );
 
     protected $annotation = 'api_cache';
 
     protected $options = array(
-        'adapter'    => 'Apix\Plugins\Cache\Adapter',
-        'enable'     => true,              // wether to enable or not
-        'ttl'        => '10mins',          // set the TTL, null stands forever
+        'enable'     => true,                     // wether to enable or not
+        'adapter'    => 'Apix\Plugins\Cache\Apc', // instantiate by default
+        'ttl'        => '10mins',          // the lifetime, null stands forever
         'flush'      => true,              // flush tags at runtime (cronjob)
         'tags'       => array(),           // default tags to append (v1, dev)
         'prefix_key' => 'apix-cache-key:', // prefix cache keys
@@ -42,7 +46,7 @@ class Cache extends PluginAbstractEntity
 
             // use the cache if present
             if ($cache = $this->adapter->load($id)) {
-                $this->log('loading', $id);
+                $this->log('loading', $id, 'DEBUG');
 
                 return $cache;
             }
@@ -65,16 +69,16 @@ class Cache extends PluginAbstractEntity
 
             $this->adapter->save($data, $id, $tags, $sec);
             $this->log(
-                sprintf('saving for %ds', $sec, $ttl[0]),
+                sprintf('saved for %ds', $sec, $ttl[0], 'DEBUG'),
                 $id . ' -- ' . implode(', ', $tags)
             );
 
         } catch (\Exception $e) {
-            $l = new Log();
-            $l->logd('errro');
+            // $l = new Log();
+            // $l->logd('errro');
 
             #$l->log('error', $e->getMessage(), 'ERROR');
-            #$this->log('error', $e->getMessage(), 'ERROR');
+            $this->log('error', $e->getMessage(), 'ERROR');
             $data = isset($data) ? $data : 'temp-execption';
         }
 
@@ -90,7 +94,7 @@ class Cache extends PluginAbstractEntity
     {
         if ( $enable && $tags = $this->getSubTagValues('flush') ) {
             $this->adapter->clean($tags);
-            $this->log('Tags purged', implode(', ', $tags));
+            $this->log('Tags purged', implode(', ', $tags), 'DEBUG');
         }
     }
 
