@@ -1,35 +1,60 @@
-Apix, a RESTful (micro)framework
-================================
+Apix, a micro-framework to build RESTful Web services
+======================================================
 
-This is a draft intended as a quick and dirty getting started guide.
+Apix provides a modular approach for developing Web services in PHP.
+It will run alognside you existing framework or application. 
 
-Apix main goal is to serve your public and private APIs over a compliant (and
-strict) RESTful interface.
 
-Out of the box, Apix features:
 
-* Light weight micro framework -- fully customisable.
-* Can be as RESTful as you wish, as strict or as lax as your need it to be.
-* Powerful and fully customisable routing mechanisms.
-* Handles most HTTP methods, including PUT, DELETE, HEAD, OPTIONS and PATCH (TRACE to some extend).
-* Provides method override usign X-HTTP-Method-Override (Google recommendation) and/or using a query params (customisable).
+
+    ```php
+        <?php
+        require 'apix.phar';
+
+        $apix = new Apix;
+
+        $api->onRead('/search/:type/with/:stuff/:optional',
+            /**
+             * Search for things by type that have stuff.
+             *
+             * @param     string  $type         A type of thing to search upon
+             * @param     string  $stuff        One or many stuff to filter against
+             * @param     string  $optional     An optional filed
+             * @return    array
+             * @api_auth  groups=clients,employes,admins users=franck
+             * @api_cache ttl=1week tags=searches flush=
+             */
+            function($type, $stuff, $optional=null) {
+                // some logic
+                $results = array();
+                return $results;
+            }
+        );
+
+        $api->run();
+    ```
+
+## Out of the box ##
+
+* Light weight, ready to deploy and customise.
+* Lax or strict RESTful modes.
 * Supports many data inputs, such as XML, JSON, CSV, ...
 * Provides various output representation, such as XML, JSONP, HTML, PHP, ...
-* Support content negotiation (which can also be overriden in different ways).
-* Provides resource(s) documention on demand, using 'GET /help' or the HTTP method OPTIONS.
+* Handles most HTTP methods, including PUT, DELETE, HEAD, OPTIONS and PATCH (TRACE to some extend).
+* Provides method override usign X-HTTP-Method-Override (Google recommendation) and/or using a query params (customisable).
+* Supports content negotiation (which can also be overriden in different ways).
 * HTTP cacheable -- supports HEAD test.
+* Provides resource(s) documention on demand, using 'GET /help' or the HTTP method OPTIONS.
 * Uses annotations to document and set your services and its behaviours.
-* Pluggeable archicture.
-* Bundle with many plugins/adapters for Authentification and ACL, logging, caching...
+* Pluggeable/modular archicture.
+* Bundle with many plugins and adapters for Authentification and ACL, caching...
 * Command line interface for maintenance, testing...
-* Comes bundle with unit-tests, integration-tests and functional-tests.
 * Based upon the relevant RFCs, such as [rfc2616] [rfc2616], [rfc2617] [rfc2617],
 [rfc2388] [rfc2388], [rfc2854] [rfc2854], [rfc4627] [rfc4627], [rfc4329] [rfc4329],
 [rfc2046] [rfc2046], [rfc3676] [rfc3676], [rfc3023] [rfc3023].
-* TODO: Follows PSR-0, PSR-1 and PSR-2.
 * TODO: self generated API resources testing.
-* TODO: add support for WSDL 2.0
-* TODO: eventually SOAP (and XML_RPC) bridge.
+* TODO: add support for WSDL 2.0 / WADL.
+* TODO: eventually SOAP (and XML_RPC) bridging.
 
 ## Installation ##
 
@@ -43,10 +68,7 @@ Apix is available through different channels:
 Apix requires PHP 5.3 or later.
 
 ## Basic Usage ##
-The easiest by far is to use the [`Phar`] [phar] distribution so all the dependencies and
-autoloading requirments are taken care of.
-
-Here is a basic usage:
+Here is a basic using the phar distribution:
 
     ```php
         <?php
@@ -121,6 +143,10 @@ Here is an example showing these in context:
 
 ## Advanced usage ##
 
+### Configuration ###
+
+Check the inline comments in the `config.dist.php` file shipped with the distribution.
+
 ### Bootstrap ###
 
 To boostrap an Apix server, add the required file and create an instance of the
@@ -137,9 +163,6 @@ A dedicated configuration file can be injected to an Apix server:
             $api->run();
     ```
 
-### Configuration ###
-
-Check the inline comments in the `config.dist.php` file shipped with the distribution.
 
 ### Console ###
 
@@ -166,45 +189,49 @@ Here is a self explanatory example:
 
             $api = new Apix\Server;
 
-            /**
-             * Title: Software version
-             * Description: Returns the lastest version of the :software
-             *
-             * @param       string          $software
-             * @return      array           A response array.
-             * @api_role    public          Available to all!
-             * @api_cache   10w some_name   Cache for a maximum of 10 weeks
-             *                              and tag cache buffer as 'some_name'.
-             */
-            $api->onRead('/version/:software', function($software) {
-                // ...
-                return array(
-                    $software => 'the version string of software.'
-                );
-            });
+            $api->onRead('/download/:app/version/:version',
+                /**
+                 * Retrieve the named sotfware
+                 * Anyone can use this resource entity to download apps. If no 
+                 * version is specified the latest revision will be returned. 
+                 * 
+                 * @param     string    $app        The name of the app
+                 * @param     string    $version    The version number.
+                 * @return    array     A response array.
+                 *
+                 * @api_auth  groups=public
+                 * @api_cache ttl=1week tags=downloads
+                 */
+                function($app, $version=null) {
+                    // ...
+                    return array(
+                        $app => 'the version string of software.'
+                    );
+                }
+            );
 
-            /**
-             * Sotware uploader
-             * Uses to upload a new software :software
-             *
-             * @param               Request  $request   The Server Request object.
-             * @param               string   $software
-             * @return              array               A response array.
-             * @api_role            admin               Require admin priviledge
-             * @api_purge_cache     some_name           Purge the cache of all the
-             *                                          'some_name' tagged entries.
-             */
-            $api->onCreate('/upload/:software', function(Request $request, $software) {
-                // ...
-            });
+            $api->onCreate('/upload/:software',
+                /**
+                 * Upload a new software
+                 * Admin users use this resource entity to upload new software.
+                 *
+                 * @param      Request  $request   The Server Request object.
+                 * @param      string   $software
+                 * @return     array    A response array.
+                 *
+                 * @api_auth   groups=admin users=franck
+                 * @api_cache  purge=downloads
+                 */
+                function(Request $request, $software) {
+                    // ...
+                }
+            );
 
 
             $api->run();
     ```
 
 ## Testing ##
-PHP5.3: status
-PHP5.4: status
 
 The idea is to get 100% code-coverage -- nearly there.
 
