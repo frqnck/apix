@@ -244,32 +244,35 @@ HELP
 
         return $optionals;
     }
-
-    public function out($msg, $type=null)
+    public function out($msg=null, $styles=null)
     {
-        $software_name = 'apix-server';
-        $msg = str_replace("{software.name}", $software_name, $msg);
+        if(null !== $msg) {
+            $software_name = 'apix-server';
+            $msg = str_replace("{software.name}", $software_name, $msg);
 
-        switch ($type):
-            case 'error':
-               parent::out($msg, 'red');
-            break;
+            switch ($styles):
+                case 'error':
+                   parent::out($msg, 'red');
+                break;
 
-            case 'info':
-               parent::out($msg, 'green');
-            break;
+                case 'info':
+                   parent::out($msg, 'green');
+                break;
 
-            case 'success':
-               parent::out($msg, 'black', 'green');
-            break;
+                case 'success':
+                   parent::out($msg, 'black', 'green');
+                break;
 
-            case 'failed':
-               parent::out($msg, 'black', 'red');
-            break;
+                case 'failed':
+                   parent::out($msg, 'black', 'red');
+                break;
 
-            default:
-               parent::out(func_get_args());
-        endswitch;
+                default:
+                   parent::out(func_get_args());
+            endswitch;
+        } else {
+            parent::out(func_get_args());
+        }
     }
 
 }
