@@ -2,10 +2,7 @@ Apix, a micro-framework to build RESTful Web services
 ======================================================
 
 Apix provides a modular approach for developing Web services in PHP.
-It will run alognside you existing framework or application. 
-
-
-
+It will run alognside you existing framework or application.
 
     ```php
         <?php
@@ -19,14 +16,13 @@ It will run alognside you existing framework or application.
              *
              * @param     string  $type         A type of thing to search upon
              * @param     string  $stuff        One or many stuff to filter against
-             * @param     string  $optional     An optional filed
+             * @param     string  $optional     An optional field
              * @return    array
              * @api_auth  groups=clients,employes,admins users=franck
-             * @api_cache ttl=1week tags=searches flush=
+             * @api_cache ttl=12mins tags=searches,indexes
              */
             function($type, $stuff, $optional=null) {
                 // some logic
-                $results = array();
                 return $results;
             }
         );
@@ -192,9 +188,9 @@ Here is a self explanatory example:
             $api->onRead('/download/:app/version/:version',
                 /**
                  * Retrieve the named sotfware
-                 * Anyone can use this resource entity to download apps. If no 
-                 * version is specified the latest revision will be returned. 
-                 * 
+                 * Anyone can use this resource entity to download apps. If no
+                 * version is specified the latest revision will be returned.
+                 *
                  * @param     string    $app        The name of the app
                  * @param     string    $version    The version number.
                  * @return    array     A response array.
