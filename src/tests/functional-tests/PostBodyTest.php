@@ -56,7 +56,7 @@ print_r($r);exit;
     {
         $values = array('param1'=>'value1', 'param2'=>'value2');
 
-        $xml = new Zenya\Api\Output\Xml;
+        $xml = new Apix\Output\Xml;
         $r = $this->post($xml->encode($values), 'xml');
 
         $this->assertEquals(
@@ -69,7 +69,7 @@ print_r($r);exit;
     {
         $values = array('param1'=>'value1', 'param2'=>'value2');
 
-        $xml = new Zenya\Api\Output\Xml;
+        $xml = new Apix\Output\Xml;
         $r = $this->post($xml->encode($values), 'xml');
 
         $this->assertSame($values, (array) $r->zenya->upload->params);
