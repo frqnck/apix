@@ -49,6 +49,7 @@ class Compiler
     const DEFAULT_PHAR_FILE = 'apix.phar';
 
     protected $version;
+    protected $verbose = 3;
 
     /**
      * Compiles the source code into one single Phar file.
@@ -67,7 +68,7 @@ class Compiler
             exit;
         }
         $this->version = $_SERVER['argv'][1];
-        echo "Processing $pharFile-" . $this->version;
+        echo "Processing $pharFile-" . $this->version . PHP_EOL;
 
         $phar = new \Phar($pharFile, 0, $pharFile);
         $phar->setSignatureAlgorithm(\Phar::SHA1);
@@ -111,13 +112,13 @@ class Compiler
 
         #$phar->compressFiles(\Phar::GZ);
 
-        echo 'The new phar has ' . $phar->count() . " entries.\n";
+        echo 'The new phar has ' . $phar->count() . ' entries.' . PHP_EOL;
         unset($phar);
 
         chmod($pharFile, 0777);
         rename($pharFile, __DIR__ . '/../../dist/' . $pharFile);
 
-        echo "Created in " . realpath(__DIR__ . '/../../dist/') . ".\n";
+        echo 'Created in ' . realpath(__DIR__ . '/../../dist/') . PHP_EOL;
     }
 
     protected function addFile($phar, $path, $strip = true)
@@ -130,7 +131,7 @@ class Compiler
             realpath($path)
         );
         #$localPath = str_replace('src/php'.DIRECTORY_SEPARATOR, '', $localPath);
-        #echo $localPath . " ($path)" . PHP_EOL;
+        if($this->verbose > 2) echo $localPath . " ($path)" . PHP_EOL;
 
         $content = file_get_contents($path);
         if ($strip) {
