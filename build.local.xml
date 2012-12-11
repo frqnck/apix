@@ -1,6 +1,32 @@
 <project name="local" default="help">
   <target name="help">
-    <echo message="This component has no local build targets." />
+
+    <echo message="${project.name} ${project.version}: specific:"/>
+    <echo message=""/>
+    <echo message="  build-phar"/>
+    <echo message="    Build apix.phar"/>
+    <echo message=""/>
+    <echo message="  composer-install"/>
+    <echo message="    Run Composer"/>
+    <echo message=""/>
+    <echo message="  file-version"/>
+    <echo message="    File the version to file"/>
+ </target>
+
+  <!-- build-phar -->
+  <target name="build-phar">
+    <exec command="./src/bin/compile ${project.version}" logoutput="true" checkreturn="true" />
   </target>
+
+  <!-- composer-install -->
+  <target name="composer-install">
+          <composer command="install"/>
+  </target>
+
+  <!-- file-version -->
+  <target name="file-version">
+        <version releasetype="bugfix" file="version.txt" property="version.number"/>
+  </target>
+
 </project>
 <!-- vim: set tabstop=2 shiftwidth=2 expandtab: -->
