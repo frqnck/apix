@@ -128,12 +128,12 @@ class Redis extends AbstractCache
     /**
      * Returns a Redis constant
      *
-     * @param  string $name Can be php, igBinary or none.
+     * @param  string  $name Can be php, igBinary or none.
      * @return integer Corresponding to a Redis constant.
      */
     public function getSerializer($name)
     {
-        switch($name) {
+        switch ($name) {
             case 'igBinary':
                 return \Redis::SERIALIZER_IGBINARY;
             case 'php':

@@ -235,6 +235,7 @@ $c['plugins'] = array(
         'adapter'   => function() use ($c) {
             $redis = new \Redis();
             $redis->connect('127.0.0.1', 6379);
+
             return new Plugins\Cache\Redis($redis);
         }
     ),

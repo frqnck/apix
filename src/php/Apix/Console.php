@@ -48,19 +48,17 @@ class Console
 
     protected $options = null;
 
-    protected $switches = array(
-        'no_colors' => array('--no-colors', '--no-colours'),
-        'verbose'   => array('--verbose', '-vv'),
-        'verbos3'  => array('--verbos3', '-vvv')
-    );
-
     public $no_colors = false;
 
     public $verbose = false;
-    public $verbos3 = false;
 
-#    private $prompt = "\033[%sm%s\033[0m";
-   private $prompt = "\x1b[%sm%s\x1b[0m";
+    protected $switches = array(
+        'no_colors' => array('--no-colors', '--no-colours'),
+        'verbose'   => array('--verbose', '-v', '-vv', '-vvv')
+    );
+
+    #private $prompt = "\033[%sm%s\033[0m";
+    private $prompt = "\x1b[%sm%s\x1b[0m";
 
     public function __construct(array $options = null)
     {
@@ -70,24 +68,42 @@ class Console
 
     public function setArgs(array $args = null)
     {
-        $this->args = array_unique(
-            null === $args ? $_SERVER['argv'] : $args
-        );
-        $this->initSwitches();
+        $args = null === $args ? $_SERVER['argv'] : $args;
+
+        $this->args = array_unique($args);
+
+        $this->setSwitches($this->switches);
+
+        if(true == $this->verbose) {
+            $this->verbose = $this->getVerbosityLevel($args);
+        }
     }
 
-    public function initSwitches()
+    /**
+     * Multiple -v options increase the verbosity. The maximum is 3
+     */
+    public function getVerbosityLevel(array $args)
     {
-        foreach ($this->switches as $key => $values) {
+        foreach($args as $arg)
+        {
+          if(preg_match('/^-(v+)/', $arg, $m)) {
+            return strlen($m[1]);
+          }
+        }
+        return 1;
+    }
+
+    public function setSwitches(array $switches)
+    {
+        foreach ($switches as $key => $values) {
             if ($this->hasArgs($values)) {
                 $this->args = array_diff($this->args, $values);
-                reset($this->args); // due to a php bug?
+                #reset($this->args); // due to a php bug?
                 $this->$key = true;
             }
         }
-        if ($this->verbos3) {
-           $this->verbose = true;
-        }
+        $this->args = array_values($this->args);
+
         // check env variables.
         if (false === $this->no_colors) {
             $this->no_colors = exec('tput colors 2> /dev/null') > 2 ? 0 : 1;
@@ -133,7 +149,8 @@ class Console
                 array('normal', 'bold', 'dark', 'italics', 'underline', 'blink',
                     'outline', 'inverse', 'invisible', 'striked'),
                 range(0, 9)
-            )
+            ),
+            array('nl' => "\n") // newline before the output.
         );
 
         $ansi['dark_gray'] = 90;
@@ -142,12 +159,16 @@ class Console
         return $ansi;
     }
 
-    public function out($msg, $styles=null)
+    public function out($msg=null, $styles=null)
     {
-        $styles = is_array($msg) ? $msg : func_get_args();
-        $msg = array_shift($styles);
+        if(null !== $msg) {
+            $styles = is_array($msg) ? $msg : func_get_args();
+            $msg = array_shift($styles);
 
-        echo $this->_out($msg, $styles);
+            echo $this->_out($msg, $styles);
+        } else {
+            echo PHP_EOL;
+        }
     }
 
     public function outRegex($msg)
