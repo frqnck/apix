@@ -486,12 +486,6 @@
     <phingcallifexists target="local.upgrade-skeleton"/>
   </target>
 
-  <!-- Build the Apix Phar -->
-  <target name="build-phar">
-    <exec command="./src/bin/compile ${project.version}" logoutput="true" checkreturn="true" />
-  </target>
-
-
   <!-- Clean up the mess -->
   <target name="clean">
     <delete dir="${project.builddir}" />
