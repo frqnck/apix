@@ -22,6 +22,21 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 try {
     $api = new Apix\App;
 
+    $api->onRead('/articles/:filters',
+        /**
+         * Retrieve a list of articles
+         * Just an example
+         * @param     string  $name  Your name.
+         * @return    array
+         * @api_auth  groups=clients,reselers users=franck
+         * @api_cache ttl=1week tags=author flush=null
+         */
+         function(array $filters=null) {
+            // some logic
+            return $results;
+        });
+
+
     $api->onRead('/test/:id', //<[[:digit:]]{1,3}>
 
         /**
