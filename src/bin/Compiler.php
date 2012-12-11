@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (c) 2011 Franck Cassedanne, Zenya.com
+ * Copyright (c) 2011 Franck Cassedanne
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -32,24 +32,24 @@
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya\Api
+ * @package     Apix
  * @subpackage  Console
- * @author      Franck Cassedanne <fcassedanne@zenya.com>
- * @copyright   2012 Franck Cassedanne, Zenya.com
- * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
+ * @author      Franck Cassedanne <franck@cassedanne.com>
+ * @copyright   2012 Franck Cassedanne
+ * @license     http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link        http://zenya.github.com
  * @version     @package_version@
  */
 
 #namespace Zenya\bin;
-
-#use Zenya\Api;
+#use Apix;
 
 class Compiler
 {
-    const DEFAULT_PHAR_FILE = 'zenya-api-server.phar';
+    const DEFAULT_PHAR_FILE = 'apix.phar';
 
     protected $version;
+    protected $verbose = 3;
 
     /**
      * Compiles the source code into one single Phar file.
@@ -63,12 +63,12 @@ class Compiler
         }
 
         // set version
-        if(!isset($_SERVER['argv'][1])) {
+        if (!isset($_SERVER['argv'][1])) {
             echo 'Usage: ' . $_SERVER['argv'][0] . ' version_string' . PHP_EOL;
             exit;
         }
         $this->version = $_SERVER['argv'][1];
-        echo "Processing $pharFile-" . $this->version;
+        echo "Processing $pharFile-" . $this->version . PHP_EOL;
 
         $phar = new \Phar($pharFile, 0, $pharFile);
         $phar->setSignatureAlgorithm(\Phar::SHA1);
@@ -93,8 +93,7 @@ class Compiler
 
         $this->addFile($phar, new \SplFileInfo($root . '/LICENSE.txt'), false);
         $this->addFile($phar, new \SplFileInfo($root . '/README.md'), false);
-        #$this->addFile($phar, new \SplFileInfo($root . '/src/data/config.dist.php'), false);
-
+        #$this->addFile($phar, new \SplFileInfo($root . '/src/data/distribution/config.dist.php'), false);
 
         if ( ! $latest_git = trim(exec('git log --pretty="%h %ci" -n1 HEAD')) ) {
             throw new \RuntimeException('The git binary cannot be found.');
@@ -113,13 +112,13 @@ class Compiler
 
         #$phar->compressFiles(\Phar::GZ);
 
-        echo 'The new phar has ' . $phar->count() . " entries.\n";
+        echo 'The new phar has ' . $phar->count() . ' entries.' . PHP_EOL;
         unset($phar);
 
         chmod($pharFile, 0777);
         rename($pharFile, __DIR__ . '/../../dist/' . $pharFile);
 
-        echo "Created in " . realpath(__DIR__ . '/../../dist/') . ".\n";
+        echo 'Created in ' . realpath(__DIR__ . '/../../dist/') . PHP_EOL;
     }
 
     protected function addFile($phar, $path, $strip = true)
@@ -132,7 +131,7 @@ class Compiler
             realpath($path)
         );
         #$localPath = str_replace('src/php'.DIRECTORY_SEPARATOR, '', $localPath);
-        #echo $localPath . " ($path)" . PHP_EOL;
+        if($this->verbose > 2) echo $localPath . " ($path)" . PHP_EOL;
 
         $content = file_get_contents($path);
         if ($strip) {
@@ -157,7 +156,7 @@ class Compiler
         return <<<'STUB'
 <?php
 /**
- * Copyright (c) 2012 Franck Cassedanne, Zenya.com
+ * Copyright (c) 2012 Franck Cassedanne
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -172,7 +171,7 @@ class Compiler
  *     the documentation and/or other materials provided with the
  *     distribution.
  *
- *   * Neither the name of Zenya nor the names of his
+ *   * Neither the name of Apix nor the names of his
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -189,21 +188,15 @@ class Compiler
  * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * @package     Zenya\Api
- * @subpackage  Server
- * @author      Franck Cassedanne <fcassedanne@zenya.com>
- * @copyright   2012 Franck Cassedanne, Zenya.com
+ * @package     Apix
+ * @author      Franck Cassedanne <franck@cassedanne.com>
+ * @copyright   2012 Franck Cassedanne
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version     @package_version@
  * @build       {GIT} / {BUILD}
  */
 try {
     Phar::mapPhar('{PHAR}');
-    # define('APP_LIBDIR', 'phar://{PHAR}/vendor/php');
-    # define('APP_TOPDIR', 'phar://{PHAR}/src/php');
-    # require APP_LIBDIR . '/psr0.autoloader.php';
-    # psr0_autoloader_searchFirst(APP_LIBDIR);
-    # psr0_autoloader_searchFirst(APP_TOPDIR);
     spl_autoload_register(function($name){
         $file = '/' . str_replace('\\', DIRECTORY_SEPARATOR, $name).'.php';
         $path = 'phar://{PHAR}/src/php' . $file;
@@ -213,7 +206,7 @@ try {
     die('Error: cannot initialize - ' . $e->getMessage());
 }
 if ('cli' === php_sapi_name() && basename(__FILE__) === basename($_SERVER['argv'][0])) {
-    $cli = new Zenya\Api\Console\Main;
+    $cli = new Apix\Console\Main;
     $cli->setPharName('phar://{PHAR}');
     $cli->run();
     exit(0);
@@ -224,11 +217,9 @@ STUB;
 
     /**
      * Removes whitespace from a PHP source string while preserving line numbers.
-     *
      * Based on Kernel::stripComments(), but keeps line numbers intact.
      *
-     * @param string $source A PHP string
-     *
+     * @param  string $source A PHP string
      * @return string The PHP string with the whitespace removed
      */
     public static function stripWhitespace($source)

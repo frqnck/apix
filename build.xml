@@ -7,8 +7,8 @@
   <now name="date.now"/>
   <if>
     <and>
-      <isset property="project.snapshot"/>
-      <istrue value="${project.snapshot}"/>
+      <isset property="project.snapshot" />
+      <istrue value="${project.snapshot}" />
     </and>
     <then>
       <property name="project.version" value="${project.majorVersion}.${project.minorVersion}.${project.patchLevel}snapshot${date.now}" />
@@ -485,12 +485,6 @@
     <exec command="phix ${component.type}:upgrade ." logoutput="true" checkreturn="true" />
     <phingcallifexists target="local.upgrade-skeleton"/>
   </target>
-
-  <!-- Build the Phar -->
-  <target name="build-phar">
-    <exec command="./src/bin/compile" logoutput="true" checkreturn="true" />
-  </target>
-
 
   <!-- Clean up the mess -->
   <target name="clean">
