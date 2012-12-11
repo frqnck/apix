@@ -21,9 +21,11 @@ class Main extends Console
     public function __construct(array $options = null)
     {
         #$this->src_url = 'http://zenya.dev/index3.php/api/v1';
-        $this->src_url = 'http://test.dev/index.php/api/v1';
+        $this->src_url = 'http://phar.dev/index.php/api/v1';
 
-        $this->src = realpath(__DIR__ . '/../../../../../');
+        #$this->src = realpath(__DIR__ . '/../../../../../');
+        $this->src = realpath(__DIR__ . '/../../../../');
+
 
         $this->version = Server::VERSION;
         $this->version_program =
@@ -52,16 +54,18 @@ class Main extends Console
                 ? '--help'
                 : $args[1];
 
-        echo $this->version_program . PHP_EOL .PHP_EOL;
+        $this->out($this->version_program . PHP_EOL .PHP_EOL);
 
         switch ($cmd):
             case '-r': case '--readme':
-                echo 'README:' . PHP_EOL . PHP_EOL;
-                echo file_get_contents($this->src . '/README.md');
-                echo PHP_EOL;
+                $this->out('README' . PHP_EOL . PHP_EOL, 'bold', 'underline');
+                $this->out(
+                    file_get_contents($this->src . '/README.md')
+                );
+                $this->out();
             break;
 
-            case '-v': case '--version':
+            case '--version':
                 exit(0);
             break;
 
@@ -82,7 +86,7 @@ class Main extends Console
                         }
                     }
                 } catch (\Exception $e) {
-                    $this->error($e);
+                    $this->outputError($e);
                 }
                 $this->out(PHP_EOL . "have been copied into:" . PHP_EOL, 'green');
                 $this->out(" --> " . $dest . PHP_EOL .PHP_EOL, 'red');
@@ -93,15 +97,17 @@ class Main extends Console
             case '-c': case '--check':
 
                 try {
-                    $input = new Input\Json;
                     $url = $this->src_url . '/version/' . $this->src_file;
                     $url .= '/current/' . $this->version;
-                    $r = $input->decode(trim($this->getContents($url)), true);
 
                     if ($this->verbose) {
                         $this->outRegex("Contacting...\n<brown>${url}</brown>\n\n");
                     }
-                    if ($this->verbos3) {
+                    $response = trim($this->getContents($url));
+
+                    $input = new Input\Json;
+                    $r = $input->decode($response, true);
+                    if ($this->verbose > 2) {
                         print_r($r);
                     }
 
@@ -116,9 +122,9 @@ class Main extends Console
                         $this->out("You are using the latest version.");
                     }
                 } catch (\Exception $e) {
-                    $this->error($e);
+                    $this->outputError($e);
                 }
-                echo PHP_EOL;
+                $this->out();
             break;
 
             case '--selfupdate':
@@ -128,9 +134,9 @@ class Main extends Console
 
                     file_put_contents($local, $this->getContents($remote));
 
-                    echo $this->src_file . " has been updated.";
+                    $this->out($this->src_file . " has been updated.");
                 } catch (\Exception $e) {
-                    $this->error($e);
+                    $this->outputError($e);
                 }
             break;
 
@@ -141,11 +147,11 @@ class Main extends Console
                 break;
 
             case '--license':
-                    echo file_get_contents($this->src .'/LICENSE.txt');
+                $this->out(file_get_contents($this->src .'/LICENSE.txt'));
             break;
 
             case '-i': case '--info':
-                    phpinfo();
+                phpinfo();
             break;
 
             case '-h': case '--help':
@@ -153,7 +159,7 @@ class Main extends Console
             break;
 
             case '-t': case '--tests':
-                    system('phpunit --colors tests/phar-test.php');
+                system('phpunit --colors tests/phar-test.php');
             break;
 
             default:
@@ -163,7 +169,7 @@ class Main extends Console
 
         endswitch;
 
-        echo PHP_EOL;
+        $this->out();
 
         exit(0);
     }
@@ -181,24 +187,36 @@ class Main extends Console
    --extractdist <brown>|</brown> -e\t<brown>Extract the latest distribution data</brown>
    --check <brown>|</brown> -c\t\t<brown>Check for updates</brown>
    --selfupdate\t\t<brown>Upgrade Apix to the latest version available</brown>
-   --version <brown>|</brown> -v\t<brown>Display the version information and exit</brown>
+   --version <brown>|</brown>\t\t<brown>Display the version information and exit</brown>
    --info <brown>|</brown> -i\t\t<brown>PHP information and configuration</brown>
    --license\t\t<brown>Display the software license</brown>
    --syscheck <brown>|</brown> -s\t<brown>Run a system check</brown>
    --tests <brown>|</brown> -t\t\t<brown>Run some unit & functional tests</brown>
    --no-colors\t\t<brown>Don't use colors in the outputs</brown>
-   --verbose <brown>|</brown> -vv\t<brown>Add some verbosity to the outputs</brown>
+   --verbose <brown>|</brown> -v\t<brown>Add some verbosity to the outputs.\n\t\t\tMultiple -v options increase the verbosity.</brown>
    --help <brown>|</brown> -h\t\t<brown>Display this help</brown>\n\n
 HELP
         );
         exit;
     }
 
-    public function error(\Exception $e)
+    public function outputError(\Exception $e)
     {
         $this->out('Error: ', 'bold', 'red');
-        $this->out("unable to proceed." . PHP_EOL . PHP_EOL, 'red');
-        $this->out($e->getMessage() . PHP_EOL . PHP_EOL );
+        $this->out("\tUnable to proceed.\n");
+
+        if ($this->verbose > 1) {
+            $this->out("\t" . $e->getMessage() . "\n");
+        }
+
+        $errors = error_get_last();
+        if ($this->verbose == 3 && null !== $errors) {
+            $this->out();
+            print_r($errors);
+        }
+
+        $this->out();
+
         exit;
     }
 
@@ -215,13 +233,19 @@ HELP
 
         $ctx  = stream_context_create($opts);
         $body = @file_get_contents($url, false, $ctx);
-        $code = substr($http_response_header[0], 9, 3);
+        if(isset($http_response_header)) {
+            $code = substr($http_response_header[0], 9, 3);
 
-        if (floor($code/100)>3) {
-            throw new \Exception("HTTP request failed: " . PHP_EOL . $http_response_header[0]);
+            if (floor($code/100)>3) {
+                throw new \Exception("HTTP request failed: " . PHP_EOL . $http_response_header[0]);
+            }
+
+            return $body;
+        } else {
+            throw new \Exception("Request failed.");
         }
 
-        return $body;
+        return null;
     }
 
 }

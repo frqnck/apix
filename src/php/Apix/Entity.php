@@ -49,7 +49,7 @@ class Entity extends Listener
     public function call($direct=false)
     {
         // early listeners @ pre-entity
-        if(!$direct) {
+        if (!$direct) {
             $this->hook('entity', 'early');
         }
 
@@ -58,9 +58,10 @@ class Entity extends Listener
         }
 
         // late listeners @ post-entity
-        if(!$direct) {
+        if (!$direct) {
             $this->hook('entity', 'late');
         }
+
         return $this->results;
     }
 
