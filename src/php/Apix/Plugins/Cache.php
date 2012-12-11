@@ -47,6 +47,7 @@ class Cache extends PluginAbstractEntity
             // use the cache if present
             if ($cache = $this->adapter->load($id)) {
                 $this->log('loading', $id, 'DEBUG');
+
                 return $entity->results = $cache;
             }
 
