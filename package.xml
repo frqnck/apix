@@ -5,9 +5,9 @@
     http://pear.php.net/dtd/package-2.0.xsd">
   <name>${project.name}</name>
   <channel>${project.channel}</channel>
-  <summary>Generic REST server API</summary>
+  <summary>The RESTfull API deployer</summary>
   <description>
-    TODO Description goes here
+    Some more detailed description will go here.
   </description>
   <lead>
     <name>Franck Cassedanne</name>
@@ -42,18 +42,14 @@ ${contents}
       <pearinstaller>
         <min>1.9.4</min>
       </pearinstaller>
+
       <package>
         <name>Autoloader</name>
         <channel>pear.phix-project.org</channel>
         <min>3.0.0</min>
         <max>3.999.9999</max>
       </package>
-      <package>
-        <name>Net_URL_Mapper</name>
-        <channel>pear.php.net</channel>
-        <min>0.9.1</min>
-        <max>0.9.9999</max>
-      </package>
+
       <package>
         <name>HTTP_Request2</name>
         <channel>pear.php.net</channel>
@@ -61,19 +57,12 @@ ${contents}
         <max>2.999.9999</max>
       </package>
       <package>
-        <name>Zend_Json</name>
-        <channel>packages.zendframework.com</channel>
-        <min>2.0.0</min>
-        <max>2.999.9999</max>
+        <name>Net_URL_Mapper</name>
+        <channel>pear.php.net</channel>
+        <min>0.9.1</min>
+        <max>0.9.9999</max>
       </package>
-      <package>
-        <name>pimple/pimple</name>
-        <channel>packages.zendframework.com</channel>
-        <min>1.0.0</min>
-        <max>1.999.9999</max>
-      </package>
-
-	</required>
+	 </required>
   </dependencies>
   <phprelease />
   <changelog>
