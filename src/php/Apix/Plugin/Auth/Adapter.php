@@ -1,5 +1,5 @@
 <?php
-namespace Apix\Plugins\Auth;
+namespace Apix\Plugin\Auth;
 
 interface Adapter
 {

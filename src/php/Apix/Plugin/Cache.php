@@ -1,5 +1,5 @@
 <?php
-namespace Apix\Plugins;
+namespace Apix\Plugin;
 
 use Apix\Entity;
 use Apix\HttpRequest;
@@ -10,14 +10,14 @@ class Cache extends PluginAbstractEntity
     public static $hook = array(
         'entity',
         'early',
-        'interface' => 'Apix\Plugins\Cache\Adapter'
+        'interface' => 'Apix\Plugin\Cache\Adapter'
     );
 
     protected $annotation = 'api_cache';
 
     protected $options = array(
         'enable'     => true,                     // wether to enable or not
-        'adapter'    => 'Apix\Plugins\Cache\Apc', // instantiate by default
+        'adapter'    => 'Apix\Plugin\Cache\Apc', // instantiate by default
         'ttl'        => '10mins',          // the lifetime, null stands forever
         'flush'      => true,                   // flush tags at runtime (cronjob)
         'tags'       => array(),           // default tags to append (v1, dev)

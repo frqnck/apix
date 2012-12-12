@@ -1,5 +1,5 @@
 <?php
-namespace Apix\Plugins;
+namespace Apix\Plugin;
 
 use Monolog\Logger as Monolog,
     Monolog\Handler\StreamHandler;
