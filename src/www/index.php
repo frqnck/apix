@@ -1,4 +1,4 @@
-<?php
+ss<?php
 define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
 define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
 define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
