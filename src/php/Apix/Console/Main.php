@@ -114,27 +114,25 @@ class Main extends Console
                     }
 
                     if( version_compare($this->version, $latest, '>=') != 1) {
-                        $this->out(sprintf("A newer version is available (%s).", $latest));
+                        $this->out(sprintf("A newer version is available (%s).", $latest));                        
+                        $this->outRegex(sprintf("\nTo update, run: <brown>%s --selfupdate</brown>\n",  $args[0]));
                     } else {
                         $this->out("You are using the latest version.");
                     }
                 } catch (\Exception $e) {
                     $this->outputError($e);
                 }
-                $this->out();
             break;
 
             case '--selfupdate':
-                try {
-                    $url = sprintf($this->src_url, 'download', $this->src_file, $this->version);
-                    $local  = __DIR__ . '/' . $this->src_file;
+                $url = sprintf($this->src_url, 'download', $this->src_file, $this->version);
 
-                    file_put_contents($local, $this->getContents($url));
-
-                    $this->out($this->src_file . " has been updated.");
-                } catch (\Exception $e) {
-                    $this->outputError($e);
+                if($this->verbose > 1) {
+                    $this->out(' --> ' . $local);
+                    $this->out();
                 }
+
+                $this->retrievepdate($url, $local);
             break;
 
             case '-s': case '--syscheck':
@@ -242,5 +240,47 @@ HELP
 
         return null;
     }
+
+    protected function copyRemotly($src, $dest)
+    {
+        $dest = $_SERVER['argv'][0];
+        $temp = basename($dest, '.phar').'-temp.phar';
+
+        try {
+            copy($dest, $temp);
+            chmod($temp, 0777 & ~umask());
+
+            // test the phar validity
+            $phar = new \Phar($temp);
+            // free the variable to unlock the file
+            unset($phar);
+            rename($temp, $dest);
+        } catch (\Exception $e) {
+            if (!$e instanceof \UnexpectedValueException&& !$e instanceof \PharException) {
+                throw $e;
+            }
+            unlink($temp);
+            $this->outputError('The dowloading ('.$e->getMessage().').');
+            $output->out('Please re-run this again.');
+        }
+
+        $this->out($this->src_file . " has been updated.");
+    }
+
+    //     ini_set('phar.readonly', 0);
+    //     if(true) {
+    //         $this->out("Please, re-run this as: ");
+    //         $this->out();
+    //         $this->out('$ php -d phar.readonly=0 ' . $args[0], 'brown');
+    //         exit(0);
+    //     }
+    //     if(false !== @file_put_contents($local, $this->getContents($url))) {
+    //         $this->out($this->src_file . " has been updated.");
+    //     } else {
+    //          throw new \Exception;
+    //     }
+    // } catch (\Exception $e) {
+    //     $this->outputError($e);
+
 
 }
