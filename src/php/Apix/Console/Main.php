@@ -20,7 +20,6 @@ class Main extends Console
 
     public function __construct(array $options = null)
     {
-        // $this->src_url = 'http://phar.dev/index.php/api/v1';
         $this->src_url = 'http://api.ouarz.net/v1/%s/%s/in/%s';
 
         #$this->src = realpath(__DIR__ . '/../../../../../');
@@ -185,7 +184,7 @@ class Main extends Console
    --extractdist <brown>|</brown> -e\t<brown>Extract the latest distribution data</brown>
    --check <brown>|</brown> -c\t\t<brown>Check for updates</brown>
    --selfupdate\t\t<brown>Upgrade Apix to the latest version available</brown>
-   --version <brown>|</brown>\t\t<brown>Display the version information and exit</brown>
+   --version\t\t<brown>Display the version information and exit</brown>
    --info <brown>|</brown> -i\t\t<brown>PHP information and configuration</brown>
    --license\t\t<brown>Display the software license</brown>
    --syscheck <brown>|</brown> -s\t<brown>Run a system check</brown>
