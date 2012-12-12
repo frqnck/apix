@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <phpunit
-	bootstrap="src/tests/unit-tests/bootstrap.php"
 	backupGlobals="false"
 	backupStaticAttributes="false"
-	colors="true"
+	colors="false"
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
@@ -13,8 +12,8 @@
 	syntaxCheck="false"
 >
     <testsuites>
-        <testsuite name="Apix Unit Tests">
-            <directory suffix="Test.php">src/tests/unit-tests</directory>
+        <testsuite name="Apix.phar Unit Tests">
+            <directory suffix="Test.php">php</directory>
         </testsuite>
     </testsuites>
     <filter>
@@ -27,21 +26,7 @@
             <directory suffix=".php">src/php</directory>
         </whitelist>
     </filter>
-    <logging>
-        <log type="coverage-html" target="review/code-coverage" yui="true"/>
-        <log type="coverage-clover" target="review/logs/phpunit.xml"/>
-        <log type="json" target="review/logs/phpunit.json"/>
-        <log type="tap" target="review/logs/phpunit.tap"/>
-        <log type="junit" target="review/logs/phpunit-junit.xml"/>
-        <log type="testdox-html" target="review/testdox.html"/>
-        <log type="testdox-text" target="review/testdox.txt"/>
-    </logging>
 
-<!--
-    <php>
-        <ini name="apc.enable_cli" value="1"/>
-    </php>
--->
  <!-- php -d apc.enable_cli=1 `which phpunit` src/tests/unit-tests/php/Apix/Listener/CacheApcTest.php -->
 </phpunit>
 <!-- vim: set tabstop=4 shiftwidth=4 expandtab: -->
