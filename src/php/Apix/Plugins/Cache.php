@@ -2,6 +2,7 @@
 namespace Apix\Plugins;
 
 use Apix\Entity;
+use Apix\HttpRequest;
 
 class Cache extends PluginAbstractEntity
 {
@@ -17,8 +18,8 @@ class Cache extends PluginAbstractEntity
     protected $options = array(
         'enable'     => true,                     // wether to enable or not
         'adapter'    => 'Apix\Plugins\Cache\Apc', // instantiate by default
-        'ttl'        => null, //'10mins',          // the lifetime, null stands forever
-        'flush'      => true,              // flush tags at runtime (cronjob)
+        'ttl'        => '10mins',          // the lifetime, null stands forever
+        'flush'      => true,                   // flush tags at runtime (cronjob)
         'tags'       => array(),           // default tags to append (v1, dev)
         'prefix_key' => 'apix-cache-key:', // prefix cache keys
         'prefix_tag' => 'apix-cache-tag:', // prefix cache tags
@@ -42,7 +43,8 @@ class Cache extends PluginAbstractEntity
             $this->flushAnnotatedTags($this->options['flush']);
 
             // the cache id is simply the entity route name for now!
-            $id = $entity->getRoute()->getPath();
+            //$id = $entity->getRoute()->getPath();
+            $id = HttpRequest::getInstance()->getRequestUri();
 
             // use the cache if present
             if ($cache = $this->adapter->load($id)) {
