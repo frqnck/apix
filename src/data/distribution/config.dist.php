@@ -146,10 +146,10 @@ $c['services'] = array(
     'auth' => function() use ($c) {
         $basic = false; // set to: False to use Digest, True to use Basic.
         if ($basic) {
-            // Example implementing Plugins\Auth\Basic'
+            // Example implementing Plugin\Auth\Basic'
             // ----------------------------------------
             // The Basic Authentification mechanism is generally use with SSL.
-            $adapter = new Plugins\Auth\Basic($c['api_realm']);
+            $adapter = new Plugin\Auth\Basic($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
                 $users = Services::get('users');
                 foreach ($users as $user) {
@@ -161,11 +161,11 @@ $c['services'] = array(
                 return false;
             });
         } else {
-            // Example implementing 'Plugins\Auth\Digest'
+            // Example implementing 'Plugin\Auth\Digest'
             // -------------------------------------------
             // The Digest Authentification mechanism is use to encrypt and salt
             // the user's credentials without the overhead of SSL.
-            $adapter = new Plugins\Auth\Digest($c['api_realm']);
+            $adapter = new Plugin\Auth\Digest($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
                 $users = Services::get('users');
                 foreach ($users as $user) {
@@ -202,25 +202,25 @@ $c['services'] = array(
 
 // Plugins definitions
 // -------------------
-$c['plugins'] = array(
+$c['plugin'] = array(
 
     // Add the entity signature as part of the response-body.
-    'Apix\Plugins\OutputSign',
+    'Apix\Plugin\OutputSign',
 
     // Add some debugging information within the response-body.
     // Should be set to false in production. This plugin affects cachability.
-    'Apix\Plugins\OutputDebug' => array('enable' => DEBUG),
+    'Apix\Plugin\OutputDebug' => array('enable' => DEBUG),
 
     // Validate, correct, and pretty-print XML and HTML outputs. Many options
     // are available (see Tidy::$options)
-    'Apix\Plugins\Tidy',
+    'Apix\Plugin\Tidy',
 
     // Autentification (with basic ACL) plugin
-    'Apix\Plugins\Auth' => array('adapter' => $c['services']['auth']),
+    'Apix\Plugin\Auth' => array('adapter' => $c['services']['auth']),
 
     // Plugin to cache the output of the controllers. The full Request-URI acts
     // as the unique cache id.
-    'Apix\Plugins\Cache' => array(
+    'Apix\Plugin\Cache' => array(
         'enable' => DEBUG,
     )
 );
