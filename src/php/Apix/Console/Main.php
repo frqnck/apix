@@ -126,13 +126,14 @@ class Main extends Console
 
             case '--selfupdate':
                 $url = sprintf($this->src_url, 'download', $this->src_file, $this->version);
+                $dest = $_SERVER['argv'][0];
 
-                if($this->verbose > 1) {
-                    $this->out(' --> ' . $local);
+                if($this->verbose > 2) {
+                    $this->out(' --> ' . $dest);
                     $this->out();
                 }
 
-                $this->retrievepdate($url, $local);
+                $this->retrieveUpdate($url, $dest);
             break;
 
             case '-s': case '--syscheck':
@@ -241,13 +242,12 @@ HELP
         return null;
     }
 
-    protected function copyRemotly($src, $dest)
+    protected function retrieveUpdate($url, $dest)
     {
-        $dest = $_SERVER['argv'][0];
         $temp = basename($dest, '.phar').'-temp.phar';
 
         try {
-            copy($dest, $temp);
+            copy($url, $temp);
             chmod($temp, 0777 & ~umask());
 
             // test the phar validity
