@@ -1,0 +1,14 @@
+{{#items.0}}
+<table>
+  {{#items}}
+  <tr>
+    <td>
+      <b>{{name}}</b>
+    </td>
+    <td>
+      {{#value}}{{value}}{{/value}}
+    </td>
+    </tr>
+  {{/items}}
+</table>
+{{/items.0}}
