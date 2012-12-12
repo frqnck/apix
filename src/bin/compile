@@ -1,4 +1,4 @@
-#!/usr/bin/env php
+#!/usr/bin/env php -d phar.readonly=0
 <?php
 
 define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
@@ -13,4 +13,4 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 
 require 'Compiler.php';
 $phar = new Compiler;
-$phar->compile('zenya-api-server.phar');
+$phar->compile('apix.phar');

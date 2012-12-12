@@ -13,7 +13,7 @@
 	syntaxCheck="false"
 >
     <testsuites>
-        <testsuite name="Sleepover Unit Tests">
+        <testsuite name="Apix Unit Tests">
             <directory suffix="Test.php">src/tests/unit-tests</directory>
         </testsuite>
     </testsuites>
@@ -36,5 +36,11 @@
         <log type="testdox-html" target="review/testdox.html"/>
         <log type="testdox-text" target="review/testdox.txt"/>
     </logging>
+<!--
+    <php>
+        <ini name="apc.enable_cli" value="1"/>
+    </php>
+ -->
+ <!-- php -d apc.enable_cli=1 `which phpunit` src/tests/unit-tests/php/Apix/Listener/CacheApcTest.php -->
 </phpunit>
 <!-- vim: set tabstop=4 shiftwidth=4 expandtab: -->
