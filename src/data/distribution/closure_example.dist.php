@@ -1,10 +1,8 @@
 <?php
 // This is an example using a closure definition
 // ---------------------------------------------
-//
-// Closure is exerimental... avoid using for now.
 
-require_once 'apix.phar';
+require 'apix.phar';
 
 try {
     $api = new Apix\Server(require 'config.php');
@@ -14,9 +12,10 @@ try {
      *
      * @param  string $software
      * @return array  The array to return to the client
-     * @api_role    public          Available to all!
-     * @api_cache   10w some_name   Cache for a maximum of 10 weeks
-     *                              and tag cache buffer as 'some_name'.
+     * @api_auth    groups=public       Make this open to the 'public' group and
+     *                                  circuvent any @api_auth set by class(). 
+     * @api_cache   ttl=10w tags=softy  Cached for a maximum of 10 weeks and
+     *                                  tagged as 'softy'.
      */
     $api->onRead('/version/:software', function($software) {
         // ...
@@ -30,10 +29,11 @@ try {
      *
      * @param  string          $software
      * @return string          Output the binary & quit.
-     * @throws DomainException 404
-     * @api_role    public              Available to all
-     * @api_cache   10w some_name       Cache for a maximum of 10 weeks
-     *                                  and tag cache buffer as 'some_name'.
+     * @throws \DomainException 404
+     * @api_auth    groups=public       Make this open to the 'public' group and
+     *                                  circuvent any @api_auth set by class(). 
+     * @api_cache   ttl=10w tags=softy  Cached for a maximum of 10 weeks and
+     *                                  tagged as 'softy'.
      */
     $api->onRead('/download/:software', function($software) {
         // ...
@@ -51,9 +51,9 @@ try {
      * @param  Request $request  The current Apix Request object.
      * @param  string  $software
      * @return array   A reponse array.
-     * @api_role            admin                   Require admin priviledge
-     * @api_purge_cache     some_name               Purge the cache of all the
-     *                                              'some_name' tagged entries.
+     *
+     * @api_auth    users=franck,jon    Only allow access to Franck and Jon.
+     * @api_cache   flush=softy         Purge the 'softy' tagged cache entries.
      */
     $api->onCreate('/upload/:software', function(Request $request, $software) {
         // ...
