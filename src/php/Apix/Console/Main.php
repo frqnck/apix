@@ -20,12 +20,11 @@ class Main extends Console
 
     public function __construct(array $options = null)
     {
-        #$this->src_url = 'http://zenya.dev/index3.php/api/v1';
-        $this->src_url = 'http://phar.dev/index.php/api/v1';
+        // $this->src_url = 'http://phar.dev/index.php/api/v1';
+        $this->src_url = 'http://api.ouarz.net/v1/%s/%s/in/%s';
 
         #$this->src = realpath(__DIR__ . '/../../../../../');
         $this->src = realpath(__DIR__ . '/../../../../');
-
 
         $this->version = Server::VERSION;
         $this->version_program =
@@ -97,8 +96,7 @@ class Main extends Console
             case '-c': case '--check':
 
                 try {
-                    $url = $this->src_url . '/version/' . $this->src_file;
-                    $url .= '/current/' . $this->version;
+                    $url = sprintf($this->src_url, 'version', $this->src_file, $this->version);
 
                     if ($this->verbose) {
                         $this->outRegex("Contacting...\n<brown>${url}</brown>\n\n");
@@ -111,7 +109,7 @@ class Main extends Console
                         print_r($r);
                     }
 
-                    $latest = $r['apix']['version'][$this->src_file];
+                    $latest = $r['apix']['version'][$this->src_file]['latest'];
                     if (empty($latest)) {
                         throw new \Exception("Something, somewhere failed!");
                     }
@@ -129,10 +127,10 @@ class Main extends Console
 
             case '--selfupdate':
                 try {
-                    $remote = $this->src_url . '/download/' . $this->src_file;
+                    $url = sprintf($this->src_url, 'download', $this->src_file, $this->version);
                     $local  = __DIR__ . '/' . $this->src_file;
 
-                    file_put_contents($local, $this->getContents($remote));
+                    file_put_contents($local, $this->getContents($url));
 
                     $this->out($this->src_file . " has been updated.");
                 } catch (\Exception $e) {
@@ -235,11 +233,9 @@ HELP
         $body = @file_get_contents($url, false, $ctx);
         if(isset($http_response_header)) {
             $code = substr($http_response_header[0], 9, 3);
-
             if (floor($code/100)>3) {
-                throw new \Exception("HTTP request failed: " . PHP_EOL . $http_response_header[0]);
+                throw new \Exception($http_response_header[0]);
             }
-
             return $body;
         } else {
             throw new \Exception("Request failed.");
