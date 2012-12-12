@@ -1,5 +1,5 @@
 <?php
-namespace Apix\Plugins;
+namespace Apix\Plugin;
 
 abstract class PluginAbstract implements \SplObserver
 {
