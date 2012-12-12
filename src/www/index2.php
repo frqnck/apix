@@ -20,7 +20,7 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 
 # Test server
 try {
-    $api = new Apix\App;
+    $api = new Apix\Server;
 
     $api->onRead('/articles/:filters',
         /**
@@ -29,11 +29,11 @@ try {
          * @param     string  $name  Your name.
          * @return    array
          * @api_auth  groups=clients,reselers users=franck
-         * @api_cache ttl=1week tags=author flush=null
+         * @api_cache ttl=1day tags=author
          */
-         function(array $filters=null) {
+         function($filters=null) {
             // some logic
-            return $results;
+            return array('$results');
         });
 
 
