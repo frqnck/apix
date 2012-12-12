@@ -55,7 +55,8 @@ class Compiler
         'src/php/Apix/Plugins/Manual.php',
         'src/php/Apix/Plugins/Streaming.php',
         'src/php/Apix/View',
-        'src/php/Apix/Plugins/Logger.php'
+        'src/php/Apix/Plugins/Logger.php',
+        'src/data/config_dev.php'
     );
 
     public function isSkippedPath($path_name)
