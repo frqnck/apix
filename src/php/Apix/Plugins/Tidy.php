@@ -39,7 +39,7 @@ class Tidy extends PluginAbstract
 
         // @codeCoverageIgnoreStart
         if (!extension_loaded('tidy')) {
-            $this->log('The Tidy extension is not available.');
+            $this->log('PHP extension not installed', null, 'DEBUG');
 
             return false;
         }
