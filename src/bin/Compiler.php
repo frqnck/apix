@@ -51,6 +51,22 @@ class Compiler
     protected $version;
     protected $verbose = 3;
 
+    protected $paths_to_skip = array(
+        'src/php/Apix/Plugins/Manual.php',
+        'src/php/Apix/Plugins/Streaming.php',
+        'src/php/Apix/View',
+        'src/php/Apix/Plugins/Logger.php'
+    );
+
+    public function isSkippedPath($path_name)
+    {
+        foreach($this->paths_to_skip as $v) {
+            if(false !== strrpos($path_name, $v)) {
+                return true;
+            }
+        }
+    }
+
     /**
      * Compiles the source code into one single Phar file.
      *
@@ -83,7 +99,7 @@ class Compiler
             foreach (new \RecursiveIteratorIterator($it) as $file) {
                 if (
                     $file->getExtension() == 'php'
-                    && !preg_match ('@/src/php/Zenya/Api/Util/Compile.php$@', $file->getPathname())
+                    && !$this->isSkippedPath($file->getPathname())
                 ) {
                     $path = $file->getPathname();
                     $this->addFile($phar, $path, ($dir != '/src/data' ? true : false));
