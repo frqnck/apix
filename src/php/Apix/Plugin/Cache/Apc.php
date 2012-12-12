@@ -1,5 +1,5 @@
 <?php
-namespace Apix\Plugins\Cache;
+namespace Apix\Plugin\Cache;
 
 /**
  * APC wrapper with emulated tag support.
