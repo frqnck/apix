@@ -114,7 +114,7 @@ class Main extends Console
                         throw new \Exception("Something, somewhere failed!");
                     }
 
-                    if ($latest != $this->version) {
+                    if( version_compare($this->version, $latest, '>=') != 1) {
                         $this->out(sprintf("A newer version is available (%s).", $latest));
                     } else {
                         $this->out("You are using the latest version.");
