@@ -1,7 +1,7 @@
 <?php
-namespace Apix\Plugins;
+namespace Apix\Plugin;
 
-use Apix\Plugins\PluginAbstract,
+use Apix\Plugin\PluginAbstract,
     Apix\TestCase;
 
 class PluginAbstractTest extends TestCase
@@ -12,7 +12,7 @@ class PluginAbstractTest extends TestCase
     public function setUp()
     {
         $this->plugin =
-            $this->getMockForAbstractClass('Apix\Plugins\PluginAbstract');
+            $this->getMockForAbstractClass('Apix\Plugin\PluginAbstract');
     }
 
     protected function tearDown()
@@ -71,7 +71,7 @@ class PluginAbstractTest extends TestCase
      */
     // public function testSetAdapterThrowRuntimeException()
     // {
-    //     //$this->plugin->setAdapter('Apix\Plugins\PluginAbstract');
+    //     //$this->plugin->setAdapter('Apix\Plugin\PluginAbstract');
     //     // $this->assertSame(
     //     //     $this->plugin,
     //     //     $this->plugin->getAdapter()
@@ -82,7 +82,7 @@ class PluginAbstractTest extends TestCase
 
     public function testConstructor()
     {
-        $plugin = $this->getMockForAbstractClass('Apix\Plugins\PluginAbstract');
+        $plugin = $this->getMockForAbstractClass('Apix\Plugin\PluginAbstract');
 
         $obj = new \stdClass;
         $plugin->__construct($obj);
