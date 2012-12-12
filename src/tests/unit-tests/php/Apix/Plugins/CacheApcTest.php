@@ -1,12 +1,12 @@
 <?php
-namespace Apix\Plugins\Cache;
+namespace Apix\Plugin\Cache;
 
 use Apix\TestCase;
 
 /*
 php -d apc.enable_cli=1 \
 `which phpunit` -v \
-src/tests/unit-tests/php/Apix/Plugins/CacheApcTest.php
+src/tests/unit-tests/php/Apix/Plugin/CacheApcTest.php
  */
 class CacheApcTest extends TestCase
 {

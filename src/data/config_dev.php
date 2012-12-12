@@ -146,10 +146,10 @@ $c['services'] = array(
     'auth' => function() use ($c) {
         $basic = false; // set to: False to use Digest, True to use Basic.
         if ($basic) {
-            // Example implementing Plugins\Auth\Basic'
+            // Example implementing Plugin\Auth\Basic'
             // ----------------------------------------
             // The Basic Authentification mechanism is generally use with SSL.
-            $adapter = new Plugins\Auth\Basic($c['api_realm']);
+            $adapter = new Plugin\Auth\Basic($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
                 $users = Services::get('users');
                 foreach ($users as $user) {
@@ -161,11 +161,11 @@ $c['services'] = array(
                 return false;
             });
         } else {
-            // Example implementing 'Plugins\Auth\Digest'
+            // Example implementing 'Plugin\Auth\Digest'
             // -------------------------------------------
             // The Digest Authentification mechanism is use to encrypt and salt
             // the user's credentials without the overhead of SSL.
-            $adapter = new Plugins\Auth\Digest($c['api_realm']);
+            $adapter = new Plugin\Auth\Digest($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
                 $users = Services::get('users');
                 foreach ($users as $user) {
@@ -214,33 +214,33 @@ $c['services'] = array(
 $c['plugins'] = array(
 
     // Add the entity signature as part of the response-body.
-    'Apix\Plugins\OutputSign',
+    'Apix\Plugin\OutputSign',
 
     // Add some debugging information within the response-body.
     // Should be set to false in production. This plugin affects cachability.
-    'Apix\Plugins\OutputDebug' => array('enable' => DEBUG),
+    'Apix\Plugin\OutputDebug' => array('enable' => DEBUG),
 
     // Validate, correct, and pretty-print XML and HTML outputs. Many options
     // are available (see Tidy::$options)
-    'Apix\Plugins\Tidy',
+    'Apix\Plugin\Tidy',
 
-    'Apix\Plugins\Auth' => array('adapter' => $c['services']['auth']),
+    'Apix\Plugin\Auth' => array('adapter' => $c['services']['auth']),
 
-    'Apix\Plugins\Cache' => array(
+    'Apix\Plugin\Cache' => array(
         'enable'    => DEBUG,
             // use APC by defaut.
         'offadapter'   => function() use ($c) {
             $redis = new \Redis();
             $redis->connect('127.0.0.1', 6379);
 
-            return new Plugins\Cache\Redis($redis);
+            return new Plugin\Cache\Redis($redis);
         }
     ),
 
-    #'Apix\Plugins\Mock',
-    #'Apix\Plugins\Log' => array('php://output'),
-    #'Apix\Plugins\Manual',
-    #'Apix\Plugins\Streaming',
+    #'Apix\Plugin\Mock',
+    #'Apix\Plugin\Log' => array('php://output'),
+    #'Apix\Plugin\Manual',
+    #'Apix\Plugin\Streaming',
 );
 
 // Init is an associative array of specific PHP directives. They are
