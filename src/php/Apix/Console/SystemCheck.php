@@ -80,17 +80,16 @@ HELP
         foreach ($optionals as $k=>$v) {
             if($v['fail'] === true) $opt = true;
         }
-        $opt = false;
 
         if ($req) {
-            $summary = "<red>Warning!</red>";
-            $summary .= " Minimum system requirements not met. Good luck.";
+            $summary = "<red>Warning!</red> ";
+            $summary .= "Minimum system requirements not met. Good luck.";
         } elseif ($opt) {
-            $summary = "Except a few optionals, your system is fine.";
-            $summary .= " <green>Well done!</green>";
+            $summary = "<green>Well done.</green> Except to a few optionals, ";
+            $summary .= "your system is ready.";
         } else {
-            $summary = "This system is all fine.";
-            $summary .= " <green>Well done, you are ready to roll!</green>";
+            $summary = "This system is fine. ";
+            $summary .= "<green>Well done, you are ready to roll.</green>";
         }
         $br = "<dark_grey>-----------------------------------------------------------------------</dark_grey>";
         $this->outRegex("${br}\n\n   ${summary}\n\n${br}\n");
@@ -228,7 +227,7 @@ HELP
             'Tidy' => array(
                 'fail' => !extension_loaded('tidy'),
                 'msgs' => array(
-                    "The PHP Tidy extension is required by Apix\Module\Tidy.",
+                    "The Tidy extension is use for validating html/xml.",
                 )
             ),
 
