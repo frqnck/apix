@@ -5,8 +5,7 @@
 // You should NOT edit this file! Instead, put any overrides into a local copy.
 // The local file should only contain values which override values set in the
 // distribution file. This eases the upgrade path when defaults are changed and
-// new features are added. Beware this file will be upgraded regularly and
-// automatically.
+// new features are added. Beware this file is upgraded regularly.
 
 namespace Apix;
 
@@ -104,9 +103,9 @@ $c = array(
 
 // Resources definitions
 // ---------------------
-// route path string (with named variable) to resource definition.
-// There are few different kind of resource definiton
-// - closure definitions (à la Sinatra): allowing fast prototyping.
+// A resource definition is made of a 'Route path' (with or without named
+// variable) poiting to a controller which are define as:
+// - closure/lambda definitions (à la Sinatra): allowing fast prototyping.
 // - class definition, e.g.
 //      '/keywords/:keyword' => array(
 //          'controller' => array(
@@ -116,7 +115,7 @@ $c = array(
 //                          a __constructor variables as an array or null.
 //          )
 //      ),
-// - redirect
+// - redirect, e.g.
 //      '/somewhere' => array(
 //          'redirect'  =>  '/to/somewhere/else'
 //      )
@@ -159,7 +158,6 @@ $c['services'] = array(
                         return true;
                     }
                 }
-
                 return false;
             });
         } else {
@@ -177,7 +175,6 @@ $c['services'] = array(
                         return $user['api_key'];
                     }
                 }
-
                 return false;
             });
         }
@@ -223,27 +220,18 @@ $c['plugins'] = array(
     // Should be set to false in production. This plugin affects cachability.
     'Apix\Plugins\OutputDebug' => array('enable' => DEBUG),
 
-    // Validate, correct, and pretty-print XML and HTML outputs.
-    // Many options are available (see Tidy::$options)
+    // Validate, correct, and pretty-print XML and HTML outputs. Many options
+    // are available (see Tidy::$options)
     'Apix\Plugins\Tidy',
 
+    // Autentification (with basic ACL) plugin
     'Apix\Plugins\Auth' => array('adapter' => $c['services']['auth']),
 
+    // Plugin to cache the output of the controllers. The full Request-URI acts
+    // as the unique cache id.
     'Apix\Plugins\Cache' => array(
-        'enable'    => DEBUG,
-            // use APC by defaut.
-        'offadapter'   => function() use ($c) {
-            $redis = new \Redis();
-            $redis->connect('127.0.0.1', 6379);
-
-            return new Plugins\Cache\Redis($redis);
-        }
-    ),
-
-    #'Apix\Plugins\Mock',
-    #'Apix\Plugins\Log' => array('php://output'),
-    #'Apix\Plugins\Manual',
-    #'Apix\Plugins\Streaming',
+        'enable' => DEBUG,
+    )
 );
 
 // Init is an associative array of specific PHP directives. They are

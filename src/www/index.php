@@ -1,4 +1,4 @@
-ss<?php
+<?php
 define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
 define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
 define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
@@ -13,8 +13,6 @@ psr0_autoloader_searchFirst(APP_TOPDIR);
 
 # Test server
 try {
-    #$server = new Apix\Server(require "../../src/data/config.dist.php");
-
     $server = new Apix\Server('../../src/data/distribution/config.dist.php');
     echo $server->run();
 
