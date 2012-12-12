@@ -202,7 +202,7 @@ $c['services'] = array(
 
 // Plugins definitions
 // -------------------
-$c['plugin'] = array(
+$c['plugins'] = array(
 
     // Add the entity signature as part of the response-body.
     'Apix\Plugin\OutputSign',
