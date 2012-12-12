@@ -201,16 +201,7 @@ $c['services'] = array(
 );
 
 // Plugins definitions
-// ---------------------
-// There are various key stages taking place durring the ....:
-// - server: the gluing kernel.
-// - entity: resource discovery stage (which include resource generation)
-// - response: during creation of the actual response output.
-// Each stages has many periods:
-// - early: elements defined withtin will fire @ a pre-processing
-// - late: elements defined withtin will fire @ post-processing
-// - exception: elements defined withtin will fire durring an error/exception
-// Each periods can have one or many listeners firing in succesion.
+// -------------------
 $c['plugins'] = array(
 
     // Add the entity signature as part of the response-body.
@@ -297,23 +288,6 @@ $c['init'] = array(
 ///////////////////////////////////////////////////////////////
 
 $c['default'] = array(
-
-    // 'listeners' => array(
-    //     'server' => array(
-    //         'early' => array(),
-    //         'late' => array(),
-    //         'exception' => array()
-    //     ),
-    //     'entity' => array(
-    //         'early' => array(),
-    //         'late' => array(),
-    //     ),
-    //     'response' => array(
-    //         'early' => array(),
-    //         'late'  => array()
-    //     )
-    // ),
-
     'services' => array(),
     'resources' => array(
         // The OPTIONS method represents a request for information about the
