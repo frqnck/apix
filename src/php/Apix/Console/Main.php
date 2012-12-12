@@ -155,7 +155,19 @@ class Main extends Console
             break;
 
             case '-t': case '--tests':
-                system('phpunit --colors tests/phar-test.php');
+                $cmd = 'phpunit';
+                if($this->verbose) {
+                    $cmd .= ' --verbose';
+                }
+                if($this->verbose > 2) {
+                    $cmd .= ' --debug';
+                }
+                if(false == $this->no_colors) {
+                    $cmd .= ' --colors';
+                }
+                $cmd .= ' --bootstrap src/tests/unit-tests/pharstrap.php';
+                $cmd .= ' -c src/tests/unit-tests/pharunit.xml';
+                system($cmd);
             break;
 
             default:
