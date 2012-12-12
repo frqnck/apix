@@ -1,7 +1,7 @@
 <?php
 namespace Apix\Fixtures;
 
-use Apix\Plugins\PluginAbstract;
+use Apix\Plugin\PluginAbstract;
 
 class PluginMock extends PluginAbstract
 {
