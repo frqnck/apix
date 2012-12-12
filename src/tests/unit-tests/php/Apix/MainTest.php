@@ -4,7 +4,7 @@ namespace Apix;
 
 use Apix\TestCase;
 
-class ServerTest extends TestCase
+class MainTest extends TestCase
 {
 
     protected $server, $request;

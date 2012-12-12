@@ -15,7 +15,7 @@ class HelpTest extends TestCase
                               ->disableOriginalConstructor()
                               ->getMock();
 
-        $this->api = new App(false, $this->request);
+        $this->api = new Server(false, $this->request);
 
         $this->api->onCreate('/create/:test',
             /**

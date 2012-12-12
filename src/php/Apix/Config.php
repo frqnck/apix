@@ -257,7 +257,8 @@ class Config #extends Di
     public function getConfigDefaults()
     {
         // add the distribution file
-        $file = realpath(__DIR__ . '/../../data/distribution/config.dist.php');
+        // $file = realpath(__DIR__ . '/../../data/distribution/config.dist.php');
+        $file = __DIR__ . '/../../data/distribution/config.dist.php';
 
         return $this->getConfigFromFile($file);
     }

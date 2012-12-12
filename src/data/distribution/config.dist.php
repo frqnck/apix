@@ -232,7 +232,7 @@ $c['plugins'] = array(
     'Apix\Plugins\Cache' => array(
         'enable'    => DEBUG,
             // use APC by defaut.
-        'adapter'   => function() use ($c) {
+        'offadapter'   => function() use ($c) {
             $redis = new \Redis();
             $redis->connect('127.0.0.1', 6379);
 
