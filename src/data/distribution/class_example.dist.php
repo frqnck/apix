@@ -45,7 +45,7 @@ class SoftwareDownload
      * @param  string $software The name of the software.
      * @return array  The array to return to the client.
      * @api_auth    groups=public       Make this open to the 'public' group and
-     *                                  circuvent the @api_auth set by class. 
+     *                                  circuvent the @api_auth set by class.
      * @api_cache   ttl=10w tags=softy  Cached for a maximum of 10 weeks and
      *                                  tagged as 'softy'.
      */
