@@ -277,31 +277,35 @@ class Request
 
     public function getBody($cache=true)
     {
-        static $decoded = null;
-        if ($cache && null !== $decoded) {
-            return $decoded;
+        static $body = null;
+        if ($cache && null !== $body) {
+            return $body;
         }
 
         // Decode any content-encoding (gzip or deflate) if needed
         switch (strtolower($this->getHeader('content-encoding'))) {
-
             // Handle gzip encoding
             case 'gzip':
-                require_once 'HTTP/Request2.php';
-                $decoded = \HTTP_Request2_Response::decodeGzip($this->body);
+                if (!function_exists('gzdecode')) {
+                    $body = file_get_contents(
+                        'compress.zlib://data:;base64,'
+                        . base64_encode($this->body)
+                    );
+                } else {
+                    $body = gzdecode($this->body);
+                }
                 break;
 
             // Handle deflate encoding
             case 'deflate':
-                require_once 'HTTP/Request2.php';
-                $decoded = \HTTP_Request2_Response::decodeDeflate($this->body);
+                $body = gzinflate($this->body);
                 break;
 
             default:
                 return $this->body;
         }
 
-        return $decoded;
+        return $body;
     }
 
 }

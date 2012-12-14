@@ -158,6 +158,7 @@ $c['services'] = array(
                         return true;
                     }
                 }
+
                 return false;
             });
         } else {
@@ -175,6 +176,7 @@ $c['services'] = array(
                         return $user['api_key'];
                     }
                 }
+
                 return false;
             });
         }
@@ -220,9 +222,7 @@ $c['plugins'] = array(
 
     // Plugin to cache the output of the controllers. The full Request-URI acts
     // as the unique cache id.
-    'Apix\Plugin\Cache' => array(
-        'enable' => DEBUG,
-    )
+    'Apix\Plugin\Cache' => array('enable' => !DEBUG)
 );
 
 // Init is an associative array of specific PHP directives. They are
