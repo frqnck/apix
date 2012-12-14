@@ -13,7 +13,7 @@ try {
      * @param  string $software
      * @return array  The array to return to the client
      * @api_auth    groups=public       Make this open to the 'public' group and
-     *                                  circuvent any @api_auth set by class(). 
+     *                                  circuvent any @api_auth set by class().
      * @api_cache   ttl=10w tags=softy  Cached for a maximum of 10 weeks and
      *                                  tagged as 'softy'.
      */
@@ -27,11 +27,11 @@ try {
     /**
      * Download some :software
      *
-     * @param  string          $software
-     * @return string          Output the binary & quit.
+     * @param  string           $software
+     * @return string           Output the binary & quit.
      * @throws \DomainException 404
      * @api_auth    groups=public       Make this open to the 'public' group and
-     *                                  circuvent any @api_auth set by class(). 
+     *                                  circuvent any @api_auth set by class().
      * @api_cache   ttl=10w tags=softy  Cached for a maximum of 10 weeks and
      *                                  tagged as 'softy'.
      */

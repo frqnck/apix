@@ -3,6 +3,9 @@
 
     <echo message="${project.name} ${project.version}: specific:"/>
     <echo message=""/>
+    <echo message="  php-cs-fix"/>
+    <echo message="    Run php-cs-fix"/>
+    <echo message=""/>
     <echo message="  build-phar"/>
     <echo message="    Build apix.phar"/>
     <echo message=""/>
@@ -12,6 +15,11 @@
     <echo message="  file-version"/>
     <echo message="    File the version to file"/>
  </target>
+
+  <!-- php-cs-fix -->
+  <target name="php-cs-fix">
+    <exec command="php /www/dev/tools/PHP-CS-Fixer/php-cs-fixer.phar fix ./src" logoutput="true" checkreturn="true" />
+  </target>
 
   <!-- build-phar -->
   <target name="build-phar">

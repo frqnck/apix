@@ -1,6 +1,6 @@
 <?php
 //namespace Apix;
-
+/*
 define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
 define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
 define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
@@ -17,6 +17,9 @@ require APP_VENDOR . '/autoload.php';
 psr0_autoloader_searchFirst(APP_LIBDIR);
 psr0_autoloader_searchFirst(APP_TESTDIR);
 psr0_autoloader_searchFirst(APP_TOPDIR);
+*/
+
+require __DIR__ . '../../../dist/apix.phar';
 
 # Test server
 try {
@@ -35,7 +38,6 @@ try {
             // some logic
             return array('$results');
         });
-
 
     $api->onRead('/test/:id', //<[[:digit:]]{1,3}>
 
@@ -63,8 +65,8 @@ try {
             $params = $api->request->getBody();
 
             return array(
-                'test'  => ' 111value11s',
-                #'xml' =>array('&"\'<> ?|\\-_+=@£$€*/":;[]{}'),
+                'test'  => Apix\Server::VERSION . ' --- ',
+                'xml' =>array('&"\'<> ?|\\-_+=@£$€*/":;[]{}'),
                 'body'  => $api->request->getBody(),
                 //'params'    => $api->getBodyData()
             );
