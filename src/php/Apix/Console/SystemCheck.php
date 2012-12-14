@@ -245,7 +245,7 @@ HELP
     }
     public function out($msg=null, $styles=null)
     {
-        if(null !== $msg) {
+        if (null !== $msg) {
             $software_name = 'apix-server';
             $msg = str_replace("{software.name}", $software_name, $msg);
 

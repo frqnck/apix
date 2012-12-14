@@ -113,8 +113,8 @@ class Main extends Console
                         throw new \Exception("Something, somewhere failed!");
                     }
 
-                    if( version_compare($this->version, $latest, '>=') != 1) {
-                        $this->out(sprintf("A newer version is available (%s).", $latest));                        
+                    if ( version_compare($this->version, $latest, '>=') != 1) {
+                        $this->out(sprintf("A newer version is available (%s).", $latest));
                         $this->outRegex(sprintf("\nTo update, run: <brown>%s --selfupdate</brown>\n",  $args[0]));
                     } else {
                         $this->out("You are using the latest version.");
@@ -128,7 +128,7 @@ class Main extends Console
                 $url = sprintf($this->src_url, 'download', $this->src_file, $this->version);
                 $dest = $_SERVER['argv'][0];
 
-                if($this->verbose > 2) {
+                if ($this->verbose > 2) {
                     $this->out(' --> ' . $dest);
                     $this->out();
                 }
@@ -156,13 +156,13 @@ class Main extends Console
 
             case '-t': case '--tests':
                 $cmd = 'phpunit';
-                if($this->verbose) {
+                if ($this->verbose) {
                     $cmd .= ' --verbose';
                 }
-                if($this->verbose > 2) {
+                if ($this->verbose > 2) {
                     $cmd .= ' --debug';
                 }
-                if(false == $this->no_colors) {
+                if (false == $this->no_colors) {
                     $cmd .= ' --colors';
                 }
                 $cmd .= ' --bootstrap src/tests/unit-tests/pharstrap.php';
@@ -241,11 +241,12 @@ HELP
 
         $ctx  = stream_context_create($opts);
         $body = @file_get_contents($url, false, $ctx);
-        if(isset($http_response_header)) {
+        if (isset($http_response_header)) {
             $code = substr($http_response_header[0], 9, 3);
             if (floor($code/100)>3) {
                 throw new \Exception($http_response_header[0]);
             }
+
             return $body;
         } else {
             throw new \Exception("Request failed.");
@@ -280,19 +281,18 @@ HELP
     }
 
     //     ini_set('phar.readonly', 0);
-    //     if(true) {
+    //     if (true) {
     //         $this->out("Please, re-run this as: ");
     //         $this->out();
     //         $this->out('$ php -d phar.readonly=0 ' . $args[0], 'brown');
     //         exit(0);
     //     }
-    //     if(false !== @file_put_contents($local, $this->getContents($url))) {
+    //     if (false !== @file_put_contents($local, $this->getContents($url))) {
     //         $this->out($this->src_file . " has been updated.");
     //     } else {
     //          throw new \Exception;
     //     }
     // } catch (\Exception $e) {
     //     $this->outputError($e);
-
 
 }
