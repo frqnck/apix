@@ -152,6 +152,14 @@ HELP
                     "Install it or recompile PHP without using --disable-phar"
                 )
             ),
+            'zlib' => array(
+                'fail' => !extension_loaded('zlib'),
+                'verbose' => 'on',
+                'msgs' => array(
+                    "The zlib extension is required.",
+                    "Install it or recompile PHP with --with-zlib"
+                )
+            ),
             'Suhosin' => array(
                 'fail' =>   false !== $suhosin
                             && false === stripos($suhosin, 'phar'),
@@ -245,7 +253,7 @@ HELP
     }
     public function out($msg=null, $styles=null)
     {
-        if(null !== $msg) {
+        if (null !== $msg) {
             $software_name = 'apix-server';
             $msg = str_replace("{software.name}", $software_name, $msg);
 
