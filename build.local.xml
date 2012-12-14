@@ -7,7 +7,7 @@
     <echo message="    Run php-cs-fix"/>
     <echo message=""/>
     <echo message="  build-phar"/>
-    <echo message="    Build apix.phar"/>
+    <echo message="    Build local ${project.shortName}.phar"/>
     <echo message=""/>
     <echo message="  composer-install"/>
     <echo message="    Run Composer"/>
@@ -28,7 +28,7 @@
 
   <!-- composer-install -->
   <target name="composer-install">
-          <composer command="install"/>
+      <composer command="install"/>
   </target>
 
   <!-- file-version -->
@@ -36,5 +36,22 @@
         <version releasetype="bugfix" file="version.txt" property="version.number"/>
   </target>
 
+  <!-- full-release -->
+  <target name="full-release">
+    <property name="project.pharfilename" value="${project.shortName}-${project.version}.phar" />
+    <tstamp>
+        <format property="build.time" pattern="%Y%m%d%H%I%S" />
+        <format property="newdeploy.date" pattern="%Y-%m-%d %H:%I:%S" />
+    </tstamp>
+
+<!--     <exec command="version" logoutput="true" checkreturn="true" />
+ -->
+<!--     <exec command="./src/bin/compile ${project.version}" logoutput="true" checkreturn="true" />-->
+    <echo>${project.pharfilename} has been created</echo>
+
+    <mail tolist="franck@cassedanne.com" from="franck@info.com" subject="build complete">The build process is a success...</mail>
+  </target>
+
 </project>
+
 <!-- vim: set tabstop=2 shiftwidth=2 expandtab: -->
