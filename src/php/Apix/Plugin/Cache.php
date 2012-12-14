@@ -16,13 +16,13 @@ class Cache extends PluginAbstractEntity
     protected $annotation = 'api_cache';
 
     protected $options = array(
-        'enable'     => true,                     // wether to enable or not
-        'adapter'    => 'Apix\Plugin\Cache\Apc', // instantiate by default
-        'ttl'        => '10mins',          // the lifetime, null stands forever
-        'flush'      => true,                   // flush tags at runtime (cronjob)
-        'tags'       => array(),           // default tags to append (v1, dev)
-        'prefix_key' => 'apix-cache-key:', // prefix cache keys
-        'prefix_tag' => 'apix-cache-tag:', // prefix cache tags
+        'enable'        => true,                     // wether to enable or not
+        'adapter'       => 'Apix\Plugin\Cache\Apc', // instantiate by default
+        'default_ttl'   => '10mins',                // the lifetime, null stands forever
+        'runtime_flush' => true,                   // flush tags at runtime (cronjob)
+        'append_tags'   => array(),           // default tags to append (v1, dev)
+        'prefix_key'    => 'apix-cache-key:', // prefix cache keys
+        'prefix_tag'    => 'apix-cache-tag:', // prefix cache tags
     );
 
     /**
@@ -40,7 +40,7 @@ class Cache extends PluginAbstractEntity
         $this->setEntity($entity);
 
         try {
-            $this->flushAnnotatedTags($this->options['flush']);
+            $this->flushAnnotatedTags($this->options['runtime_flush']);
 
             // the cache id is simply the entity route name for now!
             //$id = $entity->getRoute()->getPath();
@@ -60,11 +60,11 @@ class Cache extends PluginAbstractEntity
             );
 
             // ...and cache it for later usage.
-            $ttl = $this->getSubTagValues('ttl', array($this->options['ttl']));
+            $ttl = $this->getSubTagValues('ttl', array($this->options['default_ttl']));
             $sec = self::timeInternval($ttl[0]);
 
             $tags = array_merge(
-                $this->options['tags'],
+                $this->options['append_tags'],
                 $this->getSubTagValues('tags', array())
             );
             $tags = array_unique($tags);
