@@ -1,5 +1,5 @@
 <?php
-if(false) {
+if (false) {
     define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
     define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
     define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
@@ -27,7 +27,7 @@ if(false) {
 
 # Test server
 try {
-    $config = require "../../src/data/distribution/config.dist.php";
+    $config = require '../../src/data/distribution/config.dist.php';
 
     // Test server
     #$api = new Apix\Server($config);

@@ -9,7 +9,7 @@ class LoggerTest extends TestCase
 
     public function setUp()
     {
-        $this->adapter = $this->getMock('Apix\Plugin\Log\Adapter');
+        $this->adapter = $this->getMock('Apix\Plugin\Logger\Adapter');
         $this->logger = new Logger(
             array('enable'=>true, 'adapter'=>$this->adapter)
         );
