@@ -5,9 +5,10 @@
     http://pear.php.net/dtd/package-2.0.xsd">
   <name>${project.name}</name>
   <channel>${project.channel}</channel>
-  <summary>The RESTfull API deployer</summary>
+  <summary>A micro-framework to build RESTful Web services</summary>
   <description>
-    Some more detailed description will go here.
+    Apix provides a modular approach for developing Web services in PHP.
+    It will run alognside you existing framework or application.
   </description>
   <lead>
     <name>Franck Cassedanne</name>
@@ -50,18 +51,6 @@ ${contents}
         <max>3.999.9999</max>
       </package>
 
-      <package>
-        <name>HTTP_Request2</name>
-        <channel>pear.php.net</channel>
-        <min>2.1.0</min>
-        <max>2.999.9999</max>
-      </package>
-      <package>
-        <name>Net_URL_Mapper</name>
-        <channel>pear.php.net</channel>
-        <min>0.9.1</min>
-        <max>0.9.9999</max>
-      </package>
 	 </required>
   </dependencies>
   <phprelease />

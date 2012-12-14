@@ -61,8 +61,8 @@ class Compiler
 
     public function isSkippedPath($path_name)
     {
-        foreach($this->paths_to_skip as $v) {
-            if(false !== strrpos($path_name, $v)) {
+        foreach ($this->paths_to_skip as $v) {
+            if (false !== strrpos($path_name, $v)) {
                 return true;
             }
         }
@@ -127,7 +127,7 @@ class Compiler
 
         $phar->stopBuffering();
 
-        #$phar->compressFiles(\Phar::GZ);
+        $phar->compressFiles(\Phar::GZ);
 
         echo 'The new phar has ' . $phar->count() . ' entries.' . PHP_EOL;
         unset($phar);
