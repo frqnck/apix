@@ -31,8 +31,8 @@ abstract class PluginAbstract implements \SplObserver
     /**
      * Checks the adapter comply to a class/interface
      *
-     * @param closure|object $adapter
-     * @throws \RuntimeException
+     * @param   object              $adapter
+     * @throws  \RuntimeException
      * @return true
      */
     public function checkAdapterClass($adapter, $class)
