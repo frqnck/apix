@@ -65,20 +65,30 @@ class PluginAbstractTest extends TestCase
         );
     }
 
-    /**
-     * @TODO
-     * @ expectedException           \RuntimeException
-     */
-    // public function testSetAdapterThrowRuntimeException()
-    // {
-    //     //$this->plugin->setAdapter('Apix\Plugin\PluginAbstract');
-    //     // $this->assertSame(
-    //     //     $this->plugin,
-    //     //     $this->plugin->getAdapter()
-    //     // );
+    public function testCheckAdapterClass()
+    {
+        $this->plugin->setAdapter('Apix\Fixtures\PluginMock');
+        
+        $this->assertTrue(
+            $this->plugin->checkAdapterClass(
+                $this->plugin->getAdapter(),
+                'Apix\Plugin\PluginAbstract'
+            )
+        );
+    }
 
-    //     $this->plugin->setAdapter(new \stdClass);
-    // }
+    /**
+     * @expectedException           \RuntimeException
+     */
+    public function testCheckAdapterClassThrowsRuntimeException()
+    {
+        $this->plugin->setAdapter(new \stdClass);
+        $this->plugin->checkAdapterClass(
+            $this->plugin->getAdapter(),
+            'Apix\Plugin\PluginAbstract'
+        );
+
+    }
 
     public function testConstructor()
     {
