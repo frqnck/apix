@@ -10,7 +10,7 @@ abstract class PluginAbstract implements \SplObserver
     /**
      * Constructor
      *
-     * @param mix $options Array of options if it is an object set as an adapter
+     * @param mix $options Array of options
      */
     public function __construct($options=null)
     {
@@ -18,11 +18,36 @@ abstract class PluginAbstract implements \SplObserver
 
         if (isset($this->options['adapter'])) {
             $this->setAdapter($this->options['adapter']);
+
+            if( isset(static::$hook) && isset(static::$hook['interface'])) {
+                $this->checkAdapterClass(
+                    $this->adapter,
+                    static::$hook['interface']
+                );
+            }
         }
     }
 
     /**
-     * Sets and merge with the plugin defaults options
+     * Checks the adapter comply to a class/interface
+     *
+     * @param closure|object $adapter
+     * @throws \RuntimeException
+     * @return true
+     */
+    public function checkAdapterClass($adapter, $class)
+    {
+        if(!is_subclass_of($adapter, $class)) {
+            throw new \RuntimeException(
+                sprintf('%s not implemented.', $class)
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Sets and merge the defaults options
      *
      * @param mix $options Array of options if it is an object set as an adapter
      */
@@ -37,7 +62,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Gets the plugin options
+     * Gets the options
      *
      * @return mix
      */
@@ -47,7 +72,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Sets the plugin adapter
+     * Sets the adapter
      *
      * @param closure|object $adapter
      */
@@ -60,21 +85,10 @@ abstract class PluginAbstract implements \SplObserver
                                 ? $adapter()
                                 : $adapter;
         }
-
-        // Checks an adapter comply to a hook interface
-        if(
-            isset(static::$hook)
-            && isset(static::$hook['interface'])
-            && !is_subclass_of($this->adapter, static::$hook['interface'])
-        ) {
-            throw new \RuntimeException(
-                sprintf('%s not implemented.', static::$hook['interface'])
-            );
-        }
     }
 
     /**
-     * Gets the plugin adapter
+     * Gets the adapter
      *
      * @return mix
      */
@@ -85,6 +99,7 @@ abstract class PluginAbstract implements \SplObserver
 
     /**
      * Log shortcut
+     * TODO: refactor
      */
     public function log($msg, $ref=null, $level='debug')
     {
