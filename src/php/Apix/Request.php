@@ -298,6 +298,12 @@ class Request
 
             // Handle deflate encoding
             case 'deflate':
+                if (! function_exists('gzinflate')) {
+                    throw new \RuntimeException(
+                        'zlib extension is required to deflate encoding'
+                    );
+                }
+
                 $body = gzinflate($this->body);
                 break;
 
