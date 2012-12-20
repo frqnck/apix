@@ -283,12 +283,17 @@ class Response extends Listener
      */
     public function sendAllHttpHeaders($http_code, $version_string)
     {
-        $out = array( $this->sendHeader('X-Powered-By: ' . $version_string, true, $http_code) );
+        // PHP bug?
+        $out = $this->sendheader("Status: $http_code " . static::getStatusPrases($http_code));
+        //$out = $this->sendheader("HTTP/1.0 $http_code " . static::getStatusPrases($http_code), true);
+
+        $out[] = array( $this->sendHeader('X-Powered-By: ' . $version_string) );
 
         foreach ($this->headers as $key => $value) {
            $out[] = $this->sendheader($key . ': ' . $value);
         }
 
+        
         return $out;
     }
 
