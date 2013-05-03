@@ -1,25 +1,25 @@
 <?php
-//namespace Apix;
-/*
-define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
-define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
-define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
+#namespace Apix;
 
-// phix
-require_once APP_LIBDIR . '/psr0.autoloader.php';
+if (true) {
+    define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
+    define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
+    define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
 
-// Composer
-define('APP_SRC', realpath(__DIR__ . '/..'));
+    // phix
+    require_once APP_LIBDIR . '/psr0.autoloader.php';
 
-define('APP_VENDOR', realpath(__DIR__ . '/../../vendor'));
-require APP_VENDOR . '/autoload.php';
+    // Composer
+    define('APP_SRC', realpath(__DIR__ . '/..'));
 
-psr0_autoloader_searchFirst(APP_LIBDIR);
-psr0_autoloader_searchFirst(APP_TESTDIR);
-psr0_autoloader_searchFirst(APP_TOPDIR);
-*/
+    define('APP_VENDOR', realpath(__DIR__ . '/../../vendor'));
+    require APP_VENDOR . '/autoload.php';
 
-require __DIR__ . '../../../dist/apix.phar';
+    psr0_autoloader_searchFirst(APP_LIBDIR);
+    psr0_autoloader_searchFirst(APP_TESTDIR);
+    psr0_autoloader_searchFirst(APP_TOPDIR);
+} else
+    require __DIR__ . '../../../dist/apix.phar';
 
 # Test server
 try {
@@ -35,6 +35,7 @@ try {
          * @api_cache ttl=1day tags=author
          */
          function($filters=null) {
+
             // some logic
             return array('$results');
         });

@@ -22,6 +22,7 @@ if (
 /**
  * HTTP Digest authentication class
  *
+ * Adapted from Paul James's implemenation.
  * @link http://www.peej.co.uk/files/httpdigest.phps
  */
 class Digest extends AbstractAuth
