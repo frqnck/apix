@@ -12,8 +12,8 @@ abstract class AbstractAuth implements Adapter
     /**
      * Returns an auth token to match against.
      *
-     * @param  array           $auth_data An array of authentification data.
-     * @return boolean|string.
+     * @param  array                  $auth_data An array of authentification data.
+     * @return boolean|string|object.
      */
     public function getToken(array $auth_data)
     {
