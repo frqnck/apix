@@ -72,13 +72,15 @@ class Router
     {
         foreach ($rules as $key => $rule) {
             if ( is_int($key) ) {
-                throw new \InvalidArgumentException("Invalid rules array specified (not associative)");
+                throw new \InvalidArgumentException(
+                        'Invalid rules array specified (not associative)'
+                    );
             }
             $this->_rules[$key] = $rule;
         }
 
         // merges defaults with required props
-        $this->_defaults = $defaults+array('controller'=>null,'action'=>null);
+        $this->_defaults = $defaults+array('controller'=>null, 'action'=>null);
 
         // set default properties
         foreach ($this->_defaults as $prop => $value) {
@@ -215,7 +217,9 @@ class Router
     public function getAction($method=null)
     {
         if (isset($method)) {
-            return isset(self::$actions[$method]) ? self::$actions[$method] : null;
+            return isset(self::$actions[$method])
+                   ? self::$actions[$method]
+                   : null;
         }
         if (null === $this->action) {
             $this->setAction();
@@ -280,7 +284,9 @@ class Router
             return $this->params[$key];
         }
 
-        throw(new \InvalidArgumentException(sprintf('Invalid parameter "%s" requested.', $key)));
+        throw new \InvalidArgumentException(
+                    sprintf('Invalid parameter "%s" requested.', $key)
+                );
     }
 
     /**

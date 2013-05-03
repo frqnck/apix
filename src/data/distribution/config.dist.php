@@ -144,14 +144,14 @@ $c['services'] = array(
 
     // Auth examples (see plugins definition)
     'auth' => function() use ($c) {
-        $basic = false; // set to: False to use Digest, True to use Basic.
+        $basic = true; // set to: False to use Digest, True to use Basic.
         if ($basic) {
             // Example implementing Plugin\Auth\Basic'
             // ----------------------------------------
             // The Basic Authentification mechanism is generally use with SSL.
             $adapter = new Plugin\Auth\Basic($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
-                $users = Services::get('users');
+                $users = Service::get('users');
                 foreach ($users as $user) {
                     if ($current['username'] == $user['user']
                         && $current['password'] == $user['api_key']) {
@@ -168,7 +168,7 @@ $c['services'] = array(
             // the user's credentials without the overhead of SSL.
             $adapter = new Plugin\Auth\Digest($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
-                $users = Services::get('users');
+                $users = Service::get('users');
                 foreach ($users as $user) {
                 if ($user['user'] == $current['username']
                     && $user['realm'] == $c['api_realm']) {
