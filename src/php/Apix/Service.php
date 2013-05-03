@@ -2,7 +2,7 @@
 
 namespace Apix;
 
-class Services
+class Service
 {
 
     /**
