@@ -20,9 +20,8 @@ if (
 */
 
 /**
- * HTTP Digest authentication class
+ * HTTP Basic authentication class
  *
- * @link http://www.peej.co.uk/files/httpdigest.phps
  */
 class Basic extends AbstractAuth
 {
@@ -56,9 +55,7 @@ class Basic extends AbstractAuth
      */
     public function send()
     {
-        header('WWW-Authenticate: Basic '.
-            'realm="'.$this->realm.'"'
-        );
+        header('WWW-Authenticate: Basic realm="' . $this->realm . '"');
 
         // TODO: review
         header('HTTP/1.0 401 Unauthorized');
