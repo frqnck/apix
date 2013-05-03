@@ -51,33 +51,27 @@ class Auth extends PluginAbstractEntity
         #$entity->getResponse()->setHeader('X_REMOTE_USER', $username);
         $_SERVER['X_AUTH_USER'] = $username;
 
+
         return $username;
 
-        $s = new \Zenya_Model_Session;
+        // ---------------------------------------------------------------------
 
-        if ($request->hasHeader('X-session_id')) {
-            \Zend_Session::setId( $request->getHeader('X-session_id') );
-        }
+        // $user = \Apix\Config::getInstance()->get('user');
+        // if ( null !== $groups && !in_array($user->group, $groups) ) {
+        //     return false;
+        // }
 
-        $auth = \Zend_Auth::getInstance();
-        if ($auth->hasIdentity() === false) {
-            \Zend_Session::regenerateId();
-            throw new Exception('Session_id invalid.', 401);
-        }
-
-        $user = Zenya_Service::getService('Default_Service_User');
-        $user = $user->getUser();
+        // $user = \Apix\Config::getInstance()->get('user');
+        $user = \Apix\Service::get('user');
 
         if ($user->session->ip != $request->getIp()) {
-            \Zend_Session::destroy();
-            throw new Exception('Session\'s IP invalid.', 401);
+            throw new \Exception('Session\'s IP invalid.', 401);
         }
 
         // check UA string
         $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
         if ($user->session->ua != $ua) {
-        Zend_Session::destroy();
-        throw new Zenya_Api_Exception('Session\'s UA invalid.', 401);
+            throw new \Exception('Session\'s UA invalid.', 401);
         }
     }
 

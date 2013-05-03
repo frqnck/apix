@@ -151,13 +151,20 @@ $c['services'] = array(
             // The Basic Authentification mechanism is generally use with SSL.
             $adapter = new Plugin\Auth\Basic($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
-                $users = Services::get('users');
+                $users = Service::get('users');
                 foreach ($users as $user) {
                     if ($current['username'] == $user['user']
                         && $current['password'] == $user['api_key']) {
+
+                        // example setting a User object.
+                        // $user = array('something');
+                        // \Apix\Config::getInstance()->set('user', $user);
+                        // \Apix\Services::set('user', $user);
+
                         return true;
                     }
                 }
+
                 return false;
             });
         } else {
@@ -167,7 +174,7 @@ $c['services'] = array(
             // the user's credentials without the overhead of SSL.
             $adapter = new Plugin\Auth\Digest($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
-                $users = Services::get('users');
+                $users = Service::get('users');
                 foreach ($users as $user) {
                 if ($user['user'] == $current['username']
                     && $user['realm'] == $c['api_realm']) {
@@ -175,6 +182,7 @@ $c['services'] = array(
                         return $user['api_key'];
                     }
                 }
+
                 return false;
             });
         }
