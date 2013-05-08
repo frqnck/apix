@@ -90,6 +90,20 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($_REQUEST, $this->request->getParams() );
     }
 
+    /*
+    *  I'm running into a problem.  Filters to searches are typically passed in as an array.  APIx appears unable to handle these scenarios in GET requests, as it assumes a key=>value where the value is a string, and runs rawurldecode() on it.  So, when a query like this comes in:
+    *   GET v1/categories/search/chicago+hotels?filters[0][0]=0&filters[0][1][0]=1
+    *   It fails:
+    *   Warning: rawurldecode() expects parameter 1 to be string, array given in phar:///home/jspalink/dev/zenya/www/zenya-stack-api/lib/apix.phar/src/php/Apix/Request.php on line 135
+    *  This error occurs only for GET requests.  POST works as expected.
+    */
+    public function testGetParamWithArray()
+    {
+        $r = array('filters' => array(0=>0, 1=>1));
+        $this->request->setParams($r);
+        $this->assertSame($r['filters'], $this->request->getParam('filters', true) );
+    }
+
     public function testGetSetMethod()
     {
         $this->assertSame('GET', $this->request->getMethod() );
