@@ -146,7 +146,7 @@ $c['services'] = array(
     // Set that way to avoid duplicating code in the Auth examples further below.
     'session' => function($user) {
         $session = new Session($user['username'], $user['group']);
-        if(isset($user['ips'])) {
+        if (isset($user['ips'])) {
             $session->setTrustedIps((array) $user['ips']);
         }
         $session->addData('api_key', $user['api_key']);
@@ -171,6 +171,7 @@ $c['services'] = array(
                         $user = new User($user['user'], $user['group']);
                         $user->addData('api_key', $user['api_key'])
                         Apix\Service::set('user', $user);
+
                         return true;
                     }
                 }
