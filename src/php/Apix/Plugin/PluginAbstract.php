@@ -101,10 +101,12 @@ abstract class PluginAbstract implements \SplObserver
      * Log shortcut
      * TODO: refactor
      */
-    public function log($msg, $ref=null, $level='debug')
+    public function log($msg, $context=null, $level='debug')
     {
         if (defined('DEBUG') && !defined('UNIT_TEST')) {
-            $str = sprintf('%s %s (%s)', get_class($this), $msg, $ref);
+            if(is_array($context)) $context = implode(', ', $context);
+
+            $str = sprintf('%s %s (%s)', get_class($this), $msg, $context);
             error_log( $str );
         }
     }
