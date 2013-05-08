@@ -1,6 +1,8 @@
 <?php
 namespace Apix\Plugin;
 
+use Apix\Exception;
+
 class Auth extends PluginAbstractEntity
 {
     public static $hook = array('entity', 'early');
@@ -26,59 +28,51 @@ class Auth extends PluginAbstractEntity
             || in_array($this->options['public_group'], $groups)
             && null !== $users
         ) {
-            return false;
+            return;
         }
 
         // authenticate
-        $username = $this->adapter->authenticate();
-
-        if (!$username) {
-            $this->log('Login failed', $username, 'INFO');
+        if ( !$this->adapter->authenticate() ) {
+            $this->log('Login failed', $this->adapter->getUsername(), 'INFO');
             $this->adapter->send();
-            throw new \Exception('Authentication required', 401);
-            exit;
+            throw new Exception('Authentication required', 401);
         }
 
-        // Check the user is authorised
+        // get the Session object.
+        $session = \Apix\Service::get('session');
+        $username = $session->getUsername();
+
+        // check the username is in the authorised list.
         if (null !== $users && !in_array($username, $users)) {
-            $this->log('Login unauthorised', $username, 'INFO');
-            throw new \Exception('Access unauthorised.', 401);
+            $this->log('User unauthorised', $username, 'INFO');
+            throw new Exception('Access unauthorised.', 401);
         }
 
-        $this->log('Login', $username, 'NOTICE');
+        // check user group
+        $group = $session->getGroup();
+        if (null !== $groups && !in_array($group, $groups) ) {
+            $this->log('Group unauthorised.', array($username, $group), 'INFO');
+            throw new Exception('Access unauthorised.', 401);
+        }
+
+        // check for trusted user IPs
+        if ($session->hasTrustedIps()) {
+            $ip = \Apix\HttpRequest::getInstance()->getIp();
+            if (!$this->isTrustedIp($ip, $session->getTrustedIps())) {
+                $this->log('Session\'s IP not trusted.', array($username, $ip), 'INFO');
+                throw new Exception('Session\'s IP not trusted.', 401);
+            }
+        }
 
         // todo set X_REMOTE_USER or X_AUTH_USER
-        #$entity->getResponse()->setHeader('X_REMOTE_USER', $username);
         $_SERVER['X_AUTH_USER'] = $username;
+        $this->log('Login', $username, 'NOTICE');
+    }
 
-        return $username;
-
-        $s = new \Zenya_Model_Session;
-
-        if ($request->hasHeader('X-session_id')) {
-            \Zend_Session::setId( $request->getHeader('X-session_id') );
-        }
-
-        $auth = \Zend_Auth::getInstance();
-        if ($auth->hasIdentity() === false) {
-            \Zend_Session::regenerateId();
-            throw new Exception('Session_id invalid.', 401);
-        }
-
-        $user = Zenya_Service::getService('Default_Service_User');
-        $user = $user->getUser();
-
-        if ($user->session->ip != $request->getIp()) {
-            \Zend_Session::destroy();
-            throw new Exception('Session\'s IP invalid.', 401);
-        }
-
-        // check UA string
-        $ua = isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : null;
-        if ($user->session->ua != $ua) {
-        Zend_Session::destroy();
-        throw new Zenya_Api_Exception('Session\'s UA invalid.', 401);
-        }
+    protected function isTrustedIp($ip, array $ips)
+    {
+        // TODO improve this, check IP ranges, etc...
+        return in_array($ip, $ips);
     }
 
 }
