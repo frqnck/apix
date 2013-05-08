@@ -19,7 +19,7 @@ abstract class PluginAbstract implements \SplObserver
         if (isset($this->options['adapter'])) {
             $this->setAdapter($this->options['adapter']);
 
-            if( isset(static::$hook) && isset(static::$hook['interface'])) {
+            if ( isset(static::$hook) && isset(static::$hook['interface'])) {
                 $this->checkAdapterClass(
                     $this->adapter,
                     static::$hook['interface']
@@ -31,13 +31,13 @@ abstract class PluginAbstract implements \SplObserver
     /**
      * Checks the adapter comply to a class/interface
      *
-     * @param   object              $adapter
-     * @throws  \RuntimeException
+     * @param  object            $adapter
+     * @throws \RuntimeException
      * @return true
      */
     public function checkAdapterClass($adapter, $class)
     {
-        if(!is_subclass_of($adapter, $class)) {
+        if (!is_subclass_of($adapter, $class)) {
             throw new \RuntimeException(
                 sprintf('%s not implemented.', $class)
             );
