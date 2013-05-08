@@ -56,7 +56,7 @@ class Auth extends PluginAbstractEntity
         }
 
         // check for trusted user IPs
-        if($session->hasTrustedIps()) {
+        if ($session->hasTrustedIps()) {
             $ip = \Apix\HttpRequest::getInstance()->getIp();
             if (!$this->isTrustedIp($ip, $session->getTrustedIps())) {
                 $this->log('Session\'s IP not trusted.', array($username, $ip), 'INFO');
