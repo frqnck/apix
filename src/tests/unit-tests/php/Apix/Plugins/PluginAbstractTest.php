@@ -68,7 +68,7 @@ class PluginAbstractTest extends TestCase
     public function testCheckAdapterClass()
     {
         $this->plugin->setAdapter('Apix\Fixtures\PluginMock');
-
+var_dump($this->plugin);exit;
         $this->assertTrue(
             $this->plugin->checkAdapterClass(
                 $this->plugin->getAdapter(),
