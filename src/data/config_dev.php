@@ -1,4 +1,8 @@
 <?php
+// This is the Apix config.dev.php file
+
+namespace Apix;
+
 if(!defined('DEBUG')) define('DEBUG', true);
 
 $c = array(
@@ -20,24 +24,6 @@ $c = array(
 );
 
 $c['init']['zlib.output_compression'] = false;
-
-$c['pluginsoff'] = array(
-    'Apix\Plugin\OutputSign',
-    'Apix\Plugin\OutputDebug' => array('enable' => DEBUG),
-
-    //'Apix\Plugin\Auth' => array('adapter' => $c['services']['auth']),
-
-    'Apix\Plugin\Cache' => array(
-        'enable'    => !DEBUG,
-            // use APC by defaut.
-        'offadapter'   => function() use ($c) {
-            $redis = new \Redis();
-            $redis->connect('127.0.0.1', 6379);
-
-            return new Plugin\Cache\Redis($redis);
-        }
-    ),
-);
 
 $c['config_path'] = __DIR__;
 
