@@ -46,7 +46,7 @@
 
 class Compiler
 {
-    const DEFAULT_PHAR_FILE = 'apix.phar';
+    const DEFAULT_PHAR_FILE = 'apix-%s.phar';
 
     protected $version;
     protected $verbose = 3;
@@ -75,17 +75,19 @@ class Compiler
      */
     public function compile($pharFile = self::DEFAULT_PHAR_FILE)
     {
-        if (file_exists($pharFile)) {
-            unlink($pharFile);
-        }
-
         // set version
         if (!isset($_SERVER['argv'][1])) {
             echo 'Usage: ' . $_SERVER['argv'][0] . ' version_string' . PHP_EOL;
             exit;
         }
         $this->version = $_SERVER['argv'][1];
-        echo "Processing $pharFile-" . $this->version . PHP_EOL;
+
+        $pharFile = sprintf($pharFile, $this->version);
+        if (file_exists($pharFile)) {
+            unlink($pharFile);
+        }
+
+        echo "Processing $pharFile" . PHP_EOL;
 
         $phar = new \Phar($pharFile, 0, $pharFile);
         $phar->setSignatureAlgorithm(\Phar::SHA1);
