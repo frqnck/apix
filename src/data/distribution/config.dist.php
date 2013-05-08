@@ -162,6 +162,7 @@ $c['services'] = array(
                         return true;
                     }
                 }
+
                 return false;
             });
         } else {
@@ -183,6 +184,7 @@ $c['services'] = array(
                         return $user['api_key'];
                     }
                 }
+
                 return false;
             });
         }
@@ -206,16 +208,17 @@ $c['services'] = array(
     },
 
     // This is used by the auth_example service defined further above.
-    // Note that 'session' is used by the Apix\Session and by Apix\Plugin\Auth.
+    // Noet that this is only an example
     'session' => function($user) {
         // Set that way solely to avoid duplicating code in auth_example.
         $session = new Session($user['username'], $user['group']);
-        if(isset($user['ips'])) {
+        if (isset($user['ips'])) {
             $session->setTrustedIps((array) $user['ips']);
         }
         $session->addData('api_key', $user['api_key']);
 
-        // Overwrite this session service container, with this Session object!
+        // Overwrite this service container, with the new Session object!
+        // Apix\Plugin\Auth expects this session container to hold Apix\Session.
         Service::set('session', $session);
     }
 
