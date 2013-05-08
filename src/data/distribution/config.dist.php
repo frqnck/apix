@@ -143,18 +143,22 @@ $c['resources'] = array(
 $c['services'] = array(
 
     // Auth examples (see plugins definition)
-    'auth' => function() use ($c) {
-        $basic = false; // set to: False to use Digest, True to use Basic.
+    'auth_example' => function() use ($c) {
+        $basic = true; // set to: False to use Digest, True to use Basic.
         if ($basic) {
-            // Example implementing Plugin\Auth\Basic'
-            // ----------------------------------------
+            // Example implementing Plugin\Auth\Basic
+            // --------------------------------------
             // The Basic Authentification mechanism is generally use with SSL.
             $adapter = new Plugin\Auth\Basic($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
-                $users = Services::get('users');
+                $users = Service::get('users_example');
                 foreach ($users as $user) {
-                    if ($current['username'] == $user['user']
-                        && $current['password'] == $user['api_key']) {
+                    if (
+                        $current['username'] == $user['username']
+                        && $current['password'] == $user['api_key']
+                    ) {
+                        Service::get('session', $user);
+
                         return true;
                     }
                 }
@@ -162,17 +166,21 @@ $c['services'] = array(
                 return false;
             });
         } else {
-            // Example implementing 'Plugin\Auth\Digest'
-            // -------------------------------------------
+            // Example implementing Plugin\Auth\Digest
+            // ---------------------------------------
             // The Digest Authentification mechanism is use to encrypt and salt
             // the user's credentials without the overhead of SSL.
             $adapter = new Plugin\Auth\Digest($c['api_realm']);
             $adapter->setToken(function(array $current) use ($c) {
-                $users = Services::get('users');
+                $users = Service::get('users_example');
                 foreach ($users as $user) {
-                if ($user['user'] == $current['username']
-                    && $user['realm'] == $c['api_realm']) {
-                        // Digest match againt this token!
+                    if (
+                        $user['username'] == $current['username']
+                        && $user['realm'] == $c['api_realm']
+                    ) {
+                        Service::get('session', $user);
+
+                        // Digest match againt your selected token.
                         return $user['api_key'];
                     }
                 }
@@ -184,20 +192,34 @@ $c['services'] = array(
         return $adapter;
     },
 
-    // Returns a user array. This is used by the authentification plugins above.
-    // TODO: JON to retrieve the users generic schema and data set from Magento.
-    'users' => function() {
-        // username:password:sharedSecret:role:realm
+    // This is used by the auth_example service defined above.
+    'users_example' => function() {
         return array(
             0 => array(
-                'user' => 'franck', 'password' => 'pass', 'api_key' => '1234',
-                'role' => 'admin', 'realm' => 'api.domain.tld'
+                'username' => 'franck', 'password' => 'pass', 'api_key' => '123',
+                'group' => 'admin', 'realm' => 'api.domain.tld',
+                'ips' => '127.0.0.1'
             ),
             1 => array(
-                'user' => 'test', 'password' => 'sesame', 'api_key' => '123abc',
-                'role' => 'guest', 'realm' => 'api.domain.tld'
+                'username' => 'foo', 'password' => 'bar', 'api_key' => '123abc',
+                'group' => 'guest', 'realm' => 'api.domain.tld', 'ips' => null
             )
         );
+    },
+
+    // This is used by the auth_example service defined further above.
+    // Noet that this is only an example
+    'session' => function($user) {
+        // Set that way solely to avoid duplicating code in auth_example.
+        $session = new Session($user['username'], $user['group']);
+        if (isset($user['ips'])) {
+            $session->setTrustedIps((array) $user['ips']);
+        }
+        $session->addData('api_key', $user['api_key']);
+
+        // Overwrite this service container, with the new Session object!
+        // Apix\Plugin\Auth expects this session container to hold Apix\Session.
+        Service::set('session', $session);
     }
 
 );
@@ -217,8 +239,8 @@ $c['plugins'] = array(
     // are available (see Tidy::$options)
     'Apix\Plugin\Tidy',
 
-    // Autentification (with basic ACL) plugin
-    'Apix\Plugin\Auth' => array('adapter' => $c['services']['auth']),
+    // Autentification plugin
+    'Apix\Plugin\Auth' => array('adapter' => $c['services']['auth_example']),
 
     // Plugin to cache the output of the controllers. The full Request-URI acts
     // as the unique cache id.

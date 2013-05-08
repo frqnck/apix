@@ -34,10 +34,10 @@
  *
  * @package     Apix
  * @subpackage  Console
- * @author      Franck Cassedanne <franck@cassedanne.com>
- * @copyright   2012 Franck Cassedanne
+ * @author      Franck Cassedanne <franck@ouarz.net>
+ * @copyright   2011 Franck Cassedanne, Ouarz.net
  * @license     http://www.opensource.org/licenses/bsd-license.php BSD License
- * @link        http://zenya.github.com
+ * @link        https://github.com/frqnck
  * @version     @package_version@
  */
 
@@ -173,7 +173,7 @@ class Compiler
         return <<<'STUB'
 <?php
 /**
- * Copyright (c) 2012 Franck Cassedanne
+ * Copyright (c) 2011 Franck Cassedanne
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -206,8 +206,9 @@ class Compiler
  * POSSIBILITY OF SUCH DAMAGE.
  *
  * @package     Apix
- * @author      Franck Cassedanne <franck@cassedanne.com>
- * @copyright   2012 Franck Cassedanne
+ * @author      Franck Cassedanne <franck@ouarz.com>
+ * @copyright   2011 Franck Cassedanne
+ * @link        https://github.com/frqnck
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
  * @version     @package_version@
  * @build       {GIT} / {BUILD}
