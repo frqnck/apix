@@ -21,5 +21,5 @@ try {
 }
 
 $app_libdir = realpath(__DIR__ . '/../../../vendor/php');
-require_once($app_libdir . '/psr0.autoloader.php');
+require_once $app_libdir . '/psr0.autoloader.php';
 psr0_autoloader_searchFirst(APP_TESTDIR);
