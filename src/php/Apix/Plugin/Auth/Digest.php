@@ -1,76 +1,53 @@
 <?php
 namespace Apix\Plugin\Auth;
 
-/*
-Example usage
-
-$HTTPDigest =& new Digest();
-if (
-        $username = $HttpDigest->authenticate(
-            array(
-            'username' => md5('username:'.$HTTPDigest->getRealm().':password')
-            )
-        )
-    ) {
-        echo sprintf('Logged in as "%s"', $username);
-} else {
-    $HTTPDigest->send();
-    echo 'Not logged in';
-}
-*/
-
 /**
- * HTTP Digest authentication class
+ * HTTP Digest authentication.
  *
+ * Adapted from Paul James's implemenation.
  * @link http://www.peej.co.uk/files/httpdigest.phps
+ *
+ * @author Franck Cassedanne
  */
 class Digest extends AbstractAuth
 {
 
     /**
-     * @var string The opaque value
+     * Holds the salt (private key).
+     * @var string.
      */
-    public $opaque = 'opaque';
+    protected $salt = null;
 
     /**
-     * @var string The authentication realm.
+     * Holds the opaque value.
+     * @var string
      */
-    public $realm = null;
+    protected $opaque = null;
 
     /**
-     * @var string The base URL of the application.
+     * Enable a1 hashing (username:realm:password) or use plain text.
+     * @var boolean
      */
-    public $baseURL = '/';
-
-    /**
-     * @var boolean Are passwords stored as an a1 hash (username:realm:password) rather than plain text.
-     */
-    public $passwordsHashed = true;
-
-    /**
-     * @var string  The private key.
-     */
-    public $privateKey = 'privatekey';
+    protected $a1_hashing = true;
 
     /**
      * @var int The life of the nonce value in seconds
      */
-    public $nonceLife = 300;
+    protected $nonce_life = 300;
 
     /**
      * Constructor
-     *
-     * The constructor that sets the $this->realm
-     *
      * @param string $realm Perhaps a custom realm. Default is null so the
      *                      realm will be $_SERVER['SERVER_NAME']
      */
-    public function __construct($realm = null, $privateKey='privateSaltedKey', $opaque='opaque')
+    public function __construct($realm = null, $salt='Peppered and Salted', $opaque='opaque')
     {
-        $this->realm = $realm !== null ? $realm : $_SERVER['SERVER_NAME'];
+        $this->realm = null !== $realm
+                     ? $realm
+                     : $_SERVER['SERVER_NAME'];
 
-        $this->privateKey = $privateKey;
-        $this->opaque = $opaque;
+        $this->salt = $salt;
+        $this->opaque = md5($opaque);
     }
 
     /**
@@ -80,40 +57,18 @@ class Digest extends AbstractAuth
      */
     public function send()
     {
-        header('WWW-Authenticate: Digest '.
-            'realm="'.$this->realm.'", '.
-            'domain="'.$this->baseURL.'", '.
-            'qop=auth, '.
-            'algorithm=MD5, '.
-            'nonce="'.$this->getNonce().'", '.
-            'opaque="'.$this->getOpaque().'"'
+        $digest = sprintf(
+            'Digest realm="%s", domain="%s", qop=auth, algorithm=MD5,'
+            . ' nonce="%s", opaque="%s"',
+            $this->realm, $this->base_url,
+            $this->getNonce(), $this->opaque
         );
 
-        // TODO: review
+        header('WWW-Authenticate: ' . $digest);
+
         header('HTTP/1.0 401 Unauthorized');
-        // header('HTTP/1.1 401 Unauthorized');
-        // echo 'HTTP Digest Authentication required for "' . $this->realm . '"';
-        // exit(0);
     }
 
-    /** TODO: RM? Get the HTTP Auth header
-     * @return str
-     */
-/*
-    public function getAuthHeader()
-    {
-        if (isset($_SERVER['Authorization'])) {
-            return $_SERVER['Authorization'];
-        } elseif (function_exists('apache_request_headers')) {
-            $headers = apache_request_headers();
-            if (isset($headers['Authorization'])) {
-                return $headers['Authorization'];
-            }
-        }
-
-        return NULL;
-    }
-*/
     /**
      * Authenticate the user and return username on success.
      *
@@ -148,13 +103,13 @@ class Digest extends AbstractAuth
      */
     public function getNonce()
     {
-        $time = ceil(time() / $this->nonceLife) * $this->nonceLife;
+        $time = ceil(time() / $this->nonce_life) * $this->nonce_life;
 
-        $remoteAddress = isset($_SERVER['HTTP_X_FORWARDED_FOR'])
+        $ip = isset($_SERVER['HTTP_X_FORWARDED_FOR'])
               ? $_SERVER['HTTP_X_FORWARDED_FOR']
               : $_SERVER['REMOTE_ADDR'];
 
-        return md5(date('Y-m-d H:i', $time) . ':' . $remoteAddress . ':' . $this->privateKey);
+        return md5(date('Y-m-d H:i', $time) . ':' . $ip . ':' . $this->salt);
     }
 
     protected function parseDigest($digest)
@@ -180,6 +135,8 @@ class Digest extends AbstractAuth
                 compact('username', 'nonce', 'response', 'opaque', 'uri')
             );
 
+            $this->username = $this->digest['username'];
+
             // check for quality of protection
             if (
                 preg_match('/qop="?([^,\s"]+)/', $digest, $qop)
@@ -199,26 +156,30 @@ class Digest extends AbstractAuth
     {
         $uri = $_SERVER['REQUEST_URI'];
 
-        // hack for IE which does not pass querystring in URI element of Digest string or in response hash
+        // IE hack (remove querystring from response hash)
         if (strpos($uri, '?') !== false) {
             $uri = substr($uri, 0, strlen($this->digest['uri']));
         }
 
         if (
-            $this->getOpaque() == $this->digest['opaque']
+            $this->opaque == $this->digest['opaque']
             && $uri == $this->digest['uri']
             && $this->getNonce() == $this->digest['nonce']
         ) {
-            $passphrase = hash('md5', "{$this->digest['username']}:{$this->realm}:{$token}");
+            $passphrase = hash(
+                'md5',
+                "{$this->digest['username']}:{$this->realm}:{$token}"
+            );
 
-            if ($this->passwordsHashed) {
-                $a1 = $passphrase;
-            } else {
-                // hum??
-                $a1 = md5($this->digest['username'] . ':' . $this->realm . ':' . $passphrase);
-            }
+            $pass = $this->a1_hashing
+                    ? $passphrase
+                    : md5(
+                            $this->digest['username']
+                            . ':' . $this->realm
+                            . ':' . $passphrase
+                        );
 
-            $expected = $a1 . ':' . $this->digest['nonce'] . ':';
+            $expected = $pass . ':' . $this->digest['nonce'] . ':';
             if (isset($this->digest['qop'])) {
                 $expected .= $this->digest['qop'] . ':';
             }
@@ -232,14 +193,23 @@ class Digest extends AbstractAuth
         return $this->send();
     }
 
-    /**
-     * Gets opaque value for HTTP Digest.
-     *
-     * @return string
+    /** TODO: RM? Get the HTTP Auth header
+     * @return str
      */
-    public function getOpaque()
+/*
+    public function getAuthHeader()
     {
-        return md5($this->opaque);
+        if (isset($_SERVER['Authorization'])) {
+            return $_SERVER['Authorization'];
+        } elseif (function_exists('apache_request_headers')) {
+            $headers = apache_request_headers();
+            if (isset($headers['Authorization'])) {
+                return $headers['Authorization'];
+            }
+        }
+
+        return NULL;
     }
+*/
 
 }
