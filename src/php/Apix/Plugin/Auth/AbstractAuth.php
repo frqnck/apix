@@ -5,15 +5,34 @@ abstract class AbstractAuth implements Adapter
 {
 
     /**
-     * @var mixed Holds an auth token.
+     * Holds the authentication realm.
+     * @var string
+     */
+    protected $realm = null;
+
+    /**
+     * Holds the base URL.
+     * @var string
+     */
+    protected $base_url = '/';
+
+    /**
+     * Holds the auth token.
+     * @var mixed
      */
     protected $token;
 
     /**
-     * Returns an auth token to match against.
+     * Holds the user provided username.
+     * @var string
+     */
+    protected $username;
+
+    /**
+     * Returns the Auth token to match against.
      *
-     * @param  array           $auth_data An array of authentification data.
-     * @return boolean|string.
+     * @param  array                  $auth_data An array of authentification data.
+     * @return boolean|string|object.
      */
     public function getToken(array $auth_data)
     {
@@ -25,13 +44,23 @@ abstract class AbstractAuth implements Adapter
     }
 
     /**
-     * Sets an auth token
+     * Sets the Auth token
      *
      * @return mixed $token    An auth token, can be a closure or a boolean.
      */
     public function setToken($token)
     {
         $this->token = $token;
+    }
+
+    /**
+     * Returns the user provided username.
+     *
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->username;
     }
 
 }
