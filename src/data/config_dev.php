@@ -1,5 +1,5 @@
 <?php
-// This is the Apix config.dist.php file
+// This is the Apix config.dev.php file
 // -------------------------------------
 //
 // You should NOT edit this file! Instead, put any overrides into a local copy.
@@ -142,6 +142,18 @@ $c['resources'] = array(
 // define some generic/shared code...
 $c['services'] = array(
 
+    // Session container example, on first call set a Session object.
+    // Set that way to avoid duplicating code in the Auth examples further below.
+    'session' => function($user) {
+        $session = new Session($user['username'], $user['group']);
+        if(isset($user['ips'])) {
+            $session->setTrustedIps((array) $user['ips']);
+        }
+        $session->addData('api_key', $user['api_key']);
+
+        Service::set('session', $session);
+    },
+
     // Auth examples (see plugins definition)
     'auth' => function() use ($c) {
         $basic = false; // set to: False to use Digest, True to use Basic.
@@ -156,11 +168,9 @@ $c['services'] = array(
                     if ($current['username'] == $user['user']
                         && $current['password'] == $user['api_key']) {
 
-                        // example setting a User object.
-                        // $user = array('something');
-                        // \Apix\Config::getInstance()->set('user', $user);
-                        // \Apix\Services::set('user', $user);
-
+                        $user = new User($user['user'], $user['group']);
+                        $user->addData('api_key', $user['api_key'])
+                        Apix\Service::set('user', $user);
                         return true;
                     }
                 }
@@ -197,11 +207,11 @@ $c['services'] = array(
         return array(
             0 => array(
                 'user' => 'franck', 'password' => 'pass', 'api_key' => '1234',
-                'role' => 'admin', 'realm' => 'api.domain.tld'
+                'group' => 'admin', 'realm' => 'api.domain.tld'
             ),
             1 => array(
                 'user' => 'test', 'password' => 'sesame', 'api_key' => '123abc',
-                'role' => 'guest', 'realm' => 'api.domain.tld'
+                'group' => 'guest', 'realm' => 'api.domain.tld'
             )
         );
     }
