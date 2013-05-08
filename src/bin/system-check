@@ -37,9 +37,9 @@
  * @package     Apix
  * @subpackage  Console
  * @author      Franck Cassedanne <franck@cassedanne.com>
- * @copyright   2011 Franck Cassedanne
+ * @copyright   2011 Franck Cassedanne, Ouarz.net
  * @license     http://www.opensource.org/licenses/bsd-license.php  BSD License
- * @link        http://zenya.github.com
+ * @link        https://github.com/frqnck
  * @version     @@PACKAGE_VERSION@@
  */
 
