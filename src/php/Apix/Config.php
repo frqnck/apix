@@ -227,11 +227,11 @@ class Config #extends Di
      * @see self::retrieve
      * @return mixed Generally should return a callback
      */
-    public function getServices($key=null)
+    public function getServices($key=null, $args=null)
     {
         $service = $this->retrieve('services', $key);
 
-        return is_callable($service) ? $service() : $service;
+        return is_callable($service) ? $service($args) : $service;
     }
 
     /**

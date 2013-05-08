@@ -31,7 +31,7 @@ try {
          * Just an example
          * @param     string  $name  Your name.
          * @return    array
-         * @api_auth  groups=clients,reselers users=franck
+         * @api_auth  groups=clients,reselers,admin users=franck
          * @api_cache ttl=1day tags=author
          */
          function($filters=null) {
