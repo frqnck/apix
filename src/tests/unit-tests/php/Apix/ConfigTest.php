@@ -142,12 +142,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($default, $this->config->getServices());
     }
 
-    public function testGetOneService()
+    public function testSetGetOneService()
     {
-        $this->assertInternalType('array', $this->config->getServices('users'));
-
-        // $this->assertSame('$default', $this->config->getServices('users'));
-
+        $this->config->setService('foo', 'bar');
+        $this->assertSame('bar', $this->config->getServices('foo'));
     }
 
     /**
