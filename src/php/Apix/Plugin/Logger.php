@@ -142,6 +142,7 @@ class Logger extends PluginAbstract
         #if (defined('DEBUG') && !defined('UNIT_TEST')) {}
 
         if (null !== $context) {
+            if(is_array($context)) $context = implode(', ', $context);
             $str = sprintf('%s %s (%s)', get_class($this), $msg, $context);
         } else {
             $str = sprintf('%s %s', get_class($this), $msg);
