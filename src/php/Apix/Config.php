@@ -4,13 +4,11 @@ namespace Apix;
 
 class Config #extends Di
 {
-    public $config = array();
-
     /**
-     * TEMP: Holds the injected array.
+     * Holds the config array.
      * @var array
      */
-    private $injected;
+    public $config = array();
 
     /**
      * TEMP: Holds the singleton instance.
@@ -82,12 +80,18 @@ class Config #extends Di
     public function getConfigFromFile($file)
     {
         if (!is_file($file)) {
-            throw new \RuntimeException(sprintf('The "%s" config file does not exist.', $file), 5000);
+            throw new \RuntimeException(
+                sprintf('The "%s" config file does not exist.', $file),
+                5000
+            );
         }
 
         $config = require $file;
         if (null === $config || !is_array($config)) {
-            throw new \RuntimeException(sprintf('The "%s" config file must return an array.', $file), 5001);
+            throw new \RuntimeException(
+                sprintf('The "%s" config file must return an array.', $file),
+                5001
+            );
         }
 
         return $config;
@@ -101,7 +105,7 @@ class Config #extends Di
     public function setConfig(array $config=null)
     {
         $defaults = $this->getConfigDefaults();
-        $this->config = is_null($config) ? $defaults : $config+$defaults;
+        $this->config = null === $config ? $defaults : $config+$defaults;
     }
 
     /**
@@ -115,8 +119,8 @@ class Config #extends Di
     }
 
     /**
-     * Returns the specified config value using its index key.
-     * If the index key is not set then it will return the whole config property.
+     * Returns the specified config value using its index key. If the index key
+     * is not set then it will return the whole config property.
      *
      * @param  string                    $key=null The key to retrieve.
      * @return mixed
@@ -129,7 +133,10 @@ class Config #extends Di
         } elseif (isset($this->config[$key])) {
             return $this->config[$key];
         }
-       throw new \InvalidArgumentException( sprintf('Config for "%s" does not exists.', $key) );
+
+        throw new \InvalidArgumentException(
+            sprintf('Config for "%s" does not exists.', $key)
+        );
     }
 
     /**
@@ -169,7 +176,10 @@ class Config #extends Di
         } elseif (isset($this->config['default'][$key])) {
             return $this->config['default'][$key];
         }
-       throw new \InvalidArgumentException( sprintf('Default config for "%s" does not exists.', $key) );
+
+        throw new \InvalidArgumentException(
+            sprintf('Default config for "%s" does not exists.', $key)
+        );
     }
 
     /**
@@ -188,12 +198,15 @@ class Config #extends Di
                     ? $this->config[$type]+$this->getDefault($type)
                     : $this->config[$type];
 
-        if (is_null($key)) {
+        if (null === $key) {
             return $config;
         } elseif (isset($config[$key])) {
             return $config[$key];
         }
-       throw new \RuntimeException( sprintf('"%s" does not exists in "%s".', $key, $type) );
+
+        throw new \RuntimeException(
+            sprintf('"%s" does not exists in "%s".', $key, $type)
+        );
     }
 
     /**
@@ -208,22 +221,52 @@ class Config #extends Di
     }
 
     /**
-     * Returns the specified service (or all if unspecified).
+     * Returns the specified service -- or all if unspecified.
      *
      * @param string $key=null The service key to retrieve.
      * @see self::retrieve
      * @return mixed Generally should return a callback
      */
-    public function getServices($key=null)
+    public function getServices($key=null, $args=null)
     {
         $service = $this->retrieve('services', $key);
 
-        if (is_callable($service)) {
-            return $service();
-        }
-
-        return $service;
+        return is_callable($service) ? $service($args) : $service;
     }
+
+    /**
+     * Sets the specified name, value as a service.
+     *
+     * @param  string $name The service name to set.
+     * @param  mixed  $mix  The corresponding value to set.
+     * @return void
+     */
+    public function setService($name, $mix)
+    {
+        $this->config['services'][$name] = $mix;
+    }
+
+    /**
+     * TEMP: Returns the default configuration.
+     * TODO: should use 'config.dist.php'
+     *
+     * @return array
+     */
+    public function getConfigDefaults()
+    {
+        // $file = realpath(__DIR__ . '/../../data/distribution/config.dist.php');
+        $file = __DIR__ . '/../../data/distribution/config.dist.php';
+
+        return $this->getConfigFromFile($file);
+    }
+
+    /* --- below obsolete --- */
+
+    /**
+     * TEMP: Holds the injected array.
+     * @var array
+     */
+    private $injected;
 
     /**
      * TEMP: Sets/injects a key/value pair in the injected array.
@@ -247,36 +290,5 @@ class Config #extends Di
     {
         return $this->injected[$key];
     }
-
-    /**
-     * TEMP: Returns the default configuration.
-     * TODO: should use 'config.dist.php'
-     *
-     * @return array
-     */
-    public function getConfigDefaults()
-    {
-        // add the distribution file
-        // $file = realpath(__DIR__ . '/../../data/distribution/config.dist.php');
-        $file = __DIR__ . '/../../data/distribution/config.dist.php';
-
-        return $this->getConfigFromFile($file);
-    }
-
-    // public function addListener($key, $mix, $level, $type)
-    // {
-    //     $this->config['listeners'][$level][$type][$key] = $mix;
-    // }
-
-    // *
-    //  * Returns the specified plugin (or all if unspecified).
-    //  *
-    //  * @param string $key=null The plugin key to retrieve.
-    //  * @see     self::retrieve
-
-    // public function getListeners($key=null)
-    // {
-    //     return $this->retrieve('listeners', $key);
-    // }
 
 }
