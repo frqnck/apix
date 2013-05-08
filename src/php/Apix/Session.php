@@ -32,8 +32,8 @@ class Session
     /**
      * Constructor will set the session for the given username.
      *
-     * @param  string $username
-     * @param  string|null $group
+     * @param string      $username
+     * @param string|null $group
      */
     public function __construct($username, $group = null)
     {
@@ -98,7 +98,7 @@ class Session
     /**
      * Check if the specified user data is set.
      *
-     * @param  string $group
+     * @param  string  $group
      * @return boolean
      */
     public function hasTrustedIps()
@@ -120,7 +120,7 @@ class Session
     /**
      * Checks wether the specified key is set in the session dataset.
      *
-     * @param  string $group
+     * @param  string  $group
      * @return boolean
      */
     public function hasData($key)
@@ -131,12 +131,13 @@ class Session
     /**
      * Returns the specified data -- or the whole dataset if null.
      *
-     * @param  string $key
+     * @param  string     $key
      * @return mixed|null
      */
     public function getData($key=null)
     {
         if($null === $key) return $this->data;
+
         return isset($this->data[$key]) ? $this->data[$key] : null;
     }
 
