@@ -4,7 +4,16 @@ namespace Apix\Plugin;
 abstract class PluginAbstract implements \SplObserver
 {
 
+    /**
+     * Holds a plugin's adapter.
+     * @var  closure|object
+     */
     protected $adapter = null;
+
+    /**
+     * Holds an array of plugin's options.
+     * @var  array
+     */
     protected $options = array();
 
     /**
@@ -20,7 +29,7 @@ abstract class PluginAbstract implements \SplObserver
             $this->setAdapter($this->options['adapter']);
 
             if ( isset(static::$hook) && isset(static::$hook['interface'])) {
-                $this->checkAdapterClass(
+                self::checkAdapterClass(
                     $this->adapter,
                     static::$hook['interface']
                 );
@@ -29,13 +38,14 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Checks the adapter comply to a class/interface
+     * Checks the plugin's adapter comply to a class/interface
      *
      * @param  object            $adapter
+     * @param  object            $class
      * @throws \RuntimeException
      * @return true
      */
-    public function checkAdapterClass($adapter, $class)
+    static public function checkAdapterClass($adapter, $class)
     {
         if (!is_subclass_of($adapter, $class)) {
             throw new \RuntimeException(
@@ -47,7 +57,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Sets and merge the defaults options
+     * Sets and merge the defaults options for this plugin
      *
      * @param mix $options Array of options if it is an object set as an adapter
      */
@@ -62,9 +72,9 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Gets the options
+     * Gets this plugin's options
      *
-     * @return mix
+     * @return array
      */
     public function getOptions()
     {
@@ -72,7 +82,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Sets the adapter
+     * Sets this plugin's adapter
      *
      * @param closure|object $adapter
      */
@@ -88,7 +98,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Gets the adapter
+     * Gets this plugin's adapter
      *
      * @return mix
      */
@@ -98,8 +108,8 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Log shortcut
-     * TODO: refactor
+     * Just a shortcut for now. This is TEMP and will be moved elsewhere!
+     * TODO: TEMP to refactor
      */
     public function log($msg, $context=null, $level='debug')
     {

@@ -215,9 +215,9 @@ class Response extends Listener
     }
 
     /**
-     * Returns all the response formats available.
+     * Returns the output format.
      *
-     * @return array
+     * @return string
      */
     public function getFormat()
     {
@@ -232,6 +232,16 @@ class Response extends Listener
     public function setFormats(array $formats)
     {
         $this->formats = $formats;
+    }
+
+    /**
+     * Returns all the response formats available.
+     *
+     * @return array
+     */
+    public function getFormats()
+    {
+        return $this->formats;
     }
 
     /**
@@ -308,16 +318,6 @@ class Response extends Listener
         return isset($this->unit_test)
             ? $args
             : call_user_func_array('header', $args);
-    }
-
-    /**
-     * Returns all the response formats available.
-     *
-     * @return array
-     */
-    public function getFormats()
-    {
-        return $this->formats;
     }
 
     /**
