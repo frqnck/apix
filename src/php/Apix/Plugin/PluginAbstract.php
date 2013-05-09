@@ -4,13 +4,22 @@ namespace Apix\Plugin;
 abstract class PluginAbstract implements \SplObserver
 {
 
+    /**
+     * Holds a plugin's adapter.
+     * @var  closure|object
+     */
     protected $adapter = null;
+
+    /**
+     * Holds an array of plugin's options.
+     * @var  array
+     */
     protected $options = array();
 
     /**
      * Constructor
      *
-     * @param mix $options Array of options if it is an object set as an adapter
+     * @param mix $options Array of options
      */
     public function __construct($options=null)
     {
@@ -18,11 +27,37 @@ abstract class PluginAbstract implements \SplObserver
 
         if (isset($this->options['adapter'])) {
             $this->setAdapter($this->options['adapter']);
+
+            if ( isset(static::$hook) && isset(static::$hook['interface'])) {
+                self::checkAdapterClass(
+                    $this->adapter,
+                    static::$hook['interface']
+                );
+            }
         }
     }
 
     /**
-     * Sets and merge with the plugin defaults options
+     * Checks the plugin's adapter comply to a class/interface
+     *
+     * @param  object            $adapter
+     * @param  object            $class
+     * @throws \RuntimeException
+     * @return true
+     */
+    static public function checkAdapterClass($adapter, $class)
+    {
+        if (!is_subclass_of($adapter, $class)) {
+            throw new \RuntimeException(
+                sprintf('%s not implemented.', $class)
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Sets and merge the defaults options for this plugin
      *
      * @param mix $options Array of options if it is an object set as an adapter
      */
@@ -37,9 +72,9 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Gets the plugin options
+     * Gets this plugin's options
      *
-     * @return mix
+     * @return array
      */
     public function getOptions()
     {
@@ -47,7 +82,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Sets the plugin adapter
+     * Sets this plugin's adapter
      *
      * @param closure|object $adapter
      */
@@ -60,21 +95,10 @@ abstract class PluginAbstract implements \SplObserver
                                 ? $adapter()
                                 : $adapter;
         }
-
-        // Checks an adapter comply to a hook interface
-        if(
-            isset(static::$hook)
-            && isset(static::$hook['interface'])
-            && !is_subclass_of($this->adapter, static::$hook['interface'])
-        ) {
-            throw new \RuntimeException(
-                sprintf('%s not implemented.', static::$hook['interface'])
-            );
-        }
     }
 
     /**
-     * Gets the plugin adapter
+     * Gets this plugin's adapter
      *
      * @return mix
      */
@@ -84,7 +108,8 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Log shortcut
+     * Just a shortcut for now. This is TEMP and will be moved elsewhere!
+     * TODO: TEMP to refactor
      */
     public function log($msg, $context=null, $level='debug')
     {
