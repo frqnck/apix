@@ -20,8 +20,7 @@ class MainTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->server);
-        unset($this->request);
+        unset($this->server, $this->request);
     }
 
     /**
@@ -50,7 +49,7 @@ class MainTest extends TestCase
             'controller_ext set to true' => array(
                 'uri'=>'/index.php/api/v1/mock.xml/test/param',
                 'options' => array(
-                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i',
+                    'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
                     'default_format'    => 'xml',
                     'controller_ext'    => true,
                     'format_override'   => false,
@@ -64,7 +63,7 @@ class MainTest extends TestCase
             'controller_ext set to false' => array(
                 'uri'=>'/index.php/api/v1/mock.json/test/param',
                 'options' => array(
-                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i',
+                    'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
                     'default_format'    => 'json',
                     'controller_ext'    => false,
                     'format_override'   => false,
@@ -78,7 +77,7 @@ class MainTest extends TestCase
             'format_override set' => array(
                 'uri'=>'/index.php/api/v1/mock.json/test/param',
                 'options' => array(
-                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i',
+                    'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
                     'default_format'    => 'json',
                     'controller_ext'    => false,
                     'format_override'   => 'html',
@@ -92,7 +91,7 @@ class MainTest extends TestCase
             'http_accept is set (but none provided)' => array(
                 'uri'=>'/index.php/api/v1/mock.json/test/param',
                 'options' => array(
-                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i',
+                    'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
                     'default_format'    => 'xml',
                     'controller_ext'    => false,
                     'format_override'   => false,
@@ -106,7 +105,7 @@ class MainTest extends TestCase
             'all false, should use default' => array(
                 'uri'=>'/index.php/api/v1/mock.json/test/param',
                 'options' => array(
-                    'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i',
+                    'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
                     'default_format'    => 'xml',
                     'controller_ext'    => false,
                     'format_override'   => false,
@@ -154,7 +153,7 @@ class MainTest extends TestCase
     {
         $uri = '/index.php/api/v1/mock/test/param';
         $options = array(
-            'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i',
+            'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
             'default_format'    => 'xml',
             'controller_ext'    => false,
             'format_override'   => false,
@@ -187,7 +186,7 @@ class MainTest extends TestCase
                 ->will($this->returnValue('html'));
 
         $options = array(
-            'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i',
+            'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
             'default_format'    => 'jsonp',
             'controller_ext'    => false,
             'format_override'   => false,
@@ -206,7 +205,7 @@ class MainTest extends TestCase
     public function testSetRoutingDoesnotSetVaryWenAcceptIsDisable()
     {
         $options = array(
-            'path_prefix'      => '@^(/index.php)?/api/v(\d*)@i',
+            'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
             'default_format'    => 'jsonp',
             'controller_ext'    => false,
             'format_override'   => false,
@@ -224,10 +223,11 @@ class MainTest extends TestCase
 
     public function testGetServerVersion()
     {
-        $c = array('api_realm' => 'realm', 'api_version'=> 'version');
         $this->assertSame(
-            'realm/version (@package_version@)',
-            $this->server->getServerVersion($c)
+            'realm/version (' . Server::VERSION . ')',
+            $this->server->getServerVersion(
+                array('api_realm' => 'realm', 'api_version'=> 'version')
+            )
         );
     }
 
