@@ -1,7 +1,8 @@
 <?php
 namespace Apix\Plugin;
 
-use Apix\Exception;
+use Apix\Service,
+    Apix\Exception;
 
 class Auth extends PluginAbstractEntity
 {
@@ -39,34 +40,36 @@ class Auth extends PluginAbstractEntity
         }
 
         // get the Session object.
-        $session = \Apix\Service::get('session');
-        $username = $session->getUsername();
+        if(Service::has('session')) {
+            $session = Service::get('session');
+            $username = $session->getUsername();
 
-        // check the username is in the authorised list.
-        if (null !== $users && !in_array($username, $users)) {
-            $this->log('User unauthorised', $username, 'INFO');
-            throw new Exception('Access unauthorised.', 401);
-        }
-
-        // check user group
-        $group = $session->getGroup();
-        if (null !== $groups && !in_array($group, $groups) ) {
-            $this->log('Group unauthorised.', array($username, $group), 'INFO');
-            throw new Exception('Access unauthorised.', 401);
-        }
-
-        // check for trusted user IPs
-        if ($session->hasTrustedIps()) {
-            $ip = \Apix\HttpRequest::getInstance()->getIp();
-            if (!$this->isTrustedIp($ip, $session->getTrustedIps())) {
-                $this->log('Session\'s IP not trusted.', array($username, $ip), 'INFO');
-                throw new Exception('Session\'s IP not trusted.', 401);
+            // check the username is in the authorised list.
+            if (null !== $users && !in_array($username, $users)) {
+                $this->log('User unauthorised', $username, 'INFO');
+                throw new Exception('Access unauthorised.', 401);
             }
-        }
 
-        // todo set X_REMOTE_USER or X_AUTH_USER
-        $_SERVER['X_AUTH_USER'] = $username;
-        $this->log('Login', $username, 'NOTICE');
+            // check user group
+            $group = $session->getGroup();
+            if (null !== $groups && !in_array($group, $groups) ) {
+                $this->log('Group unauthorised.', array($username, $group), 'INFO');
+                throw new Exception('Access unauthorised.', 401);
+            }
+
+            // check for (required) trusted user IPs
+            if ($session->hasTrustedIps()) {
+                $ip = \Apix\HttpRequest::getInstance()->getIp();
+                if (!$this->isTrustedIp($ip, $session->getTrustedIps())) {
+                    $this->log('Session\'s IP not trusted.', array($username, $ip), 'INFO');
+                    throw new Exception('Session\'s IP not trusted.', 401);
+                }
+            }
+
+            // todo set X_REMOTE_USER or X_AUTH_USER
+            $_SERVER['X_AUTH_USER'] = $username;
+            $this->log('Login', $username, 'NOTICE');
+        }
     }
 
     protected function isTrustedIp($ip, array $ips)

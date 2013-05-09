@@ -60,9 +60,7 @@ class HelpTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->request);
-        unset($this->api);
-        unset($this->help);
+        unset($this->request, $this->api, $this->help);
     }
 
     public function testOnReadSetRouteName()

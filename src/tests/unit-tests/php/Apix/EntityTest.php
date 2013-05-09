@@ -23,8 +23,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->route);
-        unset($this->entity);
+        unset($this->route, $this->entity);
     }
 
     public function testAppend()
