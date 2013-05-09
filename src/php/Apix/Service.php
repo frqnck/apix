@@ -29,4 +29,18 @@ class Service
         return Config::getInstance()->setService($name, $mix);
     }
 
+    /**
+     * Checks wether the named service exists or not.
+     *
+     * @param  string $name The service name to look for.
+     * @return boolean
+     */
+    public static function has($name)
+    {
+        $services = Config::getInstance()->get('services');
+
+        return isset($services[$name]);
+    }
+
+
 }

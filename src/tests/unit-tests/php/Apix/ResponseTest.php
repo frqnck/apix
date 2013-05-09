@@ -37,8 +37,7 @@ class ResponseTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->response);
-        unset($this->route);
+        unset($this->response, $this->route);
     }
 
     public function testGetRequest()
@@ -193,17 +192,14 @@ class ResponseTest extends TestCase
         );
     }
 
-    public function testGenerateAsJsonp()
+    public function testGenerateAsJsonP()
     {
-        $this->markTestIncomplete(
-            'TODO: This test has not been implemented yet.'
-        );
-
+        $this->response->setFormats(array('jsonp'));
         $this->response->setFormat('jsonp');
-        $results = array('results');
+        $this->response->generate(array('results'));
         $this->assertSame(
-            '{"root":{"resource":["results"]}}',
-            $this->response->generate($results)
+            'root({"root":{"resource":["results"]}});',
+            $this->response->getOutput()
         );
     }
 

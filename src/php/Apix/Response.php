@@ -215,9 +215,9 @@ class Response extends Listener
     }
 
     /**
-     * Returns all the response formats available.
+     * Returns the output format.
      *
-     * @return array
+     * @return string
      */
     public function getFormat()
     {
@@ -232,6 +232,16 @@ class Response extends Listener
     public function setFormats(array $formats)
     {
         $this->formats = $formats;
+    }
+
+    /**
+     * Returns all the response formats available.
+     *
+     * @return array
+     */
+    public function getFormats()
+    {
+        return $this->formats;
     }
 
     /**
@@ -283,6 +293,11 @@ class Response extends Listener
      */
     public function sendAllHttpHeaders($http_code, $version_string)
     {
+        // PHP bug? TODO:
+        // $out = $this->sendheader("Status: $http_code " . static::getStatusPrases($http_code));
+        // //$out = $this->sendheader("HTTP/1.0 $http_code " . static::getStatusPrases($http_code), true);
+        // $out[] = array( $this->sendHeader('X-Powered-By: ' . $version_string) );
+
         $out = array( $this->sendHeader('X-Powered-By: ' . $version_string, true, $http_code) );
 
         foreach ($this->headers as $key => $value) {
@@ -303,16 +318,6 @@ class Response extends Listener
         return isset($this->unit_test)
             ? $args
             : call_user_func_array('header', $args);
-    }
-
-    /**
-     * Returns all the response formats available.
-     *
-     * @return array
-     */
-    public function getFormats()
-    {
-        return $this->formats;
     }
 
     /**
