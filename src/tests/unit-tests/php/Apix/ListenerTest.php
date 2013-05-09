@@ -18,8 +18,7 @@ class ListenerTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->plugin);
-        unset($this->listener);
+        unset($this->plugin, $this->listener);
     }
 
     public function testUpdateIsCalledOnNotifyExactlyTwoTimes()
