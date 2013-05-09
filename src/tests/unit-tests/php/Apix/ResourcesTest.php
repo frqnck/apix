@@ -29,8 +29,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->resources);
-        unset($this->route);
+        unset($this->resources, $this->route);
     }
 
     /**
