@@ -23,7 +23,15 @@
 
   <!-- build-phar -->
   <target name="build-phar">
+    <property name="project.pharfilename" value="${project.shortName}-${project.version}.phar" />
+
     <exec command="./src/bin/compile ${project.version}" logoutput="true" checkreturn="true" />
+
+    <symlink target="${project.basedir}/dist/${project.pharfilename}" link="${project.basedir}/dist/${project.shortName}.phar" overwrite="true" />
+
+    <exec command="php ${project.basedir}/dist/${project.pharfilename} -t" logoutput="true" checkreturn="true" />
+
+    <echo>${project.pharfilename} has been created and tested!</echo>
   </target>
 
   <!-- composer-install -->
@@ -43,13 +51,38 @@
         <format property="build.time" pattern="%Y%m%d%H%I%S" />
         <format property="newdeploy.date" pattern="%Y-%m-%d %H:%I:%S" />
     </tstamp>
+    <property name="phar.arc" value="${project.basedir}/../phar.dev/archives" />
 
-<!--     <exec command="version" logoutput="true" checkreturn="true" />
- -->
-<!--     <exec command="./src/bin/compile ${project.version}" logoutput="true" checkreturn="true" />-->
+    <copy file="${project.basedir}/dist/${project.pharfilename}" tofile="${phar.arc}/${project.pharfilename}" overwrite="true"/>
+    <symlink target="${phar.arc}/${project.pharfilename}" link="${phar.arc}/${project.shortName}.phar" overwrite="true"/>
+
     <echo>${project.pharfilename} has been created</echo>
 
-    <mail tolist="franck@cassedanne.com" from="franck@info.com" subject="build complete">The build process is a success...</mail>
+    <mail tolist="franck@cassedanne.com" from="franck@info.com" subject="${project.pharfilename} build complete">
+      The build process is a success...
+    </mail>
+  </target>
+
+
+  <target name="announce">
+    <property name="project.pharfilename" value="${project.shortName}-${project.version}.phar" />
+
+    <mail tolist="franck@cassedanne.com,franck@info.com" from="franck@info.com" subject="${project.pharfilename} is out">The build process for ${project.pharfilename} is complete.
+
+      Run this in your terminal to upgrade to the latest version:
+      $ php path_to/${project.shortName}.phar --selfupdate
+
+      Manual download available at:
+      - http://api.ouarz.net/v1/download/apix.phar
+
+      Previous version are listed there:
+      - http://api.ouarz.net/v1/versions/apix.phar
+      And are downloadable using a similar format as:
+      - http://api.ouarz.net/v1/download/${project.pharfilename}
+
+
+    </mail>
+
   </target>
 
 </project>
