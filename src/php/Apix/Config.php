@@ -221,6 +221,20 @@ class Config #extends Di
     }
 
     /**
+     * TEMP: Returns the default configuration.
+     * TODO: should use 'config.dist.php'
+     *
+     * @return array
+     */
+    public function getConfigDefaults()
+    {
+        // $file = realpath(__DIR__ . '/../../data/distribution/config.dist.php');
+        $file = __DIR__ . '/../../data/distribution/config.dist.php';
+
+        return $this->getConfigFromFile($file);
+    }
+
+    /**
      * Returns the specified service -- or all if unspecified.
      *
      * @param string $key=null The service key to retrieve.
@@ -230,7 +244,6 @@ class Config #extends Di
     public function getServices($key=null, $args=null)
     {
         $service = $this->retrieve('services', $key);
-
         return is_callable($service) ? $service($args) : $service;
     }
 
@@ -244,20 +257,6 @@ class Config #extends Di
     public function setService($name, $mix)
     {
         $this->config['services'][$name] = $mix;
-    }
-
-    /**
-     * TEMP: Returns the default configuration.
-     * TODO: should use 'config.dist.php'
-     *
-     * @return array
-     */
-    public function getConfigDefaults()
-    {
-        // $file = realpath(__DIR__ . '/../../data/distribution/config.dist.php');
-        $file = __DIR__ . '/../../data/distribution/config.dist.php';
-
-        return $this->getConfigFromFile($file);
     }
 
     /* --- below obsolete --- */
