@@ -29,7 +29,6 @@ class PluginMock extends PluginAbstract
     public function update(\SplSubject $subject)
     {
         return $this->value;
-        #return $subject->getNotice();
     }
 
 }
