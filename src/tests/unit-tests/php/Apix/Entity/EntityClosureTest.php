@@ -27,8 +27,7 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->entity);
-        unset($this->route);
+        unset($this->entity, $this->route);
     }
 
     public function testAppend()

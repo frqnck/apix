@@ -16,8 +16,7 @@ class CacheTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->cache);
-        unset($this->adapter);
+        unset($this->cache, $this->adapter);
     }
 
     protected function mock($return)
