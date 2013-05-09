@@ -50,6 +50,7 @@ class Compiler
 
     protected $version;
     protected $verbose = 3;
+    protected $compress = true;
 
     protected $paths_to_skip = array(
         'src/php/Apix/Plugins/Manual.php',
@@ -97,7 +98,7 @@ class Compiler
 
         // all the files
         $root = __DIR__ . '/../..';
-        foreach ( array('src/php', 'vendor/php', '/src/data') as $dir) {
+        foreach ( array('src/php', '/src/data') as $dir) {
             $it = new \RecursiveDirectoryIterator("$root/$dir");
             foreach (new \RecursiveIteratorIterator($it) as $file) {
                 if (
@@ -129,7 +130,9 @@ class Compiler
 
         $phar->stopBuffering();
 
-        $phar->compressFiles(\Phar::GZ);
+        if($this->compress)  {
+            $phar->compressFiles(\Phar::GZ);
+        }
 
         echo 'The new phar has ' . $phar->count() . ' entries.' . PHP_EOL;
         unset($phar);

@@ -22,14 +22,14 @@ class PluginAbstractTest extends TestCase
 
     public function testSetOptions()
     {
-        $defaults = array('foo'=>'bar');
+        $defaults = array('foo' => 'bar');
         $this->plugin->setOptions($defaults);
         $this->assertSame(
             $defaults,
             $this->plugin->getOptions()
         );
 
-        $options = array('adapter'=>'foobar');
+        $options = array('adapter' => 'foobar');
         $this->plugin->setOptions($options);
 
         $this->assertSame(
@@ -68,9 +68,9 @@ class PluginAbstractTest extends TestCase
     public function testCheckAdapterClass()
     {
         $this->plugin->setAdapter('Apix\Fixtures\PluginMock');
-var_dump($this->plugin);exit;
+
         $this->assertTrue(
-            $this->plugin->checkAdapterClass(
+            PluginAbstract::checkAdapterClass(
                 $this->plugin->getAdapter(),
                 'Apix\Plugin\PluginAbstract'
             )
@@ -78,16 +78,15 @@ var_dump($this->plugin);exit;
     }
 
     /**
-     * @expectedException           \RuntimeException
+     * @expectedException   \RuntimeException
      */
     public function testCheckAdapterClassThrowsRuntimeException()
     {
         $this->plugin->setAdapter(new \stdClass);
-        $this->plugin->checkAdapterClass(
+        PluginAbstract::checkAdapterClass(
             $this->plugin->getAdapter(),
             'Apix\Plugin\PluginAbstract'
         );
-
     }
 
     public function testConstructor()
