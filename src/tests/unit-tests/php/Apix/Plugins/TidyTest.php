@@ -49,9 +49,7 @@ class TidyTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->tidy);
-        unset($this->response);
-        unset($this->route);
+        unset($this->tidy, $this->response, $this->route);
     }
 
     public function testIsDisable()
