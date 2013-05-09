@@ -46,10 +46,11 @@
 
 class Compiler
 {
-    const DEFAULT_PHAR_FILE = 'apix.phar';
+    const DEFAULT_PHAR_FILE = 'apix-%s.phar';
 
     protected $version;
     protected $verbose = 3;
+    protected $compress = true;
 
     protected $paths_to_skip = array(
         'src/php/Apix/Plugins/Manual.php',
@@ -75,17 +76,19 @@ class Compiler
      */
     public function compile($pharFile = self::DEFAULT_PHAR_FILE)
     {
-        if (file_exists($pharFile)) {
-            unlink($pharFile);
-        }
-
         // set version
         if (!isset($_SERVER['argv'][1])) {
             echo 'Usage: ' . $_SERVER['argv'][0] . ' version_string' . PHP_EOL;
             exit;
         }
         $this->version = $_SERVER['argv'][1];
-        echo "Processing $pharFile-" . $this->version . PHP_EOL;
+
+        $pharFile = sprintf($pharFile, $this->version);
+        if (file_exists($pharFile)) {
+            unlink($pharFile);
+        }
+
+        echo "Processing $pharFile" . PHP_EOL;
 
         $phar = new \Phar($pharFile, 0, $pharFile);
         $phar->setSignatureAlgorithm(\Phar::SHA1);
@@ -95,7 +98,7 @@ class Compiler
 
         // all the files
         $root = __DIR__ . '/../..';
-        foreach ( array('src/php', 'vendor/php', '/src/data') as $dir) {
+        foreach ( array('src/php', '/src/data') as $dir) {
             $it = new \RecursiveDirectoryIterator("$root/$dir");
             foreach (new \RecursiveIteratorIterator($it) as $file) {
                 if (
@@ -127,7 +130,9 @@ class Compiler
 
         $phar->stopBuffering();
 
-        $phar->compressFiles(\Phar::GZ);
+        if($this->compress)  {
+            $phar->compressFiles(\Phar::GZ);
+        }
 
         echo 'The new phar has ' . $phar->count() . ' entries.' . PHP_EOL;
         unset($phar);
