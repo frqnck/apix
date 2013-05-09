@@ -14,7 +14,6 @@ date_default_timezone_set('utc');
 try {
     $api = new Apix\Server('../../src/data/config_dev.php');
 
-
     $api->onRead('/test/:id',
         /**
          * Retrieve a list of articles
