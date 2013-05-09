@@ -22,14 +22,14 @@ class PluginAbstractTest extends TestCase
 
     public function testSetOptions()
     {
-        $defaults = array('foo'=>'bar');
+        $defaults = array('foo' => 'bar');
         $this->plugin->setOptions($defaults);
         $this->assertSame(
             $defaults,
             $this->plugin->getOptions()
         );
 
-        $options = array('adapter'=>'foobar');
+        $options = array('adapter' => 'foobar');
         $this->plugin->setOptions($options);
 
         $this->assertSame(
@@ -65,20 +65,29 @@ class PluginAbstractTest extends TestCase
         );
     }
 
-    /**
-     * @TODO
-     * @ expectedException           \RuntimeException
-     */
-    // public function testSetAdapterThrowRuntimeException()
-    // {
-    //     //$this->plugin->setAdapter('Apix\Plugin\PluginAbstract');
-    //     // $this->assertSame(
-    //     //     $this->plugin,
-    //     //     $this->plugin->getAdapter()
-    //     // );
+    public function testCheckAdapterClass()
+    {
+        $this->plugin->setAdapter('Apix\Fixtures\PluginMock');
 
-    //     $this->plugin->setAdapter(new \stdClass);
-    // }
+        $this->assertTrue(
+            PluginAbstract::checkAdapterClass(
+                $this->plugin->getAdapter(),
+                'Apix\Plugin\PluginAbstract'
+            )
+        );
+    }
+
+    /**
+     * @expectedException   \RuntimeException
+     */
+    public function testCheckAdapterClassThrowsRuntimeException()
+    {
+        $this->plugin->setAdapter(new \stdClass);
+        PluginAbstract::checkAdapterClass(
+            $this->plugin->getAdapter(),
+            'Apix\Plugin\PluginAbstract'
+        );
+    }
 
     public function testConstructor()
     {
