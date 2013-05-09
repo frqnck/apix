@@ -63,11 +63,10 @@
     </mail>
   </target>
 
-
   <target name="announce">
     <property name="project.pharfilename" value="${project.shortName}-${project.version}.phar" />
 
-    <mail tolist="franck@cassedanne.com,franck@info.com" from="franck@info.com" subject="${project.pharfilename} is out">The build process for ${project.pharfilename} is complete.
+    <mail tolist="franck@info.com,jspalink@info.com,mstockbridge@info.com,bcicenas@info.com,bfritton@info.com" from="franck@info.com" subject="${project.pharfilename} is out">The build process for ${project.pharfilename} is complete.
 
       Run this in your terminal to upgrade to the latest version:
       $ php path_to/${project.shortName}.phar --selfupdate
