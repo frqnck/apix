@@ -49,7 +49,7 @@ class Request
     /**
      * Sets and parse the provided URI, or if missing guess from the enviroment
      *
-     * @param  string|false $uri If false, extract one from $_SERVER variables
+     * @param string|false $uri If false, extract one from $_SERVER variables
      */
     public function setUri($uri=false)
     {
@@ -140,7 +140,7 @@ class Request
     /**
      * Sets all parameters
      *
-     * @param  array|null $params
+     * @param array|null $params
      */
     public function setParams(array $params = null)
     {
@@ -165,8 +165,8 @@ class Request
      *       - a GET param override,
      *       - server env or use the default value.
      *
-     * @param  string $method
-     * @param  string $default
+     * @param string $method
+     * @param string $default
      */
     public function setMethod($method = null, $default = 'GET')
     {
@@ -202,7 +202,7 @@ class Request
      * Sets a request header by name
      *
      * @param string $name
-     * @param string  $value
+     * @param string $value
      */
     public function setHeader($name, $value)
     {
@@ -212,7 +212,7 @@ class Request
     /**
      * Checks if specified header exists
      *
-     * @param string $name
+     * @param  string  $name
      * @return boolean
      */
     public function hasHeader($name)
@@ -223,7 +223,7 @@ class Request
     /**
      * Returns the specified header
      *
-     * @param string $name
+     * @param  string $name
      * @return string
      */
     public function getHeader($name)
@@ -237,7 +237,7 @@ class Request
      * Populates the headers properties
      * Will use the provided associative array or extract things from $_SERVER
      *
-     * @param array  $headers The value
+     * @param array $headers The value
      */
     public function setHeaders(array $headers = null)
     {
@@ -320,7 +320,7 @@ class Request
     /**
      * Returns the (decoded) body data of a request
      *
-     * @param  boolean $cache Wether to cache the body after decoding.
+     * @param  boolean                   $cache Wether to cache the body after decoding.
      * @return string
      * @throws \BadFunctionCallException
      */
@@ -353,7 +353,7 @@ class Request
     /**
      * Handles gzip decoding
      *
-     * @param  boolean $cache Wether to cache the body after decoding.
+     * @param  boolean                   $cache Wether to cache the body after decoding.
      * @return string
      * @throws \BadFunctionCallException
      */
@@ -370,7 +370,7 @@ class Request
     /**
      * Handles inflating a deflated string
      *
-     * @param  string $data
+     * @param  string                    $data
      * @return string
      * @throws \BadFunctionCallException
      * @codeCoverageIgnore
