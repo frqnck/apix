@@ -4,6 +4,7 @@ namespace Apix;
 
 class Request
 {
+    const METHOD_OVERRIDE = '_method';
 
     /**
      * Holds the URI string
@@ -18,7 +19,7 @@ class Request
     protected $headers = array();
 
     /**
-     * Hold the request body (raw)
+     * Hold the request body (raw) data
      * @var string
      */
     protected $body = null;
@@ -29,36 +30,14 @@ class Request
      */
     protected $method = null;
 
-    // /**
-    //  * TEMP: The singleton instance
-    //  * @var Request
-    //  */
-    // private static $instance = null;
-
-    // /**
-    //  * TEMP: Returns as a singleton instance
-    //  *
-    //  * @return Request
-    //  */
-    // public static function getInstance()
-    // {
-    //     if (null === self::$instance) {
-    //         self::$instance = new self;
-    //     }
-
-    //     return self::$instance;
-    // }
-
-    // /**
-    //  * TEMP: disalow cloning.
-    //  *
-    //  * @codeCoverageIgnore
-    //  */
-    // private final function __clone() {}
+    /**
+     * Body stream scheme
+     * @var string
+     */
+    protected $bodyStream = 'php://input';
 
     /**
-     * Constructor
-     * return void
+     * Constructor, at instanciation sets the minimum request properties
      */
     public function __construct()
     {
@@ -67,15 +46,28 @@ class Request
         $this->setBody();
     }
 
-    public function getUri()
+    /**
+     * Sets and parse the provided URI, or if missing guess from the enviroment
+     *
+     * @param  string|false $uri If false, extract one from $_SERVER variables
+     */
+    public function setUri($uri=false)
     {
-        if (null === $this->uri) {
-            $this->setUri();
+        $uri = false === $uri ? $this->getRequestUri() : $uri;
+        $uri = parse_url($uri, PHP_URL_PATH);
+
+        if ( $uri != '/' && substr($uri, -1) == '/' ) {
+            $uri = substr($uri, 0, -1);
         }
 
-        return $this->uri;
+        $this->uri = $uri;
     }
 
+    /**
+     * Extacts the request URI $_SERVER variables enviroment
+     *
+     * @return string
+     */
     public function getRequestUri()
     {
         if (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
@@ -97,20 +89,22 @@ class Request
         return isset($uri) ? $uri : '/';
     }
 
-    public function setUri($uri=false)
+    /**
+     * Gets the current URI, if undefined guess and set one
+     *
+     * @return string
+     */
+    public function getUri()
     {
-        $uri = false === $uri ? $this->getRequestUri() : $uri;
-        $uri = parse_url($uri, PHP_URL_PATH);
-
-        if ( $uri != '/' && substr($uri, -1) == '/' ) {
-            $uri = substr($uri, 0, -1);
+        if (null === $this->uri) {
+            $this->setUri();
         }
 
-        $this->uri = $uri;
+        return $this->uri;
     }
 
     /**
-     * Sets a parameter by name.
+     * Sets a parameter by name
      *
      * @param string $key   The key
      * @param mixed  $value The value
@@ -121,7 +115,7 @@ class Request
     }
 
     /**
-     * Gets a specified param.
+     * Gets a specified param
      *
      * @param  string  $key
      * @param  boolean $raw    Set to true to get the raw URL encoded value
@@ -144,28 +138,43 @@ class Request
     }
 
     /**
-     * Sets all parameters.
+     * Sets all parameters
      *
-     * @param  array $params
-     * @return array
+     * @param  array|null $params
      */
     public function setParams(array $params = null)
     {
         $this->params = null === $params ? $_REQUEST : $params;
     }
 
+    /**
+     * Returns all the request parameters
+     *
+     * @return array
+     */
     public function getParams()
     {
         return $this->params;
     }
 
-    public function setMethod($method = null, $default='GET')
+    /**
+     * Sets the request method either using:
+     *   - the passed method value,
+     *   - or from an override value:
+     *       - X-HTTP-Method-Override,
+     *       - a GET param override,
+     *       - server env or use the default value.
+     *
+     * @param  string $method
+     * @param  string $default
+     */
+    public function setMethod($method = null, $default = 'GET')
     {
         if (null === $method) {
             if ($this->hasHeader('X-HTTP-Method-Override')) {
                 $method = $this->getHeader('X-HTTP-Method-Override');
-            } elseif ($this->getParam('_method')) {
-                $method = $this->getParam('_method');
+            } elseif ($this->getParam(self::METHOD_OVERRIDE)) {
+                $method = $this->getParam(self::METHOD_OVERRIDE);
             } else {
                 $method = isset($_SERVER['REQUEST_METHOD'])
                     ? $_SERVER['REQUEST_METHOD']
@@ -175,6 +184,11 @@ class Request
         $this->method = strtoupper($method);
     }
 
+    /**
+     * Returns the current requet method
+     *
+     * @param string
+     */
     public function getMethod()
     {
         if (null === $this->method) {
@@ -185,45 +199,45 @@ class Request
     }
 
     /**
-     * Sets a header by name
+     * Sets a request header by name
      *
-     * @param string $key   The key
-     * @param mixed  $value The value
+     * @param string $name
+     * @param string  $value
      */
-    public function setHeader($key, $value)
+    public function setHeader($name, $value)
     {
-        $this->headers[$key] = $value;
+        $this->headers[$name] = $value;
     }
 
-   /**
-     * Checks if specified header exist
+    /**
+     * Checks if specified header exists
      *
-     * @param  string $key The key
-     * @return bolean
+     * @param string $name
+     * @return boolean
      */
-    public function hasHeader($key)
+    public function hasHeader($name)
     {
-        return isset($this->headers[$key]);
+        return isset($this->headers[$name]);
     }
 
     /**
      * Returns the specified header
      *
-     * @param  string $key The key
-     * @return mixed
+     * @param string $name
+     * @return string
      */
-    public function getHeader($key)
+    public function getHeader($name)
     {
-        if (isset($this->headers[$key])) {
-            return $this->headers[$key];
+        if (isset($this->headers[$name])) {
+            return $this->headers[$name];
         }
     }
 
     /**
-     * Populates the header array.
+     * Populates the headers properties
+     * Will use the provided associative array or extract things from $_SERVER
      *
-     * @param string $key   The key
-     * @param mixed  $value The value
+     * @param array  $headers The value
      */
     public function setHeaders(array $headers = null)
     {
@@ -234,11 +248,21 @@ class Request
         $this->headers = $headers;
     }
 
+    /**
+     * Returns all the headers
+     *
+     * @return array
+     */
     public function getHeaders()
     {
         return $this->headers;
     }
 
+    /**
+     * Returns the client's IP address
+     *
+     * @return string
+     */
     public function getIp()
     {
         $ip = $this->getHeader('HTTP_CLIENT_IP');
@@ -249,13 +273,21 @@ class Request
         return empty($ip) ? $this->getHeader('REMOTE_ADDR') : $ip;
     }
 
-    protected $bodyStream = 'php://input';
-
+    /**
+     * Sets the body stream property
+     *
+     * @param string $string
+     */
     public function setBodyStream($string)
     {
         $this->bodyStream = $string;
     }
 
+    /**
+     * Sets the body using the provided string or retrieve it from a PHP stream
+     *
+     * @param string $body
+     */
     public function setBody($body = null)
     {
         $this->body = null === $body
@@ -263,18 +295,35 @@ class Request
             : $body;
     }
 
+    /**
+     * Checks wether the body contains data
+     *
+     * @return boolean
+     */
     public function hasBody()
     {
         return !empty($this->body);
     }
 
-    public function getRawBody()
+    /**
+     * Returns the raw (undecoded) body data
+     *
+     * @return string
+     */
+     public function getRawBody()
     {
         return $this->body;
         #return = http_get_request_body();
         #return file_get_contents($this->bodyStream);
     }
 
+    /**
+     * Returns the (decoded) body data of a request
+     *
+     * @param  boolean $cache Wether to cache the body after decoding.
+     * @return string
+     * @throws \BadFunctionCallException
+     */
     public function getBody($cache=true)
     {
         static $body = null;
@@ -286,25 +335,12 @@ class Request
         switch (strtolower($this->getHeader('content-encoding'))) {
             // Handle gzip encoding
             case 'gzip':
-                if (!function_exists('gzdecode')) {
-                    $body = file_get_contents(
-                        'compress.zlib://data:;base64,'
-                        . base64_encode($this->body)
-                    );
-                } else {
-                    $body = gzdecode($this->body);
-                }
+                $body = $this->gzDecode($this->body);
                 break;
 
             // Handle deflate encoding
             case 'deflate':
-                if (! function_exists('gzinflate')) {
-                    throw new \RuntimeException(
-                        'zlib extension is required to deflate encoding'
-                    );
-                }
-
-                $body = gzinflate($this->body);
+                $body = $this->gzInflate($this->body);
                 break;
 
             default:
@@ -312,6 +348,43 @@ class Request
         }
 
         return $body;
+    }
+
+    /**
+     * Handles gzip decoding
+     *
+     * @param  boolean $cache Wether to cache the body after decoding.
+     * @return string
+     * @throws \BadFunctionCallException
+     */
+    public function gzDecode($data)
+    {
+        return function_exists('gzdecode')
+                ? gzdecode($data)
+                : file_get_contents(
+                    'compress.zlib://data:;base64,'
+                    . base64_encode($data)
+                );
+    }
+
+    /**
+     * Handles inflating a deflated string
+     *
+     * @param  string $data
+     * @return string
+     * @throws \BadFunctionCallException
+     * @codeCoverageIgnore
+     */
+    public function gzInflate($data)
+    {
+
+        if (! function_exists('gzinflate')) {
+            throw new \BadFunctionCallException(
+                'zlib extension is required to deflate this'
+            );
+        }
+
+        return gzinflate($data);
     }
 
 }
