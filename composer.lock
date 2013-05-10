@@ -1,6 +1,121 @@
 {
-    "hash": "c3d750f390640a480b0fb7be185ff024",
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "e4ab36f18721e6cc58abd51f6577d031",
     "packages": [
+        {
+            "name": "apix/autoloader",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/frqnck/apix-autoloader",
+                "reference": "1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/frqnck/apix-autoloader/archive/1.0.0.zip",
+                "reference": "1.0.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "apix-package",
+            "autoload": {
+                "psr-0": {
+                    "Apix\\Autoloader": "src/php"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Franck Cassedanne",
+                    "email": "franck@ouarz.net"
+                }
+            ],
+            "description": "Light PSR-0 compliant autoloader for PHP5.3+ namespaces and older PEAR-style classes.",
+            "homepage": "https://github.com/frqnck/apix-autoloader",
+            "keywords": [
+                "PEAR",
+                "apix",
+                "autoload",
+                "autoloader",
+                "classloader",
+                "psr-0",
+                "spl classloader"
+            ],
+            "time": "2013-01-10 23:17:20"
+        },
+        {
+            "name": "apix/cache",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/frqnck/apix-cache.git",
+                "reference": "1.1.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/frqnck/apix-cache/archive/1.1.0.zip",
+                "reference": "1.1.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "apix/autoloader": "1.0.*"
+            },
+            "suggest": {
+                "ext-apc": "*",
+                "ext-mongo": "*",
+                "ext-pdo": "*",
+                "ext-pdo_mysql": "*",
+                "ext-pdo_pgsql": "*",
+                "ext-pdo_sqlite": "*",
+                "ext-redis": "*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Apix\\Cache": "src/php"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Franck Cassedanne",
+                    "email": "franck@ouarz.net"
+                }
+            ],
+            "description": "Apix Cache is a generic cache wrapper with a simple interface to various different caching backends.",
+            "homepage": "https://github.com/frqnck/apix-cache",
+            "keywords": [
+                "apc",
+                "apix",
+                "cache",
+                "igbinary",
+                "json",
+                "mongo",
+                "mongodb",
+                "mysql",
+                "pdo",
+                "pgsql",
+                "postgres",
+                "redis",
+                "serializer",
+                "sqlite"
+            ],
+            "time": "2013-01-30 12:07:11"
+        },
         {
             "name": "monolog/monolog",
             "version": "1.2.1",
@@ -22,18 +137,16 @@
                 "mlehner/gelf-php": "1.0.*"
             },
             "suggest": {
-                "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server",
                 "ext-amqp": "Allow sending log messages to an AMQP server (1.0+ required)",
-                "ext-mongo": "Allow sending log messages to a MongoDB server"
+                "ext-mongo": "Allow sending log messages to a MongoDB server",
+                "mlehner/gelf-php": "Allow sending log messages to a GrayLog2 server"
             },
-            "time": "2012-08-29 04:53:20",
             "type": "library",
             "extra": {
                 "branch-alias": {
                     "dev-master": "1.3.x-dev"
                 }
             },
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Monolog": "src/"
@@ -56,7 +169,8 @@
             "keywords": [
                 "log",
                 "logging"
-            ]
+            ],
+            "time": "2012-08-29 04:53:20"
         },
         {
             "name": "mustache/mustache",
@@ -75,9 +189,7 @@
             "require": {
                 "php": ">=5.2.4"
             },
-            "time": "2012-09-12 09:13:06",
             "type": "library",
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Mustache": "src/"
@@ -96,9 +208,10 @@
             "description": "A Mustache implementation in PHP.",
             "homepage": "https://github.com/bobthecow/mustache.php",
             "keywords": [
-                "templating",
-                "mustache"
-            ]
+                "mustache",
+                "templating"
+            ],
+            "time": "2012-09-12 09:13:06"
         },
         {
             "name": "phly/mustache",
@@ -117,9 +230,7 @@
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-07-31 20:33:14",
             "type": "library",
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Phly": "library/"
@@ -139,15 +250,24 @@
             "homepage": "http://wiki.github.com/weierophinney/phly_mustache/",
             "keywords": [
                 "mustache"
-            ]
+            ],
+            "time": "2012-07-31 20:33:14"
         }
     ],
-    "packages-dev": null,
+    "packages-dev": [
+
+    ],
     "aliases": [
 
     ],
     "minimum-stability": "stable",
     "stability-flags": [
+
+    ],
+    "platform": {
+        "php": ">=5.3.2"
+    },
+    "platform-dev": [
 
     ]
 }

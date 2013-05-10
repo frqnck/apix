@@ -123,7 +123,7 @@ class Server extends Main
     }
 
     /**
-     * Test Read from a group.
+     * Test Read from a group (TODO).
      *
      * @param  array  $opts Options are:
      * @return string
@@ -145,16 +145,5 @@ class Server extends Main
             'doc'   => $doc
         );
     }
-
-    // *
-    //  * Shortcut to HttpRequest::getBodyData
-    //  *
-    //  * @see  HttpRequest::getBodyData
-    //  * @return array
-
-    // public function getBodyData()
-    // {
-    //     return HttpRequest::getBodyData($this->request);
-    // }
 
 }
