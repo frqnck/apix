@@ -55,8 +55,8 @@ class Compiler
     protected $paths_to_skip = array(
         'src/php/Apix/Plugins/Manual.php',
         'src/php/Apix/Plugins/Streaming.php',
-        'src/php/Apix/View',
         'src/php/Apix/Plugins/Logger.php',
+        'src/php/Apix/View',
         'src/data/config_dev.php'
     );
 
@@ -98,7 +98,7 @@ class Compiler
 
         // all the files
         $root = __DIR__ . '/../..';
-        foreach ( array('src/php', '/src/data') as $dir) {
+        foreach ( array('src/php', '/src/data', 'vendor/apix') as $dir) {
             $it = new \RecursiveDirectoryIterator("$root/$dir");
             foreach (new \RecursiveIteratorIterator($it) as $file) {
                 if (
