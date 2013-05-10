@@ -10,7 +10,7 @@
 namespace Apix;
 
 // Define the DEBUG constant. Should be set to false in production.
-if(!defined('DEBUG')) define('DEBUG', true);
+if(!defined('DEBUG')) define('DEBUG', false);
 
 $c = array(
 
@@ -239,12 +239,17 @@ $c['plugins'] = array(
     // are available (see Tidy::$options)
     'Apix\Plugin\Tidy',
 
-    // Autentification plugin
+    // Autentification plugin. This is enable thru method/closure's annotation:
+    // e.g.  * @api_auth   groups=grp1,grp2   users=franck
     'Apix\Plugin\Auth' => array('adapter' => $c['services']['auth_example']),
 
     // Plugin to cache the output of the controllers. The full Request-URI acts
-    // as the unique cache id.
-    'Apix\Plugin\Cache' => array('enable' => !DEBUG)
+    // as the unique cache id. This is enable thru method/closure's annotation:
+    // e.g.  * @api_cache   ttl=5mins   tags=tag1,tag2   flush=tag3,tag4
+    'Apix\Plugin\Cache' => array(
+        'enable'  => !DEBUG,
+        'adapter' => new \Apix\Cache\APC
+    )
 );
 
 // Init is an associative array of specific PHP directives. They are
