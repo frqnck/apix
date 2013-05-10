@@ -79,6 +79,8 @@
       And are downloadable using a similar format as:
       - http://api.ouarz.net/v1/download/${project.pharfilename}
 
+      Changelog available at:
+      - http://api.ouarz.net/v1/download/changelog/apix.phar
 
     </mail>
 
