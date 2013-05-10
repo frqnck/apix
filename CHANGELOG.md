@@ -4,9 +4,9 @@ APIx changelog
 Version 0.3.5
 -------------
 * Some modifications to the Auth plugin and related files
-* Added a Session class to hold current user/session data.
+* Added a Session class to hold current user/session data
 * Modified the examples in config.dist.php
-* Renamed Services to Service (singular), added set() and has() methods.
+* Renamed Services to Service (singularize),and added set() and has() methods
 
 Version 0.3.4
 -------------
