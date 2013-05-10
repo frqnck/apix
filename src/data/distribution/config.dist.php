@@ -246,10 +246,11 @@ $c['plugins'] = array(
     // Plugin to cache the output of the controllers. The full Request-URI acts
     // as the unique cache id. This is enable thru method/closure's annotation:
     // e.g.  * @api_cache   ttl=5mins   tags=tag1,tag2   flush=tag3,tag4
-    'Apix\Plugin\Cache' => array(
-        'enable'  => !DEBUG,
-        'adapter' => new \Apix\Cache\APC
-    )
+    // Apix\Cache is available at https://github.com/frqnck/apix-cache
+    // 'Apix\Plugin\Cache' => array(
+    //     'enable'  => !DEBUG, // don't cache while developing!
+    //     'adapter' => new \Apix\Cache\APC
+    // )
 );
 
 // Init is an associative array of specific PHP directives. They are
