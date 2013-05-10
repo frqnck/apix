@@ -244,6 +244,7 @@ class Config #extends Di
     public function getServices($key=null, $args=null)
     {
         $service = $this->retrieve('services', $key);
+
         return is_callable($service) ? $service($args) : $service;
     }
 
