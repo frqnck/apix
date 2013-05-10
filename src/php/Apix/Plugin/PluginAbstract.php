@@ -45,7 +45,7 @@ abstract class PluginAbstract implements \SplObserver
      * @throws \RuntimeException
      * @return true
      */
-    static public function checkAdapterClass($adapter, $class)
+    public static function checkAdapterClass($adapter, $class)
     {
         if (!is_subclass_of($adapter, $class)) {
             throw new \RuntimeException(
