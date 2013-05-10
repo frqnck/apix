@@ -53,17 +53,18 @@ class Compiler
     protected $compress = true;
 
     protected $paths_to_skip = array(
-        'src/php/Apix/Plugins/Manual.php',
-        'src/php/Apix/Plugins/Streaming.php',
-        'src/php/Apix/Plugins/Logger.php',
+        'src/php/Apix/Plugin/Manual.php',
+        'src/php/Apix/Plugin/Streaming.php',
+        'src/php/Apix/Plugin/Logger.php',
         'src/php/Apix/View',
-        'src/data/config_dev.php'
+        'src/data/config_dev.php',
+        'src/bin/Compiler.php',
     );
 
     public function isSkippedPath($path_name)
     {
-        foreach ($this->paths_to_skip as $v) {
-            if (false !== strrpos($path_name, $v)) {
+        foreach ($this->paths_to_skip as $path) {
+            if (false !== strrpos($path_name, $path)) {
                 return true;
             }
         }
@@ -98,7 +99,7 @@ class Compiler
 
         // all the files
         $root = __DIR__ . '/../..';
-        foreach ( array('src/php', '/src/data', 'vendor/apix') as $dir) {
+        foreach ( array('src/php', '/src/data') as $dir) {
             $it = new \RecursiveDirectoryIterator("$root/$dir");
             foreach (new \RecursiveIteratorIterator($it) as $file) {
                 if (
