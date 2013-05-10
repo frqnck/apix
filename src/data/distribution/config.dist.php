@@ -14,8 +14,8 @@ if(!defined('DEBUG')) define('DEBUG', false);
 
 $c = array(
 
-    // The API version string allowing users to keep track of API changes. It is
-    // defined as major.minor.maintenance[.build] where:
+    // The API version string allowing a userbase to keep track of API changes.
+    // It is defined as major.minor.maintenance[.build] where:
     //  - Major: Increase for each changes that may affect or not be compatible
     // with a previous version of the API. Bumping the major generally imply a
     // fresh new production deployment so the previous version can (and should)
@@ -235,8 +235,8 @@ $c['plugins'] = array(
     // Should be set to false in production. This plugin affects cachability.
     'Apix\Plugin\OutputDebug' => array('enable' => DEBUG),
 
-    // Validate, correct, and pretty-print XML and HTML outputs. Many options
-    // are available (see Tidy::$options)
+    // Validates, corrects, and pretty-prints XML and HTML outputs.
+    // Various options are available -- see Tidy::$options.
     'Apix\Plugin\Tidy',
 
     // Autentification plugin. This is enable thru method/closure's annotation:
