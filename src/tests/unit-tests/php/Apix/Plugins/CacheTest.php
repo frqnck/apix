@@ -10,7 +10,7 @@ class CacheTest extends TestCase
 
     public function setUp()
     {
-        $this->adapter = $this->getMock('Apix\Plugin\Cache\Adapter');
+        $this->adapter = $this->getMock('Apix\Cache\Adapter');
         $this->cache = new Cache($this->adapter);
     }
 
@@ -71,7 +71,7 @@ class CacheTest extends TestCase
 
         $this->adapter
             ->expects($this->once())
-            ->method('load')
+            ->method('loadKey')
             ->will($this->returnValue('loaded from cache'));
 
         $this->assertEquals(

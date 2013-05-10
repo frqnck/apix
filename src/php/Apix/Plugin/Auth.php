@@ -40,7 +40,7 @@ class Auth extends PluginAbstractEntity
         }
 
         // get the Session object.
-        if(Service::has('session')) {
+        if (Service::has('session')) {
             $session = Service::get('session');
             $username = $session->getUsername();
 

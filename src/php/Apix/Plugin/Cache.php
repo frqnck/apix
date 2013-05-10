@@ -1,8 +1,8 @@
 <?php
 namespace Apix\Plugin;
 
-use Apix\Entity;
-use Apix\HttpRequest;
+use Apix\Entity,
+    Apix\HttpRequest;
 
 class Cache extends PluginAbstractEntity
 {
@@ -10,19 +10,17 @@ class Cache extends PluginAbstractEntity
     public static $hook = array(
         'entity',
         'early',
-        'interface' => 'Apix\Plugin\Cache\Adapter'
+        'interface' => 'Apix\Cache\Adapter' // 'frqnck\Cachette'
     );
 
     protected $annotation = 'api_cache';
 
     protected $options = array(
-        'enable'        => true,                     // wether to enable or not
-        'adapter'       => 'Apix\Plugin\Cache\Apc', // instantiate by default
-        'default_ttl'   => '10mins',                // the lifetime, null stands forever
-        'runtime_flush' => true,                   // flush tags at runtime (cronjob)
+        'enable'        => true,              // wether to enable or not
+        'adapter'       => 'Apix\Cache\Apc',  // instantiate by default
+        'default_ttl'   => '10mins',          // lifetime, null stands forever
+        'runtime_flush' => true,              // flush tags at runtime (cronjob)
         'append_tags'   => array(),           // default tags to append (v1, dev)
-        'prefix_key'    => 'apix-cache-key:', // prefix cache keys
-        'prefix_tag'    => 'apix-cache-tag:', // prefix cache tags
     );
 
     /**
@@ -47,7 +45,7 @@ class Cache extends PluginAbstractEntity
             $id = HttpRequest::getInstance()->getRequestUri();
 
             // use the cache if present
-            if ($cache = $this->adapter->load($id)) {
+            if ($cache = $this->adapter->loadKey($id)) {
                 $this->log('loading', $id, 'DEBUG');
 
                 return $entity->results = $cache;
