@@ -131,7 +131,7 @@ class Compiler
 
         $phar->stopBuffering();
 
-        if($this->compress)  {
+        if ($this->compress) {
             $phar->compressFiles(\Phar::GZ);
         }
 
