@@ -1,6 +1,12 @@
 APIx changelog
 ==============
 
+Version 0.3.6
+-------------
+* Plugin\Cache adapter files have been separated from the main distribution in
+  favor of Apix\Cache (see https://github.com/frqnck/apix-cache).
+* Modified config.dist.php accordingly.
+
 Version 0.3.5
 -------------
 * Some modifications to the Auth plugin and related files
