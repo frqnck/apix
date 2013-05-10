@@ -1,7 +1,7 @@
 <?php
-#namespace Apix;
+namespace Apix;
 
-if (true) {
+if (false) {
     define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
     define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
     define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
@@ -23,7 +23,7 @@ if (true) {
 
 # Test server
 try {
-    $api = new Apix\Server;
+    $api = new Server;
 
     $api->onRead('/articles/:filters',
         /**
@@ -32,7 +32,7 @@ try {
          * @param     string  $name  Your name.
          * @return    array
          * @api_auth  groups=clients,reselers,admin users=franck
-         * @api_cache ttl=1day tags=author
+         * @api_cache ttl=1min tags=author
          */
          function($filters=null) {
 

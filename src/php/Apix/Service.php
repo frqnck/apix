@@ -32,7 +32,7 @@ class Service
     /**
      * Checks wether the named service exists or not.
      *
-     * @param  string $name The service name to look for.
+     * @param  string  $name The service name to look for.
      * @return boolean
      */
     public static function has($name)
@@ -41,6 +41,5 @@ class Service
 
         return isset($services[$name]);
     }
-
 
 }
