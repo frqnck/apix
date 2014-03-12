@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 .DS_Store
 .build
 .tmp
@@ -12,19 +11,3 @@ vendor
 phpunit.xml
 composer.lock
 TODO
-=======
-.build
-dist
-.tmp
-nbproject
-review
-vendor
-.DS_Store
-TODO
-*~
-*.log
-.svn
-/.xmlregistry/
-review/
-vendor/
->>>>>>> 94ea77160c024c3489deaa4bf23ce8df293cf5d6
