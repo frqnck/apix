@@ -1,29 +1,26 @@
-APIx, a RESTful service binder.
-===============================
+APIx, RESTful services for PHP 5.3+
+===========================================
 
-APIx is a (micro-)framework to build RESTful Web services. It will run alognside you existing framework/application with minimum fuss.
+APIx is a (micro-)framework to build RESTful Web services. It will run alognside your existing framework/application with minimum fuss.
 
 Some of its features:
 
-* Available as a standalone **[PHAR][phar]** file, or via **[Composer][composer]** or as a **[PEAR] [pear]** package.
-* Pluggeable, modular and flexible archicture.
-* Uses annotations to document and set service behaviours.
-* Supports a multitude of data inputs such as GET/POST parameters, XML, JSON, CSV, ...
-* Provides various output representation such as XML, JSONP, HTML, PHP, ...
-
-* Provides resources documention on demand, using 'GET /help' or the HTTP method OPTIONS.
-* Handles most HTTP methods, including PUT, DELETE, HEAD, OPTIONS and PATCH (TRACE to some extend).
-* Provides method override usign X-HTTP-Method-Override (Google recommendation) and/or using a query params (customisable).
-* Supports content negotiation (which can also be overriden).
-* HTTP cacheable -- supports HEAD test.
-* Bundle with many plugins and adapters for Authentification and ACL, caching...
-* Command line interface for maintenance, testing...
-* Based upon the relevant RFCs, such as [rfc2616] [rfc2616], [rfc2617] [rfc2617],
+* Supports **many data inputs** such as GET/POST parameters, XML, JSON, CSV, ...
+* Provides **various output representation** such as XML, JSONP, HTML, PHP, ...
+* Provides **on-demand resources documention**, using GET /help or 'OPTIONS'.
+* Uses **annotations to document** and **set service behaviours**.
+* Handles **most HTTP methods**, including PUT, DELETE, HEAD, OPTIONS and PATCH (TRACE to some extend).
+* Bundle with **many plugins and adapters** for Authentification and ACL, caching...
+* **Follows the standards** such as [rfc2616] [rfc2616], [rfc2617] [rfc2617],
 [rfc2388] [rfc2388], [rfc2854] [rfc2854], [rfc4627] [rfc4627], [rfc4329] [rfc4329],
-[rfc2046] [rfc2046], [rfc3676] [rfc3676], [rfc3023] [rfc3023].
+[rfc2046] [rfc2046], [rfc3676] [rfc3676], [rfc3023] [rfc3023], etc...
+* Provides **method-override** usign X-HTTP-Method-Override (Google recommendation) and/or using a query-param (customisable).
+* Supports **content negotiation** (which can also be overriden).
+* Take advantages of network caches -- supports HEAD test.
+* Available as a standalone **[PHAR][phar]** file, or via **[Composer][composer]** and as a **[PEAR] [pear]** package.
 
 Todo:
-* Self generated API resources testing.
+* Self-generated API resources testing.
 * Add support for WSDL 2.0 / WADL.
 * Eventually SOAP (and XML_RPC) bridging.
 
@@ -32,44 +29,45 @@ Feel free to comment, send pull requests and patches...
 Basic usage
 -----------
 
-    ```php
-        <?php
-        require 'apix.phar';
+```php
+<?php
+    require 'apix.phar';
 
-        // Instantiate the server (using the default config)
-        $api = new Apix\Server;
+    // Instantiate the server (using the default config)
+    $api = new Apix\Server;
 
-        // Create a GET handler $name is required
-        $api->onRead('/hello/:name', function($name) {
-            return array('Hello ' . $name);
-        });
+    // Create a GET handler $name is required
+    $api->onRead('/hello/:name', function($name) {
+        return array('Hello ' . $name);
+    });
 
-        $api->run();
-    ```
+    $api->run();
+```
+
 Another example using annotations.
     
-    ```php
-        // $type and $stuff are required parameters.
-        // $optional is not mandatory.
-        $api->onRead('/search/:type/with/:stuff/:optional',
-            /**
-             * Search for things by type that have stuff.
-             *
-             * @param     string  $type         A type of thing to search upon
-             * @param     string  $stuff        One or many stuff to filter against
-             * @param     string  $optional     An optional field
-             * @return    array
-             * @api_auth  groups=clients,employes,admins users=franck,jon
-             * @api_cache ttl=12mins tags=searches,indexes
-             */
-            function($type, $stuff, $optional = null) {
-                // some logic
-                return $results;
-            }
-        );
+```php
+    // $type and $stuff are required parameters.
+    // $optional is not mandatory.
+    $api->onRead('/search/:type/with/:stuff/:optional',
+        /**
+         * Search for things by type that have stuff.
+         *
+         * @param     string  $type         A type of thing to search upon
+         * @param     string  $stuff        One or many stuff to filter against
+         * @param     string  $optional     An optional field
+         * @return    array
+         * @api_auth  groups=clients,employes,admins users=franck,jon
+         * @api_cache ttl=12mins tags=searches,indexes
+         */
+        function($type, $stuff, $optional = null) {
+            // some logic
+            return $results;
+        }
+    );
 
-        $api->run();
-    ```
+    $api->run();
+```
 
 Advanced usage
 --------------
@@ -117,7 +115,6 @@ It will use:
 Here is an example showing these in context:
 
 ```php
-
     $api->onRead('/category/:name', function(Request $request, $name) {
 
         // retrieve a named param
@@ -144,15 +141,14 @@ To boostrap an Apix server, add the required file and create an instance of the
 
 A dedicated configuration file can be injected to an Apix server:
 
-    ```php
-        <?php
-            require 'apix.phar';
+```php
+    <?php
+        require 'apix.phar';
 
-            $api = new Apix\Server(require 'my_config.php');
+        $api = new Apix\Server(require 'my_config.php');
 
-            $api->run();
-    ```
-
+        $api->run();
+```
 
 ### PHAR Console
 
@@ -162,73 +158,64 @@ Apix PHAR distribution contains a built-in console. Try invoking the `api.phar` 
 $ php apix.phar --help
 ```
 
-### Web server configuration ###
+### Web server configuration
 
 Use one of the vhost file provided within the distribution and follow the
 relevant instructions provided in the comments to set your web server environement.
 
-### Annotations ###
+TODO: Add ngynx and lighttpd files to the distrib.
 
-Annotations are use to define many aspects of your resource entity.
+### Annotations
+
+Annotations can be used to define many aspects of a resource entity.
 
 Here is a self explanatory example:
 
-    ```php
-        <?php
-            require_once 'apix.phar';
+```php
+    <?php
+        $api->onRead('/download/:app/version/:version',
+            /**
+             * Retrieve the named sotfware
+             * Anyone can use this resource entity to download apps. If no
+             * version is specified the latest revision will be returned.
+             *
+             * @param     string    $app        The name of the app
+             * @param     string    $version    The version number.
+             * @return    array     A response array.
+             *
+             * @api_auth  groups=public
+             * @api_cache ttl=1week tags=downloads
+             */
+            function($app, $version=null) {
+                // ...
+                return array(
+                    $app => 'the version string of software.'
+                );
+            }
+        );
 
-            $api = new Apix\Server;
+        $api->onCreate('/upload/:software',
+            /**
+             * Upload a new software
+             * Admin users use this resource entity to upload new software.
+             *
+             * @param      Request  $request   The Server Request object.
+             * @param      string   $software
+             * @return     array    A response array.
+             *
+             * @api_auth   groups=admin users=franck
+             * @api_cache  purge=downloads
+             */
+            function(Request $request, $software) {
+                // ...
+            }
+        );
 
-            $api->onRead('/download/:app/version/:version',
-                /**
-                 * Retrieve the named sotfware
-                 * Anyone can use this resource entity to download apps. If no
-                 * version is specified the latest revision will be returned.
-                 *
-                 * @param     string    $app        The name of the app
-                 * @param     string    $version    The version number.
-                 * @return    array     A response array.
-                 *
-                 * @api_auth  groups=public
-                 * @api_cache ttl=1week tags=downloads
-                 */
-                function($app, $version=null) {
-                    // ...
-                    return array(
-                        $app => 'the version string of software.'
-                    );
-                }
-            );
-
-            $api->onCreate('/upload/:software',
-                /**
-                 * Upload a new software
-                 * Admin users use this resource entity to upload new software.
-                 *
-                 * @param      Request  $request   The Server Request object.
-                 * @param      string   $software
-                 * @return     array    A response array.
-                 *
-                 * @api_auth   groups=admin users=franck
-                 * @api_cache  purge=downloads
-                 */
-                function(Request $request, $software) {
-                    // ...
-                }
-            );
-
-
-            $api->run();
-    ```
-
-## Testing ##
-
-To run the unit test suite simply run **`phpunit`** from within the main dir.
-
-Integration and functional tests are also available in the `src/tests`.
+        $api->run();
+```
 
 Installation
-------------------------
+------------
 
 Apix requires PHP 5.3 or later.
 
@@ -248,7 +235,7 @@ Apix requires PHP 5.3 or later.
 
   * or update your **`package.xml`** file as follow:
 
-    ```xml
+```xml
     <dependencies>
       <required>
         <package>
@@ -259,14 +246,21 @@ Apix requires PHP 5.3 or later.
         </package>
       </required>
     </dependencies>
-    ```
+```
 * For a system-wide installation using PEAR:
 
-    ```
+```
     sudo pear channel-discover pear.ouarz.net
     sudo pear install --alldeps ouarz/apix
-    ```
+```
 For more details see [pear.ouarz.net](http://pear.ouarz.net).
+
+Testing
+-------
+
+To run the unit test suite simply run **`phpunit`** from within the main dir.
+
+Integration and functional tests are also available in the `src/tests`.
 
 License
 -------
