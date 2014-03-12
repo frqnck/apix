@@ -17,7 +17,7 @@ Some of its features:
 * Provides **method-override** usign X-HTTP-Method-Override (Google recommendation) and/or using a query-param (customisable).
 * Supports **content negotiation** (which can also be overriden).
 * Take advantages of network caches -- supports HEAD test.
-* Available as a standalone **[PHAR][phar]** file, or via **[Composer][composer]** and as a **[PEAR] [pear]** package.
+* Available as a standalone **[PHAR][phar]** file, or via **[Composer][composer]** or as a **[PEAR] [pear]** package.
 
 Todo:
 * Self-generated API resources testing.
