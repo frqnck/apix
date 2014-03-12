@@ -1,5 +1,5 @@
 Quick Start
-============
+===========
 
 The most basic example creates and serves a route that echos the content passed in through the
 URL parameter called *name*.  This route would be accessed through http://www.example.com/hello/myname and
@@ -60,7 +60,7 @@ Another example using annotations.
 
 config.php
 ----------
-The following example configuration file is used in this example.  Details on
+The following example configuration file is used in the above examples.  Details on
 configuration options may be found in the Config documentation.
 
 .. code-block:: php
