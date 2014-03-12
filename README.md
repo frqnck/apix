@@ -275,9 +275,9 @@ _|    _| _|       _|      _|    _|
 _|    _| _|       _|     _|      _|
 </pre>
 
-[phar]: http://pear.ouarz.net/apix.phar                     "TODO: Download the Phar file."
-[pear]: http://pear.ouarz.net                               "TODO: PEAR"
-[composer]: http://https://packagist.org/packages/apix/apix "TODO: Composer"
+[phar]: http://api.ouarz.net/v1/download/apix.phar          "Download the Phar file."
+[pear]: http://pear.ouarz.net                               "PEAR (TODO add to OUARZ)"
+[composer]: http://https://packagist.org/packages/apix/apix "Composer (TODO add to composer)"
 [github]: https://github.com/frqnck/apix                    "Github"
 [apixdoc]: http://frqnck.github.io/apix                     "Apix's Documentation"
 [rfc2616]: http://www.ietf.org/rfc/rfc2616                  "Hypertext Transfer Protocol -- HTTP/1.1"
