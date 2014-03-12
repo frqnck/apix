@@ -1,8 +1,7 @@
-Apix, a micro-framework to build RESTful Web services
-======================================================
+APIx, a RESTful services binder.
+================================
 
-Apix provides a modular approach for developing Web services in PHP.
-It will run alognside you existing framework or application.
+APIx is a (micro-)framework to build RESTful Web services. It provides a modular and flexible approach and will run alognside you existing framework or application.
 
     ```php
         <?php
