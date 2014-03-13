@@ -14,6 +14,7 @@ Contents:
    introduction
    quickstart
    config
+   example
    advancedusage
    apix/index
    
