@@ -15,20 +15,20 @@ Assume that our project is laid out as follows (using Composer):
     |   |-- credentials.php
     |   |-- plugins.php
     |   |-- resources.php
-    |   |-- services.php
+    |   `-- services.php
     |-- controllers/
     |   |-- Goodbye.php
-    |   |-- Hello.php
+    |   `-- Hello.php
     |-- models/
     |-- public/
     |   |-- .htaccess
-    |   |-- index.php
-    +-- vendor/
+    |   `-- index.php
+    `-- vendor/
         |-- apix/
         |   |-- apix/
-        |   |-- cache/
+        |   `-- cache/
         |-- autoload.php
-        |-- composer/
+        `-- composer/
 
 For the sake of this example, we'll put ``MyProject`` directly in our webroot.  In most environments, you will want to expose **only** the ``public`` directory.  Download :download:`MyProject here <MyProject.zip>`.
 
