@@ -17,7 +17,7 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
-sys.path.append(os.path.abspath('_exts'))
+sys.path.insert(0, os.path.abspath('_exts'))
 
 from sphinx.highlighting import lexers
 from pygments.lexers.web import PhpLexer
@@ -29,7 +29,8 @@ from pygments.lexers.web import PhpLexer
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sensio.sphinx.refinclude', 'sensio.sphinx.configurationblock', 'sensio.sphinx.phpcode']
+#extensions = ['sensio.sphinx.php', 'sensio.sphinx.refinclude', 'sensio.sphinx.configurationblock', 'sensio.sphinx.phpcode']
+extensions = ['sphinxcontrib.phpdomain']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -252,4 +253,6 @@ lexers['php-standalone'] = PhpLexer(startinline=True)
 
 # use PHP as the primary domain
 primary_domain = 'php'
+# set URL for API links
+api_url = 'http://api.symfony.com/master/%s'
 

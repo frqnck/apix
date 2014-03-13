@@ -19,15 +19,15 @@ Some of its features:
 
 * **Follows the standards** such as:
   
-  * RFC 2616 - `Hypertext Transfer Protocol -- HTTP/1.1 <http://www.ietf.org/rfc/rfc2616>`_
-  * RFC 2617 - `HTTP Authentication: Basic and Digest Access Authentication <http://www.ietf.org/rfc/rfc2617>`_
-  * RFC 2388 - `Returning Values from Forms (multipart/form-data) <http://www.ietf.org/rfc/rfc2388>`_
-  * RFC 2854 - `The 'text/html' Media Type <http://www.ietf.org/rfc/rfc2854>`_
-  * RFC 4627 - `The application/json Media Type for JavaScript Object Notation (JSON) <http://www.ietf.org/rfc/rfc4627>`_
-  * RFC 4329 - `Scripting Media Types <http://www.ietf.org/rfc/rfc4329>`_
-  * RFC 2046 - `Multipurpose Internet Mail Extensions <http://www.ietf.org/rfc/rfc2046>`_
-  * RFC 3676 - `The Text/Plain Format and DelSp Parameters <http://www.ietf.org/rfc/rfc3676>`_
-  * RFC 3023 - `XML Media Types <http://www.ietf.org/rfc/rfc3023>`_
+  * :rfc:`2616` - Hypertext Transfer Protocol -- HTTP/1.1
+  * :rfc:`2617` - HTTP Authentication: Basic and Digest Access Authentication
+  * :rfc:`2388` - Returning Values from Forms (multipart/form-data)
+  * :rfc:`2854` - The 'text/html' Media Type
+  * :rfc:`4627` - The application/json Media Type for JavaScript Object Notation (JSON)
+  * :rfc:`4329` - Scripting Media Types
+  * :rfc:`2046` - Multipurpose Internet Mail Extensions
+  * :rfc:`3676` - The Text/Plain Format and DelSp Parameters
+  * :rfc:`3023` - XML Media Types
   * etc...
   
 * Provides **method-override** usign X-HTTP-Method-Override (Google recommendation) and/or using a query-param (customisable).

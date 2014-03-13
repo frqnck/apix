@@ -14,8 +14,8 @@ Contents:
    introduction
    quickstart
    config
-   apix/index
    advancedusage
+   apix/index
    
 
 
