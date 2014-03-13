@@ -17,10 +17,6 @@ import sys, os
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('_exts'))
-
-from sphinx.highlighting import lexers
-from pygments.lexers.web import PhpLexer
 
 # -- General configuration -----------------------------------------------------
 
@@ -247,12 +243,10 @@ texinfo_documents = [
 #texinfo_show_urls = 'footnote'
 
 # enable highlighting for PHP code not between ``<?php ... ?>`` by default
-lexers['php'] = PhpLexer(startinline=True)
-lexers['php-annotations'] = PhpLexer(startinline=True)
-lexers['php-standalone'] = PhpLexer(startinline=True)
 
 # use PHP as the primary domain
 primary_domain = 'php'
-# set URL for API links
-api_url = 'http://api.symfony.com/master/%s'
+
+# The default language to highlight source code in.
+highlight_language = 'php'
 
