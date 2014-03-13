@@ -9,26 +9,26 @@ Assume that our project is laid out as follows (using Composer):
 .. code-block:: text
 
     MyProject/
-    ├── composer.json
-    ├── config/
-    │   ├── config.php
-    │   ├── credentials.php
-    │   ├── plugins.php
-    │   ├── resources.php
-    │   └── services.php
-    ├── controllers/
-    │   ├── Goodbye.php
-    │   └── Hello.php
-    ├── models/
-    ├── public/
-    │   ├── .htaccess
-    │   └── index.php
-    └── vendor/
-        ├── apix/
-        │   ├── apix/
-        │   └── cache/
-        ├── autoload.php
-        └── composer/
+    |-- composer.json
+    |-- config/
+    |   |-- config.php
+    |   |-- credentials.php
+    |   |-- plugins.php
+    |   |-- resources.php
+    |   |-- services.php
+    |-- controllers/
+    |   |-- Goodbye.php
+    |   |-- Hello.php
+    |-- models/
+    |-- public/
+    |   |-- .htaccess
+    |   |-- index.php
+    +-- vendor/
+        |-- apix/
+        |   |-- apix/
+        |   |-- cache/
+        |-- autoload.php
+        |-- composer/
 
 For the sake of this example, we'll put ``MyProject`` directly in our webroot.  In most environments, you will want to expose **only** the ``public`` directory.  Download :download:`MyProject here <MyProject.zip>`.
 
@@ -123,13 +123,13 @@ The resources file is where we'll store information about all of our available r
     <?php
     
     return array(
-	'hello/:name' => array(
+	'/hello/:name' => array(
 	    'controller' => array(
 		'name' => 'MyProject\Controllers\Hello',
 		'args' => null
 	    )
 	),
-	'goodbye/:name' => array(
+	'/goodbye/:name' => array(
 	    'controller' => array(
 		'name' => 'MyProject\Controllers\Goodbye',
 		'args' => null
@@ -149,6 +149,7 @@ We define a caching adapter which can be used through the project as a whole, an
     <?php
     
     use Apix\Cache;
+    use Apix\Service;
     
     return array(
 	// we'll reference the existing $config variable to retrieve our redis credentials
@@ -169,7 +170,7 @@ We define a caching adapter which can be used through the project as a whole, an
 config/plugins.php
 ^^^^^^^^^^^^^^^^^^^
 
-We can define our own plugins if we choose.  Lets add in caching capabilities, which are not turned on in the default conguration.  We'll be relying on the `Apix\Cache <https://github.com/frqnck/apix-cache>`_ library to provide the caching adapter.  The caching adpater will be defined in the services configuration file.  This example also assumes that the services configuration file has already been processed, as it makes use of the cache service defined there.
+We can define our own plugins if we choose.  Lets add in caching capabilities, which are not turned on in the default conguration.  We'll be relying on the `Apix\\Cache <https://github.com/frqnck/apix-cache>`_ library to provide the caching adapter.  The caching adpater will be defined in the services configuration file.  This example also assumes that the services configuration file has already been processed, as it makes use of the cache service defined there.
 
 .. code-block:: php
     
