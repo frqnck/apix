@@ -340,163 +340,163 @@ When all is appropriately setup, access the following URL to access self-generat
 
     {
 	"myproject": {
+	    "debug": {
+		"headers": {
+		    "Vary": "Accept"
+		},
+		"memory": "1.18 MB~1.2 MB",
+		"output_format": "json",
+		"request": "GET /MyProject/public/v1/help HTTP/1.1",
+		"router_params": [
+		    "help"
+		],
+		"timestamp": "Thu, 13 Mar 2014 21:32:19 GMT",
+		"timing": "0.018 seconds"
+	    },
 	    "help": {
 		"items": [
 		    {
-			"title": "Hello",
-			"description": "Lets say hello to people nicely.",
+			"api_auth": "groups=public",
 			"api_public": "true",
 			"api_version": "1.0",
-			"api_auth": "groups=public",
+			"description": "Lets say hello to people nicely.",
 			"methods": {
 			    "GET": {
-				"title": "Hello",
+				"api_cache": "ttl=60sec  tag=goodbye  Cache this call for 60 seconds",
 				"description": "Say Hello to someone",
 				"params": {
 				    "name": {
-					"type": "string",
-					"name": "name",
 					"description": "Who should we say hello to?",
-					"required": true
+					"name": "name",
+					"required": true,
+					"type": "string"
 				    }
 				},
 				"return": "array",
-				"api_cache": "ttl=60sec  tag=goodbye  Cache this call for 60 seconds"
+				"title": "Hello"
 			    },
 			    "POST": {
-				"title": "Hello",
+				"api_cache": "ttl=60sec  tag=goodbye  Cache this call for 60 seconds",
 				"description": "Say hello to someone using the POSTED greeting.",
 				"params": {
-				    "name": {
-					"type": "string",
-					"name": "name",
-					"description": "Who should we say hello to?",
-					"required": true
-				    },
 				    "greeting": {
-					"type": "string",
-					"name": "greeting",
 					"description": "How should we say hello?",
-					"required": false
+					"name": "greeting",
+					"required": false,
+					"type": "string"
+				    },
+				    "name": {
+					"description": "Who should we say hello to?",
+					"name": "name",
+					"required": true,
+					"type": "string"
 				    }
 				},
 				"return": "array",
-				"api_cache": "ttl=60sec  tag=goodbye  Cache this call for 60 seconds"
+				"title": "Hello"
 			    }
 			},
-			"path": "\/hello\/:name"
+			"path": "/hello/:name",
+			"title": "Hello"
 		    },
 		    {
-			"title": "Goodbye",
-			"description": "Lets say goodbye to people nicely.",
+			"api_auth": "groups=public",
 			"api_public": "true",
 			"api_version": "1.0",
-			"api_auth": "groups=public",
+			"description": "Lets say goodbye to people nicely.",
 			"methods": {
 			    "GET": {
-				"title": "Goodbye",
+				"api_cache": "ttl=60sec  tag=goodbye  Cache this call for 60 seconds",
 				"description": "Say Goodbye",
 				"params": {
 				    "name": {
-					"type": "string",
-					"name": "name",
 					"description": "Who should we say goodbye to?",
-					"required": true
+					"name": "name",
+					"required": true,
+					"type": "string"
 				    }
 				},
 				"return": "array",
-				"api_cache": "ttl=60sec  tag=goodbye  Cache this call for 60 seconds"
+				"title": "Goodbye"
 			    }
 			},
-			"path": "\/goodbye\/:name"
+			"path": "/goodbye/:name",
+			"title": "Goodbye"
 		    },
 		    {
-			"title": "Help",
 			"description": "This resource entity provides in-line referencial to all the API resources and methods.",
 			"methods": {
 			    "GET": {
-				"title": "Display the manual of a resource entity",
-				"description": "This resource entity provides in-line referencial to all the API resources and methods.\nBy specify a resource and method you can narrow down to specific section.\ncommunication options available on the request\/response chain\nidentified by the Request-URI. This method allows the client to determine\nthe options and\/or requirements associated with a resource,\nor the capabilities of a server, without implying a resource action or\ninitiating a resource retrieval.",
+				"description": "This resource entity provides in-line referencial to all the API resources and methods.\nBy specify a resource and method you can narrow down to specific section.\ncommunication options available on the request/response chain\nidentified by the Request-URI. This method allows the client to determine\nthe options and/or requirements associated with a resource,\nor the capabilities of a server, without implying a resource action or\ninitiating a resource retrieval.",
+				"example": "<pre>GET /help/path/to/entity</pre>",
+				"id": "help",
 				"params": {
-				    "path": {
-					"type": "string",
-					"name": "path",
-					"description": "A string of characters used to identify a resource.",
-					"required": false
-				    },
 				    "filters": {
-					"type": "array",
-					"name": "filters",
 					"description": "Filters can be use to narrow down the resultset.",
-					"required": false
+					"name": "filters",
+					"required": false,
+					"type": "array"
+				    },
+				    "path": {
+					"description": "A string of characters used to identify a resource.",
+					"name": "path",
+					"required": false,
+					"type": "string"
 				    }
 				},
-				"example": "\u003Cpre\u003EGET \/help\/path\/to\/entity\u003C\/pre\u003E",
-				"id": "help",
-				"usage": "The OPTIONS method represents a request for information about the\ncommunication options available on the request\/response chain\nidentified by the Request-URI. This method allows the client to determine\nthe options and\/or requirements associated with a resource,\nor the capabilities of a server, without implying a resource action or\ninitiating a resource retrieval.",
-				"see": "\u003Cpre\u003Ehttp:\/\/www.w3.org\/Protocols\/rfc2616\/rfc2616-sec9.html#sec9.2\u003C\/pre\u003E"
+				"see": "<pre>http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2</pre>",
+				"title": "Display the manual of a resource entity",
+				"usage": "The OPTIONS method represents a request for information about the\ncommunication options available on the request/response chain\nidentified by the Request-URI. This method allows the client to determine\nthe options and/or requirements associated with a resource,\nor the capabilities of a server, without implying a resource action or\ninitiating a resource retrieval."
 			    },
 			    "OPTIONS": {
-				"title": "Outputs info for a resource entity.",
-				"description": "The OPTIONS method represents a request for information about the\ncommunication options available on the request\/response chain\nidentified by the Request-URI. This method allows the client to determine\nthe options and\/or requirements associated with a resource,\nor the capabilities of a server, without implying a resource action or\ninitiating a resource retrieval.",
+				"api_link": [
+				    "OPTIONS /path/to/entity",
+				    "OPTIONS /"
+				],
+				"description": "The OPTIONS method represents a request for information about the\ncommunication options available on the request/response chain\nidentified by the Request-URI. This method allows the client to determine\nthe options and/or requirements associated with a resource,\nor the capabilities of a server, without implying a resource action or\ninitiating a resource retrieval.",
 				"params": {
-				    "server": {
-					"type": "Server",
-					"name": "server",
-					"description": "The main server object.",
-					"required": true
-				    },
 				    "filters": {
-					"type": "array",
-					"name": "filters",
 					"description": "An array of filters.",
-					"required": false
+					"name": "filters",
+					"required": false,
+					"type": "array"
+				    },
+				    "server": {
+					"description": "The main server object.",
+					"name": "server",
+					"required": true,
+					"type": "Server"
 				    }
 				},
+				"private": "1",
 				"return": "array  The array documentation.",
-				"api_link": [
-				    "OPTIONS \/path\/to\/entity",
-				    "OPTIONS \/"
-				],
-				"private": "1"
+				"title": "Outputs info for a resource entity."
 			    }
 			},
-			"path": "OPTIONS"
+			"path": "OPTIONS",
+			"title": "Help"
 		    },
 		    {
-			"title": null,
 			"description": "",
 			"methods": {
 			    "HEAD": {
-				"title": "HTTP HEAD: test action handler",
-				"description": "The HEAD method is identical to GET except that the server MUST NOT return\na message-body in the response. The metainformation contained in the HTTP\nheaders in response to a HEAD request SHOULD be identical to the information\nsent in response to a GET request. This method can be used for obtaining\nmetainformation about the entity implied by the request without transferring\nthe entity-body itself. This method is often used for testing hypertext links\nfor validity, accessibility, and recent modification.",
-				"link": "http:\/\/www.w3.org\/Protocols\/rfc2616\/rfc2616-sec9.html#sec9.4",
-				"return": "null",
 				"cacheable": "true",
-				"codeCoverageIgnore": ""
+				"codeCoverageIgnore": "",
+				"description": "The HEAD method is identical to GET except that the server MUST NOT return\na message-body in the response. The metainformation contained in the HTTP\nheaders in response to a HEAD request SHOULD be identical to the information\nsent in response to a GET request. This method can be used for obtaining\nmetainformation about the entity implied by the request without transferring\nthe entity-body itself. This method is often used for testing hypertext links\nfor validity, accessibility, and recent modification.",
+				"link": "http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.4",
+				"return": "null",
+				"title": "HTTP HEAD: test action handler"
 			    }
 			},
-			"path": "HEAD"
+			"path": "HEAD",
+			"title": null
 		    }
 		]
 	    },
 	    "signature": {
+		"client_ip": "127.0.0.1",
 		"resource": "GET ",
-		"status": "200 OK - successful",
-		"client_ip": "127.0.0.1"
-	    },
-	    "debug": {
-		"timestamp": "Thu, 13 Mar 2014 21:15:48 GMT",
-		"request": "GET \/MyProject\/public\/v1\/help?_format=json HTTP\/1.1",
-		"headers": {
-		    "Vary": "Accept"
-		},
-		"output_format": "json",
-		"router_params": [
-		    "help"
-		],
-		"memory": "1.21 MB~1.23 MB",
-		"timing": "0.014 seconds"
+		"status": "200 OK - successful"
 	    }
 	}
     }
@@ -509,30 +509,29 @@ Test out POSTing to the ``/hello/:name`` resource using curl.
     
     {
 	"myproject": {
+	    "debug": {
+		"headers": {
+		    "Vary": "Accept"
+		},
+		"memory": "1.14 MB~1.15 MB",
+		"output_format": "json",
+		"request": "POST /MyProject/public/v1/hello/world?_format=json HTTP/1.1",
+		"router_params": {
+		    "name": "world"
+		},
+		"timestamp": "Thu, 13 Mar 2014 21:33:19 GMT",
+		"timing": "0.02 seconds"
+	    },
 	    "hello": {
 		"greeting": "hola, world"
 	    },
 	    "signature": {
-		"resource": "POST \/hello\/:name",
-		"status": "200 OK - successful",
-		"client_ip": "127.0.0.1"
-	    },
-	    "debug": {
-		"timestamp": "Thu, 13 Mar 2014 21:20:31 GMT",
-		"request": "POST \/MyProject\/public\/v1\/hello\/world?_format=json HTTP\/1.1",
-		"headers": {
-		    "Vary": "Accept"
-		},
-		"output_format": "json",
-		"router_params": {
-		    "name": "world"
-		},
-		"memory": "1.14 MB~1.15 MB",
-		"timing": "0.014 seconds"
+		"client_ip": "127.0.0.1",
+		"resource": "POST /hello/:name",
+		"status": "200 OK - successful"
 	    }
 	}
     }
-
 
 
 
