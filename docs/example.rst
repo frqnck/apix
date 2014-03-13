@@ -337,7 +337,7 @@ Try it out
 
 When all is appropriately setup, access the following URL to access self-generated documentation:  http://localhost/MyProject/public/v1/help?_format=json.  You should see something like the following:
 
-.. code-block:: javascript
+.. code-block:: json
 
     {
 	"myproject": {
