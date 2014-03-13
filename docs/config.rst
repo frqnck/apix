@@ -6,7 +6,7 @@ Do not make changes to the distributed configuration file.  Rather, include the 
 The configuration variable is an associative array containing the following keys and values:
 
 api_version
-^^^^^^^^^^^
+-----------
 
 .. code-block:: php
     
@@ -20,7 +20,7 @@ The API version string allowing a userbase to keep track of API changes.  It is 
 :Build: Can be use for arbitrary naming such as 0.1.0.beta, 0.1.1.rc3 (third release candidate), 0.1.2.smoking-puma, 0.1.30.testing
 
 api_realm
-^^^^^^^^^
+---------
 
 .. code-block:: php
     
@@ -29,7 +29,7 @@ api_realm
 The API realm name. Used in few places, most notably as part of the version string in the header response. It is also used as part of some authentication mechanisms e.g. Basic and Digest. Should always be a generic/static string and cannot be used to define server instance. In other words, DO NOT use $_SERVER['SERVER_NAME'] to set this option!
 
 output_rootNode
-^^^^^^^^^^^^^^^
+---------------
 
 .. code-block:: php
     
@@ -39,7 +39,7 @@ Define the name of the data output topmost node which contains the various nodes
 
 
 input_formats
-^^^^^^^^^^^^^
+-------------
 
 .. code-block:: php
     
@@ -54,7 +54,7 @@ The array of available data formats for input representation:
 Note that at this stage only UTF-8 is supported.
 
 routing
-^^^^^^^
+-------
 
 The routing value is an associative array with the following keys: path_prefix, formats, default_format, http_accept, controller_ext, and format_override.
 
@@ -70,18 +70,18 @@ The routing value is an associative array with the following keys: path_prefix, 
     );
 
 path_prefix
-"""""""""""
+^^^^^^^^^^^
 
 .. code-block:: php
     
-    'path_prefix' => '/^(\/\w+\.\w+)?(\/api)?\/v(\d+)/i'
+    'path_prefix' => '/-(\/\w+\.\w+)?(\/api)?\/v(\d+)/i'
 
 The regular expression representing the path prefix from the Request-URI. Allows the server to retrieve the path without the route prefix, handling variation in version numbering, Apache's mod_rewrite, nginx location definitions, etc...
 
 Should match '/index.php/api/v1/entity/name?whatver...' which using mod_rewrite could then translate into 'http://www.example.com/v1/entity/name?whatver...'.
 
 formats
-"""""""
+^^^^^^^
 
 .. code-block:: php
     
@@ -96,7 +96,7 @@ The array of available data formats for output representation:
 :PHP: Does not currently serialize the data as one would expect but just dumps the output array for now.
 
 default_format
-""""""""""""""
+^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -105,7 +105,7 @@ default_format
 Set the defaut output format to either JSON or XML. Note that JSON encoding is by definition UTF-8 only. If a specific encoding is required then XML should be used as the default format. In most case, JSON is favored.
 
 http_accept
-"""""""""""
+^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -114,7 +114,7 @@ http_accept
 Whether to enable the negotiation of output format from an HTTP Accept header. This is the expected and most RESTful way to set the output format.  See :rfc:`2616` for more information.
 
 controller_ext
-""""""""""""""
+^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -123,7 +123,7 @@ controller_ext
 Whether to allow the output format to be set from the Request-URI using a file extension such as '/controller.json/id'. This is handy and common practice but fairly un-RESTful. The extension overrides the http_accept negotiation.
 
 format_override
-"""""""""""""""
+^^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -132,12 +132,12 @@ format_override
 Forces the output format to the string provided and overrides the format negotiation process. Set to false to disable. Can be use to set the format from a request parameter, or any other arbitrary methods, etc... Using ``$_REQUEST`` is considered un-RESTful but also can be handy in many cases e.g. forms handling.
 
 resources
-^^^^^^^^^
+---------
 
 A resource definition is made of a 'Route path' (with or without named variable) pointing to a controller which may be defined as closure/lambda definitions (à la Sinatra) allowing fast prototyping, class definitions allowing for a tradition Model + Controller layout, or a redirect.
 
 Class Definitions
-"""""""""""""""""
+^^^^^^^^^^^^^^^^^
 
 .. code-block:: php
 
@@ -154,7 +154,8 @@ Class Definitions
 The default values to the 'resources' key set up API documentation links and should not be overwritten.
 
 Redirects
-"""""""""
+^^^^^^^^^
+
 .. code-block:: php
 
     $config['resources'] += array(
@@ -167,7 +168,7 @@ Redirects
 Perform a redirect on the path '/redirect/me' to 'hello/world'.
 
 services
-^^^^^^^^
+--------
 
 The service defintions array is mostly used as a convenient container to define some generic/shared code.  For example, Authorization adapters and session data can be stored in the services array.  These items can later be retrieved using Apix\\Service::get().
 
@@ -211,9 +212,9 @@ In this example, we have both a *session* service and an *auth* service.  The *a
 .. _plugins:
 
 plugins
-^^^^^^^
+-------
 
-Please see the :doc:`Plugin documentation <apix/plugin>` for more information on available event hooks and interface for Plugins.
+Please see the :doc:`Plugin documentation <apix/plugin/plugin-abstract>` for more information on available event hooks and interface for Plugins.
 
 Plugins is an associative array where each plugin is definied using the plugins class name as the key, and an array defining options for that plugin as the value.  The options array is passed into the constructor for the specified plugin class.  For example:
 
@@ -234,24 +235,24 @@ Currently available plugins include the following:
 .. _signature:
 
 Apix\\Plugin\\OutputSign
-""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Add the entity signature as part of the response body.
 
 .. _debug:
 
 Apix\\Plugin\\OutputDebug
-"""""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Add some debugging information within the response body.  This should be set to false in production and does have an impact on cachability.
 
 Apix\\Plugin\\Tidy
-""""""""""""""""""
+^^^^^^^^^^^^^^^^^^
 
 Validates, corrects, and pretty-prints XML and HTML outputs.  Various options are available.  See the `Tidy quickref <http://tidy.sourceforge.net/docs/quickref.html>`_ for more information on available options.
 
 Apix\\Plugin\\Auth
-""""""""""""""""""
+^^^^^^^^^^^^^^^^^^
 
 Authentication plugin.  This is enabled through method/closure annotation.  For example:
 
@@ -266,7 +267,7 @@ Authentication plugin.  This is enabled through method/closure annotation.  For 
     }
 
 Apix\\Plugin\\Cache
-"""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^
 
 Plugin to cache the output of the controllers. The full Request-URI acts as the unique cache id.  This is enabled through method/closure annotation. For example:
 
@@ -292,12 +293,12 @@ The options available for the cache plugin include an "enable" key and an "adapt
     )
 
 init
-^^^^
+----
 
 Init is an associative array of specific PHP directives. They are recommended settings for most generic REST API servers and should be set as required. There is most probably a performance penalty setting most of these at runtime so it is recommneded that most, if not all, of these be set directly in php.ini/vhost files on productions servers and then commented out.  Values included here will overwrite the values provided in php.ini or other PHP init files.
 
 display_errors
-""""""""""""""
+^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -306,7 +307,7 @@ display_errors
 Whether to display errors or not.  This should be set to false in production.
 
 init_log_errors
-"""""""""""""""
+^^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -315,7 +316,7 @@ init_log_errors
 Enable or disable php error logging.
 
 error_log
-"""""""""
+^^^^^^^^^
 
 .. code-block:: php
     
@@ -324,7 +325,7 @@ error_log
 Path to the error log file.
 
 html_errors
-"""""""""""
+^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -333,7 +334,7 @@ html_errors
 Enable or disable html_errors.
 
 zlib.output_compression
-"""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -342,7 +343,7 @@ zlib.output_compression
 Whether to transparently compress outputs using GZIP.  If enabled, this options will also add a 'Vary: Accept-Encoding' header to response objects.
 
 memory_limit
-""""""""""""
+^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -351,7 +352,7 @@ memory_limit
 Maximum amount of memory a script may consume.
 
 max_execution_time
-""""""""""""""""""
+^^^^^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -360,7 +361,7 @@ max_execution_time
 The timeout in seconds.  Be aware that web servers such as Apache also have their own timout settings that may interfere with this. See your web server manual for specific details.
 
 post_max_size
-"""""""""""""
+^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -369,7 +370,7 @@ post_max_size
 Maximum size of POST data that this script will accept.  Its value may be 0 to disable the limit.
 
 max_input_time
-""""""""""""""
+^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -378,7 +379,7 @@ max_input_time
 Maximum amount of time each script may spend parsing request data.
 
 max_input_vars
-""""""""""""""
+^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -387,7 +388,7 @@ max_input_vars
 Maximum number of GET/POST input variables.
 
 max_input_nesting_level
-"""""""""""""""""""""""
+^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -396,7 +397,7 @@ max_input_nesting_level
 Maximum input variable nesting level.
 
 variables_order
-"""""""""""""""
+^^^^^^^^^^^^^^^
 
 .. code-block:: php
     
@@ -411,7 +412,7 @@ can still get access to the environment variables through getenv() should you
 need to.
 
 request_order
-"""""""""""""
+^^^^^^^^^^^^^
 
 .. code-block:: php
     

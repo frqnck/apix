@@ -13,6 +13,8 @@
 
 import sys, os
 
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -243,6 +245,9 @@ texinfo_documents = [
 #texinfo_show_urls = 'footnote'
 
 # enable highlighting for PHP code not between ``<?php ... ?>`` by default
+from sphinx.highlighting import lexers
+from pygments.lexers.web import PhpLexer
+lexers['php'] = PhpLexer(startinline=True)
 
 # use PHP as the primary domain
 primary_domain = 'php'
