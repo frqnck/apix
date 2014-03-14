@@ -335,7 +335,11 @@ public/.htaccess
 Try it out
 ----------
 
-When all is appropriately setup, access the following URL to access self-generated documentation:  http://localhost/MyProject/public/v1/help?_format=json.  You should see something like the following:
+When all is appropriately setup, access the following URL to access self-generated documentation:  
+
+``curl http://localhost/MyProject/public/v1/help?_format=json``
+
+You should see something like the following:
 
 .. code-block:: json
 
