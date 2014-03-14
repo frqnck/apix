@@ -60,8 +60,8 @@ Another example using annotations.
 
 config.php
 ----------
-The following example configuration file is used in the above examples.  Details on
-configuration options may be found in the Config documentation.
+The following example configuration file is used in the above examples.  Details on the function
+of these options may be found in the :doc:`/config` documentation.
 
 .. code-block:: php
 

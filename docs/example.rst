@@ -4,7 +4,7 @@ Example Project
 Project Layout
 --------------
 
-Assume that our project is laid out as follows (using Composer):
+Assume that our project is laid out as follows:
 
 .. code-block:: text
 

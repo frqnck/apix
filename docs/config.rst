@@ -1,6 +1,8 @@
 Configuration Options
 =====================
 
+.. contents:: Available Options
+
 Do not make changes to the distributed configuration file.  Rather, include the distributed configuration file in your own configuration file and overwrite the items that you would like to.  This eases the upgrade path when defaults are changed and new features are added.
 
 The configuration variable is an associative array containing the following keys and values:
@@ -167,10 +169,17 @@ Redirects
 
 Perform a redirect on the path '/redirect/me' to 'hello/world'.
 
+.. _services:
+
 services
 --------
 
 The service defintions array is mostly used as a convenient container to define some generic/shared code.  For example, Authorization adapters and session data can be stored in the services array.  These items can later be retrieved using Apix\\Service::get().
+
+.. _authenticationadapter:
+
+Authentication Service Example
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 An example Authentication service might look something like this:
 
@@ -214,7 +223,7 @@ In this example, we have both a *session* service and an *auth* service.  The *a
 plugins
 -------
 
-Please see the :doc:`Plugin documentation <apix/plugin/plugin-abstract>` for more information on available event hooks and interface for Plugins.
+Please see the :doc:`Plugin documentation <plugins>` for more information on available event hooks and interface for Plugins.
 
 Plugins is an associative array where each plugin is definied using the plugins class name as the key, and an array defining options for that plugin as the value.  The options array is passed into the constructor for the specified plugin class.  For example:
 
@@ -234,27 +243,41 @@ Currently available plugins include the following:
 
 .. _signature:
 
-Apix\\Plugin\\OutputSign
-^^^^^^^^^^^^^^^^^^^^^^^^
+Output Signature
+^^^^^^^^^^^^^^^^
 
-Add the entity signature as part of the response body.
+Adds the entity signature as part of the response body.
+
+.. code-block:: php
+    
+    $config['plugins']['Apix\\Plugin\\OutputSign'] = array();
 
 .. _debug:
 
-Apix\\Plugin\\OutputDebug
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Output Debugging
+^^^^^^^^^^^^^^^^
 
 Add some debugging information within the response body.  This should be set to false in production and does have an impact on cachability.
 
-Apix\\Plugin\\Tidy
-^^^^^^^^^^^^^^^^^^
+.. code-block:: php
+    
+    $config['plugins']['Apix\\Plugin\\OutputDebug'] = array();
+
+Tidy (Pretty-print)
+^^^^^^^^^^^^^^^^^^^
 
 Validates, corrects, and pretty-prints XML and HTML outputs.  Various options are available.  See the `Tidy quickref <http://tidy.sourceforge.net/docs/quickref.html>`_ for more information on available options.
 
-Apix\\Plugin\\Auth
-^^^^^^^^^^^^^^^^^^
+.. code-block:: php
+    
+    $config['plugins']['Apix\\Plugin\\Tidy'] = array('indent-spaces' => 4, 'indent' => true);
 
-Authentication plugin.  This is enabled through method/closure annotation.  For example:
+Authentication
+^^^^^^^^^^^^^^
+
+The authentication plugin is enabled through method/closure annotation.  The following example instructs 
+the authentication plugin allow access to the following GET resource if a user can authenticate to either
+the "admin" or "default" user groups.
 
 .. code-block:: php
 
@@ -266,10 +289,20 @@ Authentication plugin.  This is enabled through method/closure annotation.  For 
         ...
     }
 
-Apix\\Plugin\\Cache
-^^^^^^^^^^^^^^^^^^^
+The configuration block must provide an adapter object which implements ``Apix\Plugin\\Auth\\Adapter``.
+An :ref:`authenticationadapter` which provides an authentication adapter is included in the :ref:`Services <services>` section.
 
-Plugin to cache the output of the controllers. The full Request-URI acts as the unique cache id.  This is enabled through method/closure annotation. For example:
+.. code-block:: php
+    
+    $config['plugins']['Apix\\Plugin\\Auth'] = array('adapter' => $c['services']['auth']);
+    
+
+Entity Caching
+^^^^^^^^^^^^^^
+
+The cache plugin allows you to easily cache the output from a controller request. The full Request-URI
+acts as the unique cache id for a particular resource.  Like the authorization plugin, this is enabled
+through method/closure annotation. For example:
 
 .. code-block:: php
 
@@ -281,16 +314,29 @@ Plugin to cache the output of the controllers. The full Request-URI acts as the 
         ...
     }
 
-Apix\\Cache is available at https://github.com/frqnck/apix-cache.
+``Apix\Cache`` is available at https://github.com/frqnck/apix-cache.
 
-The options available for the cache plugin include an "enable" key and an "adapter" key, which requires an object implementing an Apix\\Cache\\Adapter interface.
+The options available for the cache plugin include an "enable" key and an "adapter" key, which requires an object implementing an :php:class:`Apix\\Cache\\Adapter` interface.
 
 .. code-block:: php
     
-    'Apix\Plugin\Cache' => array(
+    $config['plugins']['Apix\Plugin\Cache'] = array(
         'enable'  => true,
         'adapter' => new Apix\Cache\APC
-    )
+    );
+
+You could also add the caching adapter as a :ref:`services` to reuse the same cache connection
+throughout your project.  In that case, instead of instantiating a new ``Apix\Cache\APC`` in your
+plugin configuration, you would create a service that exposes the adapter, and use that.  For example:
+
+.. code-block:: php
+    
+    $config['services']['cache'] = new Apix\Cache\APC;
+    
+    $config['plugins']['Apix\Plugin\Cache'] = array(
+	'enable' => true,
+	'adapter' => $config['services']['cache']
+    );
 
 init
 ----
