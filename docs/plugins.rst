@@ -1,10 +1,10 @@
 Plugins
 =======
 
-APIx comes prepackaged with serveral plugins, but there is nothing stopping you from
+APIx comes prepackaged with several plugins, but there is nothing stopping you from
 extending this functionality and building your own.  There are two available builtin
-plugin types that you may extend from which implement `SplObserver <http://www.php.net/manual/en/class.splobserver.php>`_.  The basic plugin is relatively
-straightforward but we'll delve into the :ref:`EntityPlugins` below.
+plugin types that you may extend which implement an Observer patter using `SplObserver <http://www.php.net/manual/en/class.splobserver.php>`_.  The basic plugin architecture
+is relatively straightforward but we'll delve specifically into the :ref:`EntityPlugins` below.
 
 Plugins are activated by "hook" calls throughout the APIx process and should implement the
 `SplObserver::update <http://www.php.net/manual/en/splobserver.update.php>`_ method.  The
