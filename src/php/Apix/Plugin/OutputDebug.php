@@ -9,11 +9,11 @@ class OutputDebug extends PluginAbstract
     public static $hook = array('response', 'early');
 
     protected $options = array(
-        'enable'     => false,              // wether to enable or not
+        'enable'     => false,              // whether to enable or not
         'name'       => 'debug',            // the header name
-        'prepend'    => false,              // wether to prepend the debugging
+        'prepend'    => false,              // whether to prepend the debugging
         'timestamp'  => 'D, d M Y H:i:s T', // stamp format, default to RFC1123
-        'extras'     => null,                 // extras to inject, string or array
+        'extras'     => null,               // extras to inject, string or array
     );
 
     public function update(\SplSubject $response)

@@ -30,7 +30,7 @@ Assume that our project is laid out as follows:
         |-- autoload.php
         `-- composer/
 
-For the sake of this example, we'll put ``MyProject`` directly in our webroot.  In most environments, you will want to expose **only** the ``public`` directory.  Download :download:`MyProject here <MyProject.zip>`.
+For the sake of this example, we'll put ``MyProject`` directly in our webroot.  In most environments, you will want to expose **only** the ``public`` directory.  Download :download:`MyProject here <_static/MyProject.zip>`.
 
 composer.json
 -------------
