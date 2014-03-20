@@ -136,7 +136,7 @@ class Session
      */
     public function getData($key=null)
     {
-        if($null === $key) return $this->data;
+        if(null === $key) return $this->data;
 
         return isset($this->data[$key]) ? $this->data[$key] : null;
     }
