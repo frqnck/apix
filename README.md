@@ -18,6 +18,7 @@ Some of its features:
 * Supports **content negotiation** (which can also be overriden).
 * Take advantages of network caches -- supports HEAD test.
 * Available as a standalone **[PHAR][phar]** file, or via **[Composer][composer]** or as a **[PEAR] [pear]** package.
+* Read the [documentation][doc]!
 
 Todo:
 * Self-generated API resources testing.
@@ -275,17 +276,18 @@ _|    _| _|       _|      _|    _|
 _|    _| _|       _|     _|      _|
 </pre>
 
-[phar]: http://api.ouarz.net/v1/download/apix.phar          "Download the Phar file."
-[pear]: http://pear.ouarz.net                               "PEAR (TODO add to OUARZ)"
-[composer]: http://https://packagist.org/packages/apix/apix "Composer (TODO add to composer)"
-[github]: https://github.com/frqnck/apix                    "Github"
-[apixdoc]: http://frqnck.github.io/apix                     "Apix's Documentation"
-[rfc2616]: http://www.ietf.org/rfc/rfc2616                  "Hypertext Transfer Protocol -- HTTP/1.1"
-[rfc2617]: http://www.ietf.org/rfc/rfc2617                  "HTTP Authentication: Basic and Digest Access Authentication"
-[rfc2388]: http://www.ietf.org/rfc/rfc2388                  "Returning Values from Forms:  multipart/form-data"
-[rfc2854]: http://www.ietf.org/rfc/rfc2854                  "The 'text/html' Media Type"
-[rfc4627]: http://www.ietf.org/rfc/rfc4627                  "The application/json Media Type for JavaScript Object Notation (JSON)"
-[rfc4329]: http://www.ietf.org/rfc/rfc4329                  "Scripting Media Types"
-[rfc2046]: http://www.ietf.org/rfc/rfc2046                  "Multipurpose Internet Mail Extensions"
-[rfc3676]: http://www.ietf.org/rfc/rfc3676                  "The Text/Plain Format and DelSp Parameters"
-[rfc3023]: http://www.ietf.org/rfc/rfc3023                   "XML Media Types"
+[doc]: http://apix.readthedocs.org/en/latest/        "APIx Official Documentaion."
+[phar]: http://api.ouarz.net/v1/download/apix.phar   "Download the Phar file."
+[pear]: http://pear.ouarz.net                        "PEAR (TODO add to OUARZ)"
+[composer]: https://packagist.org/packages/apix/apix "Composer (TODO add to composer)"
+[github]: https://github.com/frqnck/apix             "Github"
+[apixdoc]: http://frqnck.github.io/apix              "Apix's Documentation"
+[rfc2616]: http://www.ietf.org/rfc/rfc2616           "Hypertext Transfer Protocol -- HTTP/1.1"
+[rfc2617]: http://www.ietf.org/rfc/rfc2617           "HTTP Authentication: Basic and Digest Access Authentication"
+[rfc2388]: http://www.ietf.org/rfc/rfc2388           "Returning Values from Forms:  multipart/form-data"
+[rfc2854]: http://www.ietf.org/rfc/rfc2854           "The 'text/html' Media Type"
+[rfc4627]: http://www.ietf.org/rfc/rfc4627           "The application/json Media Type for JavaScript Object Notation (JSON)"
+[rfc4329]: http://www.ietf.org/rfc/rfc4329           "Scripting Media Types"
+[rfc2046]: http://www.ietf.org/rfc/rfc2046           "Multipurpose Internet Mail Extensions"
+[rfc3676]: http://www.ietf.org/rfc/rfc3676           "The Text/Plain Format and DelSp Parameters"
+[rfc3023]: http://www.ietf.org/rfc/rfc3023           "XML Media Types"
