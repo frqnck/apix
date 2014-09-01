@@ -120,8 +120,9 @@ class Resources
     /**
      * Gets the specified ressource entity from a route object.
      *
-     * @param  Router                 $route The resource route object.
-     * @throws /DomainException       404
+     * @param  Router           $route The resource route object.
+     * @param  boolean          $follow Wether to handle the default actions.
+     * @throws /DomainException 404
      * @return Entity/EntityInterface
      */
     public function get(Router &$route, $follow=true)
@@ -136,7 +137,7 @@ class Resources
         }
 
         // handles the default actions but do not override a local action definition.
-        if ($follow===true) {
+        if ($follow) {
 
             $method = $route->getMethod();
 

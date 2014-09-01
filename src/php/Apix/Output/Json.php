@@ -19,9 +19,9 @@ class Json extends AbstractOutput
         $options = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
 
         // @codeCoverageIgnoreStart
-        // if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
-        //     $options = $options | JSON_PRETTY_PRINT;
-        // }
+        if (!defined('UNIT_TEST') && version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            $options = $options | JSON_PRETTY_PRINT;
+        }
         // @codeCoverageIgnoreEnd
 
         if (null !== $rootNode) {

@@ -196,8 +196,8 @@ class Response extends Listener
     /**
      * Sets the output format.
      *
-     * @param  string           $format
-     * @param  string           $default
+     * @param  string   $format
+     * @param  string   $default
      * @throws \DomainException 406
      */
     public function setFormat($format, $default=null)
@@ -245,21 +245,22 @@ class Response extends Listener
     }
 
     /**
-     * Sets a header.
+     * Sets a response header.
      *
-     * @param string $key
-     * @param string $value
+     * @param string  $key
+     * @param string  $value
+     * @param boolean $overwrite Wether to overwrite an existing header.   
      */
-    public function setHeader($key, $value, $replace=true)
+    public function setHeader($key, $value, $overwrite=true)
     {
-        if (!$replace && isset($this->headers[$key])) {
+        if (!$overwrite && isset($this->headers[$key])) {
             return;
         }
         $this->headers[$key] = $value;
     }
 
     /**
-     * Gets a specified header.
+     * Gets the specified response header.
      *
      * @param  string $key
      * @return string
@@ -345,7 +346,7 @@ class Response extends Listener
      * Returns an HTTP status phrase.
      *
      * @param  integer $http_code
-     * @param  bolean  $long
+     * @param  boolean $long
      * @return string
      */
     public static function getStatusPrases($http_code=null, $long=false)
