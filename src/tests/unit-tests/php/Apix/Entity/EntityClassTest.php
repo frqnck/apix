@@ -1,4 +1,15 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 use Apix\Entity,
@@ -75,7 +86,7 @@ class EntityClassTest extends \PHPUnit_Framework_TestCase
 
     public function testParseDocsClassLevel()
     {
-        $docs = $this->entity->_parseDocs();
+        $docs = $this->entity->parseDocs();
         $this->assertSame('CRUD fixture class', $docs['title']);
         $this->assertSame(4, count($docs['methods']));
     }

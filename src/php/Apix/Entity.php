@@ -1,8 +1,19 @@
 <?php
 
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 use Apix\Listener,
+    Apix\Config,
     Apix\Router,
     Apix\Entity\EntityInterface;
 
@@ -11,10 +22,33 @@ use Apix\Listener,
  */
 class Entity extends Listener
 {
-    protected $docs;
+    /**
+     * Holds the parsed entity documentaions.
+     * @var array|null
+     */
+    protected $docs = null;
+
+    /**
+     * @var Route
+     */
     protected $route;
+
+    /**
+     * Holds the entity redirect location.
+     * @var  string|null
+     */
     protected $redirect;
+
+    /**
+     * Holds all the entity available actions.
+     * @var  array|null
+     */
     protected $actions = null;
+
+    /**
+     * Holds all default actions.
+     * @var  array
+     */
     protected $defaultActions = array(
         'OPTIONS' => 'help',
         'HEAD' => 'test'
@@ -24,14 +58,29 @@ class Entity extends Listener
      * Holds the array of results of an entity.
      * @var  array
      */
-    public $results = null;
+    protected $results = null;
+
+    /**
+     * @var Config
+     */
+    protected $config;
+
+    /**
+     * Constructor.
+     *
+     * @param Config|null $config A config object
+     */
+    public function __construct(Config $config = null)
+    {
+        $this->config = $config ?: \Apix\Config::getInstance();
+    }
 
     /**
      * Appends the given array definition and apply generic mappings.
      *
      * @param  array $def An entity array definition.
      * @return void
-     * @see     EntityInterface::_append
+     * @see    EntityInterface::_append
      */
     final public function _append(array $def)
     {
@@ -108,7 +157,7 @@ class Entity extends Listener
     }
 
     /**
-     * To array...
+     * Returns this entity as an associative array.
      *
      * @return array
      */
@@ -118,15 +167,23 @@ class Entity extends Listener
     }
 
     /**
-     * Returns the full class/group or specified method documentation .
+     * Returns the full class/group or specified method documentation.
      *
      * @param  string $method
      * @return array
      */
     public function getDocs($method=null)
     {
-        if (null === $this->docs) {
-            $this->docs = $this->_parseDocs();
+        // apc_store('test_apix', "testing apix internal cache..");
+        // echo apc_fetch('test_apix');
+
+        if (null == $this->docs) {
+            $name = 'apix_docs';
+            if(!$this->config->get('cache_annotation')) {
+                $this->docs = $this->parseDocs();
+            } elseif (false === $this->docs = apc_fetch($name)) {
+                apc_store($name, $this->docs = $this->parseDocs());
+            }
         }
 
         if (null !== $method) {
@@ -146,8 +203,9 @@ class Entity extends Listener
      * @return array                       The array of validated and required parameters
      * @throws \BadMethodCallException     400
      */
-    public function getValidatedParams(\ReflectionFunctionAbstract $refMethod, $httpMethod, array $routeParams)
-    {
+    public function getValidatedParams(
+        \ReflectionFunctionAbstract $refMethod, $httpMethod, array $routeParams
+    ) {
         $params = array();
         foreach ($refMethod->getParameters() as $param) {
             $name = $param->getName();
@@ -158,18 +216,28 @@ class Entity extends Listener
 
                 // auto inject local objects
                 if ($class = $param->getClass()) {
-                    $obj = strtolower(str_replace(__NAMESPACE__ . '\\', '', $class->getName()));
-                    $params[$name] = $obj == 'server' ? $this->route->server : $this->route->server->$obj;
+                    $obj = strtolower(str_replace(__NAMESPACE__
+                           . '\\', '', $class->getName()));
+                    $params[$name] = $obj == 'server'
+                                     ? $this->route->server
+                                     : $this->route->server->$obj;
                 } else {
-                    throw new \BadMethodCallException("Required {$httpMethod} parameter \"{$name}\" missing in action.", 400);
+                    throw new \BadMethodCallException(
+                        "Required {$httpMethod} parameter \"{$name}\" missing in action.",
+                        400
+                    );
                 }
 
             } elseif (isset($routeParams[$name])) {
                 $params[$name] = $routeParams[$name];
             }
         }
+
         // TODO: maybe we need to check the order of params to match the method?
-        // TODO: eventually add type casting using namespacing e.g. method(integer $myInteger) => Apix\Casting\Integer, etc...
+
+        // TODO: eventually add some kind of type casting using namespacing
+        // e.g. method(integer $myInteger) => Apix\Casting\Integer, etc...
+
         return $params;
     }
 

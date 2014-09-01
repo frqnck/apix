@@ -96,8 +96,14 @@ $c = array(
         // be handy in many cases e.g. forms handling.
         'format_override'   => isset($_REQUEST['_format'])
                                 ? $_REQUEST['_format']
-                                : false,
-    )
+                                : false
+    ),
+    
+    // Wether to cache the collection and parsing of entity documentations. 
+    // This requires the APC extension enable. In order to clear the cache, e.g.
+    // when deploying a new version, you can restart the Web server or use the 
+    // commnd line..
+    'cache_annotation'     => extension_loaded('apc') && !DEBUG
 
 );
 
@@ -231,9 +237,9 @@ $c['plugins'] = array(
     // Add the entity signature as part of the response-body.
     'Apix\Plugin\OutputSign',
 
-    // Add some debugging information within the response-body.
-    // Should be set to false in production. This plugin affects cachability.
-    'Apix\Plugin\OutputDebug' => array('enable' => DEBUG),
+    // Cross-Origin Resource Sharing plugin. Enable thru annotation:
+    // e.g.  * @api_cors   groups=grp1,grp2   users=franck
+    'Apix\Plugin\Cors' => array('enable' => true),
 
     // Validates, corrects, and pretty-prints XML and HTML outputs.
     // Various options are available -- see Tidy::$options.
@@ -251,6 +257,10 @@ $c['plugins'] = array(
     //     'enable'  => !DEBUG, // don't cache while developing!
     //     'adapter' => new \Apix\Cache\APC
     // )
+
+    // Add some debugging information within the response-body.
+    // Should be set to false in production. This plugin affects cachability.
+    'Apix\Plugin\OutputDebug' => array('enable' => DEBUG)
 );
 
 // Init is an associative array of specific PHP directives. They are

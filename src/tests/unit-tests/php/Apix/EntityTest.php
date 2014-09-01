@@ -1,4 +1,15 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 use Apix\Entity,
@@ -15,7 +26,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entity = $this->getMock('Apix\Entity', array('underlineCall', '_parseDocs', 'getActions'));
+        $this->entity = $this->getMock('Apix\Entity', array('underlineCall', 'parseDocs', 'getActions'));
 
         $this->route = $this->getMock('Apix\Router', array('getMethod'));
         $this->entity->setRoute($this->route);
@@ -47,7 +58,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $docs = array('parseDocs', 'methods'=>array('GET'=>'doc for GET'));
         $this->entity->expects($this->once())
-                ->method('_parseDocs')
+                ->method('parseDocs')
                 ->will($this->returnValue($docs));
 
         $this->assertSame($docs, $this->entity->getDocs());
@@ -57,7 +68,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $docs = array('parseDocs', 'methods'=>array('GET'=>'doc for GET'));
         $this->entity->expects($this->once())
-                ->method('_parseDocs')
+                ->method('parseDocs')
                 ->will($this->returnValue($docs));
 
         $this->assertSame($docs['methods']['GET'], $this->entity->getDocs('GET'));
