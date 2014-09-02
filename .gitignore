@@ -10,4 +10,5 @@ vendor
 .svn
 phpunit.xml
 composer.lock
+build.xml
 TODO
