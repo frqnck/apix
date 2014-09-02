@@ -1,4 +1,15 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 // This is the Apix config.dist.php file
 // -------------------------------------
 //
@@ -99,10 +110,9 @@ $c = array(
                                 : false
     ),
     
-    // Wether to cache the collection and parsing of entity documentations. 
-    // This requires the APC extension enable. In order to clear the cache, e.g.
-    // when deploying a new version, you can restart the Web server or use the 
-    // commnd line..
+    // Wether to cache the collection and parsing of the entity' documentations. 
+    // This requires the APC extension to be enable. In order to clear the cache,
+    // e.g. when deploying a new version, (gracefully) restart the Web server.
     'cache_annotation'     => extension_loaded('apc') && !DEBUG
 
 );
@@ -239,7 +249,7 @@ $c['plugins'] = array(
 
     // Cross-Origin Resource Sharing plugin. Enable thru annotation:
     // e.g.  * @api_cors   groups=grp1,grp2   users=franck
-    'Apix\Plugin\Cors' => array('enable' => true),
+    'Apix\Plugin\Cors',
 
     // Validates, corrects, and pretty-prints XML and HTML outputs.
     // Various options are available -- see Tidy::$options.
