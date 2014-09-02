@@ -174,9 +174,6 @@ class Entity extends Listener
      */
     public function getDocs($method=null)
     {
-        // apc_store('test_apix', "testing apix internal cache..");
-        // echo apc_fetch('test_apix');
-
         if (null == $this->docs) {
             $name = 'apix_docs';
             if(!$this->config->get('cache_annotation')) {
