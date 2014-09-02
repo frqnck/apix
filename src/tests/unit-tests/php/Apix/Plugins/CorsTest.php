@@ -1,4 +1,15 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin;
 
 use Apix\HttpRequest,
@@ -13,13 +24,11 @@ class CorsTest extends TestCase
     public function setUp()
     {
         $this->request = HttpRequest::GetInstance();
-
-        $this->response = new Response(
-            HttpRequest::GetInstance()
-        );
+        $this->response = new Response($this->request);
         $this->response->unit_test = true;
 
         $this->route = $this->getMock('Apix\Router');
+        $this->entity = $this->getMock('Apix\Entity');
 
         $this->route->expects($this->any())
             ->method('getName')
@@ -31,16 +40,7 @@ class CorsTest extends TestCase
 
         $this->response->setRoute($this->route);
 
-        $options = array(
-            'enable'    => true,
-            'generic'   => array(
-                'indent'        => true,
-                'indent-spaces' => 2,
-                'show-body-only' => true
-            )
-        );
-
-        $this->plugin = new Cors($options);
+        $this->plugin = new Cors;
     }
 
     protected function tearDown()
@@ -51,14 +51,15 @@ class CorsTest extends TestCase
     public function testIsDisable()
     {
         $plugin = new Cors( array('enable' => false) );
-        $this->assertFalse( $plugin->update($this->response) );
+        $this->assertFalse( $plugin->update( $this->entity ) );
     }
 
     /**
      * @dataProvider originsProvider
      */
-    public function testIsOriginAllowed($origin, $host, $result, $port='(:[0-9]+)?', $scheme='https?')
-    {
+    public function testIsOriginAllowed(
+        $origin, $host, $result, $port = '(:[0-9]+)?', $scheme = 'https?'
+    ) {
         $this->assertSame(
             $result,
             $this->plugin->isOriginAllowed($origin, $host, $port, $scheme)

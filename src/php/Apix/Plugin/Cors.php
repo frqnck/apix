@@ -1,4 +1,15 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin;
 
 use Apix\Service,
@@ -17,12 +28,12 @@ class Cors extends PluginAbstractEntity
     protected $annotation = 'api_cors';
 
     protected $options = array(
-        'enable'    => true,         // enable or not
+        'enable'    => true,            // enable by default or not
         
-        // -- whitelist
-        'scheme'    => 'https?',     // allows http and https, 
-        'host'      => '.*\.info\.com', #'foo.bar',    // the domain(s) or ip(s) allowed.
-        'port'      => '(:[0-9]+)?', // port definition, here any number or none
+        // -- whitelist (regex)
+        'scheme'    => 'https?',        // allows both http and https 
+        'host'      => '.*\.info\.com', // the host domain(s) or ip(s) to allow
+        'port'      => '(:[0-9]+)?',    // the port(s) allowed
 
         // -- CORS directives
         'allow-origin'      => 'origin', // 'origin', '*', or string-list or null
@@ -37,31 +48,25 @@ class Cors extends PluginAbstractEntity
 
     public function update(\SplSubject $entity)
     {
-        // skip if null
-        if (
-            false === $this->options['enable']
-            // || null === $entity->getAnnotationValue($this->annotation)
-        ){
+        $this->setEntity($entity);
+
+        // skip this plugin if it is disable.
+        if( !$this->getSubTagBool('enable', $this->options['enable']) ) {
             return false;
         }
 
-        $this->entity = $entity;
-        
-        $host = $this->getSubTagValues('host');
+        $hosts = $this->getSubTagValues('host', array($this->options['host']));
+        if($hosts) {
+            // get only the first element -- use regex for multiple matches. 
+            $this->options['host'] = $hosts[0];
+        }
 
-        // $this->options['enable'] = (bool) $values[0];
-        // var_dump( $host );exit;
-
-        $response = Service::get('response');
-        $request = $response->getRequest();
-        // $request = HttpRequest::GetInstance();  //Service::get('request');
-
-        // Grab the Origin header.
+        // Grab the Origin: header.
         $http_origin = array_key_exists('HTTP_ORIGIN', $_SERVER)
                         ? $_SERVER['HTTP_ORIGIN']
                         : null;
 
-        # If the Origin is whitelisted then it is some kind of CORS request.
+        // If whitelisted then it is a valid CORS request.
         if (
             $http_origin
             // && $_SERVER['HTTP_HOST'] == $http_origin
@@ -71,6 +76,8 @@ class Cors extends PluginAbstractEntity
                 $this->options['port'], $this->options['scheme']
             )
         ) {
+            $response = Service::get('response');
+
             // 5.1 Access-Control-Allow-Origin
             $http_origin = $this->options['allow-origin'] == 'origin'
                             ? $http_origin
@@ -120,9 +127,11 @@ class Cors extends PluginAbstractEntity
      * @param string $host      The host domain(s) or IP(s) to match.
      * @param string $port      Default to any port or none provided.
      * @param string $scheme    Default tp 'http' and 'https'.
+     * @return boolean
      */
-    public function isOriginAllowed($origin, $host, $port='(:[0-9]+)?', $scheme='https?')
-    {
+    public function isOriginAllowed(
+        $origin, $host, $port='(:[0-9]+)?', $scheme='https?'
+    ) {
         $regex = '`^' . $scheme . ':\/\/' . $host . $port . '$`';
         return (bool) preg_match($regex, $origin);
     }

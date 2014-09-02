@@ -1,14 +1,25 @@
 <?php
 
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 use Apix\Listener,
     Apix\Config,
     Apix\Resources,
-    Apix\Entity,
+    // Apix\Entity,
     Apix\Request,
     Apix\HttpRequest,
-    Apix\Response;
+    Apix\Response,
+    Apix\Service;
 
 class Main extends Listener
 {
@@ -87,6 +98,9 @@ class Main extends Listener
             );
         }
 
+        // Set some generic services
+        Service::set('response', $this->response);
+        Service::set('request', $this->request);
     }
 
     /**

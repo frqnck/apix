@@ -1,4 +1,15 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin;
 
 use Apix\Plugin\PluginAbstract,
@@ -91,14 +102,12 @@ class PluginAbstractTest extends TestCase
 
     public function testConstructor()
     {
-        $plugin = $this->getMockForAbstractClass('Apix\Plugin\PluginAbstract');
-
         $obj = new \stdClass;
-        $plugin->__construct($obj);
+        $this->plugin->__construct($obj);
 
         $this->assertSame(
             array('adapter' => $obj),
-            $plugin->getOptions()
+            $this->plugin->getOptions()
         );
     }
 
