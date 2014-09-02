@@ -35,7 +35,7 @@ class DocbookClass
      * @api_randomName   methodRandomValue
      * @rndGrouping      a group value
      * @rndGrouping      another group value
-     * @api_link OPTIONS /\*\/etc...
+     * @api_link OPTIONS .*\.foo\.bar
      */
     public function methodNameOne($namedInteger, $namedString, $namedBoolean, array $optional=null)
     {

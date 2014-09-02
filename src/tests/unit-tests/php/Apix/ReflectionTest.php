@@ -214,11 +214,9 @@ class ReflectionTest extends TestCase
         $this->assertSame($r->getPrefix(), 'api_');
     }
 
-    // /* TODO Prefix handler */
-    // public function testSpecialCharacters()
-    // {
-    //     $this->markTestIncomplete('TODO: allow to use wildcard within doc (fix regex)');
-    //     $this->assertSame('OPTIONS /*/etc...', $this->method['api_link']);
-    // }
+    public function testWithWildcardCharacter()
+    {
+        $this->assertSame('OPTIONS .*\.foo\.bar', $this->method['api_link']);
+    }
 
 }
