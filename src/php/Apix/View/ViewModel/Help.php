@@ -116,7 +116,7 @@ class Help extends ViewModel
      */
     public function _def()
     {
-        return function($t) {
+        return function ($t) {
             return '<span class="default">' . $t . '</span>';
         };
     }

@@ -131,7 +131,7 @@ class Digest extends AbstractAuth
             && preg_match('/uri="([^"]+)"/', $digest, $uri))
         {
             $this->digest = array_map(
-                function($a){return array_pop($a);},
+                function ($a) {return array_pop($a);},
                 compact('username', 'nonce', 'response', 'opaque', 'uri')
             );
 

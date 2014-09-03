@@ -146,8 +146,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 
     public function testAutoInject()
     {
-        $this->route->server = new Server;
-        $ref = new \ReflectionFunction(function(Request $request, Server $server, Response $response, Resources $resources){return 'something';});
+        $this->route->server = new Server();
+        $ref = new \ReflectionFunction(function (Request $request, Server $server, Response $response, Resources $resources) {return 'something';});
         $params = $this->entity->getValidatedParams($ref, 'aStringName', array());
 
         $this->assertInstanceOf('Apix\Request', $params['request']);
@@ -162,13 +162,13 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $_REQUEST['param1'] = 'value1';
         $_REQUEST['param2'] = 'value2';
 
-        $request = New HttpRequest;
+        $request = new HttpRequest();
         $request->setHeader('CONTENT_TYPE', 'application/x-www-form-urlencoded');
         $request->setBody('param1=value1&param2=value2');
 
         $this->route->server = new Server(null, $request);
 
-        $ref = new \ReflectionFunction(function(Request $request){echo '*test*'; return $request->getBodyData();return func_get_args();});
+        $ref = new \ReflectionFunction(function (Request $request) {echo '*test*'; return $request->getBodyData();return func_get_args();});
         $params = $this->entity->getValidatedParams($ref, 'aStringName', array());
 
         $this->assertInstanceOf('Apix\HttpRequest', $params['request']);

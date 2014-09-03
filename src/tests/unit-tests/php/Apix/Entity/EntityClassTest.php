@@ -28,7 +28,7 @@ class EntityClassTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entity = new Entity\EntityClass;
+        $this->entity = new Entity\EntityClass();
         $this->entity->append($this->definition);
 
         $routes = array('/:controller/:id/:optional' => array());

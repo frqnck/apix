@@ -109,8 +109,8 @@ $c = array(
                                 ? $_REQUEST['_format']
                                 : false
     ),
-    
-    // Wether to cache the collection and parsing of the entity' documentations. 
+
+    // Wether to cache the collection and parsing of the entity' documentations.
     // This requires the APC extension to be enable. In order to clear the cache,
     // e.g. when deploying a new version, (gracefully) restart the Web server.
     'cache_annotation'     => extension_loaded('apc') && !DEBUG
@@ -159,14 +159,14 @@ $c['resources'] = array(
 $c['services'] = array(
 
     // Auth examples (see plugins definition)
-    'auth_example' => function() use ($c) {
+    'auth_example' => function () use ($c) {
         $basic = true; // set to: False to use Digest, True to use Basic.
         if ($basic) {
             // Example implementing Plugin\Auth\Basic
             // --------------------------------------
             // The Basic Authentification mechanism is generally use with SSL.
             $adapter = new Plugin\Auth\Basic($c['api_realm']);
-            $adapter->setToken(function(array $current) use ($c) {
+            $adapter->setToken(function (array $current) use ($c) {
                 $users = Service::get('users_example');
                 foreach ($users as $user) {
                     if (
@@ -187,7 +187,7 @@ $c['services'] = array(
             // The Digest Authentification mechanism is use to encrypt and salt
             // the user's credentials without the overhead of SSL.
             $adapter = new Plugin\Auth\Digest($c['api_realm']);
-            $adapter->setToken(function(array $current) use ($c) {
+            $adapter->setToken(function (array $current) use ($c) {
                 $users = Service::get('users_example');
                 foreach ($users as $user) {
                     if (
@@ -209,7 +209,7 @@ $c['services'] = array(
     },
 
     // This is used by the auth_example service defined above.
-    'users_example' => function() {
+    'users_example' => function () {
         return array(
             0 => array(
                 'username' => 'franck', 'password' => 'pass', 'api_key' => '123',
@@ -225,7 +225,7 @@ $c['services'] = array(
 
     // This is used by the auth_example service defined further above.
     // Noet that this is only an example
-    'session' => function($user) {
+    'session' => function ($user) {
         // Set that way solely to avoid duplicating code in auth_example.
         $session = new Session($user['username'], $user['group']);
         if (isset($user['ips'])) {

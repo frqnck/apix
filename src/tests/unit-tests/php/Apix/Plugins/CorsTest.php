@@ -40,7 +40,7 @@ class CorsTest extends TestCase
 
         $this->response->setRoute($this->route);
 
-        $this->plugin = new Cors;
+        $this->plugin = new Cors();
     }
 
     protected function tearDown()

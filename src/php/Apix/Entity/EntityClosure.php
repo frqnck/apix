@@ -39,7 +39,7 @@ class EntityClosure extends Entity implements EntityInterface
         if (isset($this->reflection[$name])) {
             return $this->reflection[$name];
         } elseif ( isset($this->actions[$name]['action'])
-            && $this->actions[$name]['action'] instanceOf \Closure
+            && $this->actions[$name]['action'] instanceof \Closure
         ) {
             $this->reflection[$name] = new \ReflectionFunction($this->actions[$name]['action']);
 

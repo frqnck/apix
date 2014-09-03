@@ -1,14 +1,14 @@
 <?php
 namespace Apix;
 
-class OutputJsonpTest extends \PHPUnit_Framework_TestCase
+class JsonpTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $js;
 
     public function setUp()
     {
-        $this->js = new Output\Jsonp;
+        $this->js = new Output\Jsonp();
     }
 
     protected function tearDown()

@@ -38,10 +38,10 @@ class Xml extends AbstractOutput
     public function encode(array $data, $rootNode='root')
     {
         if (extension_loaded('xmlwriter')) {
-            $xml = new Xml\XmlWriter;
+            $xml = new Xml\XmlWriter();
         } else {
             // SimpleXml is a default PHP extension
-            $xml = new Xml\SimpleXml;
+            $xml = new Xml\SimpleXml();
         }
 
         return $xml->encode($data, $rootNode);
@@ -65,11 +65,11 @@ class Xml extends AbstractOutput
 /*
 if ( !function_exists( 'xmlentities' ) ) {
 
-    public function xmlentities( $string )
+    public function xmlentities($string)
     {
         $not_in_list = "A-Z0-9a-z\s_-";
 
-        return preg_replace_callback( "/[^{$not_in_list}]/" , function($CHAR) {
+        return preg_replace_callback( "/[^{$not_in_list}]/" , function ($CHAR) {
         if ( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
             die( "function: 'get_xml_entity_at_index_zero' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type." );
         }
@@ -82,7 +82,7 @@ if ( !function_exists( 'xmlentities' ) ) {
             }, $string );
     }
 
-    public function get_xml_entity_at_index_zero( $CHAR )
+    public function get_xml_entity_at_index_zero($CHAR)
     {
         if ( !is_string( $CHAR[0] ) || ( strlen( $CHAR[0] ) > 1 ) ) {
             die( "function: 'get_xml_entity_at_index_zero' requires data type: 'char' (single character). '{$CHAR[0]}' does not match this type." );
@@ -95,7 +95,7 @@ if ( !function_exists( 'xmlentities' ) ) {
         }
     }
 
-    public function numeric_entity_4_char( $char )
+    public function numeric_entity_4_char($char)
     {
         return "&#".str_pad(ord($char), 3, '0', STR_PAD_LEFT).";";
     }

@@ -10,7 +10,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->config = new Config;
+        $this->config = new Config();
     }
 
     protected function tearDown()
@@ -33,7 +33,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
 
     public function testConstructorLoadsDistFileByDefault()
     {
-        $config = new Config;
+        $config = new Config();
         $this->assertRegExp('@\/.*$@', $config->get('config_path'));
     }
 

@@ -2,7 +2,7 @@
 
 namespace Apix;
 
-class ConsoleTest extends \PHPUnit_Framework_TestCase
+class Console extends \PHPUnit_Framework_TestCase
 {
     protected $cli;
 

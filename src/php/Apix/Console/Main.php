@@ -102,7 +102,7 @@ class Main extends Console
                     }
                     $response = trim($this->getContents($url));
 
-                    $input = new Input\Json;
+                    $input = new Input\Json();
                     $r = $input->decode($response, true);
                     if ($this->verbose > 2) {
                         print_r($r);
@@ -137,7 +137,7 @@ class Main extends Console
             break;
 
             case '-s': case '--syscheck':
-                $syscheck = new SystemCheck;
+                $syscheck = new SystemCheck();
                 $syscheck->setArgs(array('--all', '--no-credits'));
                 $syscheck->run();
                 break;

@@ -20,8 +20,6 @@ class TestTest extends \PHPUnit_Framework_TestCase
 
         $obj = new BlankResource('POST', array('paramName' => 'someValue'));
 
-
-
         // TODO create assertHeader
         $this->assertHeader('Allow: GET, HEAD, OPTIONS');
     }

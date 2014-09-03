@@ -23,7 +23,7 @@ class HelpTest extends TestCase
              *
              * @return array  The array to return to the client
              */
-            function($test) {
+            function ($test) {
                 return array("You just created $test.");
             }
         );
@@ -34,7 +34,7 @@ class HelpTest extends TestCase
              *
              * @return array  The array to return to the client
              */
-            function($test) {
+            function ($test) {
                 return array("You just retrieve $test.");
             }
         );
@@ -45,7 +45,7 @@ class HelpTest extends TestCase
              *
              * @return array  The array to return to the client
              */
-            function($test) {
+            function ($test) {
                 return array("$test was modified.");
             }
         );

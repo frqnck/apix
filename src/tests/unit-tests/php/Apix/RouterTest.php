@@ -307,7 +307,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetActions()
     {
-        $route = new Router;
+        $route = new Router();
         $actions = array(
             'POST'      => 'onCreate',
             'GET'       => 'onRead',
@@ -323,7 +323,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetActionWithMethod()
     {
-        $route = new Router;
+        $route = new Router();
         $this->assertSame(null, $route->getAction());
         $this->assertSame('onCreate', $route->getAction('POST'));
         $this->assertSame('onUpdate', $route->getAction('PUT'));
@@ -331,21 +331,21 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
     public function testGetSetActions()
     {
-        $route = new Router;
+        $route = new Router();
         $route->setAction('PUT');
         $this->assertSame('onUpdate', $route->getAction() );
     }
 
     public function testGetsetController()
     {
-        $route = new Router;
+        $route = new Router();
         $route->setController('resourceName');
         $this->assertSame('resourceName', $route->getController() );
     }
 
     public function testGetSetMethodGoesUppercase()
     {
-        $route = new Router;
+        $route = new Router();
         $route->setMethod('get');
         $this->assertSame('GET', $route->getMethod() );
     }
@@ -355,7 +355,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetSetParam()
     {
-        $route = new Router;
+        $route = new Router();
         $route->setParam('test', 'value');
         $this->assertSame('value', $route->getParam('test') );
 
@@ -379,7 +379,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
      */
     public function testRegexRouteToParamsMatcher($route, $url, $expected)
     {
-        $router = new Router;
+        $router = new Router();
         $results = $router->routeToParamsMatcher($route, $url);
         $this->assertSame($expected, $results);
     }

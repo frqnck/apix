@@ -2,8 +2,6 @@
 
 namespace Apix;
 
-Use Apix\Entity\EntityInterface;
-
 /**
  * Represents a response.
  */
@@ -196,8 +194,8 @@ class Response extends Listener
     /**
      * Sets the output format.
      *
-     * @param  string   $format
-     * @param  string   $default
+     * @param  string           $format
+     * @param  string           $default
      * @throws \DomainException 406
      */
     public function setFormat($format, $default=null)
@@ -249,7 +247,7 @@ class Response extends Listener
      *
      * @param string  $key
      * @param string  $value
-     * @param boolean $overwrite Wether to overwrite an existing header.   
+     * @param boolean $overwrite Wether to overwrite an existing header.
      */
     public function setHeader($key, $value, $overwrite=true)
     {

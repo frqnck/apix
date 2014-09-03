@@ -100,7 +100,7 @@ abstract class PluginAbstract implements \SplObserver
     public function setAdapter($adapter)
     {
         if (is_string($adapter)) {
-            $this->adapter = new $adapter;
+            $this->adapter = new $adapter();
         } else {
             $this->adapter = $adapter instanceof \Closure
                                 ? $adapter()

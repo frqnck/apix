@@ -66,7 +66,7 @@ class Main extends Listener
     ) {
 
         // Set and intialise the config
-        $c = $config instanceOf Config ? $config : Config::getInstance($config);
+        $c = $config instanceof Config ? $config : Config::getInstance($config);
         $this->config = $c->get();
 
         $this->initSet($this->config);
@@ -79,7 +79,7 @@ class Main extends Listener
                             ? HttpRequest::getInstance()
                             : $request;
 
-        if ($this->request instanceOf HttpRequest) {
+        if ($this->request instanceof HttpRequest) {
             $this->request->setFormats($this->config['input_formats']);
         }
 
@@ -91,7 +91,7 @@ class Main extends Listener
         $this->response->setFormats($this->config['routing']['formats']);
 
         // Add all the resources from config.
-        $this->resources = new Resources;
+        $this->resources = new Resources();
         foreach ($c->getResources() as $key => $values) {
             $this->resources->add(
                 $key, $values
@@ -246,7 +246,7 @@ class Main extends Listener
         if ($opts['controller_ext']) {
             $parts = explode('/', $path);
             $info = pathinfo(isset($parts[1]) ? $parts[1] : $parts[0] );
-            $ext = isset($info['extension'])?$info['extension']:null;
+            $ext = isset($info['extension']) ? $info['extension'] : null;
             if ($ext) {
                 $path = preg_replace('/\.' . $ext . '/', '', $path, 1);
             }

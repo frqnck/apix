@@ -176,7 +176,7 @@ class Entity extends Listener
     {
         if (null == $this->docs) {
             $name = 'apix_docs';
-            if(!$this->config->get('cache_annotation')) {
+            if (!$this->config->get('cache_annotation')) {
                 $this->docs = $this->parseDocs();
             } elseif (false === $this->docs = apc_fetch($name)) {
                 apc_store($name, $this->docs = $this->parseDocs());
@@ -234,7 +234,6 @@ class Entity extends Listener
 
         // TODO: eventually add some kind of type casting using namespacing
         // e.g. method(integer $myInteger) => Apix\Casting\Integer, etc...
-
         return $params;
     }
 

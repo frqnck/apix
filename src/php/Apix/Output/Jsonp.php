@@ -1,8 +1,6 @@
 <?php
 namespace Apix\Output;
 
-use Apix\Output\Json;
-
 class Jsonp extends AbstractOutput
 {
 

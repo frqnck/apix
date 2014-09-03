@@ -51,7 +51,7 @@ class PluginAbstractTest extends TestCase
 
     public function testSetAdapterWithClosure()
     {
-        $this->plugin->setAdapter(function(){return 'foo';});
+        $this->plugin->setAdapter(function () {return 'foo';});
         $this->assertSame(
             'foo',
             $this->plugin->getAdapter()
@@ -93,7 +93,7 @@ class PluginAbstractTest extends TestCase
      */
     public function testCheckAdapterClassThrowsRuntimeException()
     {
-        $this->plugin->setAdapter(new \stdClass);
+        $this->plugin->setAdapter(new \stdClass());
         PluginAbstract::checkAdapterClass(
             $this->plugin->getAdapter(),
             'Apix\Plugin\PluginAbstract'
@@ -102,7 +102,7 @@ class PluginAbstractTest extends TestCase
 
     public function testConstructor()
     {
-        $obj = new \stdClass;
+        $obj = new \stdClass();
         $this->plugin->__construct($obj);
 
         $this->assertSame(

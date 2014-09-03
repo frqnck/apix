@@ -7,7 +7,7 @@ define('APP_TESTDIR', realpath(__DIR__ . '/php'));
 
 try {
      // Phar::mapPhar('apix.phar');
-    spl_autoload_register(function($name){
+    spl_autoload_register(function ($name) {
         $phar = 'phar://' . realpath(__DIR__ . '/../../../dist/apix.phar');
 
         $file = '/' . str_replace('\\', DIRECTORY_SEPARATOR, $name).'.php';

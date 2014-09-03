@@ -1,14 +1,14 @@
 <?php
 namespace Apix;
 
-class OutputJsonTest extends \PHPUnit_Framework_TestCase
+class JsonTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $json;
 
     public function setUp()
     {
-        $this->json = new Output\Json;
+        $this->json = new Output\Json();
     }
 
     protected function tearDown()

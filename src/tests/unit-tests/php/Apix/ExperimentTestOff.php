@@ -2,7 +2,7 @@
 
 namespace Apix;
 
-class ExperimentTest extends \PHPUnit_Framework_TestCase
+class ExperimentTestOff extends \PHPUnit_Framework_TestCase
 {
 
     protected $server, $request;
@@ -28,7 +28,7 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
 
     public function OfftestOnReadUpdateRoutesInConfig()
     {
-        $this->api->onRead('/keywords/:keyword', function($keyword) {
+        $this->api->onRead('/keywords/:keyword', function ($keyword) {
             return array('keyword'=>$keyword);
         });
 
@@ -40,7 +40,7 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
 
     public function testAccessOnReadMapsWithRoute()
     {
-        $this->api->onRead('/keywords/:keyword', function($keyword) {
+        $this->api->onRead('/keywords/:keyword', function ($keyword) {
             return array('keyword'=>$keyword);
         });
 
@@ -56,11 +56,11 @@ class ExperimentTest extends \PHPUnit_Framework_TestCase
 
     public function OfftestAccessReadWith()
     {
-        $this->api->onRead('/keywords/:keyword', function($keyword) {
+        $this->api->onRead('/keywords/:keyword', function ($keyword) {
             return array('GET Keyword' => $keyword);
         });
 
-        $this->api->onPost('/keywords/:keyword', function($keyword) {
+        $this->api->onPost('/keywords/:keyword', function ($keyword) {
             return array('POST Keyword' => $keyword);
         });
 

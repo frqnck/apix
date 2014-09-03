@@ -2,8 +2,6 @@
 
 namespace Apix;
 
-use Apix\Server;
-
 if (!defined('APIX_START_TIME')) {
     define('APIX_START_TIME', microtime(true));
 }
@@ -27,8 +25,8 @@ class Server extends Main
     /**
      * GET request handler
      *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
+     * @param  string     $path The path name to match against.
+     * @param  mixed      $to   Callback that returns the response when matched.
      * @see  Server::proxy
      * @return Controller Provides a fluent interface.
      */
@@ -40,8 +38,8 @@ class Server extends Main
     /**
      * PUT request handler
      *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
+     * @param  string     $path The path name to match against.
+     * @param  mixed      $to   Callback that returns the response when matched.
      * @see  Server::proxy
      * @return Controller Provides a fluent interface.
      */
@@ -53,8 +51,8 @@ class Server extends Main
     /**
      * PATCH request handler
      *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
+     * @param  string     $path The path name to match against.
+     * @param  mixed      $to   Callback that returns the response when matched.
      * @see  Server::proxy
      * @return Controller Provides a fluent interface.
      */
@@ -66,8 +64,8 @@ class Server extends Main
     /**
      * DELETE request handler
      *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
+     * @param  string     $path The path name to match against.
+     * @param  mixed      $to   Callback that returns the response when matched.
      * @see  Server::proxy
      * @return Controller Provides a fluent interface.
      */
@@ -79,8 +77,8 @@ class Server extends Main
     /**
      * OPTIONS request handler
      *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
+     * @param  string     $path The path name to match against.
+     * @param  mixed      $to   Callback that returns the response when matched.
      * @see  Server::proxy
      * @return Controller Provides a fluent interface.
      */
@@ -92,8 +90,8 @@ class Server extends Main
     /**
      * HEAD request handler
      *
-     * @param string $path The path name to match against.
-     * @param mixed  $to   Callback that returns the response when matched.
+     * @param  string     $path The path name to match against.
+     * @param  mixed      $to   Callback that returns the response when matched.
      * @see  Server::proxy
      * @return Controller Provides a fluent interface.
      */

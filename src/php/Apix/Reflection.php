@@ -48,7 +48,7 @@ class Reflection
      */
     public static function parsePhpDoc($mix, array $requireds=null)
     {
-        if ($mix instanceOf \Reflector) {
+        if ($mix instanceof \Reflector) {
             $doc = $mix->getDocComment();
             $requireds = self::getRequiredParams($mix);
         } else {
@@ -56,7 +56,7 @@ class Reflection
         }
 
         $docs = array();
-        
+
         // 1st - remove /*, *, */ from all the lines
         $doc = substr($doc, 3, -2);
 

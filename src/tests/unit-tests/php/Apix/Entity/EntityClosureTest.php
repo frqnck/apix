@@ -26,9 +26,9 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->definition = array('action'=>function($id, $optional=null){return func_get_args();}, 'method'=>'GET', 'redirect' => 'location' );
+        $this->definition = array('action'=>function ($id, $optional=null) {return func_get_args();}, 'method'=>'GET', 'redirect' => 'location' );
 
-        $this->entity = new Entity\EntityClosure;
+        $this->entity = new Entity\EntityClosure();
         $this->entity->append($this->definition);
 
         $routes = array('/:controller/:id/:optional' => array());
@@ -45,7 +45,7 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
     {
         $entity = $this->entity->toArray();
 
-        $this->assertTrue($entity['actions']['GET']['action'] instanceOf \Closure);
+        $this->assertTrue($entity['actions']['GET']['action'] instanceof \Closure);
         $this->assertTrue(is_callable($entity['actions']['GET']['action']));
 
         $this->assertSame('location', $entity['redirect'], "Check to see if parent::_append is called.");

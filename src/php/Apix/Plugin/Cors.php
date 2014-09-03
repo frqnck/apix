@@ -29,9 +29,9 @@ class Cors extends PluginAbstractEntity
 
     protected $options = array(
         'enable'    => true,            // enable by default or not
-        
+
         // -- whitelist (regex)
-        'scheme'    => 'https?',        // allows both http and https 
+        'scheme'    => 'https?',        // allows both http and https
         'host'      => '.*\.info\.com', // the host domain(s) or ip(s) to allow
         'port'      => '(:[0-9]+)?',    // the port(s) allowed
 
@@ -51,13 +51,13 @@ class Cors extends PluginAbstractEntity
         $this->setEntity($entity);
 
         // skip this plugin if it is disable.
-        if( !$this->getSubTagBool('enable', $this->options['enable']) ) {
+        if ( !$this->getSubTagBool('enable', $this->options['enable']) ) {
             return false;
         }
 
         $hosts = $this->getSubTagValues('host', array($this->options['host']));
-        if($hosts) {
-            // get only the first element -- use regex for multiple matches. 
+        if ($hosts) {
+            // get only the first element -- use regex for multiple matches.
             $this->options['host'] = $hosts[0];
         }
 
@@ -92,17 +92,17 @@ class Cors extends PluginAbstractEntity
 
             // 5.3 Access-Control-Expose-Headers
             // Which response headers are available (besides the generic ones)
-            if($this->options['expose-headers']) {
+            if ($this->options['expose-headers']) {
                 $response->setHeader('Access-Control-Expose-Headers',
                                             $this->options['expose-headers']);
             }
 
             // TODO: Preflight...
             $preflight = false;
-            if($preflight) {
+            if ($preflight) {
                 // 5.4 Access-Control-Max-Age
                 // Cache the preflight request for the provided amount of seconds.
-                if($this->options['max-ages'] > 0) {
+                if ($this->options['max-ages'] > 0) {
                     $response->setHeader('Access-Control-Max-Age',
                                             (int) $this->options['max-ages']);
                 }
@@ -124,15 +124,16 @@ class Cors extends PluginAbstractEntity
     /**
      * Checks the provided origin as a CORS requests.
      *
-     * @param string $host      The host domain(s) or IP(s) to match.
-     * @param string $port      Default to any port or none provided.
-     * @param string $scheme    Default tp 'http' and 'https'.
+     * @param  string  $host   The host domain(s) or IP(s) to match.
+     * @param  string  $port   Default to any port or none provided.
+     * @param  string  $scheme Default tp 'http' and 'https'.
      * @return boolean
      */
     public function isOriginAllowed(
         $origin, $host, $port='(:[0-9]+)?', $scheme='https?'
     ) {
         $regex = '`^' . $scheme . ':\/\/' . $host . $port . '$`';
+
         return (bool) preg_match($regex, $origin);
     }
 

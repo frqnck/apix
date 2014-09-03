@@ -52,16 +52,17 @@ abstract class PluginAbstractEntity extends PluginAbstract
     /**
      * Returns the boolean value of the specified subtag.
      *
-     * @param  string      $key     The subtag $key to retrieve
-     * @param  string|null $default The default value
+     * @param  string       $key     The subtag $key to retrieve
+     * @param  string|null  $default The default value
      * @return boolean|null
      */
     public function getSubTagBool($key, $default=null)
     {
         $tags = $this->extractSubTags();
         $k = array_search($key, $tags['keys']);
-        
+
         $value = $k === false ? ( $default ? (bool) $default : null)  : $tags['values'][$k];
+
         return null === $value ? null : filter_var($value, FILTER_VALIDATE_BOOLEAN);
     }
 
@@ -87,7 +88,6 @@ abstract class PluginAbstractEntity extends PluginAbstract
                 );
             }
         // }
-
         return $this->subtags_extract;
     }
 

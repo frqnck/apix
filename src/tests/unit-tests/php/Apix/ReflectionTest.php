@@ -2,7 +2,6 @@
 namespace Apix;
 
 use Apix\Fixtures\DocbookClass;
-use Apix\TestCase;
 
 class ReflectionTest extends TestCase
 {
@@ -14,7 +13,7 @@ class ReflectionTest extends TestCase
 
     protected function setUp()
     {
-        $class = new DocbookClass;
+        $class = new DocbookClass();
 
         $this->reflected = new \ReflectionClass($class);
 

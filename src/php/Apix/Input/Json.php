@@ -1,8 +1,6 @@
 <?php
 namespace Apix\Input;
 
-use Apix\Input\InputInterface;
-
 class Json implements InputInterface
 {
 
