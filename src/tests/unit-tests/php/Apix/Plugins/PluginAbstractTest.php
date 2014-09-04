@@ -102,13 +102,16 @@ class PluginAbstractTest extends TestCase
 
     public function testConstructor()
     {
-        $obj = new \stdClass();
-        $this->plugin->__construct($obj);
+        $ref = new \ReflectionClass($this->plugin);
+        $ref->setStaticPropertyValue('hook', array('interface' => '\Apix\Plugin\PluginAbstract'));
+
+        $this->plugin->__construct($this->plugin);
 
         $this->assertSame(
-            array('adapter' => $obj),
+            array('adapter' => $this->plugin),
             $this->plugin->getOptions()
         );
+
     }
 
 }

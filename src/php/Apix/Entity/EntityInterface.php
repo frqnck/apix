@@ -12,8 +12,7 @@
 
 namespace Apix\Entity;
 
-use Apix\Entity,
-    Apix\Router;
+use Apix\Router;
 
 interface EntityInterface
 {

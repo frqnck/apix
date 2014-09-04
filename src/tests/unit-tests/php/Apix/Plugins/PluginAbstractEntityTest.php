@@ -33,9 +33,9 @@ class PluginAbstractEntityTest extends TestCase
         $this->entity
             ->expects($this->any())
             ->method('getAnnotationValue')
-            // ->with($this->equalTo('anno1'))
+            ->with($this->equalTo('anno1'))
             ->will($this->returnValue('foo=yes bar=val1,val2'));
-        // $this->plugin->setAnnotation('anno1');
+        $this->plugin->setAnnotation('anno1');
     }
 
     protected function tearDown()
@@ -77,7 +77,7 @@ class PluginAbstractEntityTest extends TestCase
 
     public function testGetSubTagBoolString()
     {
-        // $this->plugin->setAnnotation('anno2');
+        $this->plugin->setAnnotation('anno2');
         $this->entity = $this->getMockBuilder('Apix\Entity')
                                 ->disableOriginalConstructor()
                                 ->getMock();
@@ -85,7 +85,7 @@ class PluginAbstractEntityTest extends TestCase
         $this->entity
             ->expects( $this->any() )
             ->method('getAnnotationValue')
-            // ->with($this->equalTo('anno2'))
+            ->with($this->equalTo('anno2'))
             ->will($this->returnValue(
                 'True=true False=false Yes=yes No=no Zero=0 One=1')
             );
@@ -99,6 +99,14 @@ class PluginAbstractEntityTest extends TestCase
         $this->assertFalse( $this->plugin->getSubTagBool('Zero') );
         $this->assertTrue( $this->plugin->getSubTagBool('One') );
         $this->assertNull( $this->plugin->getSubTagBool('Nil') );
+    }
+
+    public function testEntitySetters()
+    {
+        $mock = $this->getMock('Apix\Entity');
+        $this->plugin->setEntity($mock);
+
+        $this->assertSame( $this->plugin->getEntity(), $mock);
     }
 
 }

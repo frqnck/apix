@@ -1,17 +1,9 @@
 <?php
 
-/**
- *
- * This file is part of the Apix Project.
- *
- * (c) Franck Cassedanne <franck at ouarz.net>
- *
- * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
- *
- */
-
 // This is the Apix config.dist.php file
 // -------------------------------------
+// (c) Franck Cassedanne <franck at ouarz.net>
+// License: http://opensource.org/licenses/BSD-3-Clause  New BSD License
 //
 // You should NOT edit this file! Instead, put any overrides into a local copy.
 // The local file should only contain values which override values set in the

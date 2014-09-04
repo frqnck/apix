@@ -148,6 +148,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('bar', $this->config->getServices('foo'));
     }
 
+    public function testAddValue()
+    {
+        $this->config->add('foo', 'bar');
+        $this->assertSame(array('bar'), $this->config->get('foo'));
+    }
+
+
     /**
      * TEMP: testIsSingleton
      */

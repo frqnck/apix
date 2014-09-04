@@ -16,6 +16,12 @@ abstract class PluginAbstract implements \SplObserver
 {
 
     /**
+     * Holds the hook'ing array.
+     * @var array
+     */
+    public static $hook = array();
+
+    /**
      * Holds a plugin's adapter.
      * @var  closure|object
      */
@@ -121,6 +127,7 @@ abstract class PluginAbstract implements \SplObserver
     /**
      * Just a shortcut for now. This is TEMP and will be moved elsewhere!
      * TODO: TEMP to refactor
+     * @codeCoverageIgnore
      */
     public function log($msg, $context=null, $level='debug')
     {

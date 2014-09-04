@@ -15,7 +15,6 @@ namespace Apix;
 use Apix\Listener,
     Apix\Config,
     Apix\Resources,
-    // Apix\Entity,
     Apix\Request,
     Apix\HttpRequest,
     Apix\Response,
