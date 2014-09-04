@@ -1,4 +1,15 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 class RequestTest extends \PHPUnit_Framework_TestCase
@@ -124,6 +135,12 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('METHD', $this->request->getMethod(), 'Should go all uppercase');
     }
 
+    public function testGetSetHeaderIsCaseInsensitive()
+    {
+        $this->request->setHeader('fOo', 'bar');
+        $this->assertSame('bar', $this->request->getHeader('FoO') );
+    }
+
     public function testGetSetHeaders()
     {
         $this->request->setHeaders(array('a', 'b', 'c'));
@@ -131,7 +148,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
 
         $this->request->setHeaders();
         $this->assertSame($_SERVER, $this->request->getHeaders() );
-
     }
 
     public function testGetIp()
