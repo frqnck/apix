@@ -376,7 +376,8 @@ class Response extends Listener
      */
     public function collate(array $results)
     {
-        return array($this->route->getController() => $results);
+        $top = $this->route->getController() ?: 'index';
+        return array($top => $results);
     }
 
     /**

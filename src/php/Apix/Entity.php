@@ -90,7 +90,7 @@ class Entity extends Listener
     }
 
     /**
-     * Call the resource entity.
+     * Call the resource entity and return its results as an array.
      *
      * @return array
      * @see     EntityInterface::underlineCall
@@ -111,7 +111,28 @@ class Entity extends Listener
             $this->hook('entity', 'late');
         }
 
-        return $this->results;
+        return self::convertToArray($this->results);
+    }
+
+    /**
+     * Converts the provided variable to an array.
+     *
+     * @param mixed $mix
+     * @return array
+     */
+    public static function convertToArray($mix)
+    {
+        switch(true):
+            case is_object($mix): 
+                // TODO: convert nested objects recursively...
+                return get_object_vars($mix);
+            
+            case is_string($mix):
+                return array($mix);
+            
+            default: // so it must be an array!
+                return $mix;
+        endswitch;
     }
 
     /**

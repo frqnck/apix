@@ -16,7 +16,7 @@ use Apix\Entity,
     Apix\Router,
     Apix\Entity\EntityInterface;
 
-class EntityTest extends \PHPUnit_Framework_TestCase
+class EntityTest extends TestCase
 {
 
     /**
@@ -43,6 +43,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 
         $entity = $this->entity->toArray();
         $this->assertSame('test', $entity['redirect']);
+        $this->assertSame('test', $this->entity->getRedirect());
     }
 
     public function testCall()
@@ -62,6 +63,22 @@ class EntityTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($docs));
 
         $this->assertSame($docs, $this->entity->getDocs());
+    }
+
+    public function testGetDocsRetrievesAllTheApiDocsWithInternalCache()
+    {
+        $this->skipIfMissing('apc');
+
+        // if (!ini_get('apc.enable_cli')) {
+        //     self::markTestSkipped(
+        //         'apc.enable_cli MUST be enabled in order to run this unit test'
+        //     );
+        // }
+
+        $config = \Apix\Config::getInstance();
+        $config->set('cache_annotation', true);
+
+        $this->testGetDocsRetrievesAllTheApiDocs();
     }
 
     public function testGetDocsRetrievesTheSpecifiedApiDoc()
@@ -208,6 +225,41 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('admin', $this->entity->getAnnotationValue('api_role'));
         $this->assertSame('public', $this->entity->getAnnotationValue('api_role'));
         $this->assertNull($this->entity->getAnnotationValue('api_auth_role'));
-     }
+    }
+
+    public function testConvertToArray()
+    {
+        $results = array(
+            'array' => array('foo', 'bar'),
+            'string' => "this is a string",
+            'object' => new \stdClass,
+        );
+        $results['object']->foo = 'bar';
+
+        foreach($results as $result) {
+             $this->assertInternalType('array', Entity::convertToArray($result));
+        }
+    }
+
+    public function testConvertToArrayWithNestedArrayAndObjects()
+    {
+        $object = new \stdClass;
+        $object->foo = 'bar';
+        $object->ray = array('ban');
+        $object->nested = new \stdClass;
+        $object->nested->biz = 'yo';
+
+        $array = Entity::convertToArray($object);
+
+        $this->assertInternalType('array', $array);
+        $this->assertEquals($object->foo, $array['foo']);
+
+        $this->assertEquals($object->ray, $array['ray']);
+        $this->assertEquals($object->nested, $array['nested']);
+
+        $this->markTestIncomplete('TODO: convert nested objects recursively...');
+
+        $this->assertEquals($object->nested->biz, $array['nested']['biz']);
+    }
 
 }
