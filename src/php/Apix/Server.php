@@ -121,10 +121,11 @@ class Server extends Main
     }
 
     /**
-     * Test Read from a group (TODO).
+     * TODO: Test Read from a group.
      *
      * @param  array  $opts Options are:
      * @return string
+     * @codeCoverageIgnore
      */
     public function setGroup($name)
     {

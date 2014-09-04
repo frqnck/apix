@@ -46,6 +46,9 @@ abstract class PluginAbstractEntity extends PluginAbstract
         $tags = $this->extractSubTags();
         $k = array_search($key, $tags['keys']);
 
+        // return false === $k
+        //         ? $default
+        //         : array_map('trim', explode(',', $tags['values'][$k])); 
         return false === $k ? $default : explode(',', $tags['values'][$k]);
     }
 
