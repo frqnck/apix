@@ -9,8 +9,8 @@ class Auth extends PluginAbstractEntity
     public static $hook = array('entity', 'early');
 
     protected $options = array(
+        // 'enable'        => true,        // wether to enable or not
         'adapter'       => 'Apix\Plugin\Auth\Adapter',
-        'enable'        => true,        // wether to enable or not
         'public_group'  => 'public',    // public group to skip auth
     );
 

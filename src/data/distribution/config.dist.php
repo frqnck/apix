@@ -51,6 +51,12 @@ $c = array(
     // schema can be implemented if required by clients.
     'input_formats'     => array('post', 'json', 'xml'),
 
+    // Wether to cache the collection and parsing of the entity' documentations.
+    // This requires the APC extension to be enable. In order to clear the cache,
+    // e.g. when deploying a new version, (gracefully) restart the Web server.
+    'cache_annotation'  => !DEBUG // don't cache while developing!
+                            && extension_loaded('apc'),
+
     // routing definitions
     'routing'           => array(
 
@@ -100,12 +106,7 @@ $c = array(
         'format_override'   => isset($_REQUEST['_format'])
                                 ? $_REQUEST['_format']
                                 : false
-    ),
-
-    // Wether to cache the collection and parsing of the entity' documentations.
-    // This requires the APC extension to be enable. In order to clear the cache,
-    // e.g. when deploying a new version, (gracefully) restart the Web server.
-    'cache_annotation'     => extension_loaded('apc') && !DEBUG
+    )
 
 );
 
