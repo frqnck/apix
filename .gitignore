@@ -8,7 +8,12 @@ vendor
 *~
 *.log
 .svn
-phpunit.xml
 composer.lock
-build.xml
 TODO
+
+phpunit.xml
+
+build.xml
+build.local.xml
+build.properties
+package.xml
