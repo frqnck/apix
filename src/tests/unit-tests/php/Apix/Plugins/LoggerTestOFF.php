@@ -3,7 +3,7 @@ namespace Apix\Plugin;
 
 use Apix\TestCase;
 
-class LoggerTest extends TestCase
+class LoggerTestOFF extends TestCase
 {
     protected $logger, $adapter;
 

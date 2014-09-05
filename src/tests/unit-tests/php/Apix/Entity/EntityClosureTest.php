@@ -1,4 +1,15 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 use Apix\Entity,
@@ -15,9 +26,9 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->definition = array('action'=>function($id, $optional=null){return func_get_args();}, 'method'=>'GET', 'redirect' => 'location' );
+        $this->definition = array('action'=>function ($id, $optional=null) {return func_get_args();}, 'method'=>'GET', 'redirect' => 'location' );
 
-        $this->entity = new Entity\EntityClosure;
+        $this->entity = new Entity\EntityClosure();
         $this->entity->append($this->definition);
 
         $routes = array('/:controller/:id/:optional' => array());
@@ -34,7 +45,7 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
     {
         $entity = $this->entity->toArray();
 
-        $this->assertTrue($entity['actions']['GET']['action'] instanceOf \Closure);
+        $this->assertTrue($entity['actions']['GET']['action'] instanceof \Closure);
         $this->assertTrue(is_callable($entity['actions']['GET']['action']));
 
         $this->assertSame('location', $entity['redirect'], "Check to see if parent::_append is called.");
@@ -72,7 +83,7 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
     public function testParseDocsGroupLevel()
     {
         $this->entity->group("/* TODO {closure-group-title} */");
-        $docs = $this->entity->_parseDocs();
+        $docs = $this->entity->parseDocs();
         $this->assertSame("TODO {closure-group-title} ", $docs['title']);
         $this->assertSame(1, count($docs['methods']));
     }

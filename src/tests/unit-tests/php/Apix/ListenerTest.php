@@ -2,8 +2,6 @@
 
 namespace Apix;
 
-use Apix\TestCase;
-
 class ListenerTest extends TestCase
 {
     protected $plugin_name = 'Apix\Fixtures\PluginMock';
@@ -12,7 +10,7 @@ class ListenerTest extends TestCase
 
      public function setUp()
     {
-        $this->listener = new Listener;
+        $this->listener = new Listener();
         $this->plugin = $this->getMock($this->plugin_name, array('update'));
     }
 

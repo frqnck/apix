@@ -3,7 +3,7 @@ namespace Apix;
 
 require_once APP_TESTDIR . '/Apix/Output/XmlTest.php';
 
-class SimpleXmlTest extends OutputXmlTest
+class SimpleXmlTest extends XmlTest
 {
 
     public function setUp()
@@ -14,7 +14,7 @@ class SimpleXmlTest extends OutputXmlTest
             );
         }
 
-        $this->xml = new Output\Xml\SimpleXml;
+        $this->xml = new Output\Xml\SimpleXml();
     }
 
     public function testSimpleArray()

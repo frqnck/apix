@@ -96,7 +96,7 @@ class Console
             array_combine(
                 array('dark_gray', 'light_red', 'light_green', 'yellow',
                     'light_blue', 'pink', 'light_cyan', 'white'),
-                array_map(function($k){return '1;' . $k;}, range(30, 37))
+                array_map(function ($k) {return '1;' . $k;}, range(30, 37))
             ),
             // background colors.
             array_combine(

@@ -1,8 +1,6 @@
 <?php
 namespace Apix\View;
 
-use Apix\View\ViewModel;
-
 class View
 {
 
@@ -74,7 +72,7 @@ class View
      * we create an instance using [Template::$default_class].
      *
      * @param   Template
-     * @return  $this
+     * @return $this
      */
     public function template(Template $template = null)
     {
@@ -103,7 +101,7 @@ class View
         if ($model === null) {
             if ($this->model === null) {
                 $class = ViewModel::$default_class;
-                $this->model = new $class;
+                $this->model = new $class();
             }
 
             return $this->model;
@@ -122,7 +120,7 @@ class View
      */
     public function render($layout = null)
     {
-        if ($layout instanceOf Template) {
+        if ($layout instanceof Template) {
             $this->template($layout);
         } elseif (is_string($layout)) {
             $this->template()->setLayout($layout);

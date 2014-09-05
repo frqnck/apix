@@ -1,14 +1,14 @@
 <?php
 namespace Apix;
 
-class OutputXmlTest extends \PHPUnit_Framework_TestCase
+class XmlTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $xml;
 
     public function setUp()
     {
-        $this->xml = new Output\Xml;
+        $this->xml = new Output\Xml();
     }
 
     protected function tearDown()

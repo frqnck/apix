@@ -237,9 +237,9 @@ class Config #extends Di
     /**
      * Returns the specified service -- or all if unspecified.
      *
-     * @param string $key=null The service key to retrieve.
+     * @param  string $key=null The service key to retrieve.
      * @see self::retrieve
-     * @return mixed Generally should return a callback
+     * @return mixed  Generally should return a callback
      */
     public function getServices($key=null, $args=null)
     {

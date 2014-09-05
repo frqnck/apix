@@ -1,6 +1,9 @@
 <?php
+
 // This is the Apix config.dist.php file
 // -------------------------------------
+// (c) Franck Cassedanne <franck at ouarz.net>
+// License: http://opensource.org/licenses/BSD-3-Clause  New BSD License
 //
 // You should NOT edit this file! Instead, put any overrides into a local copy.
 // The local file should only contain values which override values set in the
@@ -47,6 +50,12 @@ $c = array(
     // Note that at this stage only UTF-8 is supported. Later more XML based
     // schema can be implemented if required by clients.
     'input_formats'     => array('post', 'json', 'xml'),
+
+    // Wether to cache the collection and parsing of the entity' documentations.
+    // This requires the APC extension to be enable. In order to clear the cache,
+    // e.g. when deploying a new version, (gracefully) restart the Web server.
+    'cache_annotation'  => !DEBUG // don't cache while developing!
+                            && extension_loaded('apc'),
 
     // routing definitions
     'routing'           => array(
@@ -96,7 +105,7 @@ $c = array(
         // be handy in many cases e.g. forms handling.
         'format_override'   => isset($_REQUEST['_format'])
                                 ? $_REQUEST['_format']
-                                : false,
+                                : false
     )
 
 );
@@ -143,14 +152,14 @@ $c['resources'] = array(
 $c['services'] = array(
 
     // Auth examples (see plugins definition)
-    'auth_example' => function() use ($c) {
+    'auth_example' => function () use ($c) {
         $basic = true; // set to: False to use Digest, True to use Basic.
         if ($basic) {
             // Example implementing Plugin\Auth\Basic
             // --------------------------------------
             // The Basic Authentification mechanism is generally use with SSL.
             $adapter = new Plugin\Auth\Basic($c['api_realm']);
-            $adapter->setToken(function(array $current) use ($c) {
+            $adapter->setToken(function (array $current) use ($c) {
                 $users = Service::get('users_example');
                 foreach ($users as $user) {
                     if (
@@ -171,7 +180,7 @@ $c['services'] = array(
             // The Digest Authentification mechanism is use to encrypt and salt
             // the user's credentials without the overhead of SSL.
             $adapter = new Plugin\Auth\Digest($c['api_realm']);
-            $adapter->setToken(function(array $current) use ($c) {
+            $adapter->setToken(function (array $current) use ($c) {
                 $users = Service::get('users_example');
                 foreach ($users as $user) {
                     if (
@@ -193,7 +202,7 @@ $c['services'] = array(
     },
 
     // This is used by the auth_example service defined above.
-    'users_example' => function() {
+    'users_example' => function () {
         return array(
             0 => array(
                 'username' => 'franck', 'password' => 'pass', 'api_key' => '123',
@@ -209,7 +218,7 @@ $c['services'] = array(
 
     // This is used by the auth_example service defined further above.
     // Noet that this is only an example
-    'session' => function($user) {
+    'session' => function ($user) {
         // Set that way solely to avoid duplicating code in auth_example.
         $session = new Session($user['username'], $user['group']);
         if (isset($user['ips'])) {
@@ -231,9 +240,9 @@ $c['plugins'] = array(
     // Add the entity signature as part of the response-body.
     'Apix\Plugin\OutputSign',
 
-    // Add some debugging information within the response-body.
-    // Should be set to false in production. This plugin affects cachability.
-    'Apix\Plugin\OutputDebug' => array('enable' => DEBUG),
+    // Cross-Origin Resource Sharing plugin. Enable thru annotation:
+    // e.g.  * @api_cors   groups=grp1,grp2   users=franck
+    'Apix\Plugin\Cors',
 
     // Validates, corrects, and pretty-prints XML and HTML outputs.
     // Various options are available -- see Tidy::$options.
@@ -251,6 +260,10 @@ $c['plugins'] = array(
     //     'enable'  => !DEBUG, // don't cache while developing!
     //     'adapter' => new \Apix\Cache\APC
     // )
+
+    // Add some debugging information within the response-body.
+    // Should be set to false in production. This plugin affects cachability.
+    'Apix\Plugin\OutputDebug' => array('enable' => DEBUG)
 );
 
 // Init is an associative array of specific PHP directives. They are

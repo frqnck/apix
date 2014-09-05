@@ -1,7 +1,6 @@
 <?php
 namespace Apix\View;
 
-use Apix\View\ViewModel;
 use Apix\View\Template as Template;
 
 abstract class Template
@@ -37,7 +36,7 @@ abstract class Template
     final public static function setEngine($name=null)
     {
         $class = __NAMESPACE__ . '\\Template';
-        $class .= null === $name ? : '\\' . $name;
+        $class .= null === $name ?: '\\' . $name;
         if (!class_exists($class)) {
             throw new \RuntimeException(
                 sprintf('Template class "%s" does not exist.', $class)
@@ -59,7 +58,7 @@ abstract class Template
             Template::setEngine($name);
         }
 
-        return new Template::$engine;
+        return new Template::$engine();
     }
 
     /**

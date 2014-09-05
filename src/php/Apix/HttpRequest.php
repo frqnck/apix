@@ -29,7 +29,7 @@ class HttpRequest extends Request
     public static function getInstance()
     {
         if (null === self::$instance) {
-            self::$instance = new self;
+            self::$instance = new self();
         }
 
         return self::$instance;
@@ -112,7 +112,7 @@ class HttpRequest extends Request
             } elseif ($format = self::getFormat($ctx)) {
                 if (in_array(strtolower($format), $this->formats)) {
                     $class = __NAMESPACE__ . '\Input\\' . ucfirst($format);
-                    $input = new $class;
+                    $input = new $class();
 
                     return $input->decode($this->getBody(), $assoc);
                     #$this->setParams($r); // TODO: maybe set as request params?

@@ -1,5 +1,15 @@
 <?php
 
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 class Request
@@ -206,7 +216,7 @@ class Request
      */
     public function setHeader($name, $value)
     {
-        $this->headers[$name] = $value;
+        $this->headers[strtolower($name)] = $value;
     }
 
     /**
@@ -217,7 +227,7 @@ class Request
      */
     public function hasHeader($name)
     {
-        return isset($this->headers[$name]);
+        return isset($this->headers[strtolower($name)]);
     }
 
     /**
@@ -228,6 +238,7 @@ class Request
      */
     public function getHeader($name)
     {
+        $name = strtolower($name);
         if (isset($this->headers[$name])) {
             return $this->headers[$name];
         }
@@ -356,6 +367,7 @@ class Request
      * @param  boolean                   $cache Wether to cache the body after decoding.
      * @return string
      * @throws \BadFunctionCallException
+     * @codeCoverageIgnore
      */
     public function gzDecode($data)
     {

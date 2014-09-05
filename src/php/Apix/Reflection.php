@@ -48,7 +48,7 @@ class Reflection
      */
     public static function parsePhpDoc($mix, array $requireds=null)
     {
-        if ($mix instanceOf \Reflector) {
+        if ($mix instanceof \Reflector) {
             $doc = $mix->getDocComment();
             $requireds = self::getRequiredParams($mix);
         } else {
@@ -56,7 +56,8 @@ class Reflection
         }
 
         $docs = array();
-        // 1. Remove /*, *, */ from the lines
+
+        // 1st - remove /*, *, */ from all the lines
         $doc = substr($doc, 3, -2);
 
         // 2. remove the carrier returns
@@ -66,7 +67,8 @@ class Reflection
         #$pattern = '%(\r?\n(?! \* ?@))?^(/\*\*\r?\n \* | \*/| \* ?)%m';
 
         // same as 2. BUT keep the carrier returns in.
-        $pattern = '@(\r+|\t+)? *\* *@';
+        // $pattern = '@(\r+|\t+)? *\* *@';
+        $pattern = '@(\r+|\t+)? +\*\s?@';
 
         $str = preg_replace($pattern, '', $doc);
 

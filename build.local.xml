@@ -18,7 +18,7 @@
 
   <!-- php-cs-fix -->
   <target name="php-cs-fix">
-    <exec command="php /www/dev/tools/PHP-CS-Fixer/php-cs-fixer.phar fix ./src" logoutput="true" checkreturn="true" />
+    <exec command="php-cs-fixer fix ./src" logoutput="true" checkreturn="true" />
   </target>
 
   <!-- build-phar -->
@@ -66,7 +66,7 @@
   <target name="announce">
     <property name="project.pharfilename" value="${project.shortName}-${project.version}.phar" />
 
-    <mail tolist="franck@info.com,jspalink@info.com,mstockbridge@info.com,bcicenas@info.com,bfritton@info.com" from="franck@info.com" subject="${project.pharfilename} is out">The build process for ${project.pharfilename} is complete.
+    <mail tolist="franck@info.com,jspalink@info.com,mstockbridge@info.com,iknox@info.com,bcicenas@info.com,bfritton@info.com,vvondrakk@info.com" from="franck@info.com" subject="${project.pharfilename} is out">The build process for ${project.pharfilename} is complete.
 
       Run this in your terminal to upgrade to the latest version:
       $ php path_to/${project.shortName}.phar --selfupdate
@@ -81,6 +81,9 @@
 
       Changelog available at:
       - http://api.ouarz.net/v1/download/changelog/apix.phar
+
+      Github repo available at:
+      - https://github.com/frqnck/apix
 
     </mail>
 

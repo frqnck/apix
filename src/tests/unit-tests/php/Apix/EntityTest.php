@@ -1,11 +1,22 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 use Apix\Entity,
     Apix\Router,
     Apix\Entity\EntityInterface;
 
-class EntityTest extends \PHPUnit_Framework_TestCase
+class EntityTest extends TestCase
 {
 
     /**
@@ -15,7 +26,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->entity = $this->getMock('Apix\Entity', array('underlineCall', '_parseDocs', 'getActions'));
+        $this->entity = $this->getMock('Apix\Entity', array('underlineCall', 'parseDocs', 'getActions'));
 
         $this->route = $this->getMock('Apix\Router', array('getMethod'));
         $this->entity->setRoute($this->route);
@@ -32,6 +43,7 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 
         $entity = $this->entity->toArray();
         $this->assertSame('test', $entity['redirect']);
+        $this->assertSame('test', $this->entity->getRedirect());
     }
 
     public function testCall()
@@ -47,17 +59,33 @@ class EntityTest extends \PHPUnit_Framework_TestCase
     {
         $docs = array('parseDocs', 'methods'=>array('GET'=>'doc for GET'));
         $this->entity->expects($this->once())
-                ->method('_parseDocs')
+                ->method('parseDocs')
                 ->will($this->returnValue($docs));
 
         $this->assertSame($docs, $this->entity->getDocs());
+    }
+
+    public function testGetDocsRetrievesAllTheApiDocsWithInternalCache()
+    {
+        $this->skipIfMissing('apc');
+
+        // if (!ini_get('apc.enable_cli')) {
+        //     self::markTestSkipped(
+        //         'apc.enable_cli MUST be enabled in order to run this unit test'
+        //     );
+        // }
+
+        $config = \Apix\Config::getInstance();
+        $config->set('cache_annotation', true);
+
+        $this->testGetDocsRetrievesAllTheApiDocs();
     }
 
     public function testGetDocsRetrievesTheSpecifiedApiDoc()
     {
         $docs = array('parseDocs', 'methods'=>array('GET'=>'doc for GET'));
         $this->entity->expects($this->once())
-                ->method('_parseDocs')
+                ->method('parseDocs')
                 ->will($this->returnValue($docs));
 
         $this->assertSame($docs['methods']['GET'], $this->entity->getDocs('GET'));
@@ -135,8 +163,8 @@ class EntityTest extends \PHPUnit_Framework_TestCase
 
     public function testAutoInject()
     {
-        $this->route->server = new Server;
-        $ref = new \ReflectionFunction(function(Request $request, Server $server, Response $response, Resources $resources){return 'something';});
+        $this->route->server = new Server();
+        $ref = new \ReflectionFunction(function (Request $request, Server $server, Response $response, Resources $resources) {return 'something';});
         $params = $this->entity->getValidatedParams($ref, 'aStringName', array());
 
         $this->assertInstanceOf('Apix\Request', $params['request']);
@@ -151,13 +179,13 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $_REQUEST['param1'] = 'value1';
         $_REQUEST['param2'] = 'value2';
 
-        $request = New HttpRequest;
+        $request = new HttpRequest();
         $request->setHeader('CONTENT_TYPE', 'application/x-www-form-urlencoded');
         $request->setBody('param1=value1&param2=value2');
 
         $this->route->server = new Server(null, $request);
 
-        $ref = new \ReflectionFunction(function(Request $request){echo '*test*'; return $request->getBodyData();return func_get_args();});
+        $ref = new \ReflectionFunction(function (Request $request) {echo '*test*'; return $request->getBodyData();return func_get_args();});
         $params = $this->entity->getValidatedParams($ref, 'aStringName', array());
 
         $this->assertInstanceOf('Apix\HttpRequest', $params['request']);
@@ -197,6 +225,41 @@ class EntityTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('admin', $this->entity->getAnnotationValue('api_role'));
         $this->assertSame('public', $this->entity->getAnnotationValue('api_role'));
         $this->assertNull($this->entity->getAnnotationValue('api_auth_role'));
-     }
+    }
+
+    public function testConvertToArray()
+    {
+        $results = array(
+            'array' => array('foo', 'bar'),
+            'string' => "this is a string",
+            'object' => new \stdClass,
+        );
+        $results['object']->foo = 'bar';
+
+        foreach($results as $result) {
+             $this->assertInternalType('array', Entity::convertToArray($result));
+        }
+    }
+
+    public function testConvertToArrayWithNestedArrayAndObjects()
+    {
+        $object = new \stdClass;
+        $object->foo = 'bar';
+        $object->ray = array('ban');
+        $object->nested = new \stdClass;
+        $object->nested->biz = 'yo';
+
+        $array = Entity::convertToArray($object);
+
+        $this->assertInternalType('array', $array);
+        $this->assertEquals($object->foo, $array['foo']);
+
+        $this->assertEquals($object->ray, $array['ray']);
+        $this->assertEquals($object->nested, $array['nested']);
+
+        $this->markTestIncomplete('TODO: convert nested objects recursively...');
+
+        $this->assertEquals($object->nested->biz, $array['nested']['biz']);
+    }
 
 }

@@ -1,8 +1,25 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin;
 
 abstract class PluginAbstract implements \SplObserver
 {
+
+    /**
+     * Holds the hook'ing array.
+     * @var array
+     */
+    public static $hook = array();
 
     /**
      * Holds a plugin's adapter.
@@ -17,7 +34,7 @@ abstract class PluginAbstract implements \SplObserver
     protected $options = array();
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param mix $options Array of options
      */
@@ -38,7 +55,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Checks the plugin's adapter comply to a class/interface
+     * Checks the plugin's adapter comply to the provided class/interface.
      *
      * @param  object            $adapter
      * @param  object            $class
@@ -57,7 +74,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Sets and merge the defaults options for this plugin
+     * Sets and merge the defaults options for this plugin.
      *
      * @param mix $options Array of options if it is an object set as an adapter
      */
@@ -72,7 +89,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Gets this plugin's options
+     * Gets this plugin's options.
      *
      * @return array
      */
@@ -82,14 +99,14 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Sets this plugin's adapter
+     * Sets this plugin's adapter.
      *
      * @param closure|object $adapter
      */
     public function setAdapter($adapter)
     {
         if (is_string($adapter)) {
-            $this->adapter = new $adapter;
+            $this->adapter = new $adapter();
         } else {
             $this->adapter = $adapter instanceof \Closure
                                 ? $adapter()
@@ -98,7 +115,7 @@ abstract class PluginAbstract implements \SplObserver
     }
 
     /**
-     * Gets this plugin's adapter
+     * Gets this plugin's adapter.
      *
      * @return mix
      */
@@ -110,6 +127,7 @@ abstract class PluginAbstract implements \SplObserver
     /**
      * Just a shortcut for now. This is TEMP and will be moved elsewhere!
      * TODO: TEMP to refactor
+     * @codeCoverageIgnore
      */
     public function log($msg, $context=null, $level='debug')
     {

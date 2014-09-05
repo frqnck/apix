@@ -53,23 +53,23 @@ class Resources
         switch(true):
 
             case isset($resources['action'])
-                && $resources['action'] instanceOf \Closure:
+                && $resources['action'] instanceof \Closure:
                 $this->setEntity(
-                    new Entity\EntityClosure
+                    new Entity\EntityClosure()
                 );
             break;
 
             case isset($resources['controller']):
             default:
                 $this->setEntity(
-                    new Entity\EntityClass
+                    new Entity\EntityClass()
                 );
 
         endswitch;
 
         if (!isset($this->resources[$name])) {
             $entity = get_class($this->getEntity());
-            $this->resources[$name] = new $entity; //new Entity($group);
+            $this->resources[$name] = new $entity(); //new Entity($group);
         }
         $this->resources[$name]->append($resources);
 
@@ -120,7 +120,8 @@ class Resources
     /**
      * Gets the specified ressource entity from a route object.
      *
-     * @param  Router                 $route The resource route object.
+     * @param  Router                 $route  The resource route object.
+     * @param  boolean                $follow Wether to handle the default actions.
      * @throws /DomainException       404
      * @return Entity/EntityInterface
      */
@@ -136,7 +137,7 @@ class Resources
         }
 
         // handles the default actions but do not override a local action definition.
-        if ($follow===true) {
+        if ($follow) {
 
             $method = $route->getMethod();
 

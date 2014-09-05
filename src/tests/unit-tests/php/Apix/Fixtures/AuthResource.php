@@ -34,10 +34,10 @@ class AuthResource
     public function onRead($username, $optional=null)
     {
         return array(
-            'class' 			=> __CLASS__,
-            'constructorParams'	=> $this->constructorParams,
-            'method'			=> __METHOD__,
-            'methodParams'		=> get_defined_vars()
+            'class' => __CLASS__,
+            'constructorParams' => $this->constructorParams,
+            'method' => __METHOD__,
+            'methodParams' => get_defined_vars()
         );
     }
 

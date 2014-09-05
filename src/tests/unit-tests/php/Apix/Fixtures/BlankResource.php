@@ -57,10 +57,10 @@ class BlankResource
     public function onRead($keyword, $param2=null, $optional=null)
     {
         return array(
-            'class' 			=> __CLASS__,
-            'constructorParams'	=> $this->constructorParams,
-            'method'			=> __METHOD__,
-            'methodParams'		=> get_defined_vars()
+            'class'            => __CLASS__,
+            'constructorParams'    => $this->constructorParams,
+            'method'            => __METHOD__,
+            'methodParams'        => get_defined_vars()
         );
     }
 

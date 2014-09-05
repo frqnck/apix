@@ -12,11 +12,11 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $resources = new Resources;
+        $resources = new Resources();
         $resources->setEntity(
             $this->getMock('Apix\Entity\EntityInterface')
         );
-        $resources->add('/paris', array('action'=>function(){return 'metro';}, 'method'=>'some'));
+        $resources->add('/paris', array('action'=>function () {return 'metro';}, 'method'=>'some'));
 
         $this->resources = $resources;
 
@@ -63,7 +63,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
      */
     public function testToArray()
     {
-        $resources = new Resources;
+        $resources = new Resources();
         $this->assertSame(array(), $resources->toArray());
 
         $resources->add('name1', array());
@@ -211,7 +211,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         // $this->route->expects($this->any())
         //     ->method('getMethod')
         //     ->will($this->returnValue('HEAD'));
-        $route = new Router;
+        $route = new Router();
 
         $route->setMethod('HEAD');
         $route->setName('help');
@@ -233,7 +233,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
     {
         $this->markTestIncomplete('TODO: grouping of objcts!');
 
-        // $this->resources->add('group', array('group'=>function(){return 'string';}, 'method'=>'some'));
+        // $this->resources->add('group', array('group'=>function () {return 'string';}, 'method'=>'some'));
         // $this->assertInstanceOf('Apix\Entity\EntityClosure', $this->resources->get('closure'));
     }
 

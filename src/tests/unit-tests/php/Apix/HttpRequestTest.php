@@ -82,7 +82,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase
     {
         $values = array('param1'=>'value1', 'param2'=>'value2');
 
-        $xml = new Output\Xml;
+        $xml = new Output\Xml();
 
         return array(
             'x-www-form as array' => array(

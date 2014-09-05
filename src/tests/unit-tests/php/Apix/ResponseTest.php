@@ -2,8 +2,6 @@
 
 namespace Apix;
 
-use Apix\TestCase;
-
 class ResponseTest extends TestCase
 {
 

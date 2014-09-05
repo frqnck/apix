@@ -1,7 +1,7 @@
 <?php
 namespace Apix;
 
-class OutputPhpTest extends \PHPUnit_Framework_TestCase
+class PhpTest extends \PHPUnit_Framework_TestCase
 {
 
     protected $php;
@@ -9,7 +9,7 @@ class OutputPhpTest extends \PHPUnit_Framework_TestCase
     public function setUp()
     {
         $this->data = array(1, 2, 'abc');
-        $this->php = new Output\Php;
+        $this->php = new Output\Php();
     }
 
     protected function tearDown()

@@ -1,4 +1,15 @@
 <?php
+
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin;
 
 use Apix\Plugin\PluginAbstract,
@@ -40,7 +51,7 @@ class PluginAbstractTest extends TestCase
 
     public function testSetAdapterWithClosure()
     {
-        $this->plugin->setAdapter(function(){return 'foo';});
+        $this->plugin->setAdapter(function () {return 'foo';});
         $this->assertSame(
             'foo',
             $this->plugin->getAdapter()
@@ -82,7 +93,7 @@ class PluginAbstractTest extends TestCase
      */
     public function testCheckAdapterClassThrowsRuntimeException()
     {
-        $this->plugin->setAdapter(new \stdClass);
+        $this->plugin->setAdapter(new \stdClass());
         PluginAbstract::checkAdapterClass(
             $this->plugin->getAdapter(),
             'Apix\Plugin\PluginAbstract'
@@ -91,15 +102,16 @@ class PluginAbstractTest extends TestCase
 
     public function testConstructor()
     {
-        $plugin = $this->getMockForAbstractClass('Apix\Plugin\PluginAbstract');
+        $ref = new \ReflectionClass($this->plugin);
+        $ref->setStaticPropertyValue('hook', array('interface' => '\Apix\Plugin\PluginAbstract'));
 
-        $obj = new \stdClass;
-        $plugin->__construct($obj);
+        $this->plugin->__construct($this->plugin);
 
         $this->assertSame(
-            array('adapter' => $obj),
-            $plugin->getOptions()
+            array('adapter' => $this->plugin),
+            $this->plugin->getOptions()
         );
+
     }
 
 }

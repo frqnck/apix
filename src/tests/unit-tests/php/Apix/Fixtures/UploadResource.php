@@ -84,7 +84,7 @@ class UploadResource
 
                 // 'application/json'
                 case (strstr($ct, '/json')):
-                    $input = new Input\Json;
+                    $input = new Input\Json();
                     $r = $input->decode($request->getBody(), true);
                     $request->setParams($r);
                 break;
@@ -92,7 +92,7 @@ class UploadResource
                 // 'text/xml', 'application/xml'
                 case (strstr($ct, '/xml')
                     && (!strstr($ct, 'html'))):
-                    $input = new Input\Xml;
+                    $input = new Input\Xml();
                     $r = $input->decode($request->getBody(), true);
                     $request->setParams($r);
             }

@@ -38,7 +38,7 @@ class Streaming extends PluginAbstract
             return;
         }
 
-        $this->callback = function() use ($response) {
+        $this->callback = function () use ($response) {
             header('Content-type: text/html; charset=utf-8');
             echo 'Begin ...<br>';
 

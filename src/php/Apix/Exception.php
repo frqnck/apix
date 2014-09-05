@@ -1,11 +1,19 @@
 <?php
 
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 class Exception extends \Exception
 {
-
-    const DEBUG =  true;
 
     /**
      *  E_RECOVERABLE_ERROR handler
@@ -13,23 +21,22 @@ class Exception extends \Exception
      *  Use to re-throw E_RECOVERABLE_ERROR as they occur.
      *
      * @param  int             $code    The error number.
-     * @param  string          $message The error message.
+     * @param  string          $msg     The error message.
      * @param  string          $file    The filename where the error occured.
-     * @param  int             $line    The line number at which the error happened.
-     * @param  array           $context The array of context vars.
+     * @param  int             $line    The line number where it happened.
+     * @param  array           $ctx The array of context vars.
      * @throws \ErrorException
-     * @return false
      */
-    public static function errorHandler($code, $message, $file, $line, $context)
+    public static function errorHandler($code, $msg='', $file=__FILE__, $line=__LINE__, $ctx=null)
     {
-        if(self::DEBUG) return false;
-
         if (E_RECOVERABLE_ERROR === $code) {
-            $message = preg_replace('@to\s.*::\w+\(\)@', '', $message, 1);
-            throw new \ErrorException($message, 400, 0, $file, $line, $context);
+            $msg = preg_replace('@to\s.*::\w+\(\)@', '', $msg, 1);
+            throw new \ErrorException($msg,
+                400, 0, $file, $line, 
+                $ctx);
         }
 
-        return false;
+        throw new \ErrorException($msg, 500);
     }
 
     /**
@@ -40,7 +47,12 @@ class Exception extends \Exception
      */
     public static function startupException(\Exception $e)
     {
-        self::errorOutput($e->getCode(), 'Startup:- ' . $e->getMessage(), $e->getFile(), $e->getLine());
+        self::errorOutput(
+            $e->getCode(),
+            (DEBUG ? 'Startup:- ' : null) . $e->getMessage(),
+            $e->getFile(),
+            $e->getLine()
+        );
     }
 
     /**
@@ -51,30 +63,34 @@ class Exception extends \Exception
     public static function shutdownHandler()
     {
         if ($e = error_get_last()) {
-            self::errorOutput($e['type'], 'Shutdown:- ' . $e['message'], $e['file'], $e['line']);
+            self::errorOutput(
+                $e['type'],
+                (DEBUG ? 'Shutdown:- ' : null) . $e['message'],
+                $e['file'],
+                $e['line']
+            );
         }
     }
 
     /**
-     * Output the error
+     * Output the error.
      *
      * @param  int             $code    The error number.
      * @param  string          $message The error message.
      * @param  string          $file    The filename where the error occured.
-     * @param  int             $line    The line number at which the error happened.
-     * @param  array           $context The array of context vars.
-     * @throws \ErrorException
-     * @return false
+     * @param  int             $line    The line number where it happened.
      */
-    public static function errorOutput($code, $message, $file, $line, $context = null)
+    public static function errorOutput($code, $message, $file, $line)
     {
-        $proto = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'http:1/1';
+        $proto = isset($_SERVER['SERVER_PROTOCOL'])
+                    ? $_SERVER['SERVER_PROTOCOL']
+                    : 'http:1/1';
+
         if (!defined('UNIT_TEST')) {
             header($proto . ' 500 Internal Server Error', true, 500);
         }
         echo '<h1>500 Internal Server Error</h1>';
-
-        if (self::DEBUG) {
+        if (DEBUG) {
             $info = sprintf(
                 "#%d %s @ %s:%d",
                 $code,

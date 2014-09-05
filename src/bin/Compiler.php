@@ -221,7 +221,7 @@ class Compiler
  */
 try {
     Phar::mapPhar('{PHAR}');
-    spl_autoload_register(function($name){
+    spl_autoload_register(function ($name) {
         $file = '/' . str_replace('\\', DIRECTORY_SEPARATOR, $name).'.php';
         $path = 'phar://{PHAR}/src/php' . $file;
         if (file_exists($path)) require $path;

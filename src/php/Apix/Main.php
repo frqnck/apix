@@ -1,14 +1,24 @@
 <?php
 
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix;
 
 use Apix\Listener,
     Apix\Config,
     Apix\Resources,
-    Apix\Entity,
     Apix\Request,
     Apix\HttpRequest,
-    Apix\Response;
+    Apix\Response,
+    Apix\Service;
 
 class Main extends Listener
 {
@@ -55,7 +65,7 @@ class Main extends Listener
     ) {
 
         // Set and intialise the config
-        $c = $config instanceOf Config ? $config : Config::getInstance($config);
+        $c = $config instanceof Config ? $config : Config::getInstance($config);
         $this->config = $c->get();
 
         $this->initSet($this->config);
@@ -68,7 +78,7 @@ class Main extends Listener
                             ? HttpRequest::getInstance()
                             : $request;
 
-        if ($this->request instanceOf HttpRequest) {
+        if ($this->request instanceof HttpRequest) {
             $this->request->setFormats($this->config['input_formats']);
         }
 
@@ -80,13 +90,16 @@ class Main extends Listener
         $this->response->setFormats($this->config['routing']['formats']);
 
         // Add all the resources from config.
-        $this->resources = new Resources;
+        $this->resources = new Resources();
         foreach ($c->getResources() as $key => $values) {
             $this->resources->add(
                 $key, $values
             );
         }
 
+        // Set some generic services
+        Service::set('response', $this->response);
+        Service::set('request', $this->request);
     }
 
     /**
@@ -98,8 +111,7 @@ class Main extends Listener
      */
     private function initSet(array $configs)
     {
-        if(!defined('UNIT_TEST') && isset($configs['init'])
-            ) {
+        if( !defined('UNIT_TEST') && isset($configs['init']) ) {
             // set config inits
             foreach ($configs['init'] as $key => $value) {
                 ini_set($key, $value);
@@ -232,7 +244,7 @@ class Main extends Listener
         if ($opts['controller_ext']) {
             $parts = explode('/', $path);
             $info = pathinfo(isset($parts[1]) ? $parts[1] : $parts[0] );
-            $ext = isset($info['extension'])?$info['extension']:null;
+            $ext = isset($info['extension']) ? $info['extension'] : null;
             if ($ext) {
                 $path = preg_replace('/\.' . $ext . '/', '', $path, 1);
             }

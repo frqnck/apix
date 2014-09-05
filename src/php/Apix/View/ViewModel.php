@@ -33,7 +33,7 @@ class ViewModel
      *
      * @param   string|array  	variable name or an array of variables
      * @param   mix				value
-     * @return  $this
+     * @return $this
      */
     public function set($mix, $value = null)
     {
@@ -55,7 +55,7 @@ class ViewModel
     public function get($key)
     {
         $v = is_array($this->{$key}) ?  $this->{$key} : (array) $this->{$key};
-        array_walk_recursive($v, function(&$v){$v=ViewModel::htmlizer($v);});
+        array_walk_recursive($v, function (&$v) {$v=ViewModel::htmlizer($v);});
 
         return $v;
     }
@@ -87,7 +87,7 @@ class ViewModel
      *
      * @param   string   variable name
      * @param   mixed    referenced variable
-     * @return  $this
+     * @return $this
      */
     public function bind($key, & $value)
     {
