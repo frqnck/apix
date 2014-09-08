@@ -91,9 +91,7 @@ class HelpTest extends TestCase
 
         $this->assertArrayHasKey('path', $results);
 
-
-
-        $this->assertEquals(4, count($results), var_dump($results));
+        $this->assertEquals(4, count($results));
         $this->assertArrayHasKey('GET', $results['methods']);
         $this->assertArrayHasKey('PATCH', $results['methods']);
     }

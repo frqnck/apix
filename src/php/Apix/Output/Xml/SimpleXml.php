@@ -64,7 +64,7 @@ class SimpleXml extends Xml
     }
 
     /**
-     * decode any special characters entities.
+     * Decodes any special characters entities.
      * XmlWriter does this automatically.
      */
     public function specialChars($var)
