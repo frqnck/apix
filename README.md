@@ -18,6 +18,7 @@ Some of its features:
 * Supports **content negotiation** (which can also be overriden).
 * Take advantages of network caches -- supports HEAD test.
 * Available as a standalone **[PHAR][phar]** file, or via **[Composer][composer]** or as a **[PEAR] [pear]** package.
+* Continuous integration against PHP **5.3**, **5.4**, **5.5** and **5.6**.
 * Read the [documentation][doc]!
 
 Todo:
