@@ -1,4 +1,4 @@
-APIx, RESTful services for PHP 5.3+
+APIx, RESTful services for PHP 5.3+ [![Build Status](https://travis-ci.org/frqnck/apix.png?branch=master)](https://travis-ci.org/frqnck/apix)
 ===========================================
 
 APIx is a (micro-)framework to build RESTful Web services. It will run alognside your existing framework/application with minimum fuss.
