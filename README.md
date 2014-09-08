@@ -1,4 +1,4 @@
-APIx, RESTful services for PHP 5.3+
+APIx, RESTful services for PHP 5.3+ [![Build Status](https://travis-ci.org/frqnck/apix.png?branch=master)](https://travis-ci.org/frqnck/apix)
 ===========================================
 
 APIx is a (micro-)framework to build RESTful Web services. It will run alognside your existing framework/application with minimum fuss.
@@ -18,6 +18,7 @@ Some of its features:
 * Supports **content negotiation** (which can also be overriden).
 * Take advantages of network caches -- supports HEAD test.
 * Available as a standalone **[PHAR][phar]** file, or via **[Composer][composer]** or as a **[PEAR] [pear]** package.
+* Continuous integration against PHP **5.3**, **5.4**, **5.5** and **5.6**.
 * Read the [documentation][doc]!
 
 Todo:
