@@ -11,11 +11,7 @@ class HelpTest extends TestCase
 
     protected function setUp()
     {
-        // $this->request = HttpRequest::getInstance();
         $this->request = $this->getMock('Apix\HttpRequest');
-        // $this->request = $this->getMockBuilder('Apix\HttpRequest')
-        //                       ->disableOriginalConstructor()
-        //                       ->getMock();
 
         $this->api = new Server(false, $this->request);
 

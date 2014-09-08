@@ -7,7 +7,7 @@ php:
   - 5.6
 
 env:
-  - DB=apc
+#  - DB=apc
 
 before_script:
   - sh -c "if [ '$DB' = 'apc' ]; then curl -o APC.tgz http://pecl.php.net/get/APC; tar -xzf APC.tgz; fi"
