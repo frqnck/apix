@@ -45,9 +45,13 @@ class SimpleXmlTest extends XmlTest
 
     public function testNullValue()
     {
+        $result = LIBXML_NOEMPTYTAG ? '<r><null/></r>' : '<r><null></null></r>';
+
         $this->assertXml(
-            '<r><null/></r>',
-            $this->xml->encode(array('null'=>null), 'r')
+            $result,
+            $this->xml->encode(array('null'=>null), 'r', 
+                "LIBXML_NOEMPTYTAG error? version " . LIBXML_VERSION
+            )
         );
     }
 
@@ -85,14 +89,14 @@ class SimpleXmlTest extends XmlTest
     /**
      * @covers Apix\Output\Xml::arrayToXml
      */
-    public function testEncodeAttributes()
-    {
-        $this->markTestIncomplete('TODO: testEncodeAttributes');
+    // public function testEncodeAttributes()
+    // {
+    //     // $this->markTestIncomplete('TODO: testEncodeAttributes');
 
-        // todo
-        $data = array('@attributes'=>'vattributes');
-        $xml = $this->xml->encode($data, 'r');
-        print_r($xml);exit;
-    }
+    //     // todo
+    //     $data = array('@attributes'=>'vattributes');
+    //     $xml = $this->xml->encode($data, 'r');
+    //     print_r($xml);exit;
+    // }
 
 }

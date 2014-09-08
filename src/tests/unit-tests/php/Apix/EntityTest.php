@@ -84,7 +84,7 @@ class EntityTest extends TestCase
     public function testGetDocsRetrievesTheSpecifiedApiDoc()
     {
         $docs = array('parseDocs', 'methods'=>array('GET'=>'doc for GET'));
-        $this->entity->expects($this->once())
+        $this->entity->expects($this->any())
                 ->method('parseDocs')
                 ->will($this->returnValue($docs));
 
