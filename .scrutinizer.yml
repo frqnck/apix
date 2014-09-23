@@ -2,6 +2,11 @@
 tools:
     external_code_coverage: true
 
+checks:
+    php:
+        code_rating: true
+        duplication: true
+
 filter:
     excluded_paths:
         - 'vendor/*'
