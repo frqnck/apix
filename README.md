@@ -1,6 +1,8 @@
 APIx, RESTful services for PHP 5.3+ [![Build Status](https://travis-ci.org/frqnck/apix.png?branch=master)](https://travis-ci.org/frqnck/apix)
 ===========================================
 
+[![Latest Stable Version](https://poser.pugx.org/apix/apix/v/stable.svg)](https://packagist.org/packages/apix/apix)  [![Build Status](https://scrutinizer-ci.com/g/frqnck/apix/badges/build.png?b=master)](https://scrutinizer-ci.com/g/frqnck/apix/build-status/master)  [![Code Quality](https://scrutinizer-ci.com/g/frqnck/apix/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/frqnck/apix/?branch=master)  [![Code Coverage](https://scrutinizer-ci.com/g/frqnck/apix/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/frqnck/apix/?branch=master)  [![License](https://poser.pugx.org/apix/apix/license.svg)](https://packagist.org/packages/apix/apix)
+
 APIx is a (micro-)framework to build RESTful Web services. It will run alognside your existing framework/application with minimum fuss.
 
 Some of its features:
