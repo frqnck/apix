@@ -11,4 +11,8 @@ filter:
     excluded_paths:
         - 'vendor/*'
         - 'src/tests/*'
+        - 'src/bin/*'
+        - 'src/data/*'
+        - 'src/php/Apix/Console'
+        - 'src/php/Apix/Console.php'
     paths: {  }
