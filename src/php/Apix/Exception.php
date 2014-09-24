@@ -58,6 +58,7 @@ class Exception extends \Exception
      *  Shutdown / Fatal error handler
      *
      * @see errorOutput
+     * @codeCoverageIgnore
      */
     public static function shutdownHandler()
     {
@@ -78,6 +79,7 @@ class Exception extends \Exception
      * @param  string          $message The error message.
      * @param  string          $file    The filename where the error occured.
      * @param  int             $line    The line number where it happened.
+     * @codeCoverageIgnore
      */
     public static function errorOutput($code, $message, $file, $line)
     {

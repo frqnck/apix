@@ -11,6 +11,9 @@
 
 namespace Apix\Plugin\Auth;
 
+/**
+ * @codeCoverageIgnore
+ */
 abstract class AbstractAuth implements Adapter
 {
 

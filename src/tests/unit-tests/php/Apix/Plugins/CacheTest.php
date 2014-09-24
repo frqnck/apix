@@ -86,10 +86,7 @@ class CacheTest extends TestCase
 
     public function testReturnCachedData()
     {
-        $_SERVER['HTTP_X_REWRITE_URL'] = '/foo';
-        $this->assertSame($_SERVER['HTTP_X_REWRITE_URL'], $this->request->getRequestUri());
-
-        $this->plugin->getAdapter()->save('foo value from cache', '/foo');
+        $this->plugin->getAdapter()->save('foo value from cache', '/');
 
         $data = $this->plugin->update($this->entity);
         $this->assertSame('foo value from cache', $data);
@@ -97,12 +94,13 @@ class CacheTest extends TestCase
 
     /**
      * @expectedException           \Exception
+     * @expectedExceptionMessage    blah blah
      */
     public function testReThrowsException()
     {
         $this->entity->expects($this->once())
                 ->method('call')
-                ->will($this->throwException(new \Exception));
+                ->will($this->throwException(new \Exception('blah blah')));
         $data = $this->plugin->update($this->entity);
     }
 

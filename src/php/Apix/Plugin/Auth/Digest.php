@@ -18,6 +18,7 @@ namespace Apix\Plugin\Auth;
  * @link http://www.peej.co.uk/files/httpdigest.phps
  *
  * @author Franck Cassedanne
+ * @codeCoverageIgnore
  */
 class Digest extends AbstractAuth
 {

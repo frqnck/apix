@@ -36,29 +36,18 @@ class ExceptionTest extends TestCase
     /**
      * @expectedException           \ErrorException
      * @expectedExceptionCode       400
-     * @ expectedExceptionMessage    boo!
+     * @expectedExceptionMessage    boo!
      */
     public function testErrorHandlerThrowsRecoverableErrorException()
     {
         // trigger_error("boo!", E_USER_ERROR);
         // TODO!?
-        Exception::errorHandler(4096, "error msg");
+        Exception::errorHandler(4096, 'boo!');
     }
 
     public function testStartupException()
     {
         Exception::startupException(new Exception());
-        $this->expectOutputString('<h1>500 Internal Server Error</h1>');
-    }
-
-    public function OfftestShutdownHandler()
-    {
-        // register_shutdown_function(array('Apix\Exception', 'shutdownHandler'));
-        try { 
-            $response = json_decode();
-        } catch (\Exception $e) {
-            Exception::ShutdownHandler();
-        }
         $this->expectOutputString('<h1>500 Internal Server Error</h1>');
     }
 

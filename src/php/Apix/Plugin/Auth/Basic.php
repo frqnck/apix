@@ -15,6 +15,7 @@ namespace Apix\Plugin\Auth;
  * HTTP Basic authentication.
  *
  * @author Franck Cassedanne
+ * @codeCoverageIgnore
  */
 class Basic extends AbstractAuth
 {
