@@ -19,7 +19,7 @@ define('APP_VENDOR', realpath(__DIR__ . '/../../../vendor'));
 
 // Composer
 // define('APP_SRC', realpath(__DIR__ . '/../..'));
-// require APP_VENDOR . '/autoload.php';
+require APP_VENDOR . '/autoload.php';
 
 // PEAR
 // $pear_libdir = realpath(__DIR__ . '/../../../vendor/php');

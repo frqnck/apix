@@ -1,4 +1,14 @@
 <?php
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin;
 
 use Apix\HttpRequest,
@@ -12,11 +22,7 @@ class TidyTest extends TestCase
 
     public function setUp()
     {
-        if (!extension_loaded('tidy')) {
-            $this->markTestSkipped(
-              'The Tidy extension is not available.'
-            );
-        }
+        $this->skipIfMissing('tidy');
 
         $this->response = new Response(
             HttpRequest::GetInstance()

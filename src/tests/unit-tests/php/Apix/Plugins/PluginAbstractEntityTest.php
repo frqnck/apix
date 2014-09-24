@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * This file is part of the Apix Project.
@@ -99,6 +98,26 @@ class PluginAbstractEntityTest extends TestCase
         $this->assertFalse( $this->plugin->getSubTagBool('Zero') );
         $this->assertTrue( $this->plugin->getSubTagBool('One') );
         $this->assertNull( $this->plugin->getSubTagBool('Nil') );
+    }
+
+    public function testGetSubTagString()
+    {
+        $this->assertSame(
+            'yes', $this->plugin->getSubTagString('foo')
+        );
+        $this->assertSame(
+            'val1,val2', $this->plugin->getSubTagString('bar')
+        );
+        $this->assertSame(
+            'default',
+            $this->plugin->getSubTagString('none', 'default')
+        );
+        $this->assertNull( $this->plugin->getSubTagString('nil') );
+
+        $this->assertSame(
+            'default',
+            $this->plugin->getSubTagString('none', ('default'))
+        );
     }
 
     public function testEntitySetters()

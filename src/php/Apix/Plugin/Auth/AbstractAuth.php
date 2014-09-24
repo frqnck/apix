@@ -1,4 +1,14 @@
 <?php
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin\Auth;
 
 abstract class AbstractAuth implements Adapter
@@ -29,10 +39,7 @@ abstract class AbstractAuth implements Adapter
     protected $username;
 
     /**
-     * Returns the Auth token to match against.
-     *
-     * @param  array                  $auth_data An array of authentification data.
-     * @return boolean|string|object.
+     * @{@inheritdoc}
      */
     public function getToken(array $auth_data)
     {

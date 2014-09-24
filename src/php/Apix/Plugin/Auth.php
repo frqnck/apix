@@ -1,4 +1,14 @@
 <?php
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin;
 
 use Apix\Service,
@@ -23,23 +33,31 @@ class Auth extends PluginAbstractEntity
         $groups = $this->getSubTagValues('groups');
         $users = $this->getSubTagValues('users');
 
-        // skip if groups and users are null, or if the group is public.
+        // skip auth if groups and users are both null
+        // or if the group is public.
         if(
-            null === $groups
-            || in_array($this->options['public_group'], $groups)
-            && null !== $users
+            null === $users
+            && null === $groups
+            || null !== $groups
+            && in_array($this->options['public_group'], $groups)
         ) {
-            return;
+            return null;
         }
 
         // authenticate
         if ( !$this->adapter->authenticate() ) {
-            $this->log('Login failed', $this->adapter->getUsername(), 'INFO');
+            // $this->log('Login failed', $this->adapter->getUsername(), 'INFO');
             $this->adapter->send();
+
+            // TODO: eventually
+            // $response = Service::get('response');
+            // $response->setHeaders($headers);
+            // $response->send();
+
             throw new Exception('Authentication required', 401);
         }
 
-        // get the Session object.
+        // TODO: get the Session object.
         if (Service::has('session')) {
             $session = Service::get('session');
             $username = $session->getUsername();
@@ -47,7 +65,7 @@ class Auth extends PluginAbstractEntity
             // check the username is in the authorised list.
             if (null !== $users && !in_array($username, $users)) {
                 $this->log('User unauthorised', $username, 'INFO');
-                throw new Exception('Access unauthorised.', 401);
+                throw new Exception('Access unauthorised', 401);
             }
 
             // check user group
@@ -59,22 +77,24 @@ class Auth extends PluginAbstractEntity
 
             // check for (required) trusted user IPs
             if ($session->hasTrustedIps()) {
-                $ip = \Apix\HttpRequest::getInstance()->getIp();
+                $ip = Service::get('response')->getRequest()->getIp();
                 if (!$this->isTrustedIp($ip, $session->getTrustedIps())) {
                     $this->log('Session\'s IP not trusted.', array($username, $ip), 'INFO');
-                    throw new Exception('Session\'s IP not trusted.', 401);
+                    throw new Exception('Session\'s IP not trusted', 401);
                 }
             }
 
-            // todo set X_REMOTE_USER or X_AUTH_USER
+            // TODO: set X_REMOTE_USER or X_AUTH_USER
             $_SERVER['X_AUTH_USER'] = $username;
             $this->log('Login', $username, 'NOTICE');
         }
+
+        return true;
     }
 
     protected function isTrustedIp($ip, array $ips)
     {
-        // TODO improve this, check IP ranges, etc...
+        // TODO: improve this, check IP ranges, etc...
         return in_array($ip, $ips);
     }
 

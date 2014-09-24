@@ -1,8 +1,18 @@
 <?php
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin;
 
-use Apix\Entity,
-    Apix\HttpRequest;
+use Apix\Service;
+use Apix\HttpRequest;
 
 class Cache extends PluginAbstractEntity
 {
@@ -28,58 +38,49 @@ class Cache extends PluginAbstractEntity
      */
     public function update(\SplSubject $entity)
     {
-        // skip if null
-        if (
-            false === $this->options['enable']
-            || null === $entity->getAnnotationValue($this->annotation)){
+        $this->setEntity($entity);
+
+        // skip this plugin if it is disable.
+        if ( !$this->getSubTagBool('enable', $this->options['enable']) ) {
             return false;
         }
-
-        $this->setEntity($entity);
 
         try {
             $this->flushAnnotatedTags($this->options['runtime_flush']);
 
             // the cache id is simply the entity route name for now!
-            //$id = $entity->getRoute()->getPath();
-            $id = HttpRequest::getInstance()->getRequestUri();
+            $id = Service::get('response')->getRequest()->getRequestUri();
 
-            // use the cache if present
-            if ($cache = $this->adapter->loadKey($id)) {
+            // 1.) use the cache if present
+            if ($data = $this->adapter->loadKey($id)) {
+                $entity->setResults((array) $data);
+
                 $this->log('loading', $id, 'DEBUG');
 
-                return $entity->results = $cache;
+            } else {
+
+                // 2.) otherwise call and retrieve the method's output
+                $data = call_user_func_array(array($entity, 'call'), array(true));
+
+                $ttl = $this->getSubTagString('ttl', $this->options['default_ttl']);
+
+                $seconds = $this->getTimeInterval($ttl);
+
+                $tags = $this->getTags();
+
+                // 3.) cache it for later usage
+                $this->adapter->save($data, $id, $tags, $seconds);
+
+                $this->log(
+                    sprintf('saved for %ds', $seconds, $ttl, 'DEBUG'),
+                    $id . ' -- ' . implode(', ', $tags)
+                );
             }
 
-            // else call and retrieve the method's output...
-            $data = call_user_func_array(
-                array($entity, 'call'),
-                array(true)
-            );
-
-            // ...and cache it for later usage.
-            $ttl = $this->getSubTagValues('ttl', array($this->options['default_ttl']));
-            $sec = self::timeInternval($ttl[0]);
-
-            $tags = array_merge(
-                $this->options['append_tags'],
-                $this->getSubTagValues('tags', array())
-            );
-            $tags = array_unique($tags);
-
-            $this->adapter->save($data, $id, $tags, $sec);
-            $this->log(
-                sprintf('saved for %ds', $sec, $ttl[0], 'DEBUG'),
-                $id . ' -- ' . implode(', ', $tags)
-            );
-
         } catch (\Exception $e) {
-            // $l = new Log();
-            // $l->logd('errro');
-
-            #$l->log('error', $e->getMessage(), 'ERROR');
             $this->log('error', $e->getMessage(), 'ERROR');
-            $data = isset($data) ? $data : 'temp-execption';
+
+            throw $e; // rethrow!
         }
 
         return $data;
@@ -89,12 +90,16 @@ class Cache extends PluginAbstractEntity
      * Flush the tags explicitly
      *
      * @param boolean $enable Wether to flush or not
+     * @return boolean|null
      */
-    public function flushAnnotatedTags($enable)
+    public function flushAnnotatedTags($enable, array $default = null)
     {
-        if ( $enable && $tags = $this->getSubTagValues('flush') ) {
-            $this->adapter->clean($tags);
+        if ( $enable
+            && $tags = $this->getSubTagValues('flush', $default)
+        ) {
+            $success = $this->adapter->clean($tags);
             $this->log('Tags purged', implode(', ', $tags), 'DEBUG');
+            return $success;
         }
     }
 
@@ -108,9 +113,24 @@ class Cache extends PluginAbstractEntity
      * @param  string  $start The start time, default to 'now'.
      * @return integer The interval in seconds.
      */
-    public static function timeInternval($end=null, $start='now')
+    protected function getTimeInterval($end=null, $start='now')
     {
         return 0 == $end ? null : strtotime($end)-strtotime($start);
+    }
+
+    /**
+     * Returns all the tags for this cache.
+     *
+     * @return array
+     */
+    protected function getTags()
+    {
+        $tags = array_merge(
+            $this->options['append_tags'],
+            $this->getSubTagValues('tags', array())
+        );
+
+        return array_unique($tags);
     }
 
 }

@@ -16,13 +16,13 @@
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-html" target="review/code-coverage"/>
-        <log type="coverage-clover" target="review/logs/phpunit.xml"/>
-        <log type="json" target="review/logs/phpunit.json"/>
-        <log type="tap" target="review/logs/phpunit.tap"/>
-        <log type="junit" target="review/logs/phpunit-junit.xml"/>
-        <log type="testdox-html" target="review/testdox.html"/>
-        <log type="testdox-text" target="review/testdox.txt"/>
+        <log type="coverage-html" target="build/code-coverage"/>
+        <log type="coverage-clover" target="build/logs/phpunit.xml"/>
+        <log type="json" target="build/logs/phpunit.json"/>
+        <log type="tap" target="build/logs/phpunit.tap"/>
+        <log type="junit" target="build/logs/phpunit-junit.xml"/>
+        <log type="testdox-html" target="build/testdox.html"/>
+        <log type="testdox-text" target="build/testdox.txt"/>
     </logging>
 </phpunit>
 <!-- vim: set tabstop=4 shiftwidth=4 expandtab: -->

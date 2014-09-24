@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * This file is part of the Apix Project.
@@ -59,10 +58,8 @@ class Cors extends PluginAbstractEntity
             return false;
         }
 
-        $hosts = $this->getSubTagValues('host', array($this->options['host']));
-        if ($hosts) {
-            // get only the first element -- use regex for multiple matches.
-            $this->options['host'] = $hosts[0];
+        if ( $host = $this->getSubTagString('host', $this->options['host']) ) {
+            $this->options['host'] = $host;
         }
 
         // Grab the Origin: header.

@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * This file is part of the Apix Project.
@@ -276,6 +275,9 @@ class Request
      */
     public function getIp()
     {
+        // var_dump( $this->headers );
+
+
         $ip = $this->getHeader('HTTP_CLIENT_IP');
         if (empty($ip)) {
             $ip = $this->getHeader('HTTP_X_FORWARDED_FOR');

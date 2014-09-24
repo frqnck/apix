@@ -1,4 +1,14 @@
 <?php
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin\Auth;
 
 /**
@@ -51,9 +61,7 @@ class Digest extends AbstractAuth
     }
 
     /**
-     * Send/set the HTTP Auth header diget
-     *
-     * @return void
+     * @{@inheritdoc}
      */
     public function send()
     {
@@ -65,19 +73,14 @@ class Digest extends AbstractAuth
         );
 
         header('WWW-Authenticate: ' . $digest);
-
         header('HTTP/1.0 401 Unauthorized');
     }
 
     /**
-     * Authenticate the user and return username on success.
+     * @{@inheritdoc}
      *
      * @link    http://www.peej.co.uk/projects/phphttpdigest.html
      * @link    http://www.faqs.org/rfcs/rfc2617.html
-     *
-     * @return mixed Either the username of the user making the request or we
-     *               return access to $this->send() which will pop up the authentication
-     *               challenge once again.
      */
     public function authenticate()
     {

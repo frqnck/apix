@@ -1,4 +1,14 @@
 <?php
+/**
+ *
+ * This file is part of the Apix Project.
+ *
+ * (c) Franck Cassedanne <franck at ouarz.net>
+ *
+ * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
+ *
+ */
+
 namespace Apix\Plugin\Auth;
 
 /**
@@ -22,9 +32,7 @@ class Basic extends AbstractAuth
     }
 
     /**
-     * Send/set the HTTP Auth header diget
-     *
-     * @return void
+     * @{@inheritdoc}
      */
     public function send()
     {
@@ -33,13 +41,9 @@ class Basic extends AbstractAuth
     }
 
     /**
-     * Authenticate the user and return username on success.
+     * @{@inheritdoc}
      *
      * @link    http://uk3.php.net/manual/en/features.http-auth.php
-     *
-     * @return mixed Either the username of the user making the request or we
-     *               return access to $this->send() which will pop up the
-     *               authentication challenge once again.
      */
     public function authenticate()
     {

@@ -14,12 +14,11 @@
     "require": {
         "php": ">=5.3.2",
         "apix/autoloader": "1.*",
-        "apix/cache": "1.1.*",
+        "apix/cache": "1.2.*",
         "mustache/mustache": "v2.0.2",
         "phly/mustache": "v1.2.0",
         "monolog/monolog": "v1.2.1"
     },
-
     "autoload": {
         "psr-0": { "Apix": "src/php" }
     }

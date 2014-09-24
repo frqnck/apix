@@ -64,9 +64,28 @@ abstract class PluginAbstractEntity extends PluginAbstract
         $tags = $this->extractSubTags();
         $k = array_search($key, $tags['keys']);
 
-        $value = $k === false ? ( $default ? (bool) $default : null)  : $tags['values'][$k];
+        $value = $k === false
+                    ? ( $default ? (bool) $default : null)
+                    : $tags['values'][$k];
 
-        return null === $value ? null : filter_var($value, FILTER_VALIDATE_BOOLEAN);
+        return null === $value
+                    ? null
+                    : filter_var($value, FILTER_VALIDATE_BOOLEAN);
+    }
+
+    /**
+     * Returns the value of the specified subtag.
+     *
+     * @param  string      $key     The subtag $key to retrieve
+     * @param  string|null $default The default value
+     * @return string|null
+     */
+    public function getSubTagString($key, $default=null)
+    {
+        $tags = $this->extractSubTags();
+        $k = array_search($key, $tags['keys']);
+
+        return $k === false ? $default : (string) $tags['values'][$k];
     }
 
     /**

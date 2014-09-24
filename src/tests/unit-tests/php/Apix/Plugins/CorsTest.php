@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * This file is part of the Apix Project.
@@ -32,18 +31,7 @@ class CorsTest extends TestCase
 
         Service::set('response', $this->response);
 
-        $this->route = $this->getMock('Apix\Router');
         $this->entity = $this->getMock('Apix\Entity');
-
-        $this->route->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue('/resource'));
-
-        $this->route->expects($this->any())
-            ->method('getController')
-            ->will($this->returnValue('resource'));
-
-        $this->response->setRoute($this->route);
 
         $this->plugin = new Cors( array('enable' => true, 'host' => 'foo\.bar') );
 

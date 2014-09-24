@@ -1,9 +1,8 @@
 .DS_Store
 .build
 .tmp
-/review/
+/build/
 /vendor/
-/dist/
 vendor
 *~
 *.log

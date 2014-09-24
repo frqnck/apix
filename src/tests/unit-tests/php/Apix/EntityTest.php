@@ -26,7 +26,9 @@ class EntityTest extends TestCase
 
     protected function setUp()
     {
-        $this->entity = $this->getMock('Apix\Entity', array('underlineCall', 'parseDocs', 'getActions'));
+        $this->entity = $this->getMock('Apix\Entity',
+            array('underlineCall', 'parseDocs', 'getActions')
+        );
 
         $this->route = $this->getMock('Apix\Router', array('getMethod'));
         $this->entity->setRoute($this->route);

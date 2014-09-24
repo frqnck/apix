@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * This file is part of the Apix Project.
@@ -56,7 +55,7 @@ class Entity extends Listener
 
     /**
      * Holds the array of results of an entity.
-     * @var  array
+     * @var  array|null
      */
     protected $results = null;
 
@@ -256,6 +255,27 @@ class Entity extends Listener
         // TODO: eventually add some kind of type casting using namespacing
         // e.g. method(integer $myInteger) => Apix\Casting\Integer, etc...
         return $params;
+    }
+
+    /**
+     * Sets the entity results.
+     *
+     * @param  array $results
+     * @return void
+     */
+    public function setResults(array $results=null)
+    {
+        $this->results = $results;
+    }
+
+    /**
+     * Sets the entity results.
+     *
+     * @return array
+     */
+    public function getResults()
+    {
+        return $this->results;
     }
 
     /**
