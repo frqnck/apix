@@ -1,0 +1,18 @@
+# .scrutinizer.yml #
+tools:
+    external_code_coverage: true
+
+checks:
+    php:
+        code_rating: true
+        duplication: true
+
+filter:
+    excluded_paths:
+        - 'vendor/*'
+        - 'src/tests/*'
+        - 'src/bin/*'
+        - 'src/data/*'
+        - 'src/php/Apix/Console'
+        - 'src/php/Apix/Console.php'
+    paths: {  }

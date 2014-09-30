@@ -5,13 +5,15 @@ php:
   - 5.4
   - 5.5
   - 5.6
-  - hhvm
 
 before_script:
-  - composer install --dev --prefer-source
+  - travis_retry composer install --dev --no-interaction --prefer-source
+  - mkdir -p build/logs
 
 script:
-  - phpunit --coverage-text --configuration phpunit.xml.dist
+  - phpunit --coverage-text --coverage-clover build/logs/clover.xml
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then wget https://scrutinizer-ci.com/ocular.phar; fi;'
+  - bash -c 'if [ "$TRAVIS_PHP_VERSION" != "hhvm" ]; then php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml; fi;'
 
 notifications:
   irc: "irc.freenode.org#ouarz"
