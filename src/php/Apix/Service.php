@@ -35,7 +35,7 @@ class Service
      */
     public static function set($name, $mix)
     {
-        return Config::getInstance()->setService($name, $mix);
+        Config::getInstance()->setService($name, $mix);
     }
 
     /**

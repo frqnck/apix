@@ -14,7 +14,6 @@ namespace Apix\Plugin;
 
 abstract class PluginAbstract implements \SplObserver
 {
-
     /**
      * Holds the hook'ing array.
      * @var array
@@ -124,19 +123,19 @@ abstract class PluginAbstract implements \SplObserver
         return $this->adapter;
     }
 
-    /**
-     * Just a shortcut for now. This is TEMP and will be moved elsewhere!
-     * TODO: TEMP to refactor
-     * @codeCoverageIgnore
-     */
-    public function log($msg, $context=null, $level='debug')
-    {
-        if (defined('DEBUG') && !defined('UNIT_TEST')) {
-            if(is_array($context)) $context = implode(', ', $context);
+    // /**
+    //  * Just a shortcut for now. This is TEMP and will be moved elsewhere!
+    //  * TODO: TEMP to refactor
+    //  * @codeCoverageIgnore
+    //  */
+    // public function log($msg, $context=null, $level='debug')
+    // {
+    //     if (defined('DEBUG') && !defined('UNIT_TEST')) {
+    //         if(is_array($context)) $context = implode(', ', $context);
 
-            $str = sprintf('%s %s (%s)', get_class($this), $msg, $context);
-            error_log( $str );
-        }
-    }
+    //         $str = sprintf('%s %s (%s)', get_class($this), $msg, $context);
+    //         error_log( $str );
+    //     }
+    // }
 
 }

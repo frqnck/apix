@@ -28,4 +28,11 @@ class ServiceTest extends TestCase
         $this->assertSame( Service::get('foo'), 'bar' );
     }
 
+    public function testLoggerIsPsr3()
+    {
+        $this->assertInstanceOf(
+            'Psr\Log\LoggerInterface', Service::get('logger')
+        );
+    }
+
 }

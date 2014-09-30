@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * This file is part of the Apix Project.
@@ -42,14 +43,14 @@ class Tidy extends PluginAbstract
     public function update(\SplSubject $response)
     {
         if (false === $this->options['enable']) {
-            $this->log('Disabled');
-
             return false;
         }
 
         // @codeCoverageIgnoreStart
         if (!extension_loaded('tidy')) {
-            $this->log('PHP extension not installed', null, 'DEBUG');
+
+            $logger = Service::get('logger')
+                        ->debug('Tidy: PHP extension not installed');
 
             return false;
         }

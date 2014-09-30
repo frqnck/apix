@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * This file is part of the Apix Project.
@@ -44,12 +45,19 @@ class Auth extends PluginAbstractEntity
             return null;
         }
 
+        $logger = Service::get('logger');
+
         // authenticate
         if ( !$this->adapter->authenticate() ) {
-            // $this->log('Login failed', $this->adapter->getUsername(), 'INFO');
+            
+            // $logger->info(
+            //     'Login failed for "{username}"',
+            //     array('username' => $this->adapter->getUsername())
+            // );
+            
             $this->adapter->send();
 
-            // TODO: eventually
+            // TODO: eventually in Auth...
             // $response = Service::get('response');
             // $response->setHeaders($headers);
             // $response->send();
@@ -60,33 +68,50 @@ class Auth extends PluginAbstractEntity
         // TODO: get the Session object.
         if (Service::has('session')) {
             $session = Service::get('session');
-            $username = $session->getUsername();
+            
+            $context = array('user' => $session->getUsername());
 
             // check the username is in the authorised list.
-            if (null !== $users && !in_array($username, $users)) {
-                $this->log('User unauthorised', $username, 'INFO');
+            if (null !== $users && !in_array($context['user'], $users)) {
+
+                $logger->notice('Auth: User unauthorised [{user}]', $context);
+
                 throw new Exception('Access unauthorised', 401);
             }
 
             // check user group
-            $group = $session->getGroup();
-            if (null !== $groups && !in_array($group, $groups) ) {
-                $this->log('Group unauthorised.', array($username, $group), 'INFO');
+            $context['group'] = $session->getGroup();
+            if (null !== $groups && !in_array($context['group'], $groups) ) {
+
+                $logger->notice(
+                    'Auth: Sessions\'s group unauthorised [{user}/{group}]".',
+                    $context
+                );
+
                 throw new Exception('Access unauthorised.', 401);
             }
 
             // check for (required) trusted user IPs
             if ($session->hasTrustedIps()) {
-                $ip = Service::get('response')->getRequest()->getIp();
-                if (!$this->isTrustedIp($ip, $session->getTrustedIps())) {
-                    $this->log('Session\'s IP not trusted.', array($username, $ip), 'INFO');
+                $context['ip'] = Service::get('response')->getRequest()->getIp();
+                if (!$this->isTrustedIp($context['ip'], $session->getTrustedIps())) {
+
+                    $logger->notice(
+                        'Auth: Session\'s IP not trusted [{user}/{group}/{ip}].',
+                        $context
+                    );
+
                     throw new Exception('Session\'s IP not trusted', 401);
                 }
             }
 
             // TODO: set X_REMOTE_USER or X_AUTH_USER
-            $_SERVER['X_AUTH_USER'] = $username;
-            $this->log('Login', $username, 'NOTICE');
+            $_SERVER['X_AUTH_USER'] = $context['user'];
+            
+            $logger->info(
+                'Auth: User logged in [{user}/{group}/{ip}]',
+                $context
+            );
         }
 
         return true;

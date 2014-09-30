@@ -226,9 +226,33 @@ $c['services'] = array(
         }
         $session->addData('api_key', $user['api_key']);
 
-        // Overwrite this service container, with the new Session object!
+        // Overwrite this service container, with the new object.
         // Apix\Plugin\Auth expects this session container to hold Apix\Session.
         Service::set('session', $session);
+    },
+
+    'logger' => function () {
+        $logger = new Log\Logger();
+
+        // log bucket for critical, alert and emergency
+        $notify_log = new Log\Logger\File('/tmp/apix_notify.log');
+        $notify_log->setMinLevel('critical');
+        $logger->add($notify_log);
+
+        // log bucket for notice, warning and error 
+        $prod_log = new Log\Logger\File('/tmp/apix_prod.log');
+        $prod_log->setMinLevel('notice');
+        $logger->add($prod_log);
+
+        if(DEBUG) {
+            // log bucket for info and debug 
+            $dev_log = new Log\Logger\File('/tmp/apix_dev.log');
+            $logger->add($dev_log);
+        }
+
+        // Overwrite this service container, with the new object.
+        Service::set('logger', $logger);
+        return $logger;
     }
 
 );

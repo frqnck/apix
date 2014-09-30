@@ -1,4 +1,5 @@
 <?php
+
 /**
  *
  * This file is part of the Apix Project.
@@ -44,6 +45,7 @@ class Cache extends PluginAbstractEntity
         if ( !$this->getSubTagBool('enable', $this->options['enable']) ) {
             return false;
         }
+        $logger = Service::get('logger');
 
         try {
             $this->flushAnnotatedTags($this->options['runtime_flush']);
@@ -55,7 +57,7 @@ class Cache extends PluginAbstractEntity
             if ($data = $this->adapter->loadKey($id)) {
                 $entity->setResults((array) $data);
 
-                $this->log('loading', $id, 'DEBUG');
+                $logger->debug('Cache: loading resource "{id}"', array('id'=>$id));
 
             } else {
 
@@ -71,14 +73,17 @@ class Cache extends PluginAbstractEntity
                 // 3.) cache it for later usage
                 $this->adapter->save($data, $id, $tags, $seconds);
 
-                $this->log(
-                    sprintf('saved for %ds', $seconds, $ttl, 'DEBUG'),
-                    $id . ' -- ' . implode(', ', $tags)
+                $logger->debug(
+                    'Cache: saving resource "{id}" for {sec}s [tags: {tags}]',
+                    array('id' => $id, 'sec' => $seconds, 'tags' => $tags)
                 );
             }
 
         } catch (\Exception $e) {
-            $this->log('error', $e->getMessage(), 'ERROR');
+            $logger->error(
+                'Cache: Exception "{msg}"',
+                array('msg' => $e->getMessage(), 'exception' => $e)
+            );
 
             throw $e; // rethrow!
         }
@@ -98,7 +103,10 @@ class Cache extends PluginAbstractEntity
             && $tags = $this->getSubTagValues('flush', $default)
         ) {
             $success = $this->adapter->clean($tags);
-            $this->log('Tags purged', implode(', ', $tags), 'DEBUG');
+            
+            $logger = Service::get('logger');
+            $logger->debug('Cache: tags purged [{tags}]', array('tags' => $tags));
+
             return $success;
         }
     }
