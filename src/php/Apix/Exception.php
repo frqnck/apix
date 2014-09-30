@@ -83,15 +83,14 @@ class Exception extends \Exception
      */
     public static function errorOutput($code, $message, $file, $line)
     {
-        $proto = isset($_SERVER['SERVER_PROTOCOL'])
-                    ? $_SERVER['SERVER_PROTOCOL']
-                    : 'http:1/1';
-
         if (!defined('UNIT_TEST')) {
+            $proto = isset($_SERVER['SERVER_PROTOCOL'])
+                        ? $_SERVER['SERVER_PROTOCOL']
+                        : 'http:1/1';
             header($proto . ' 500 Internal Server Error', true, 500);
         }
         echo '<h1>500 Internal Server Error</h1>';
-        if (DEBUG) {
+        if (DEBUG && !defined('UNIT_TEST')) {
             $info = sprintf(
                 "#%d %s @ %s:%d",
                 $code,

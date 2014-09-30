@@ -1,6 +1,11 @@
 APIx changelog
 ==============
 
+Version 0.3.8
+-------------
+* Added Apix\Log
+* A lot moore unit-tests...
+
 Version 0.3.7
 -------------
 * Added an internal cache (reflection/parsing of annotation).
