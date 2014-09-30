@@ -164,7 +164,6 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame(array('bar'), $this->config->get('foo'));
     }
 
-
     /**
      * TEMP: testIsSingleton
      */

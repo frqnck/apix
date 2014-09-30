@@ -12,6 +12,8 @@
 
 namespace Apix\Plugin;
 
+use Apix\Service;
+
 class Tidy extends PluginAbstract
 {
 

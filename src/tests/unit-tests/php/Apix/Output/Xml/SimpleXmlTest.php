@@ -55,7 +55,7 @@ class SimpleXmlTest extends XmlTest
     }
 
     /**
-     * 
+     *
      * @see http://stackoverflow.com/questions/19629379/how-to-prevent-self-closing-tag-in-php-simplexml#answer-19630648
      * @see http://stackoverflow.com/questions/259719/turn-off-self-closing-tags-in-simplexml-for-php
      */
@@ -69,7 +69,7 @@ class SimpleXmlTest extends XmlTest
 
         $this->assertXml(
             $result,
-            $this->xml->encode(array('null'=>null), 'r', 
+            $this->xml->encode(array('null'=>null), 'r',
                 "LIBXML_NOEMPTYTAG error? version " . LIBXML_VERSION
             )
         );

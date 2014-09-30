@@ -101,7 +101,7 @@ class AuthTest extends TestCase
         $this->assertTrue( $this->plugin->update( $this->entity ) );
     }
 
-    // -------- TEMP Session 
+    // -------- TEMP Session
 
     /**
      * @expectedException           \Apix\Exception
@@ -149,7 +149,7 @@ class AuthTest extends TestCase
     {
         Service::set('session', new \Apix\Session('frqnck', 'admin'));
         Service::get('session')->setTrustedIps((array) '1.2.3.4');
-        
+
         $this->authAdapter->expects($this->once())
             ->method('authenticate')
             ->will($this->returnValue(true));
@@ -169,7 +169,7 @@ class AuthTest extends TestCase
 
         Service::set('session', new \Apix\Session('frqnck', 'admin'));
         Service::get('session')->setTrustedIps((array) '1.2.3.4');
-        
+
         $this->authAdapter->expects($this->once())
             ->method('authenticate')
             ->will($this->returnValue(true));

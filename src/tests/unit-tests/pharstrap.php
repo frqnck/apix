@@ -10,8 +10,6 @@
  *
  */
 
-// phpunit --bootstrap src/tests/unit-tests/pharstrap.php
-
 define('UNIT_TEST', true);
 
 define('APP_TESTDIR', realpath(__DIR__ . '/php'));
@@ -31,6 +29,6 @@ try {
     die('Error: cannot initialize - ' . $e->getMessage());
 }
 
-$app_libdir = realpath(__DIR__ . '/../../../vendor/php');
-require_once $app_libdir . '/psr0.autoloader.php';
-psr0_autoloader_searchFirst(APP_TESTDIR);
+define('APP_VENDOR', realpath(__DIR__ . '/../../../vendor'));
+$loader = require APP_VENDOR . '/autoload.php';
+$loader->add('Apix', APP_TESTDIR);

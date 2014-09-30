@@ -15,7 +15,7 @@ composer.phar
 /build/
 phpunit.xml
 TODO
-build.xml
-build.local.xml
-build.properties
+build.*
 package.xml
+
+src/data/config_dev.php

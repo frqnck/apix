@@ -234,21 +234,21 @@ class EntityTest extends TestCase
         $results = array(
             'array' => array('foo', 'bar'),
             'string' => "this is a string",
-            'object' => new \stdClass,
+            'object' => new \stdClass(),
         );
         $results['object']->foo = 'bar';
 
-        foreach($results as $result) {
+        foreach ($results as $result) {
              $this->assertInternalType('array', Entity::convertToArray($result));
         }
     }
 
     public function testConvertToArrayWithNestedArrayAndObjects()
     {
-        $object = new \stdClass;
+        $object = new \stdClass();
         $object->foo = 'bar';
         $object->ray = array('ban');
-        $object->nested = new \stdClass;
+        $object->nested = new \stdClass();
         $object->nested->biz = 'yo';
 
         $array = Entity::convertToArray($object);

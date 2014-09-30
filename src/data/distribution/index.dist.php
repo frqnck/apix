@@ -10,12 +10,12 @@
  *
  */
 
-namespace MY_NAMESPACE;
+namespace SOME_NAMESPACE;
 
 use Apix\Server,
     Apix\Exception;
 
-// Composer autoloader 
+// Composer autoloader
 require_once '../vendor/autoload.php';
 
 // Uncomment if using apix.phar
@@ -33,8 +33,7 @@ try {
          * @param     string  $name  The name to say hi to.
          * @return    array   The "Hello World" result set.
          */
-        function ($name = 'World')
-        {
+        function ($name = 'World') {
             $results = array(
                 "Hello" . ucfirst($name)
             );

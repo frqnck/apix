@@ -117,20 +117,21 @@ class Entity extends Listener
     /**
      * Converts the provided variable to an array.
      *
-     * @param mixed $mix
+     * @param  mixed $mix
      * @return array
      */
     public static function convertToArray($mix)
     {
         switch(true):
-            case is_object($mix): 
+            case is_object($mix):
                 // TODO: convert nested objects recursively...
                 return get_object_vars($mix);
-            
+
             case is_string($mix):
                 return array($mix);
-            
+
             default: // so it must be an array!
+
                 return $mix;
         endswitch;
     }

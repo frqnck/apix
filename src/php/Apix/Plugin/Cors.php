@@ -43,7 +43,7 @@ class Cors extends PluginAbstractEntity
 
         // -- preflight
         'max-age'       => 3600,         // TTL in seconds for preflight
-        'allow-methods' => 'GET,POST',   // comma-delimited HTTP methods allowed 
+        'allow-methods' => 'GET,POST',   // comma-delimited HTTP methods allowed
         'allow-headers' => 'x-apix',     // comma-delimited HTTP headers allowed
     );
 
@@ -102,7 +102,7 @@ class Cors extends PluginAbstractEntity
 
             $request = $response->getRequest();
             if ( self::isPreflight($request) ) {
-                
+
                 // 5.4 Access-Control-Max-Age
                 if ($this->options['max-age'] > 0) {
                     // Cache the request for the provided amount of seconds
@@ -113,10 +113,10 @@ class Cors extends PluginAbstractEntity
                 // 5.5 Access-Control-Allow-Methods
                 if ($request->hasHeader('Access-Control-Request-Method') ) {
                    if (!in_array(
-                        $request->getHeader('Access-Control-Request-Method'), 
+                        $request->getHeader('Access-Control-Request-Method'),
                         self::split($this->options['allow-methods'])
                     )) {
-                        return self::exception(); 
+                        return self::exception();
                     }
                     $response->setHeader(
                         'Access-Control-Allow-Methods',
@@ -130,9 +130,9 @@ class Cors extends PluginAbstractEntity
                         $request->getHeader('Access-Control-Request-Headers')
                     );
                     $allowed = self::split($this->options['allow-headers']);
-                    foreach($req_headers as $req_header) {
+                    foreach ($req_headers as $req_header) {
                         if (!in_array($req_header, $allowed)) {
-                            return self::exception(); 
+                            return self::exception();
                         }
                     }
                     $response->setHeader(
@@ -145,7 +145,7 @@ class Cors extends PluginAbstractEntity
             return true;
         }
 
-        // so it must be an invalid CORS request 
+        // so it must be an invalid CORS request
         return self::exception();
     }
 
@@ -162,12 +162,12 @@ class Cors extends PluginAbstractEntity
     /**
      * Split and trim the provided string.
      *
-     * @param  string  $str
+     * @param  string $str
      * @return array
      */
     public static function split($str)
     {
-        return array_map('trim', explode(',', $str)); 
+        return array_map('trim', explode(',', $str));
     }
 
     /**
@@ -186,7 +186,6 @@ class Cors extends PluginAbstractEntity
         return (bool) preg_match($regex, $origin);
     }
 
-
     /**
      * Checks for a preflighted request.
      *
@@ -195,7 +194,8 @@ class Cors extends PluginAbstractEntity
     public static function isPreflight(HttpRequest $request)
     {
         $method = $request->getMethod();
-        return 
+
+        return
             // uses methods other than...
             !in_array($method, array('GET', 'HEAD', 'POST'))
 
@@ -210,9 +210,9 @@ class Cors extends PluginAbstractEntity
                         )
                     )
                 )
-            
+
             // if it is set with some custom request headers
-            or $request->hasHeader('Access-Control-Request-Headers'); 
+            or $request->hasHeader('Access-Control-Request-Headers');
     }
 
 }
