@@ -47,7 +47,7 @@ class CacheTest extends TestCase
         $plugin = new Cache( $this->opts );
         $this->assertFalse( $plugin->update( $this->entity ) );
     }
-    
+
     public function testFlushAnnotatedTagsReturnsNull()
     {
         $this->plugin->update( $this->entity );

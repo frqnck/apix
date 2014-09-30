@@ -111,7 +111,7 @@ class Main extends Listener
      */
     private function initSet(array $configs)
     {
-        if( !defined('UNIT_TEST') && isset($configs['init']) ) {
+        if ( !defined('UNIT_TEST') && isset($configs['init']) ) {
             // set config inits
             foreach ($configs['init'] as $key => $value) {
                 ini_set($key, $value);

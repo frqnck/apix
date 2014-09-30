@@ -205,9 +205,9 @@ $c['services'] = array(
     'users_example' => function () {
         return array(
             0 => array(
-                'username' => 'franck', 'password' => 'pass', 'api_key' => '123',
-                'group' => 'admin', 'realm' => 'api.domain.tld',
-                'ips' => '127.0.0.1'
+                'username' => 'franck', 'password' => 'pass',
+                'api_key' => '123', 'group' => 'admin',
+                'realm' => 'api.domain.tld', 'ips' => array('127.0.0.1')
             ),
             1 => array(
                 'username' => 'foo', 'password' => 'bar', 'api_key' => '123abc',
@@ -216,42 +216,45 @@ $c['services'] = array(
         );
     },
 
-    // This is used by the auth_example service defined further above.
-    // Noet that this is only an example
+    // This is used by the auth_example service defined further above -- It was
+    // set that way solely to avoid duplicating code from that example.
+    // Note: Apix\Plugin\Auth currently needs 'Apix\Session' from this container.
     'session' => function ($user) {
-        // Set that way solely to avoid duplicating code in auth_example.
         $session = new Session($user['username'], $user['group']);
+        
         if (isset($user['ips'])) {
             $session->setTrustedIps((array) $user['ips']);
         }
         $session->addData('api_key', $user['api_key']);
 
         // Overwrite this service container, with the new object.
-        // Apix\Plugin\Auth expects this session container to hold Apix\Session.
         Service::set('session', $session);
     },
 
+    // This is the PSR3 logger service, should be altered as required.
     'logger' => function () {
         $logger = new Log\Logger();
 
-        // log bucket for critical, alert and emergency
+        // the log bucket for critical, alert and emergency
+        #$notify_log = new Log\Logger\Mail('foo@bar.boo');
         $notify_log = new Log\Logger\File('/tmp/apix_notify.log');
         $notify_log->setMinLevel('critical');
         $logger->add($notify_log);
 
-        // log bucket for notice, warning and error 
+        // the log bucket for notice, warning and error
         $prod_log = new Log\Logger\File('/tmp/apix_prod.log');
         $prod_log->setMinLevel('notice');
         $logger->add($prod_log);
 
-        if(DEBUG) {
-            // log bucket for info and debug 
+        if (DEBUG) {
+            // the log bucket for info and debug
             $dev_log = new Log\Logger\File('/tmp/apix_dev.log');
             $logger->add($dev_log);
         }
 
         // Overwrite this service container, with the new object.
         Service::set('logger', $logger);
+
         return $logger;
     }
 

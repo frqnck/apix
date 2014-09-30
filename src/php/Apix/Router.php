@@ -113,9 +113,9 @@ class Router
     public function setAsProperties(array $rules, array $params)
     {
         foreach (array_keys($this->_defaults) as $k) {
-            $value = isset($rules[$k]) ? $rules[$k]	// rules
-                : (isset($params[$k]) ? $params[$k]	// params
-                : $this->_defaults[$k]);			// defaults
+            $value = isset($rules[$k]) ? $rules[$k]    // rules
+                : (isset($params[$k]) ? $params[$k]    // params
+                : $this->_defaults[$k]);            // defaults
 
             if (property_exists($this, $k)) {
                 $this->$k = $value;
@@ -184,8 +184,7 @@ class Router
                     $result[$value] = $paths[$key];
                 }
             //} elseif (!isset($paths[$key]) || strcmp($value, $paths[$key]) != 0) {
-            } else
-            if ( //Regex based!
+            } elseif ( //Regex based!
                 isset($paths[$key])
                 && preg_match('/^:(?P<key>[\w]+)(?:<(?P<regex>.+)>)?/', $value, $m)
                 && isset($m['regex'])

@@ -20,11 +20,11 @@ class Exception extends \Exception
      *
      *  Use to re-throw E_RECOVERABLE_ERROR as they occur.
      *
-     * @param  int             $code    The error number.
-     * @param  string          $msg     The error message.
-     * @param  string          $file    The filename where the error occured.
-     * @param  int             $line    The line number where it happened.
-     * @param  array           $ctx The array of context vars.
+     * @param  int             $code The error number.
+     * @param  string          $msg  The error message.
+     * @param  string          $file The filename where the error occured.
+     * @param  int             $line The line number where it happened.
+     * @param  array           $ctx  The array of context vars.
      * @throws \ErrorException
      */
     public static function errorHandler($code, $msg='', $file=__FILE__, $line=__LINE__, $ctx=null)
@@ -32,7 +32,7 @@ class Exception extends \Exception
         if (E_RECOVERABLE_ERROR === $code) {
             $msg = preg_replace('@to\s.*::\w+\(\)@', '', $msg, 1);
             throw new \ErrorException($msg,
-                400, 0, $file, $line, 
+                400, 0, $file, $line,
                 $ctx);
         }
 
@@ -76,10 +76,10 @@ class Exception extends \Exception
     /**
      * Output the error.
      *
-     * @param  int             $code    The error number.
-     * @param  string          $message The error message.
-     * @param  string          $file    The filename where the error occured.
-     * @param  int             $line    The line number where it happened.
+     * @param int    $code    The error number.
+     * @param string $message The error message.
+     * @param string $file    The filename where the error occured.
+     * @param int    $line    The line number where it happened.
      * @codeCoverageIgnore
      */
     public static function errorOutput($code, $message, $file, $line)

@@ -3,8 +3,11 @@ APIx changelog
 
 Version 0.3.8
 -------------
-* Added Apix\Log
-* A lot moore unit-tests...
+* Added Service 'logger' PSR3 logger aware using by default Apix\Log.
+* Plugin\Cache unit-tested and updated to Apix\Cache v1.2
+* Plugin\Auth unit-tested.
+* Many bug fixes and additional unit-tests.
+* Added Scrutinizer checks.
 
 Version 0.3.7
 -------------

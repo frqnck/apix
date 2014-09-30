@@ -13,7 +13,6 @@
 namespace Apix\Plugin;
 
 use Apix\Service;
-use Apix\HttpRequest;
 
 class Cache extends PluginAbstractEntity
 {
@@ -94,7 +93,7 @@ class Cache extends PluginAbstractEntity
     /**
      * Flush the tags explicitly
      *
-     * @param boolean $enable Wether to flush or not
+     * @param  boolean      $enable Wether to flush or not
      * @return boolean|null
      */
     public function flushAnnotatedTags($enable, array $default = null)
@@ -103,7 +102,7 @@ class Cache extends PluginAbstractEntity
             && $tags = $this->getSubTagValues('flush', $default)
         ) {
             $success = $this->adapter->clean($tags);
-            
+
             $logger = Service::get('logger');
             $logger->debug('Cache: tags purged [{tags}]', array('tags' => $tags));
 
