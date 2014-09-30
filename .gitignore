@@ -1,17 +1,20 @@
+# System related
 .DS_Store
 .build
 .tmp
-/build/
-/vendor/
-vendor
 *~
 *.log
 .svn
+
+# Composer related
 composer.lock
-TODO
+composer.phar
+/vendor/*
 
+# Development related
+/build/
 phpunit.xml
-
+TODO
 build.xml
 build.local.xml
 build.properties
