@@ -2,13 +2,14 @@
 <?php
 
 define('APP_TOPDIR', realpath(__DIR__ . '/../php'));
-define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor/php'));
+define('APP_LIBDIR', realpath(__DIR__ . '/../../vendor'));
 //define('APP_TESTDIR', realpath(__DIR__ . '/../tests/unit-tests/php'));
 
-require_once APP_LIBDIR . '/psr0.autoloader.php';
+// require_once APP_LIBDIR . '/psr0.autoloader.php';
+require_once APP_LIBDIR . '/autoload.php';
 
-psr0_autoloader_searchFirst(APP_LIBDIR);
-psr0_autoloader_searchFirst(APP_TOPDIR);
+// psr0_autoloader_searchFirst(APP_LIBDIR);
+// psr0_autoloader_searchFirst(APP_TOPDIR);
 //psr0_autoloader_searchFirst(APP_TESTDIR);
 
 require 'Compiler.php';

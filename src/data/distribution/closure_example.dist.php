@@ -13,11 +13,11 @@ try {
      * @param  string $software
      * @return array  The array to return to the client
      * @api_auth    groups=public       Make this open to the 'public' group and
-     *                                  circuvent any @api_auth set by class().
+     *                         circuvent any @api_auth set by class().
      * @api_cache   ttl=10w tags=softy  Cached for a maximum of 10 weeks and
-     *                                  tagged as 'softy'.
+     *                         tagged as 'softy'.
      */
-    $api->onRead('/version/:software', function($software) {
+    $api->onRead('/version/:software', function ($software) {
         // ...
         return array(
             $software => 'the version string of software.'
@@ -31,11 +31,11 @@ try {
      * @return string           Output the binary & quit.
      * @throws \DomainException 404
      * @api_auth    groups=public       Make this open to the 'public' group and
-     *                                  circuvent any @api_auth set by class().
+     *                                   circuvent any @api_auth set by class().
      * @api_cache   ttl=10w tags=softy  Cached for a maximum of 10 weeks and
-     *                                  tagged as 'softy'.
+     *                                   tagged as 'softy'.
      */
-    $api->onRead('/download/:software', function($software) {
+    $api->onRead('/download/:software', function ($software) {
         // ...
         if (file_exists($software)) {
             echo file_get_contents($software);
@@ -55,7 +55,7 @@ try {
      * @api_auth    users=franck,jon    Only allow access to Franck and Jon.
      * @api_cache   flush=softy         Purge the 'softy' tagged cache entries.
      */
-    $api->onCreate('/upload/:software', function(Request $request, $software) {
+    $api->onCreate('/upload/:software', function (Request $request, $software) {
         // ...
     });
 
@@ -64,7 +64,7 @@ try {
      *
      * @see POST /upload/:software
      */
-    $api->onUpdate('/upload/:software', function($software) {
+    $api->onUpdate('/upload/:software', function ($software) {
         // ...
     });
 

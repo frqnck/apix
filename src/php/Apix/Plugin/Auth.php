@@ -49,12 +49,12 @@ class Auth extends PluginAbstractEntity
 
         // authenticate
         if ( !$this->adapter->authenticate() ) {
-            
+
             // $logger->info(
             //     'Login failed for "{username}"',
             //     array('username' => $this->adapter->getUsername())
             // );
-            
+
             $this->adapter->send();
 
             // TODO: eventually in Auth...
@@ -68,7 +68,7 @@ class Auth extends PluginAbstractEntity
         // TODO: get the Session object.
         if (Service::has('session')) {
             $session = Service::get('session');
-            
+
             $context = array('user' => $session->getUsername());
 
             // check the username is in the authorised list.
@@ -107,7 +107,7 @@ class Auth extends PluginAbstractEntity
 
             // TODO: set X_REMOTE_USER or X_AUTH_USER
             $_SERVER['X_AUTH_USER'] = $context['user'];
-            
+
             $logger->info(
                 'Auth: User logged in [{user}/{group}/{ip}]',
                 $context

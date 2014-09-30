@@ -48,7 +48,7 @@ abstract class PluginAbstractEntity extends PluginAbstract
 
         // return false === $k
         //         ? $default
-        //         : array_map('trim', explode(',', $tags['values'][$k])); 
+        //         : array_map('trim', explode(',', $tags['values'][$k]));
         return false === $k ? $default : explode(',', $tags['values'][$k]);
     }
 

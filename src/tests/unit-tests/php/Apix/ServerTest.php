@@ -25,7 +25,7 @@ class ServerTest extends TestCase
 
         $this->server = new Server(null, $this->request);
 
-        $this->closure = function(){};
+        $this->closure = function () {};
     }
 
     protected function tearDown()

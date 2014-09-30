@@ -105,7 +105,7 @@ class CorsTest extends TestCase
             $this->response->getHeader('Access-Control-Allow-Credentials')
         );
     }
-    
+
     public function testAllowCredentialsSetToFalse()
     {
         $this->opts['allow-credentials'] = false;
