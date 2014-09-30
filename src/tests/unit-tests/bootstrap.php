@@ -12,6 +12,8 @@
 
 namespace Apix;
 
+define('DEBUG', true);
+
 define('UNIT_TEST', true);
 define('APP_TOPDIR', realpath(__DIR__ . '/../../php'));
 define('APP_TESTDIR', realpath(__DIR__ . '/php'));

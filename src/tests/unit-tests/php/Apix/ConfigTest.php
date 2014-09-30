@@ -135,14 +135,14 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($defaults, $this->config->getResources());
     }
 
-    public function testGetManyServices()
+    public function testGetServices()
     {
         $default = $this->config->get('services');
 
         $this->assertSame($default, $this->config->getServices());
     }
 
-    public function testSetGetOneService()
+    public function testSetGetServicesWithServiceKey()
     {
         $this->config->setService('foo', 'bar');
         $this->assertSame('bar', $this->config->getServices('foo'));

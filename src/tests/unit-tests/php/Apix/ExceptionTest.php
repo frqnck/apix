@@ -40,13 +40,13 @@ class ExceptionTest extends TestCase
      */
     public function testErrorHandlerThrowsRecoverableErrorException()
     {
-        // trigger_error("boo!", E_USER_ERROR);
-        // TODO!?
+        // trigger_error("boo!", \E_USER_ERROR);
         Exception::errorHandler(4096, 'boo!');
     }
 
     public function testStartupException()
     {
+        // trigger_error("boo!", E_CORE_ERROR);
         Exception::startupException(new Exception());
         $this->expectOutputString('<h1>500 Internal Server Error</h1>');
     }
