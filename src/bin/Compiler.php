@@ -139,9 +139,9 @@ class Compiler
         unset($phar);
 
         chmod($pharFile, 0777);
-        rename($pharFile, __DIR__ . '/../../dist/' . $pharFile);
+        rename($pharFile, __DIR__ . '/../../build/dist/' . $pharFile);
 
-        echo 'Created in ' . realpath(__DIR__ . '/../../dist/') . PHP_EOL;
+        echo 'Created in ' . realpath(__DIR__ . '/../../build/dist/') . PHP_EOL;
     }
 
     protected function addFile($phar, $path, $strip = true)
