@@ -17,3 +17,5 @@ phpunit.xml
 TODO
 build.*
 package.xml
+
+src/data/config_dev.php
