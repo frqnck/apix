@@ -11,6 +11,11 @@
 
 namespace Apix;
 
+/**
+ * Console class.
+ *
+ * @codeCoverageIgnore
+ */
 class Console
 {
     protected $args;
