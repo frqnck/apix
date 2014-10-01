@@ -1,7 +1,7 @@
 {
     "name": "apix/apix",
     "type": "application",
-    "description": "Restful API server for structured and self-documenting resources over JSON, XML, ...",
+    "description": "RESTful API server for structured and self-documenting resources over JSON, XML, ...",
     "keywords": ["restful","api","server","web service","framework","json","xml","http","documentation","cors","auth","rest","apix"],
     "homepage": "http://github.com/frqnck/apix",
     "license": "BSD-3-Clause",
