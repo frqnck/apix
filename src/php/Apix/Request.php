@@ -216,7 +216,7 @@ class Request
      */
     public function setHeader($name, $value)
     {
-        $this->headers[strtolower($name)] = $value;
+        $this->headers[strtoupper($name)] = $value;
     }
 
     /**
@@ -227,7 +227,7 @@ class Request
      */
     public function hasHeader($name)
     {
-        return isset($this->headers[strtolower($name)]);
+        return isset($this->headers[strtoupper($name)]);
     }
 
     /**
@@ -238,7 +238,7 @@ class Request
      */
     public function getHeader($name)
     {
-        $name = strtolower($name);
+        $name = strtoupper($name);
         if (isset($this->headers[$name])) {
             return $this->headers[$name];
         }
@@ -257,6 +257,7 @@ class Request
             $headers = $_SERVER;
         }
         $this->headers = $headers;
+        // $this->headers = array_change_key_case($headers);
     }
 
     /**
