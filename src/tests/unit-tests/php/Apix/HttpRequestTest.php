@@ -76,9 +76,12 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetBodyData($type, $body, $assoc=true, $expected, array $formats=null)
     {
-        if ($formats !== null) {
-           $this->request->setFormats($formats);
-        }
+       $this->request->setFormats(
+            $formats !== null
+            ? $formats
+            : array('post', 'xml', 'json')
+        );
+
         $this->request->setHeader('CONTENT_TYPE', $type);
         $this->request->setBody($body);
 
@@ -136,7 +139,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase
                 'expected' => null
             ),
             'no body, returns null' => array(
-                'type' => 'text/nullll',
+                'type' => 'text/xml',
                 'body' => null,
                 'assoc' => true,
                 'expected' => null
@@ -147,12 +150,12 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase
                 'assoc' => true,
                 'expected' => null
             ),
-            'Not set in formats should return null' => array(
+            'content-type not supported, returns null' => array(
                 'type' => 'application/json',
                 'body' => json_encode($values),
                 'assoc' => true,
                 'expected' => null, // maybe should actually throw an exception?
-                'formats' => array('XML')
+                'formats' => array('xml')
             ),
             // TODO: CSV eventually?
             // 'CSV as array' => array(
@@ -162,7 +165,6 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase
             //     'expected' => $values,
             //     'formats' => array('XML')
             // )
-
         );
     }
 
