@@ -1,6 +1,12 @@
 APIx changelog
 ==============
 
+Version 0.3.9
+-------------
+* Bug Fix: $_SERVER headers incorrectly read due to uppercase/lowercase mixup #4
+  see: https://github.com/frqnck/apix/pull/4
+* Modified slightly Plugin\OutputDebug so it is in parity with the other plugins.
+
 Version 0.3.8
 -------------
 * Added Service 'logger' PSR3 logger aware using by default Apix\Log.
