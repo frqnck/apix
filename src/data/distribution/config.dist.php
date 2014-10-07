@@ -269,7 +269,7 @@ $c['plugins'] = array(
 
     // Cross-Origin Resource Sharing plugin. Enable thru annotation:
     // e.g.  * @api_cors   groups=grp1,grp2   users=franck
-    'Apix\Plugin\Cors',
+    // 'Apix\Plugin\Cors' => array('enable' => false),
 
     // Validates, corrects, and pretty-prints XML and HTML outputs.
     // Various options are available -- see Tidy::$options.
