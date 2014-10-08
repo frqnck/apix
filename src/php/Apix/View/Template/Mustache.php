@@ -25,7 +25,9 @@ class Mustache extends Template
      */
     public function __construct(array $options=array())
     {
-        $dir = APP_SRC . '/data/templates/html';
+        $distrib_path = \Apix\Service::get('config')['distrib_path'];
+        
+        $dir = $distrib_path . '/../templates/html';
         $opts = array('extension' => '.ms');
         $this->defaultOptions = array(
             'extension'         => '.ms',

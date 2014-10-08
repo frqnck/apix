@@ -130,6 +130,12 @@ class Server extends Main
         );
     }
 
+    public function setGroupInfo($path, array $docs=null)
+    {
+        var_dump( $this->resources); exit;
+        $this->group = $infos;
+    }
+
     /**
      * TODO: Test Read from a group.
      *
@@ -137,22 +143,9 @@ class Server extends Main
      * @return string
      * @codeCoverageIgnore
      */
-    public function setGroup($name)
+    public function setGroup($name, array $groupInfo=null)
     {
-        $class = new \ReflectionClass($this);
-        $method = $class->getMethod('setGroup');
-    var_dump($class);
-
-        $class = new \ReflectionFunction();
-        //$method = $class->getMethod('setGroup');
-    var_dump($class);
-
-        $doc = $method->getDocComment();
-
-        $this->group = array(
-            'name'  => $name,
-            'doc'   => $doc
-        );
+        $this->group[$name] = $groupInfo;
     }
 
 }

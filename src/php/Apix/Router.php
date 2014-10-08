@@ -21,7 +21,6 @@ namespace Apix;
  */
 class Router
 {
-
     /**
      * Holds the controller string.
      * @var	string

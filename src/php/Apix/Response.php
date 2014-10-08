@@ -402,6 +402,7 @@ class Response extends Listener
     public function generate(array $results, $version_string='ouarz', $rootNode='root')
     {
         $this->results = $this->collate($results);
+        // var_dump( $results );echo __METHOD__;exit;
 
         // early listeners @ post-response
         $this->hook('response', 'early');

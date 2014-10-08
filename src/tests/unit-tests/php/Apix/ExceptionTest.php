@@ -12,8 +12,6 @@
 
 namespace Apix;
 
-// use Apix\Exception as Ex;
-
 class ExceptionTest extends TestCase
 {
 
@@ -26,16 +24,32 @@ class ExceptionTest extends TestCase
      * @expectedException           \ErrorException
      * @expectedExceptionCode       500
      */
-    public function testErrorHandlerThrowsErrorException()
+    public function testErrorHandlerThrowsErrorExceptionTriggered()
     {
-        trigger_error("boo!", E_USER_WARNING);
-        // Exception::errorHandler(0);
-        // $response = json_decode();
+        trigger_error('boo!', E_USER_WARNING);
     }
 
     /**
      * @expectedException           \ErrorException
-     * @expectedExceptionCode       400
+     * @expectedExceptionCode       500
+     */
+    public function testErrorHandlerThrowsErrorExceptionReal()
+    {
+        $response = json_decode();
+    }
+
+    /**
+     * @expectedException           \ErrorException
+     * @expectedExceptionCode       500
+     */
+    public function testErrorHandlerThrowsErrorExceptionCalled()
+    {
+        Exception::errorHandler(0);
+    }
+
+    /**
+     * @expectedException           \ErrorException
+     * @expectedExceptionCode       500
      * @expectedExceptionMessage    boo!
      */
     public function testErrorHandlerThrowsRecoverableErrorException()

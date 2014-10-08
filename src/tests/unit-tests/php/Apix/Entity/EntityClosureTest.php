@@ -80,14 +80,6 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
         $this->entity->underlineCall($this->route);
     }
 
-    public function testParseDocsGroupLevel()
-    {
-        $this->entity->group("/* TODO {closure-group-title} */");
-        $docs = $this->entity->parseDocs();
-        $this->assertSame("TODO {closure-group-title} ", $docs['title']);
-        $this->assertSame(1, count($docs['methods']));
-    }
-
     public function testGetMethod()
     {
         $method = $this->entity->getMethod($this->route);
@@ -135,6 +127,16 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse(
             $this->entity->reflectedFunc('non-existant')
         );
+    }
+
+
+    public function testParseDocsGroupLevel()
+    {
+        $this->entity->group("TODO!");
+        $docs = $this->entity->parseDocs();
+        $this->assertSame("TODO!", $docs['title']);
+        
+        $this->assertSame(1, count($docs['methods']));
     }
 
 }

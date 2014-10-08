@@ -116,8 +116,6 @@ class Resources
      */
     public function getResource($name)
     {
-        #echo '<pre>';print_r($this->resources);
-
         if (isset($this->resources[$name])) {
             return $this->resources[$name];
         }

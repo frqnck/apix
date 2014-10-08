@@ -23,7 +23,7 @@ use Apix\Listener,
 class Entity extends Listener
 {
     /**
-     * Holds the parsed entity documentaions.
+     * Holds this entity (parsed) documentaions.
      * @var array|null
      */
     protected $docs = null;
@@ -167,13 +167,11 @@ class Entity extends Listener
     /**
      * Gets the specified default action.
      *
-     * @return string
+     * @return string|null
      */
     public function getDefaultAction($method)
     {
         if (isset($this->defaultActions[$method])) {
-            #return $method;
-
             return $this->defaultActions[$method];
         }
     }
@@ -347,9 +345,7 @@ class Entity extends Listener
         $method = $this->route->getMethod();
         $doc = $this->getDocs($method);
 
-        return isset($doc[$name])
-          ? $doc[$name]
-          : null;
+        return isset($doc[$name]) ? $doc[$name] : null;
     }
 
 }

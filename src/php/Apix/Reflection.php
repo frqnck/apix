@@ -54,6 +54,7 @@ class Reflection
      * Extract PHPDOCs
      *
      * @param  \Reflection|string $mix A reflection object or a PHPDoc string
+     * @param array|null $requireds An array of param name that are required. 
      * @return array
      */
     public static function parsePhpDoc($mix, array $requireds=null)
@@ -115,7 +116,8 @@ class Reflection
                     'description'   => isset($m['description'])
                                         ? trim($m['description'])
                                         : null,
-                    'required'      => isset($requireds) && in_array($m['name'], $requireds)
+                    'required'      => isset($requireds)
+                                        && in_array($m['name'], $requireds)
                 );
 
             } else {

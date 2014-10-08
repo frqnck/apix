@@ -18,7 +18,7 @@
 {{/methods}}
 {{/items}}
 </ul>
-
+<hr>
 <h2>API structure</h2>
 <p></p>
 <h3>Parameters</h3>

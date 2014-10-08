@@ -351,6 +351,8 @@ $c['init'] = array(
     'request_order'             => 'GP'
 );
 
+$c['config_path'] = __DIR__;
+
 ///////////////////////////////////////////////////////////////
 // Anything below that point should not need to be modified. //
 ///////////////////////////////////////////////////////////////
@@ -380,6 +382,6 @@ $c['default'] = array(
     )
 );
 
-$c['config_path'] = __DIR__;
+$c['distrib_path'] = __DIR__;
 
 return $c;

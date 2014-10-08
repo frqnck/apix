@@ -20,8 +20,8 @@ use Apix\Entity,
 
 /**
  * Help
- * This resource entity provides in-line referencial to all the API resources and methods.
-*/
+ * This resource entity provides in-line referencial of all the API resources.
+ */
 class Help
 {
     // only use in verbose mode.
@@ -36,7 +36,7 @@ class Help
      * @param string $path    A string of characters used to identify a resource.
      * @param array  $filters Filters can be use to narrow down the resultset.
      *
-     * @example <pre>GET /help/path/to/entity</pre>
+     * @example <pre>GET /help/path_to_entity</pre>
      * @id help
      * @usage The OPTIONS method represents a request for information about the
      * communication options available on the request/response chain
@@ -137,31 +137,18 @@ class Help
      */
     protected function getDocs($method, $path, Entity $entity, array $filters=null)
     {
-        // $man = $this->getParam('resource');
-        // $resource = Zenya_Api_Resource::getInternalAppelation($man);
-        // $help = new Zenya_Api_ManualParser($resource, $man, 'api_');
-        // $this->view = $help->toArray();
-
-        $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
-
-        if (null !== $method || $entity->hasMethod($method) ) {
-
-            // get specified method.
-            $docs = $entity->getDocs($method);
-
-        } else {
-
-            // get all docs.
-            $docs = $entity->getDocs();
-        }
+        $docs = (null !== $method || $entity->hasMethod($method))
+            ? $entity->getDocs($method) // get the specified doc method.
+            : $entity->getDocs();       // get all the methods docs.
 
         $docs['path'] = $path;
 
-        if ($verbose) {
-            $docs[$this->private_nodeName] = array(
-                'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)'
-            );
-        }
+        // $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
+        // if ($verbose) {
+        //     $docs[$this->private_nodeName] = array(
+        //         'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)'
+        //     );
+        // }
 
         return $docs;
     }

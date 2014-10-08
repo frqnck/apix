@@ -24,7 +24,15 @@ use Apix\Entity,
 class EntityClosure extends Entity implements EntityInterface
 {
 
-    public $group;
+    /**
+     * Holds group info...
+     */
+    protected $group = null;
+    // protected $group = array(
+    //         // 'title' => 'some group title...',
+    //         // 'description' => 'some group description..',
+    //         // 'bb' => 'ss'
+    //     );
 
     private $reflection;
 
@@ -93,16 +101,20 @@ class EntityClosure extends Entity implements EntityInterface
      */
     public function parseDocs()
     {
-        // class doc
-        $docs = Reflection::parsePhpDoc( $this->group );
+        // group class doc
+        // $docs = Reflection::parsePhpDoc( $this->group );
+        $docs = $this->group;
 
         // doc for all methods
         foreach ($this->getActions() as $key => $func) {
-          $ref = $this->reflectedFunc($key);
-          $docs['methods'][$key] = Reflection::parsePhpDoc($ref); // <----------------------- TODO (required args)
+            $ref = $this->reflectedFunc($key);
+            $docs['methods'][$key] = Reflection::parsePhpDoc($ref); // <- TODO (required args)
 
-            // temp
-          $docs['methods'][$key]['method'] = $key;
+            // HERE: temp
+            $docs['methods'][$key]['method'] = $key;
+
+            $docs['methods'][$key]['path'] = $key . ' '; //. $this->getAction($key); // tood here 
+
         }
 
         return $docs;
@@ -115,7 +127,10 @@ class EntityClosure extends Entity implements EntityInterface
     {
         $name = $route->getMethod();
         if (false === $method = $this->reflectedFunc($name)) {
-            throw new \InvalidArgumentException("Invalid resource's method ({$name}) specified.", 405);
+            throw new \InvalidArgumentException(
+                "Invalid resource's method ({$name}) specified.",
+                405
+            );
         }
 
         return $method;
@@ -127,22 +142,6 @@ class EntityClosure extends Entity implements EntityInterface
     }
 
     /* --- CLOSURE only --- */
-
-    /**
-     * Group a resource entity.
-     *
-     * @param  string $name The group name
-     * @return void
-     */
-    public function group($test)
-    {
-        // TODO retrive phpdoc coment strinfg here!
-        #$test = "/* TODO {closure-group-title} */";
-        // group test
-        $this->group = $test;
-
-        return $this;
-    }
 
     /**
      * Adds a redirect.
@@ -157,4 +156,25 @@ class EntityClosure extends Entity implements EntityInterface
 
         return $this;
     }
+
+    /**
+     * Group a resource entity.
+     *
+     * @param  string $name The group name
+     * @return void
+     */
+    public function group($title)
+    {
+        // var_dump('dd');exit;
+        // public $group = null;
+        // $this->group = ['title'=> 'd', 'documentation'=>'some'];
+
+        // TODO retrive phpdoc coment strinfg here!
+
+        // group test
+        $this->group = ['title'=>$title];
+
+        return $this;
+    }
+
 }

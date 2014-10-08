@@ -71,21 +71,19 @@ class Help extends ViewModel
      */
     public function params()
     {
-        if (empty($this->params)) {
-            return null;
+        if (!empty($this->params)) {
+            $params = isset($this->params) ? $this->params : array();
+
+            $many = $this->hasMany('params');
+
+            return array(
+                'title' => $many ? 'Options' : 'Option',
+                'txt'   => $many
+                        ? 'The following request parameters are available:'
+                        : 'The following request parameter is available:',
+                'items' => array_values($params)
+            );
         }
-
-        $params = isset($this->params) ? $this->params : array();
-
-        $many = $this->hasMany('params');
-
-        return array(
-            'title' => $many ? 'Options' : 'Option',
-            'txt'   => $many
-                    ? 'The following request parameters are available:'
-                    : 'The following request parameter is available:',
-            'items' => array_values($params)
-        );
     }
 
     /**

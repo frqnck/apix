@@ -20,6 +20,8 @@ use Apix\Listener,
     Apix\Response,
     Apix\Service;
 
+// Apix\Router
+
 class Main extends Listener
 {
     const VERSION = '@package_version@';
@@ -67,6 +69,7 @@ class Main extends Listener
         // Set and intialise the config
         $c = $config instanceof Config ? $config : Config::getInstance($config);
         $this->config = $c->get();
+        Service::set('config', $this->config);
 
         $this->initSet($this->config);
 
@@ -154,11 +157,31 @@ class Main extends Listener
             $http_code = $e->getCode()>199 ? $e->getCode() : 500;
             $this->response->setHttpCode($http_code);
 
-            $this->results['error'] = array(
+            $error = array(
                 'message'   => $e->getMessage(),
-                'code'      => $http_code
+                'code'      => $http_code,
             );
 
+            if(DEBUG) {
+                $error['exception'] = array(
+                    'message' => $e->getMessage(),
+                    'code'    => $e->getCode(),
+                    'type'    => get_class($e),
+                    'file'    => $e->getFile(),
+                    'line'    => $e->getLine(),
+                    'stack trace'   => $e->getTraceAsString(),
+                );
+                if(method_exists($e, 'getPrevious')) {
+                    $p = $e->getPrevious();
+                    if(method_exists($p, 'getTraceAsString')) {
+                        $error['exception']['prev'] = $p->getTraceAsString();
+                    }
+                }
+            }
+
+            // TODO: log the exception!
+            // Service::get('logger')->error('');
+            
             // set the error controller!
             if (
                 !in_array(
@@ -167,7 +190,8 @@ class Main extends Listener
                 )
             ) {
                $this->route->setController('error');
-               $this->results = $this->results['error'];
+
+               $this->results = $error;
             }
 
             // listeners @ server exception stage
@@ -256,7 +280,7 @@ class Main extends Listener
             array(
                 'method'    => $request->getMethod(),
                 'path'      => $path,
-                'server'    => & $this
+                'server'    => & $this // so the resources can cross ref server.
             )
         );
 

@@ -92,7 +92,7 @@ class EntityClass extends Entity implements EntityInterface
      */
     public function parseDocs()
     {
-        // class doc
+        // group class doc
         $docs = Reflection::parsePhpDoc(
             $this->reflectedClass()->getDocComment()
         );
@@ -120,7 +120,10 @@ class EntityClass extends Entity implements EntityInterface
     {
         $name = $route->getAction();
         if (false === $this->reflectedClass()->hasMethod($name)) {
-            throw new \InvalidArgumentException("Invalid resource's method ({$route->getMethod()}) specified.", 405);
+            throw new \InvalidArgumentException(
+                "Invalid resource's method ({$route->getMethod()}) specified.",
+                405
+            );
         }
 
         return $this->reflectedClass()->getMethod($name);

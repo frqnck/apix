@@ -56,4 +56,17 @@ class ServerTest extends TestCase
         );
     }
 
+    // public function testSetGroup()
+    // {
+    //     $entity = $this->server->onRead('/path', $this->closure);
+
+    //     // $entity = $this->server->setGroup('dddd');
+        
+    //     $entity->group = 'test';
+    //     // $this->assertInstanceOf('Apix\Entity', $entity);
+
+    //     // $this->assertInstanceOf('Apix\Entity', $entity);
+    //     // $this->assertTrue($entity->hasMethod($method));
+    // }
+
 }

@@ -20,23 +20,25 @@ class Exception extends \Exception
      *
      *  Use to re-throw E_RECOVERABLE_ERROR as they occur.
      *
-     * @param  int             $code The error number.
-     * @param  string          $msg  The error message.
-     * @param  string          $file The filename where the error occured.
-     * @param  int             $line The line number where it happened.
-     * @param  array           $ctx  The array of context vars.
+     * @param  int              $code The error number.
+     * @param  string           $msg  The error message.
+     * @param  string           $file The filename where the error occured.
+     * @param  int              $line The line number where it happened.
+     * @param  array|\Exception $ctx  The context array or previous Exception.
      * @throws \ErrorException
      */
-    public static function errorHandler($code, $msg='', $file=__FILE__, $line=__LINE__, $ctx=null)
-    {
-        if (E_RECOVERABLE_ERROR === $code) {
+    public static function errorHandler(
+        $code, $msg='', $file=__FILE__, $line=__LINE__, $ctx=null
+    ) {
+        if (E_RECOVERABLE_ERROR == $code) {
             $msg = preg_replace('@to\s.*::\w+\(\)@', '', $msg, 1);
-            throw new \ErrorException($msg,
-                400, 0, $file, $line,
-                $ctx);
+            // $code = 400;
         }
+        if( null !== $ctx && !($ctx instanceof \Exception) ) {
+            $ctx = null;
+        } 
 
-        throw new \ErrorException($msg, 500);
+        throw new \ErrorException($msg, 500, 0, $file, $line, $ctx);
     }
 
     /**
