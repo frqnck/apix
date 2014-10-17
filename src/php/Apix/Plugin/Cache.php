@@ -14,6 +14,12 @@ namespace Apix\Plugin;
 
 use Apix\Service;
 
+/**
+ * Caching plugin for APIx.
+ *
+ * @author Franck Cassedanne <franck@cassedanne.com>
+ * @see https://github.com/frqnck/apix-cache
+ */
 class Cache extends PluginAbstractEntity
 {
 

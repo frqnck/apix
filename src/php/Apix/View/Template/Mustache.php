@@ -17,26 +17,21 @@ use Apix\View\Template,
 
 class Mustache extends Template
 {
-
     public $options = null;
 
     /**
      * Constructor.
      */
-    public function __construct(array $options=array())
+    public function __construct(array $options = array())
     {
-        $distrib_path = \Apix\Service::get('config')['distrib_path'];
-        
-        $dir = $distrib_path . '/../templates/html';
         $opts = array('extension' => '.ms');
-        $this->defaultOptions = array(
-            'extension'         => '.ms',
-            'loader'            => new \Mustache_Loader_FilesystemLoader($dir, $opts),
-            'partials_loader'   => new \Mustache_Loader_FilesystemLoader($dir . '/partials', $opts),
+        $defaultOptions = array(
+            'loader'            => new \Mustache_Loader_FilesystemLoader($options['view_dir'], $opts),
+            'partials_loader'   => new \Mustache_Loader_FilesystemLoader($options['view_dir'] . '/partials', $opts),
             'cache'             => '/tmp/cache/mustache'
         );
 
-        $this->options = $this->defaultOptions + $options;
+        $this->options = $defaultOptions + $options;
     }
 
     /**
@@ -44,7 +39,7 @@ class Mustache extends Template
      */
     public function render(ViewModel $model)
     {
-        #$template = '<h1> {{title}} </h1> <ul> {{#sites}} <li> {{#url}} {{.}} {{/url}} </li> {{/sites}}  </ul>';
+        // $template = '<h1> {{title}} </h1> <ul> {{#sites}} <li> {{#url}} {{.}} {{/url}} </li> {{/sites}}  </ul>';
         $m = new \Mustache_Engine($this->options);
 
         return $m->render($this->layout, $model);

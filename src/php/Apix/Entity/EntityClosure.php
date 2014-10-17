@@ -27,7 +27,9 @@ class EntityClosure extends Entity implements EntityInterface
     /**
      * Holds group info...
      */
-    protected $group = null;
+    public $group = null;
+
+    // protected $group = null;
     // protected $group = array(
     //         // 'title' => 'some group title...',
     //         // 'description' => 'some group description..',
@@ -108,13 +110,12 @@ class EntityClosure extends Entity implements EntityInterface
         // doc for all methods
         foreach ($this->getActions() as $key => $func) {
             $ref = $this->reflectedFunc($key);
-            $docs['methods'][$key] = Reflection::parsePhpDoc($ref); // <- TODO (required args)
 
-            // HERE: temp
-            $docs['methods'][$key]['method'] = $key;
+            $_docs = Reflection::parsePhpDoc($ref); // <- TODO (required args)
+            $_docs['method'] = $key;
+            // $_docs['path'] = $key . ' '; //. $this->getAction($key); // tood here 
 
-            $docs['methods'][$key]['path'] = $key . ' '; //. $this->getAction($key); // tood here 
-
+            $docs['methods'][$key] = $_docs;
         }
 
         return $docs;

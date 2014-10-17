@@ -13,7 +13,7 @@
 namespace Apix;
 
 // Define the DEBUG constant. Should be set to false in production.
-if(!defined('DEBUG')) define('DEBUG', false);
+if(!defined('DEBUG')) define('DEBUG', true);
 
 $c = array(
 
@@ -133,14 +133,14 @@ $c = array(
 $c['resources'] = array(
 
     // Handles GET /help/path/to/resource
-    '/help/:path' => array(
+    '/help/:resource' => array(
         'redirect' => 'OPTIONS'
     ),
 
     // As per RFC2616 section 9.2
     // see http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
     '/*' => array(
-        'redirect' => 'OPTIONS',
+        'redirect' => 'OPTIONS'
     )
 
 );
@@ -290,7 +290,10 @@ $c['plugins'] = array(
 
     // Add some debugging information within the response-body.
     // Should be set to false in production. This plugin affects cachability.
-    'Apix\Plugin\OutputDebug' => array('enable' => DEBUG)
+    'Apix\Plugin\OutputDebug' => array('enable' => DEBUG),
+
+    // TODO
+    'Apix\Plugin\Manual'
 );
 
 // Init is an associative array of specific PHP directives. They are

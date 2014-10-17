@@ -83,20 +83,19 @@ class Reflection
 
         $str = preg_replace($pattern, '', $doc);
 
-       # $lines =array_map('trim',explode(PHP_EOL, $str));
-
+        #$lines =array_map('trim',explode(PHP_EOL, $str));
         $lines = preg_split('@\r?\n|\r@', $str, null, PREG_SPLIT_NO_EMPTY);
 
-        // extract the title
+        // extract the short decription (title)
         $docs['title'] = array_shift($lines);
 
-        // extract the description
+        // extract the long description
         $docs['description'] = '';
         foreach ($lines as $i => $line) {
             if (strlen(trim($line)) && strpos($line, '@') !== 0) {
                 $docs['description'] .= $docs['description'] ? PHP_EOL . $line : $line;
                 unset($lines[$i]);
-            }
+            } else break;
         }
 
         // do all the "@entries"
@@ -105,12 +104,11 @@ class Reflection
         foreach ($lines['value'] as $i => $v) {
             $grp = $lines['key'][$i];
 
-            if ($grp == 'param') {
+            if ($grp == 'param' || $grp == 'global') {
                 // "@param string $param description of param"
                 preg_match('/(?P<type>\S+)\s+\$(?P<name>\S+)(?P<description>\s+(?:.+))?/', $v, $m);
-
-                $docs['params'][$m['name']] = array(
-                #$docs['params'][] = array(
+                $t = $grp == 'param' ? 'params' : 'globals';
+                $docs[$t][$m['name']] = array(
                     'type'          => $m['type'],
                     'name'          => $m['name'],
                     'description'   => isset($m['description'])
@@ -126,7 +124,7 @@ class Reflection
             }
         }
 
-        //reduce group
+        // reduce group
         foreach ($docs as $key => $value) {
             if ($key !== 'params') {
                 if (is_array($value) && count($value) == 1) {

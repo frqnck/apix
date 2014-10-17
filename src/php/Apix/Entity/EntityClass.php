@@ -101,13 +101,14 @@ class EntityClass extends Entity implements EntityInterface
 
         // doc for all methods
         foreach ($this->getMethods() as $key => $method) {
-          if ( $key = array_search($method->name, $actions) ) {
-            $docs['methods'][$key] =
-                Reflection::parsePhpDoc( $method );
+            if ( $key = array_search($method->name, $actions) ) {
 
-            // temp
-            #$docs['methods'][$key]['method'] = $key;
-          }
+               $_docs = Reflection::parsePhpDoc( $method );
+                $_docs['method'] = $key;
+
+                // temp
+                $docs['methods'][$key] = $_docs;
+            }
         }
 
         return $docs;

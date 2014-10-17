@@ -1,6 +1,14 @@
 APIx changelog
 ==============
 
+Version 0.4.0
+-------------
+* Added Plugin\Manual
+* Added Exception debug output.
+* Changed The file extension is the resource enpoint rather the
+* Fixeded extension is now set from the resource enpoint rather the
+
+
 Version 0.3.8
 -------------
 * Added Service 'logger' PSR3 logger aware using by default Apix\Log.

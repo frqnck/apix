@@ -98,23 +98,27 @@ class HelpTest extends TestCase
 
         $results = $this->help->onRead($this->api);
 
-        $this->assertArrayHasKey('path', $results, "Shoudl have path!");
-
-        $this->assertEquals(2, count($results)); // 4?
+        $this->assertArrayHasKey('path', $results, "Should always have a path field.");
+        $this->assertSame('/unit/:test', $results['path']);
 
         $this->assertArrayHasKey('GET', $results['methods']);
         $this->assertArrayHasKey('PATCH', $results['methods']);
+
+        $this->assertEquals(2, count($results)); // ?4
     }
 
     protected function genericTest($items)
     {
-        #print_r($items);exit;
-        $this->assertSame('/create/:test', $items[2]['path']);
-        #$this->assertArrayHasKey('POST', $items[2]['methods']);
+        $item = &$items[0];
+        $this->assertSame('/create/:test', $item['path']);
+        $this->assertArrayHasKey('POST', $item['methods']);
+        $this->assertEquals(1, count($item['methods']));
 
-        $this->assertSame('/unit/:test', $items[3]['path']);
-        #$this->assertArrayHasKey('GET', $items[3]['methods']);
-        #$this->assertArrayHasKey('PATCH', $items[3]['methods']);
+        $item = &$items[1];
+        $this->assertSame('/unit/:test', $item['path']);
+        $this->assertArrayHasKey('GET', $item['methods']);
+        $this->assertArrayHasKey('PATCH', $item['methods']);
+        $this->assertEquals(2, count($item['methods']));
     }
 
     public function testOnReadReturnsArrayForAllEntities()
@@ -126,7 +130,7 @@ class HelpTest extends TestCase
         $results = $this->help->onRead($this->api);
 
         $this->assertTrue( count($results['items'])>1 );
-        $this->genericTest($results['items']);
+        $this->genericTest( $results['items'] );
     }
 
     public function testOnHelpRetrieveAllTheEntities()

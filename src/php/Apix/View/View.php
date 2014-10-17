@@ -16,55 +16,43 @@ class View
 {
 
     /**
+     * Holds a ViewModel object.
      * @var	ViewModel
      */
     protected $model;
 
     /**
+     * Holds a Template object.
      * @var	Template
      */
     protected $template;
 
     /**
-     * Constructor.
-     * Sets [Template] and [ViewModel]. If a string is passed as $template
-     * then it will be used a the path to the template and a Template
-     * instance will be created using [Template::$default_class].
+     * Constructor, sets the ViewModel ad Template objects. 
      *
-     * If an array is passed as $viewmodel then [ViewModel::$default_class]
+     * If an array is passed as $viewmodel then ViewModel::$default_class
      * will be used to create a ViewModel instance and then the data will
      * be set on that object.
      *
-     * @param   mixed
-     * @param   mixed
-     * @return void
+     * @param   mixed|null  $model      An array or an instance of ViewModel.
      */
-    public function __construct($model = null, $template = null)
+    public function __construct($model = null)
     {
-        // sort out the view model.
-        if ($model !== null) {
+        if (null !== $model) {
             if (is_array($model)) {
-
                 // set the model view
                 $this->setViewModelFromArray($model);
-
             } elseif ($model instanceof ViewModel) {
                 $this->model($model);
             }
         }
-
-        // deal with the template engine.
-        if ($template !== null) {
-            if (is_string($template)) {
-                $this->template()->setLayout($template);
-            } elseif ($template instanceof Template) {
-                $this->template($template);
-            }
-        }
-
     }
 
-    // todo
+    /**
+     * Sets the ViewModel from an array
+     *
+     * @param   array  $model      An array of data.
+     */
     public function setViewModelFromArray(array $model)
     {
         $key = key($model);
@@ -79,28 +67,6 @@ class View
     }
 
     /**
-     * Set/Get Template. If getting and no template is set then
-     * we create an instance using [Template::$default_class].
-     *
-     * @param   Template
-     * @return $this
-     */
-    public function template(Template $template = null)
-    {
-        if ($template === null) {
-
-            if ($this->template === null) {
-                $this->template = Template::getEngine();
-            }
-
-            return $this->template;
-        }
-
-        $this->template = $template;
-        #return $this;
-    }
-
-    /**
      * Get/Set [ViewModel]. If getting and no [ViewModel] set we then
      * create an instance using [ViewModel::$default_class].
      *
@@ -109,6 +75,7 @@ class View
      */
     public function model(ViewModel $model = null)
     {
+
         if ($model === null) {
             if ($this->model === null) {
                 $class = ViewModel::$default_class;
@@ -123,25 +90,38 @@ class View
     }
 
     /**
-     * Passes [ViewModel] to [Template::render()] and returns
-     * a final string.
+     * Sets the Template instance.
      *
-     * @param    mixed   Can be Template or string path to template
+     * If a string is passed as $template
+     * then it will be used a the path to the template and a Template
+     * instance will be created using [Template::$default_class].
+     *
+     * @param   Template|string|null  $template   A string or an instance of Template.
+     */
+    public function setTemplate($template, array $options = null)
+    {
+        if (!$template instanceof Template) {
+            $t = new Template();
+            $t->setEngine($template);
+            $class = $t->getEngine();
+            $template = new $class($options);
+        }
+
+        $this->template = $template;
+    }
+
+    /**
+     * Renders the given layout or retrieved from the view model if null.
+     *
+     * @param  string|null Template layout to render.
      * @return string
      */
     public function render($layout = null)
     {
-        if ($layout instanceof Template) {
-            $this->template($layout);
-        } elseif (is_string($layout)) {
-            $this->template()->setLayout($layout);
-        } else {
-            $this->template()->setLayout(
-                $this->model()->getViewLayout()
-            );
-        }
-        // $this->model()->debug();
-        return $this->template()->render( $this->model() );
+        $layout = is_string($layout) ? $layout : $this->model()->getViewLayout();
+        $this->template->setLayout( $layout );
+
+        return $this->template->render( $this->model() );
     }
 
     /**

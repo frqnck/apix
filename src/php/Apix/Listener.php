@@ -157,11 +157,12 @@ class Listener implements \SplSubject, \IteratorAggregate, \Countable
      * Load the specified plugin
      *
      * @param  string           $name The plugin name to load
+     * @param  mix              $mix  The plugin options
      * @return boolean          True on success, false otherwise
      * @throws RuntimeException If the plugin does not exists
      * @throws DomainException  If the plugin does not have a $hook property.
      */
-    public function loadPlugin($key, $mix)
+    public function loadPlugin($key, $mix = null)
     {
        $name = is_int($key) ? $mix : $key;
 

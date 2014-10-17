@@ -105,4 +105,31 @@ class Exception extends \Exception
         }
     }
 
+    /**
+     * Returns this exception as an associative array.
+     *
+     * @param \Exception $e
+     * @return array
+     */
+    public static function toArray(\Exception $e)
+    {
+        $array = array(
+            'message' => $e->getMessage(),
+            'code'    => $e->getCode(),
+            'type'    => get_class($e),
+            'file'    => $e->getFile(),
+            'line'    => $e->getLine(),
+            'stack trace'   => $e->getTraceAsString(),
+        );
+
+        if(method_exists($e, 'getPrevious')) {
+            $p = $e->getPrevious();
+            if(method_exists($p, 'getTraceAsString')) {
+                $array['prev'] = $p->getTraceAsString();
+            }
+        }
+
+        return $array;
+    }
+
 }

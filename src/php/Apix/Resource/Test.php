@@ -31,6 +31,7 @@ class Test
      * @return null
      * @cacheable true
      * @codeCoverageIgnore
+     * @apix_man_toc_hidden
      */
     final public function onTest()
     {

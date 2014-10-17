@@ -141,7 +141,6 @@ class Main extends Listener
                 $this->resources->toArray(),
                 $this->config['routing']
             );
-            $this->response->setRoute($this->route);
 
             // early listeners @ pre-server
             $this->hook('server', 'early');
@@ -153,7 +152,6 @@ class Main extends Listener
             $this->results = $this->entity->call();
 
         } catch (\Exception $e) {
-
             $http_code = $e->getCode()>199 ? $e->getCode() : 500;
             $this->response->setHttpCode($http_code);
 
@@ -163,25 +161,9 @@ class Main extends Listener
             );
 
             if(DEBUG) {
-                $error['exception'] = array(
-                    'message' => $e->getMessage(),
-                    'code'    => $e->getCode(),
-                    'type'    => get_class($e),
-                    'file'    => $e->getFile(),
-                    'line'    => $e->getLine(),
-                    'stack trace'   => $e->getTraceAsString(),
-                );
-                if(method_exists($e, 'getPrevious')) {
-                    $p = $e->getPrevious();
-                    if(method_exists($p, 'getTraceAsString')) {
-                        $error['exception']['prev'] = $p->getTraceAsString();
-                    }
-                }
+                $error['exception'] = Exception::toArray($e);
             }
 
-            // TODO: log the exception!
-            // Service::get('logger')->error('');
-            
             // set the error controller!
             if (
                 !in_array(
@@ -266,8 +248,11 @@ class Main extends Listener
 
         // check controller_ext
         if ($opts['controller_ext']) {
+            $info = pathinfo($path);
+
             $parts = explode('/', $path);
             $info = pathinfo(isset($parts[1]) ? $parts[1] : $parts[0] );
+
             $ext = isset($info['extension']) ? $info['extension'] : null;
             if ($ext) {
                 $path = preg_replace('/\.' . $ext . '/', '', $path, 1);
@@ -283,6 +268,7 @@ class Main extends Listener
                 'server'    => & $this // so the resources can cross ref server.
             )
         );
+        $this->response->setRoute($this->route);
 
         // Set the response format...
         if (null !== $opts) {

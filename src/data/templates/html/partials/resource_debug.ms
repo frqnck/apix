@@ -1,12 +1,12 @@
 {{#items.0}}
-<table>
+<table border=1>
   {{#items}}
   <tr>
     <td>
-      <b>{{name}}</b>
+      <b>{{ name }}</b>
     </td>
     <td>
-      {{#value}}{{value}}{{/value}}
+      {{#value}}{{ value }}{{/value}}
     </td>
     </tr>
   {{/items}}

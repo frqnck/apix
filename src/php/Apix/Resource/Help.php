@@ -33,10 +33,10 @@ class Help
      * This resource entity provides in-line referencial to all the API resources and methods.
      * By specify a resource and method you can narrow down to specific section.
      *
-     * @param string $path    A string of characters used to identify a resource.
+     * @param string $resource    A string of characters used to identify a resource.
      * @param array  $filters Filters can be use to narrow down the resultset.
      *
-     * @example <pre>GET /help/path_to_entity</pre>
+     * @example <pre>GET /help/path_to_resource</pre>
      * @id help
      * @usage The OPTIONS method represents a request for information about the
      * communication options available on the request/response chain
@@ -80,7 +80,7 @@ class Help
      *
      * @api_link    OPTIONS /path/to/entity
      * @api_link    OPTIONS /*
-     * @private 1
+     * @apix_man_toc_hidden
      */
     public function onHelp(Server $server, array $filters=null)
     {
@@ -95,10 +95,16 @@ class Help
         if (null === $entity) {
 
             $docs = array();
-            foreach ($server->resources->toArray() as $path => $entity) {
+            $redir = array();
+            $resources = $server->resources->toArray();
+            ksort($resources);
+            foreach ($resources as $path => $entity) {
                 if (!$entity->hasRedirect()) {
-                    #$doc[$path] = $this->getDocs($entity, $filters);
-                    $docs['items'][] = $this->getDocs(null, $path, $entity, $filters);
+                    $item = $this->getDocs(null, $path, $entity, $filters);
+                    $item['path'] = isset($redir[$path]) ? $redir[$path] : $path;
+                    $docs['items'][] = $item;
+                } else {
+                    $redir[$entity->getRedirect()] = $path;
                 }
             }
 

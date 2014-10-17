@@ -13,6 +13,7 @@
 namespace Apix\View;
 
 use Apix\View\ViewModel as Model;
+use Apix\Service;
 
 /**
  * Model View ViewModel (MVVM)
@@ -30,6 +31,31 @@ class ViewModel
      * Default View Model class.
      */
     public static $default_class = 'Apix\View\ViewModel';
+
+
+    public $help_path = '/v1/help';
+
+    /**
+     * Variable exposed to the templates
+     * @var array|null
+     */
+    public $config = null;
+
+    /**
+     * Variable exposed to the templates
+     * @var array
+     */
+    public $options = array();
+
+    public function __construct()
+    {
+        $this->config = Service::get('config');
+
+        $this->options['url_api'] = preg_replace('@/help(.+)?$@i', '', $_SERVER['SCRIPT_URI'], 1);
+        $this->options['url_help']   =  $this->options['url_api'] . '/help';
+
+        if(isset($_GET['debug1'])) var_dump( $this->options );
+    }
 
     /**
      * Assigns a property.
@@ -65,7 +91,7 @@ class ViewModel
 
     public function get($key)
     {
-        $v = is_array($this->{$key}) ?  $this->{$key} : (array) $this->{$key};
+        $v = is_array($this->{$key}) ? $this->{$key} : (array) $this->{$key};
         array_walk_recursive($v, function (&$v) {$v=ViewModel::htmlizer($v);});
 
         return $v;
@@ -107,7 +133,7 @@ class ViewModel
         return $this;
     }
 
-    /* generic helpers */
+    /* ---- generic helpers --- */
 
     public function hasMany($mix)
     {
@@ -123,6 +149,18 @@ class ViewModel
     public function getViewLayout()
     {
         return $this->_layout;
+    }
+
+    /**
+     * _def - view helper.
+     *
+     * @return string
+     */
+    public function _def()
+    {
+        return function ($t) {
+            return '<span class="default">' . $t . '</span>';
+        };
     }
 
     public function debug($data=null)

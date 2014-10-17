@@ -55,7 +55,7 @@ class MainTest extends TestCase
     {
         return array(
             'controller_ext set to true' => array(
-                'uri'=>'/index.php/api/v1/mock.xml/test/param',
+                'uri'=>'/index.php/api/v1/foo/bar/baz.xml',
                 'options' => array(
                     'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
                     'default_format'    => 'xml',
@@ -64,63 +64,63 @@ class MainTest extends TestCase
                     'http_accept'       => false,
                 ),
                'expected' => array(
-                    'path' => '/mock/test/param',
+                    'path' => '/foo/bar/baz',
                     'format' => 'xml',
                 )
             ),
             'controller_ext set to false' => array(
-                'uri'=>'/index.php/api/v1/mock.json/test/param',
+                'uri'=>'/api/v1/foo/bar/baz.json',
                 'options' => array(
-                    'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
+                    'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'json',
                     'controller_ext'    => false,
                     'format_override'   => false,
                     'http_accept'       => false,
                 ),
                'expected' => array(
-                    'path' => '/mock.json/test/param',
+                    'path' => '/foo/bar/baz.json',
                     'format' => 'json',
                 )
             ),
             'format_override set' => array(
-                'uri'=>'/index.php/api/v1/mock.json/test/param',
+                'uri'=>'/api/v1/foo/bar/baz.json',
                 'options' => array(
-                    'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
+                    'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'json',
                     'controller_ext'    => false,
                     'format_override'   => 'html',
                     'http_accept'       => false,
                 ),
                'expected' => array(
-                    'path' => '/mock.json/test/param',
+                    'path' => '/foo/bar/baz.json',
                     'format' => 'html',
                 )
             ),
             'http_accept is set (but none provided)' => array(
-                'uri'=>'/index.php/api/v1/mock.json/test/param',
+                'uri'=>'/api/v1/foo/bar/baz.json',
                 'options' => array(
-                    'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
+                    'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'xml',
                     'controller_ext'    => false,
                     'format_override'   => false,
                     'http_accept'       => true,
                 ),
                'expected' => array(
-                    'path' => '/mock.json/test/param',
+                    'path' => '/foo/bar/baz.json',
                     'format' => 'xml',
                 )
             ),
             'all false, should use default' => array(
-                'uri'=>'/index.php/api/v1/mock.json/test/param',
+                'uri'=>'/api/v1/foo/bar/baz.json',
                 'options' => array(
-                    'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
+                    'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'xml',
                     'controller_ext'    => false,
                     'format_override'   => false,
                     'http_accept'       => false,
                 ),
                'expected' => array(
-                    'path' => '/mock.json/test/param',
+                    'path' => '/foo/bar/baz.json',
                     'format' => 'xml',
                 )
             )
@@ -159,9 +159,8 @@ class MainTest extends TestCase
 
     public function testSetRoutingWithAcceptHeader()
     {
-        $uri = '/index.php/api/v1/mock/test/param';
+        $uri = 'api/v1/foo/bar/baz';
         $options = array(
-            'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
             'default_format'    => 'xml',
             'controller_ext'    => false,
             'format_override'   => false,
@@ -194,7 +193,6 @@ class MainTest extends TestCase
                 ->will($this->returnValue('html'));
 
         $options = array(
-            'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
             'default_format'    => 'jsonp',
             'controller_ext'    => false,
             'format_override'   => false,
@@ -206,14 +204,13 @@ class MainTest extends TestCase
         );
         $this->assertSame(
             'Accept', $this->server->getResponse()->getHeader('Vary'),
-            "Vary should be set when accept is enable."
+            'Vary should be set when accept is enable.'
         );
     }
 
     public function testSetRoutingDoesnotSetVaryWenAcceptIsDisable()
     {
         $options = array(
-            'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
             'default_format'    => 'jsonp',
             'controller_ext'    => false,
             'format_override'   => false,

@@ -218,7 +218,6 @@ class Response extends Listener
                 406 // maybe 404?
             );
         }
-
         $this->format = $format;
     }
 
@@ -298,16 +297,18 @@ class Response extends Listener
      * readfile('original.pdf');
      *
      * @param integer $http_code
-     * @param string  $version_string
+     * @param string  $version
      */
-    public function sendAllHttpHeaders($http_code, $version_string)
+    public function sendAllHttpHeaders($http_code, $version)
     {
         // PHP bug? TODO:
         // $out = $this->sendheader("Status: $http_code " . static::getStatusPrases($http_code));
         // //$out = $this->sendheader("HTTP/1.0 $http_code " . static::getStatusPrases($http_code), true);
         // $out[] = array( $this->sendHeader('X-Powered-By: ' . $version_string) );
-
-        $out = array( $this->sendHeader('X-Powered-By: ' . $version_string, true, $http_code) );
+        
+        $out = array(
+            $this->sendHeader('X-Powered-By: ' . $version, true, $http_code)
+        );
 
         foreach ($this->headers as $key => $value) {
            $out[] = $this->sendheader($key . ': ' . $value);
@@ -386,7 +387,10 @@ class Response extends Listener
      */
     public function collate(array $results)
     {
-        $top = $this->route->getController() ?: 'index';
+        $top =  is_object($this->route)
+                && $this->route->getController()
+                    ? $this->route->getController()
+                    : 'index';
 
         return array($top => $results);
     }
@@ -409,6 +413,7 @@ class Response extends Listener
 
         $renderer = __NAMESPACE__ . '\Output\\' . ucfirst($this->getFormat());
         $view = new $renderer($this->encoding);
+
         $this->setHeader('Content-Type', $view->getContentType());
         $this->sendAllHttpHeaders($this->getHttpCode(), $version_string);
 

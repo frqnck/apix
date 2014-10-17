@@ -14,14 +14,14 @@ namespace Apix\View;
 
 use Apix\View\Template as Template;
 
-abstract class Template
+ class Template #implements Template\Adapter
 {
 
     /**
      * Name of the templating engine.
      * @var  string
      */
-    public static $engine = 'Apix\View\Template\Mustache';
+    protected $engine = 'Apix\View\Template\Mustache';
 
     /**
      * The name of the template layout.
@@ -30,46 +30,35 @@ abstract class Template
     protected $layout = 'default';
 
     /**
-     * Renders the model view into the template layout.
-     *
-     * @param ViewModel $view
-     * @abstract
+     * The path to the view directory.
+     * @var string
      */
-    abstract public function render(ViewModel $view);
+    protected $view_dir = null;
 
     /**
-     * Sets the template engine object.
+     * Sets the engine name.
      *
-     * Returns the object instance, as it is its own template engine
-     *
-     * @return Template
+     * @param string|null $engine
      */
-    final public static function setEngine($name=null)
+    public function setEngine($engine = null)
     {
-        $class = __NAMESPACE__ . '\\Template';
-        $class .= null === $name ?: '\\' . $name;
-        if (!class_exists($class)) {
+        $engine = null !== $engine ? $engine : $this->engine;
+        if (!class_exists($engine)) {
             throw new \RuntimeException(
-                sprintf('Template class "%s" does not exist.', $class)
+                sprintf('Template class "%s" does not exist.', $engine)
             );
         }
-        Template::$engine = $class;
+        $this->engine = $engine;
     }
 
     /**
-     * Returns the template engine object.
+     * Returns the engine name.
      *
-     * Returns the object instance, as it is its own template engine
-     *
-     * @return Template
+     * @return string
      */
-    final public static function getEngine($name=null)
+    public function getEngine()
     {
-        if (null !== $name) {
-            Template::setEngine($name);
-        }
-
-        return new Template::$engine();
+        return $this->engine;
     }
 
     /**
@@ -80,6 +69,15 @@ abstract class Template
     public function setLayout($layout)
     {
         $this->layout = $layout;
+    }
+
+    /**
+     * Sets the main directory for this template view.
+     * @var string
+     */
+    public function setViewDir($dir)
+    {
+        $this->view_dir = $dir;
     }
 
 }
