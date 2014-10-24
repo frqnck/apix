@@ -14,7 +14,6 @@ namespace Apix\Plugin;
 
 use Apix\HttpRequest,
     Apix\Response,
-    Apix\Config,
     Apix\TestCase;
 
 class OutputDebugSignTest extends TestCase

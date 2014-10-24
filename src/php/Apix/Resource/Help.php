@@ -27,38 +27,44 @@ class Help
     // only use in verbose mode.
     public $private_nodeName = 'verbose';
 
+    private $rel_path = '/help';
+
     /**
-     * Display the manual of a resource entity
+     * Help - Provides in-line referencial to this API.
      *
-     * This resource entity provides in-line referencial to all the API resources and methods.
+     * This resource entity provides documentation and in-line referencial to this API's resources.
      * By specify a resource and method you can narrow down to specific section.
      *
-     * @param string $resource    A string of characters used to identify a resource.
-     * @param array  $filters Filters can be use to narrow down the resultset.
+     * @param string $resource   Optional. A string of characters used to identify a resource.
+     * @param array  $filters     Optional. Some filters to narrow down the resultset.
+     * @global string $method    Default "GET". The resource HTTP method to interact. 
+     * @return array  An array of documentation data.
      *
-     * @example <pre>GET /help/path_to_resource</pre>
-     * @id help
-     * @usage The OPTIONS method represents a request for information about the
-     * communication options available on the request/response chain
-     * identified by the Request-URI. This method allows the client to determine
-     * the options and/or requirements associated with a resource,
-     * or the capabilities of a server, without implying a resource action or
-     * initiating a resource retrieval.
-     * @see <pre>http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2</pre>
+     * @example 
+     * <pre>GET /help/path_to_resource
+     *    - also -
+     * OPTIONS /path_to_resource</pre>
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
      */
-    public function onRead(Server $server, array $filters=null)
+    public function onRead($resource=null, array $filters=null)
     {
-        $this->route = $server->getRoute();
+        $server = \Apix\Service::get('server');
+        $resource = preg_replace(
+            '@^(.*?)' . preg_quote($this->rel_path) . '(\.\w+)?@',
+            '',
+            $server->request->getUri()
+        );
 
-        $path = preg_replace('@^.*help(\.\w+)?@', '', $server->request->getUri());
-
-        # $path = rawurldecode($path);
+        // $resource = rawurldecode($resource);
+        // if (!$server->resources->has($resource)) {
+        //     return array();
+        // }
 
         // if (
-        //     !empty($path)
-        //     && $server->resources->has($path)
+        //     !empty($resource)
+        //     && $server->resources->has($resource)
         // ) {
-            $server->getRoute()->setName($path);
+            $server->getRoute()->setName($resource);
         // }
         return $this->onHelp($server, $filters);
     }
@@ -76,7 +82,7 @@ class Help
      *
      * @param  Server $server  The main server object.
      * @param  array  $filters An array of filters.
-     * @return array  The array documentation.
+     * @return array  An array of documentation data.
      *
      * @api_link    OPTIONS /path/to/entity
      * @api_link    OPTIONS /*
@@ -84,32 +90,22 @@ class Help
      */
     public function onHelp(Server $server, array $filters=null)
     {
-        $this->route = $server->getRoute();
+        $route = $server->getRoute();
 
-        $entity = $this->route->getName() != '/' && $this->route->getName() != '/*'
-            && $this->route->getPath() != '/help'
-            ? $server->resources->get($this->route, false)
+        // insures the top node is set to help.
+        $route->setController('help');
+
+        $entity = $route->getName() != '/' && $route->getName() != '/*'
+            && $route->getPath() != '/help'
+            ? $server->resources->get($route, false)
             : null;
 
         // TOC of all entities.
         if (null === $entity) {
 
-            $docs = array();
-            $redir = array();
-            $resources = $server->resources->toArray();
-            ksort($resources);
-            foreach ($resources as $path => $entity) {
-                if (!$entity->hasRedirect()) {
-                    $item = $this->getDocs(null, $path, $entity, $filters);
-                    $item['path'] = isset($redir[$path]) ? $redir[$path] : $path;
-                    $docs['items'][] = $item;
-                } else {
-                    $redir[$entity->getRedirect()] = $path;
-                }
-            }
-
-            // insures the top node is set to help.
-            $this->route->setController('help');
+            $docs = array(
+                'items' => self::getResourcesDocs($server)
+            );
 
             // // set Content-Type (negotiate or default)
             // if(
@@ -122,10 +118,10 @@ class Help
 
         // Manual for the specified entity doc.
         } else {
-            // return array($this->doc_nodeName => $this->getDocs($route->getName(), $entity, $filters));
-
-            $docs = $this->getDocs(
-                $server->request->getParam('method'), $this->route->getName(), $entity, $filters
+            $docs = self::getEntityDocs(
+                $entity,
+                $server->request->getParam('method') ? : 'GET',
+                $route->getName()
             );
         }
 
@@ -133,28 +129,48 @@ class Help
     }
 
     /**
-     * Get an entity documentaion.
+     * Get the documentation of all the resource entities.
      *
-     * @param  string          $method       The Request-method for that entity.
-     * @param  string          $path         The Request-URI for that entity.
-     * @param  EntityInterface $entity       An Entity object.
-     * @param  array           $filters=null An array of filters.
-     * @return array           The array documentation.
+     * @param  Server $server
+     * @return array           The documentation for all resource entities.
      */
-    protected function getDocs($method, $path, Entity $entity, array $filters=null)
+    static function getResourcesDocs(Server $server)
     {
-        $docs = (null !== $method || $entity->hasMethod($method))
-            ? $entity->getDocs($method) // get the specified doc method.
-            : $entity->getDocs();       // get all the methods docs.
+        $docs = array();
+        $redir = array();
+        $resources = $server->resources->toArray();
+        ksort($resources);
+        foreach ($resources as $path => $entity) {
+            if (!$entity->hasRedirect()) {
+                $item = self::getEntityDocs($entity, null, $path);
+                $item['path'] = isset($redir[$path])
+                                    ? $redir[$path]
+                                    : $path;
+                $docs[] = $item;
+            } else {
+                $redir[$entity->getRedirect()] = $path;
+            }
+        }
+
+        return $docs;
+    }
+
+    /**
+     * Get the documentation for the provided entity and method.
+     *
+     * @param  EntityInterface $entity  The Entity object to interact with.
+     * @param  string|null     $method  Optional. The Request-method or all.
+     * @param  string|null     $path    Optional. Request-URI for that entity.
+     * @return array                    The entity array documentation.
+     */
+    static function getEntityDocs(Entity $entity, $method=null, $path=null)
+    {
+        $docs = $entity->getDocs($method);
+        // $docs = (null !== $method || $entity->hasMethod($method))
+        //     ? $entity->getDocs($method) // get the specified doc method.
+        //     : $entity->getDocs();       // get all the docs for all methods
 
         $docs['path'] = $path;
-
-        // $verbose = isset($_REQUEST['verbose']) ? $_REQUEST['verbose'] : false;
-        // if ($verbose) {
-        //     $docs[$this->private_nodeName] = array(
-        //         'TODO: verbose/admin/private mode (display AUTH/ACL, Cache entries, etc...)'
-        //     );
-        // }
 
         return $docs;
     }

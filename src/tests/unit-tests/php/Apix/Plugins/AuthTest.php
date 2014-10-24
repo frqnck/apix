@@ -61,7 +61,10 @@ class AuthTest extends TestCase
 
     public function testIsDisableIfPublicGroup()
     {
-        $this->setEntityAnnotation('api_auth', 'groups=' . $this->opts['public_group']);
+        $this->setEntityAnnotation(
+            'api_auth',
+            'groups=' . $this->opts['public_group']
+        );
         $this->assertNull( $this->plugin->update( $this->entity ) );
     }
 

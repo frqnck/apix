@@ -31,7 +31,9 @@ class CacheTest extends TestCase
 
         $this->entity = $this->getMock('Apix\Entity');
 
-        $this->plugin = new Cache( array('enable' => true, 'adapter' => 'Apix\Cache\Runtime') );
+        $this->plugin = new Cache(
+            array('enable' => true, 'adapter' => 'Apix\Cache\Runtime')
+        );
 
         $this->opts = $this->plugin->getOptions();
     }

@@ -93,16 +93,16 @@ $c = array(
         'http_accept'       => true,
 
         // Wether to allow the output format to be set from the Request-URI
-        // using a file extension such as '/controller.json/id'.
+        // using a file extension such as '/foo/bar/baz.xml'.
         // This is handy and common practice but fairly un-RESTful...
         // The extension overrides the http_accept negotiation.
-        'controller_ext'    => true,
+        'controller_ext'    => true, // TODO rename this option
 
         // Forces the output format to the string provided and overrides the
         // format negotiation process. Set to false to disable. Can be use to
         // set the format from a request parameter, or any other arbitrary
-        // methods, etc... Using REQUEST is considered un-RESTful but also can
-        // be handy in many cases e.g. forms handling.
+        // methods, etc... Using $_REQUEST is considered un-RESTful but can be
+        // handy some use cases e.g. forms handling.
         'format_override'   => isset($_REQUEST['_format'])
                                 ? $_REQUEST['_format']
                                 : false
@@ -132,7 +132,7 @@ $c = array(
 // See the server guide for more details on the subject.
 $c['resources'] = array(
 
-    // Handles GET /help/path/to/resource
+    // Handles GET /help/:resource
     '/help/:resource' => array(
         'redirect' => 'OPTIONS'
     ),
@@ -142,7 +142,6 @@ $c['resources'] = array(
     '/*' => array(
         'redirect' => 'OPTIONS'
     )
-
 );
 
 // Service definitions
@@ -292,8 +291,8 @@ $c['plugins'] = array(
     // Should be set to false in production. This plugin affects cachability.
     'Apix\Plugin\OutputDebug' => array('enable' => DEBUG),
 
-    // TODO
-    'Apix\Plugin\Manual'
+    // Plugin that generates manual pages of the whole API and its resources.
+    'Apix\Plugin\ManPage'
 );
 
 // Init is an associative array of specific PHP directives. They are

@@ -54,8 +54,8 @@ class MainTest extends TestCase
     public function negotiateFormatProvider()
     {
         return array(
-            'controller_ext set to true' => array(
-                'uri'=>'/index.php/api/v1/foo/bar/baz.xml',
+            'controller_ext (from end) set to true' => array(
+                'uri' => '/index.php/api/v1/foo/bar/baz.xml',
                 'options' => array(
                     'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
                     'default_format'    => 'xml',
@@ -69,7 +69,7 @@ class MainTest extends TestCase
                 )
             ),
             'controller_ext set to false' => array(
-                'uri'=>'/api/v1/foo/bar/baz.json',
+                'uri' => '/api/v1/foo/bar/baz.json',
                 'options' => array(
                     'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'json',
@@ -83,7 +83,7 @@ class MainTest extends TestCase
                 )
             ),
             'format_override set' => array(
-                'uri'=>'/api/v1/foo/bar/baz.json',
+                'uri' => '/api/v1/foo/bar/baz.json',
                 'options' => array(
                     'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'json',
@@ -97,7 +97,7 @@ class MainTest extends TestCase
                 )
             ),
             'http_accept is set (but none provided)' => array(
-                'uri'=>'/api/v1/foo/bar/baz.json',
+                'uri' => '/api/v1/foo/bar/baz.json',
                 'options' => array(
                     'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'xml',
@@ -111,7 +111,7 @@ class MainTest extends TestCase
                 )
             ),
             'all false, should use default' => array(
-                'uri'=>'/api/v1/foo/bar/baz.json',
+                'uri' => '/api/v1/foo/bar/baz.json',
                 'options' => array(
                     'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'xml',
@@ -128,6 +128,7 @@ class MainTest extends TestCase
     }
 
     /**
+     * @group tt
      * @dataProvider negotiateFormatProvider
      */
     public function testSetRoutingNegotiateFormat(

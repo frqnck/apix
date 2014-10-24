@@ -52,4 +52,17 @@ class Service
         return isset($services[$name]);
     }
 
+    /**
+     * Checks wether the named service exists or not.
+     *
+     * @param  string  $name The service name to look for.
+     * @return boolean
+     */
+    public static function debug($key=null)
+    {
+        echo "<pre>";
+        var_dump( Config::getInstance()->getServices($key) );
+    }
+
+
 }

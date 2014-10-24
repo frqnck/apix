@@ -26,7 +26,10 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         $resources->setEntity(
             $this->getMock('Apix\Entity\EntityInterface')
         );
-        $resources->add('/paris', array('action'=>function () {return 'metro';}, 'method'=>'some'));
+        $resources->add(
+            '/paris',
+            array('action' => function () {return 'metro';}, 'method' => 'some')
+        );
 
         $this->resources = $resources;
 
@@ -88,7 +91,10 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetReturnsEntityInterface()
     {
-        $this->assertInstanceOf('Apix\Entity\EntityInterface', $this->resources->get($this->route));
+        $this->assertInstanceOf(
+            'Apix\Entity\EntityInterface',
+            $this->resources->get($this->route)
+        );
     }
 
     /**
@@ -105,42 +111,57 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFollowsRedirect()
     {
-        $this->resources->add('/milan', array('redirect'=>'/paris'));
+        $this->resources->add('/milan', array('redirect' => '/paris'));
 
         $route = $this->getMock('Apix\Router');
         $route->expects($this->any(3))
             ->method('getName')
             ->will($this->onConsecutiveCalls('/paris', '/milan'));
 
-        $this->assertEquals($this->resources->get($route), $this->resources->get($route), '/milan should be equal to /paris');
+        $this->assertEquals(
+            $this->resources->get($route),
+            $this->resources->get($route),
+            '/milan should be equal to /paris'
+        );
     }
 
     public function testGetFollowsAllTheSubsequentRedirects()
     {
-        $this->resources->add('/pierre', array('redirect'=>'/paul'));
-        $this->resources->add('/paul', array('redirect'=>'/jacques'));
-        $this->resources->add('/jacques', array('redirect'=>'/paris'));
+        $this->resources->add('/pierre',  array('redirect' => '/paul'));
+        $this->resources->add('/paul',    array('redirect' => '/jacques'));
+        $this->resources->add('/jacques', array('redirect' => '/paris'));
 
-        $route = $this->getMock('Apix\Router');
-        $route->expects($this->once())
+        $this->route = $this->getMock('Apix\Router');
+        $this->route->expects($this->once())
             ->method('getName')
             ->will($this->returnValue('/pierre'));
 
-        $this->assertEquals('/jacques', $this->resources->get($route)->getRedirect(), '/pierre follows a redirect from /paul to /jacques');
+        $this->assertEquals(
+            '/jacques',
+            $this->resources->get($this->route)->getRedirect(),
+            '/pierre follows a redirect from /paul to /jacques'
+        );
     }
 
+    /**
+     * @group test
+     */
     public function testGetDoNotRedirect()
     {
-        $this->resources->add('/pierre', array('redirect'=>'/paul'));
-        $this->resources->add('/paul', array('redirect'=>'/jacques'));
-        $this->resources->add('/jacques', array('redirect'=>'/paris'));
+        $this->resources->add('/pierre',  array('redirect' => '/paul'));
+        $this->resources->add('/paul',    array('redirect' => '/jacques'));
+        $this->resources->add('/jacques', array('redirect' => '/paris'));
 
-        $route = $this->getMock('Apix\Router');
-        $route->expects($this->exactly(2))
+        $this->route = $this->getMock('Apix\Router');
+        $this->route->expects($this->exactly(2))
             ->method('getName')
             ->will($this->onConsecutiveCalls('/jacques', '/paul'));
 
-        $this->assertNotEquals($this->resources->get($route), $this->resources->get($route), '/pierre should not be equal to /jacques');
+        $this->assertNotSame(
+            $this->resources->get($this->route),
+            $this->resources->get($this->route),
+            '/pierre should not be equal to /jacques'
+        );
     }
 
     /**
@@ -154,7 +175,10 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
 
     public function testAddClosureObject()
     {
-        $this->assertInstanceOf('Apix\Entity\EntityClosure', $this->resources->get($this->route));
+        $this->assertInstanceOf(
+            'Apix\Entity\EntityClosure',
+            $this->resources->get($this->route)
+        );
     }
 
     public function testAddClassObject()
@@ -170,7 +194,10 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
             ->method('getName')
             ->will($this->returnValue('/london'));
 
-        $this->assertInstanceOf('Apix\Entity\EntityClass', $this->resources->get($route));
+        $this->assertInstanceOf(
+            'Apix\Entity\EntityClass',
+            $this->resources->get($route)
+        );
     }
 
     public function testRedirectToTheHelpResourceOnHelpRequest()
@@ -185,10 +212,13 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
             ->method('getMethod')
             ->will($this->returnValue('OPTIONS'));
 
-        $this->assertSame($this->resources->getResource('help'), $this->resources->get($this->route));
+        $this->assertSame(
+            $this->resources->getResource('help'),
+            $this->resources->get($this->route)
+        );
     }
 
-    public function testDoNotRedirectToTheHelpResourceOnHelpRequestWhenFollowIsFalse()
+    public function testNoRedirectToHelpResourceOnHelpRequestWhenFollowIsFalse()
     {
         $this->resources->add('help', array(
             'controller' => array(
@@ -200,7 +230,10 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
             ->method('getMethod')
             ->will($this->returnValue('OPTIONS'));
 
-        $this->assertSame($this->resources->getResource('/paris'), $this->resources->get($this->route, false));
+        $this->assertSame(
+            $this->resources->getResource('/paris'),
+            $this->resources->get($this->route, false)
+        );
     }
 
     public function testHeadRequestSetRouteMethodToGet()
@@ -226,13 +259,20 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
         $route->setMethod('HEAD');
         $route->setName('help');
         $entity = $this->resources->get($route);
-        $this->assertSame('GET', $route->getMethod(), 'HEAD should forward to GET');
+        $this->assertSame(
+            'GET',
+            $route->getMethod(),
+            'HEAD forwards to GET'
+        );
 
         $route->setMethod('HEAD');
         $route->setName('test');
         $entity = $this->resources->get($route);
-        $this->assertSame('HEAD', $route->getMethod(), 'HEAD should not be forwarded if GET is not defined.');
-
+        $this->assertSame(
+            'HEAD',
+            $route->getMethod(),
+            'HEAD should not be forwarded if GET is not defined.'
+        );
     }
 
 #######
@@ -243,7 +283,7 @@ class ResourcesTest extends \PHPUnit_Framework_TestCase
     {
         $this->markTestIncomplete('TODO: grouping of objcts!');
 
-        // $this->resources->add('group', array('group'=>function () {return 'string';}, 'method'=>'some'));
+        // $this->resources->add('group', array('group'=>function () {return 'string';}, 'method' => 'some'));
         // $this->assertInstanceOf('Apix\Entity\EntityClosure', $this->resources->get('closure'));
     }
 

@@ -12,11 +12,10 @@
 
 namespace Apix\View\ViewModel;
 
-use Apix\View\ViewModel;
-
-class Help extends ViewModel
+class Help extends Common
 {
     /**
+     * Holds the supported format definitions.
      * @var array
      */
     protected $format_defs = array(
@@ -65,26 +64,20 @@ class Help extends ViewModel
     );
 
     /**
+     * Holds the usage string.
+     * @var string
+     */
+    protected $usage = null;
+
+    /**
      * Gets the view layout.
      *
      * @return string
      */
-    public function getViewLayout()
+    public function getLayout()
     {
-        if(isset($_GET['debug'])) $this->debug();
-
-        switch (true) {
-            case isset($this->items):
-                return 'man_toc';
-
-            case isset($this->methods):
-                return 'man_group';
-
-            default:
-                return 'man_single';
-        }
+        return isset($this->items) ? 'man_toc' : 'man_page';
     }
-
 
     /**
      * Returns the Usage field formatted
@@ -93,69 +86,58 @@ class Help extends ViewModel
      */
     public function getFormatedUsage()
     {
-        if (!isset($this->usage)) {
-            $this->usage = '<dl><dt class="flush">' . $this->path;
+        if (null === $this->usage) {
+            $this->usage = '<dl><dt class="flush">'
+                            // . $this->path
+                            . $this->options['rel_path'];
 
-            foreach($this->params as $var) {
-                if(!$var['required'])
-                    $this->usage .= '/' . $var['name'];
+            if(isset($this->params)) {
+                foreach($this->params as $var) {
+                    if(!$var['required'])
+                        $this->usage .= '/:' . $var['name'];
+                }
             }
             $this->usage .= '</dt><dd>';
             if(isset($this->globals)) {
                 foreach($this->globals as $param) {
-                    $this->usage .= '<span>' . $param['name'];
-                    if($param['type'] != 'null') $this->usage .= '=<i>' . $param['type'] . '</i>';
-                    $this->usage .= '</span>';
+                    $types = explode('|', $param['type']);
+                    if(! in_array('null', $types) ) {
+                        $this->usage .= '<span>' . $param['name'];
+                        if($param['type'] != 'null') {
+                            $this->usage .= '=<i>' . $param['type'] . '</i>';
+                        }
+                        $this->usage .= '</span>';
+                    }
                 }
             }
             $this->usage .= '</dd></dl>';
-
-            // $vars = array_filter($this->params, function($v) {
-            //     return !$v['required'];
-            // });
-
-            // var_dump( $this->globals ); exit;
-
-
-        // request params;
-// var_dump($this->params);
         }
 
         return $this->usage;
     }
 
     /**
-     * Returns formatted Input formats
+     * Checks wether the plugin signature is enable.
      *
-     * @return array
+     * @return boolean
      */
-    public function getResources()
-    {
-        $resources = array();
-        foreach ($this->items as $resource) {
-            foreach ($resource['methods'] as $v) {
-                if(
-                    !isset($v['apix_man_toc_hidden'])
-                ) {
-                    $resources[] = array(
-
-                        // 'url' => $this->options['url']
-                        'method' => $v['method'],
-                        'resource'   => $resource['path']
-                    );
-                }
-            }
-        }
-        return $resources;
-    }
-
     public function hasPluginSignature()
     {
         return in_array('Apix\Plugin\OutputSign', $this->config['plugins']);
     }
 
     /**
-     * Returns formatted Output formats
+     * Checks wether many output format are available.
+     *
+     * @return boolean
+     */
+    public function hasManyOutputFormats()
+    {
+        return $this->config['routing']['formats'] > 1;
+    }
+
+    /**
+     * Returns the formatted Output formats.
      *
      * @return array
      */
@@ -166,32 +148,29 @@ class Help extends ViewModel
         foreach($this->config['routing']['formats'] as $k) {
             $item = &$this->format_defs[$k];
             $formatted[] = sprintf(
-                '<a href="%s"><b>%s</b></a> <dfn>%s</dfn> %s',
-                $item['url'],
-                strtoupper($k),
-                $item['name'],
-                $k == $this->config['routing']['default_format'] ? '(default format)' : ''
+                '<td><a href="%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td>',
+                $item['url'], strtoupper($k),
+                $item['name'], $item['ext'], $item['mime']
             );
         }
 
         return $formatted;
     }
 
-    public function getOutputExtensionExamples()
-    {
-        $formats = &$this->format_defs;
-        $formatted = array();
-        sort($this->config['routing']['formats']);
-        foreach($this->config['routing']['formats'] as $k) {
-            $ext = $formats[$k]['ext'];
-            $formatted[] = sprintf(
-                '<a href="/help/:path%s">/help<b>%s</b></a>', $ext, $ext
-            );
-        }
+    // public function getOutputExtensionExamples()
+    // {
+    //     $formats = &$this->format_defs;
+    //     $formatted = array();
+    //     sort($this->config['routing']['formats']);
+    //     foreach($this->config['routing']['formats'] as $k) {
+    //         $ext = $formats[$k]['ext'];
+    //         $formatted[] = sprintf(
+    //             '<a href="/help/:path%s">/help<b>%s</b></a>', $ext, $ext
+    //         );
+    //     }
 
-        return $formatted;
-    }
-
+    //     return $formatted;
+    // }
 
     /**
      * Returns formatted Input formats
@@ -220,17 +199,12 @@ class Help extends ViewModel
      *
      * @return array
      */
-    public function getResourceParams()
+    public function getPathParams()
     {
         if (isset($this->params) && !empty($this->params)) {
-            $many = $this->hasMany('params');
             return array(
                 'prefix' => ':',
-                'title' => 'Resource ' . ($many ? 'variables' : 'variable'),
-                'txt'   => $many
-                        ? 'The following resource variables are available:'
-                        : 'The following resource variable is available:',
-                'items' => array_values($this->params)
+                'items'  => array_values($this->params)
             );
         }
     }
@@ -240,21 +214,57 @@ class Help extends ViewModel
      *
      * @return array
      */
-    public function getRequestParams()
+    public function getQueryParams()
     {
         if (isset($this->globals) && !empty($this->globals)) {
-            $many = $this->hasMany('globals');
             return array(
-                'usage_prefix' => '&',
-                'title' => 'Request ' . ($many ? 'parameters' : 'parameter'),
-                'txt'   => $many
-                        ? 'The following request parameters are available:'
-                        : 'The following request parameter is available:',
+                'prefix' => '&',
                 'items' => array_values($this->globals)
             );
         }
     }
 
+    /**
+     * Deals with the request params/filters definitions.
+     *
+     * @return array
+     */
+    public function getReturns()
+    {
+        if (isset($this->return) && !empty($this->return)) {
+            return array(
+                'items' => array_values($this->return)
+            );
+        }
+    }
+
+    /**
+     * Deals with the request params/filters definitions.
+     *
+     * @return array
+     */
+    public function getVersion()
+    {
+        if (isset($this->version)) {
+            if(is_array($this->version)) {
+                $this->version = 'version <b>'
+                        . implode('</b>, version <b>', $this->version)
+                        . '</b>';
+            }
+
+            return $this->version;
+        }
+    }
+
+    /**
+     * Deals with the request params/filters definitions.
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
 
     /**
      * Deals with the resource groups definitions.
@@ -265,19 +275,18 @@ class Help extends ViewModel
     {
         #$ignore = array('internal', 'id', 'toc', 'todo', 'method');
         $titles = array(
-            'return'        => 'Expected Response',
-            'example'       => $this->hasMany('example') ? 'Examples' : 'Example',
-            'copyright'     => 'Copyright',
-            'see'           => 'See also',
-            'link'          => $this->hasMany('link') ? 'Links' : 'Link',
-            'license'       => 'License'
+            'example'   => $this->hasMany('example') ? 'Examples' : 'Example',
+            'see'       => 'See also',
+            'link'      => $this->hasMany('link') ? 'Links' : 'Link',
+            'copyright' => 'Copyright',
+            'license'   => 'Licensing',
+            // 'throws'    => 'Failure responses'
         );
         $groups = array();
 
         foreach ($titles as $key => $title) {
             if(
-                isset($this->{$key})
-                #&& !in_array($key, $ignore)
+                isset($this->{$key}) #&& !in_array($key, $ignore)
             ) {
                 $groups[] = array(
                     'title' => $title,

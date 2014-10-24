@@ -20,7 +20,7 @@ use Apix\HttpRequest,
 class CorsTest extends TestCase
 {
 
-    protected $plugin, $request, $response, $route, $opts;
+    protected $plugin, $request, $response, $opts;
 
     public function setUp()
     {
@@ -34,14 +34,16 @@ class CorsTest extends TestCase
 
         $this->entity = $this->getMock('Apix\Entity');
 
-        $this->plugin = new Cors( array('enable' => true, 'host' => 'foo\.bar') );
+        $this->plugin = new Cors(
+            array('enable' => true, 'host' => 'foo\.bar')
+        );
 
         $this->opts = $this->plugin->getOptions();
     }
 
     protected function tearDown()
     {
-        unset($this->plugin, $this->request, $this->response, $this->route, $this->opts);
+        unset($this->plugin, $this->request, $this->response, $this->opts);
     }
 
     public function testIsDisable()
@@ -288,7 +290,10 @@ class CorsTest extends TestCase
     {
         $this->opts['allow-headers'] = 'x-foo-bar,x-booz-bar';
 
-        $this->request->setHeader('Access-Control-Request-Headers', 'x-booz-bar');
+        $this->request->setHeader(
+            'Access-Control-Request-Headers',
+            'x-booz-bar'
+        );
         $this->assertTrue( Cors::IsPreflight($this->request) );
 
         $this->updatePlugin();

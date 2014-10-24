@@ -12,50 +12,12 @@
 
 namespace Apix\View;
 
-use Apix\View\ViewModel as Model;
-use Apix\Service;
-
 /**
  * Model View ViewModel (MVVM)
  * @see  http://en.wikipedia.org/wiki/Model_View_ViewModel
  */
-class ViewModel
+abstract class ViewModel
 {
-
-    /**
-     * Default View Model key.
-     */
-    public static $default_key = null;
-
-    /**
-     * Default View Model class.
-     */
-    public static $default_class = 'Apix\View\ViewModel';
-
-
-    public $help_path = '/v1/help';
-
-    /**
-     * Variable exposed to the templates
-     * @var array|null
-     */
-    public $config = null;
-
-    /**
-     * Variable exposed to the templates
-     * @var array
-     */
-    public $options = array();
-
-    public function __construct()
-    {
-        $this->config = Service::get('config');
-
-        $this->options['url_api'] = preg_replace('@/help(.+)?$@i', '', $_SERVER['SCRIPT_URI'], 1);
-        $this->options['url_help']   =  $this->options['url_api'] . '/help';
-
-        if(isset($_GET['debug1'])) var_dump( $this->options );
-    }
 
     /**
      * Assigns a property.
@@ -68,22 +30,18 @@ class ViewModel
      *     // Create the values {{food}} and {{beverage}} in the template
      *     $view->set(array('food' => 'bread', 'beverage' => 'water'));
      *
-     * @param   string|array  	variable name or an array of variables
-     * @param   mix				value
+     * @param  string|array $blob  A string key or an associative array to set.
+     * @param  mixed        $value The value to set if the blob is a string.
      * @return $this
      */
-    public function set($mix, $value = null)
+    public function set($blob, $value = null)
     {
-        if (is_array($mix)) {
-            $mix = isset($mix[self::$default_key])
-                    ? $mix[self::$default_key]
-                    : array();
-
-            foreach ($mix as $name => $value) {
-                $this->{$name} = $value;
+        if (is_array($blob)) {
+            foreach ($blob as $key => $value) {
+                $this->{$key} = $value;
             }
         } else {
-            $this->{$mix} = $value;
+            $this->{$blob} = $value;
         }
 
         return $this;
@@ -100,14 +58,14 @@ class ViewModel
     public static function htmlizer($string)
     {
         $pattern = array(
-          '/((?:[\w\d]+\:\/\/)?(?:[\w\-\d]+\.)+[\w\-\d]+(?:\/[\w\-\d]+)*(?:\/|\.[\w\-\d]+)?(?:\?[\w\-\d]+\=[\w\-\d]+\&?)?(?:\#[\w\-\d]*)?)/', # URL
+          '/((?:[\w\d]+\:\/\/)?(?:[\w\-\d]+\.)+[\w\-\d]+(?:\/[\w\-\d]+)*(?:\/|\.[\w\-\d]+)?(?:\?[\w\-\d]+\=[\w\-\d]+\&?)?(?:\#[\w\-\d\.]*)?)/', # URL
           '/([\w\-\d]+\@[\w\-\d]+\.[\w\-\d]+)/', # email
-          '/\s{2}/', # line break
+          // '/\S{2}/', # line break
         );
         $replace = array(
             '<a href="$1">$1</a>',
             '<a href="mailto:$1">$1</a>',
-            '<br />'
+            // '- $1'
         );
 
         return preg_replace($pattern, $replace, $string);
@@ -146,30 +104,14 @@ class ViewModel
         return false;
     }
 
-    public function getViewLayout()
-    {
-        return $this->_layout;
-    }
-
     /**
-     * _def - view helper.
+     * Returns this view model layout.
      *
      * @return string
      */
-    public function _def()
+    public function getLayout()
     {
-        return function ($t) {
-            return '<span class="default">' . $t . '</span>';
-        };
-    }
-
-    public function debug($data=null)
-    {
-        $data = null !== $data ? $data : $this;
-
-        echo '<pre>';
-        print_r($data);
-        echo '</pre>';
+        return $this->_layout;
     }
 
 }

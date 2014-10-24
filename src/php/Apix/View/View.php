@@ -12,6 +12,8 @@
 
 namespace Apix\View;
 
+use \Apix\View\ViewModel;
+
 class View
 {
 
@@ -19,7 +21,7 @@ class View
      * Holds a ViewModel object.
      * @var	ViewModel
      */
-    protected $model;
+    protected $view_model;
 
     /**
      * Holds a Template object.
@@ -28,65 +30,42 @@ class View
     protected $template;
 
     /**
-     * Constructor, sets the ViewModel ad Template objects. 
+     * View constructor, sets the ViewModel. 
      *
-     * If an array is passed as $viewmodel then ViewModel::$default_class
-     * will be used to create a ViewModel instance and then the data will
-     * be set on that object.
-     *
-     * @param   mixed|null  $model      An array or an instance of ViewModel.
+     * @see http://en.wikipedia.org/wiki/Model_View_ViewModel
+     * @param ViewModel $view_model     Optional. The view model to set.
+     * @param array     $model_data     Optional. An array of data to model.
      */
-    public function __construct($model = null)
+    public function __construct(ViewModel $view_model = null, array $model_data = null)
     {
-        if (null !== $model) {
-            if (is_array($model)) {
-                // set the model view
-                $this->setViewModelFromArray($model);
-            } elseif ($model instanceof ViewModel) {
-                $this->model($model);
-            }
+        if (null !== $view_model) {
+            $this->setViewModel($view_model);
+        }
+
+        if (null !== $model_data) {
+            $this->view_model->set($model_data);
         }
     }
 
     /**
-     * Sets the ViewModel from an array
+     * Sets the ViewModel object.
      *
-     * @param   array  $model      An array of data.
+     * @param  ViewModel $view_model    The view model to set.
+     * @return ViewModel                Provides method chaining.
      */
-    public function setViewModelFromArray(array $model)
+    public function setViewModel(ViewModel $view_model)
     {
-        $key = key($model);
-        ViewModel::$default_key = $key;
-
-        $class = ViewModel::$default_class . '\\' . ucfirst($key);
-        if (class_exists($class)) {
-            ViewModel::$default_class = $class;
-        }
-
-        $this->model()->set($model);
+        return $this->view_model = $view_model;
     }
 
     /**
-     * Get/Set [ViewModel]. If getting and no [ViewModel] set we then
-     * create an instance using [ViewModel::$default_class].
+     * Returns the current ViewModel object.
      *
-     * @param   ViewModel
      * @return ViewModel
      */
-    public function model(ViewModel $model = null)
+    public function getViewModel()
     {
-
-        if ($model === null) {
-            if ($this->model === null) {
-                $class = ViewModel::$default_class;
-                $this->model = new $class();
-            }
-
-            return $this->model;
-        }
-        $this->model = $model;
-
-        return $this;
+        return $this->view_model;
     }
 
     /**
@@ -118,10 +97,13 @@ class View
      */
     public function render($layout = null)
     {
-        $layout = is_string($layout) ? $layout : $this->model()->getViewLayout();
+        $layout = is_string($layout)
+                    ? $layout
+                    : $this->view_model->getLayout();
+
         $this->template->setLayout( $layout );
 
-        return $this->template->render( $this->model() );
+        return $this->template->render( $this->view_model );
     }
 
     /**

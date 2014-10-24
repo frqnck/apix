@@ -51,7 +51,7 @@ class Entity extends Listener
      */
     protected $defaultActions = array(
         'OPTIONS' => 'help',
-        'HEAD' => 'test'
+        'HEAD'    => 'test'
     );
 
     /**

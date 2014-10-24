@@ -100,7 +100,7 @@ class Request
     }
 
     /**
-     * Gets the current URI, if undefined guess and set one
+     * Gets the current URI, if undefined guess and set one up.
      *
      * @return string
      */

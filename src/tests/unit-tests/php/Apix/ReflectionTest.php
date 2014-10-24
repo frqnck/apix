@@ -81,11 +81,14 @@ class ReflectionTest extends TestCase
         $this->assertInternalType('array', $grp);
     }
 
+    /** 
+     * @group tt
+     */
    public function testClassPrefixedParamsAsStrings()
     {
-       #$this->assertEquals('true', $this->class['api_public']);
-       # $this->assertSame('1.0', $this->class['api_version']);
-       # $this->assertSame('admin', $this->class['api_permission']);
+        # $this->assertEquals('true', $this->class['api_public']);
+        # $this->assertSame('1.0', $this->class['api_version']);
+        # $this->assertSame('admin', $this->class['api_permission']);
         $this->assertSame('classRandomValue', $this->class['api_randomName']);
     }
 

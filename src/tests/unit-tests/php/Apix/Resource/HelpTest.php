@@ -28,7 +28,7 @@ class HelpTest extends TestCase
 
         $this->api->onCreate('/create/:test',
             /**
-             * Create something...
+             * Creates something...
              *
              * @return array  The array to return to the client
              */
@@ -39,7 +39,7 @@ class HelpTest extends TestCase
 
         $this->api->onRead('/unit/:test',
             /**
-             * Read/retrieve something...
+             * Read/retrieves something...
              *
              * @return array  The array to return to the client
              */
@@ -50,7 +50,7 @@ class HelpTest extends TestCase
 
         $this->api->onModify('/unit/:test',
             /**
-             * Modify that something...
+             * Modifies that something...
              *
              * @return array  The array to return to the client
              */
@@ -79,6 +79,7 @@ class HelpTest extends TestCase
             ->will( $this->onConsecutiveCalls('/', '/unit/:test', '/*') );
 
         $this->help->onRead($this->api);
+
         $this->assertSame('/', $this->api->getRoute()->getName());
 
         $this->help->onRead($this->api);
@@ -88,6 +89,9 @@ class HelpTest extends TestCase
         #$this->assertSame('/*', $this->api->getRoute()->getName());
     }
 
+    /**
+     * @group tt
+     */
     public function testOnReadReturnsArrayForOneEntity()
     {
         $this->request->expects($this->any())
@@ -101,6 +105,7 @@ class HelpTest extends TestCase
         $this->assertArrayHasKey('path', $results, "Should always have a path field.");
         $this->assertSame('/unit/:test', $results['path']);
 
+        $this->assertArrayHasKey('methods', $results, "Should always have a methods field.");
         $this->assertArrayHasKey('GET', $results['methods']);
         $this->assertArrayHasKey('PATCH', $results['methods']);
 

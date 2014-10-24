@@ -103,6 +103,7 @@ class Main extends Listener
         // Set some generic services
         Service::set('response', $this->response);
         Service::set('request', $this->request);
+        Service::set('server', $this);
     }
 
     /**
@@ -250,8 +251,11 @@ class Main extends Listener
         if ($opts['controller_ext']) {
             $info = pathinfo($path);
 
-            $parts = explode('/', $path);
-            $info = pathinfo(isset($parts[1]) ? $parts[1] : $parts[0] );
+            // use the first path entry to extratc the extension
+            // if ($opts['controller_ext']) {
+            //     $parts = explode('/', $path);
+            //     $info = pathinfo(isset($parts[1]) ? $parts[1] : $parts[0] );
+            // }
 
             $ext = isset($info['extension']) ? $info['extension'] : null;
             if ($ext) {

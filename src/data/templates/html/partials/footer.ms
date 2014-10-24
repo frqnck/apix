@@ -1,13 +1,17 @@
-<h2>Copyright</h2>
-	<p>This API is Copyright (C) XXXXX</p>
-	<p>Powered by APIx, Copyright (C) 2010 Franck Cassedanne</p>
+			{{# getVersion }}
+			<h2>Vesion information</h2>
+			    <p>
+			       This API manpage describes {{{ getVersion }}}.
+			    </p>
+			{{/ getVersion }}
 
-{{! <h2>See Also</h2>
-	<p>todo</p>
- }}			<ol class='man-decor man-foot man foot'>
-			  <li class='tl'>{{ config.output_rootNode }}</li>
-			  <li class='tc'>Date</li>
-			  <li class='tr'>Apix</li>
+			<h2>Copyright</h2>
+				<p>Powered by APIx-server, Copyright (C) 2010 Franck Cassedanne</p>
+
+			<ol class='man-decor man-foot man foot'>
+			  <li class='tl'>{{ config.api_version }}</li>
+			  <li class='tc'>...</li>
+			  <li class='tr'>{{ config.api_realm }}</li>
 			</ol>
 		</div>
 	</body>

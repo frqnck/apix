@@ -99,34 +99,54 @@ class Reflection
         }
 
         // do all the "@entries"
-        preg_match_all('/@(?P<key>[\w_]+)\s+(?P<value>.*?)\s*(?=$|@[\w_]+\s)/s', $str, $lines);
+        preg_match_all(
+            '/@(?P<key>[\w_]+)\s+(?P<value>.*?)\s*(?=$|@[\w_]+\s)/s',
+            $str,
+            $lines
+        );
 
         foreach ($lines['value'] as $i => $v) {
             $grp = $lines['key'][$i];
 
             if ($grp == 'param' || $grp == 'global') {
                 // "@param string $param description of param"
-                preg_match('/(?P<type>\S+)\s+\$(?P<name>\S+)(?P<description>\s+(?:.+))?/', $v, $m);
+                preg_match('/(?P<t>\S+)\s+\$(?P<name>\S+)(?P<d>\s+(?:.+))?/', $v, $m);
                 $t = $grp == 'param' ? 'params' : 'globals';
                 $docs[$t][$m['name']] = array(
-                    'type'          => $m['type'],
-                    'name'          => $m['name'],
-                    'description'   => isset($m['description'])
-                                        ? trim($m['description'])
+                    'type'        => $m['t'],
+                    'name'        => $m['name'],
+                    'description' => isset($m['d'])
+                                        ? trim($m['d'])
                                         : null,
-                    'required'      => isset($requireds)
+                    'required'    => isset($requireds)
                                         && in_array($m['name'], $requireds)
                 );
-
             } else {
                 // other @entries as group
                 $docs[$grp][] = $v;
             }
         }
 
+        if (isset($docs['return'])) {
+            $returns = array();
+            foreach ($docs['return'] as $v) {
+                preg_match('/(?P<t>\S+)(?P<d>\s+(?:.+))?(?P<x>(?:.|\s)*)/', $v, $m);
+                if( isset($m['t']) ) {
+                    $returns[] = array(
+                        'type'        => $m['t'],
+                        'description' => trim($m['d']),
+                        'extra'       => trim($m['x']),
+                    );
+                }
+            }
+            $docs['return'] = array( $returns );
+        }
+
         // reduce group
         foreach ($docs as $key => $value) {
-            if ($key !== 'params') {
+            if (
+                $key !== 'params' && $key !== 'globals' && $key !== 'methods'
+            ) {
                 if (is_array($value) && count($value) == 1) {
                     $docs[$key] = reset( $docs[$key] );
                 }
