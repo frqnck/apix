@@ -9,11 +9,6 @@
  * @license     http://opensource.org/licenses/BSD-3-Clause  New BSD License
  *
  */
-
-define('UNIT_TEST', true);
-
-define('APP_TESTDIR', realpath(__DIR__ . '/php'));
-
 try {
      // Phar::mapPhar('apix.phar');
     spl_autoload_register(function ($name) {
@@ -29,6 +24,4 @@ try {
     die('Error: cannot initialize - ' . $e->getMessage());
 }
 
-define('APP_VENDOR', realpath(__DIR__ . '/../../../vendor'));
-$loader = require APP_VENDOR . '/autoload.php';
-$loader->add('Apix', APP_TESTDIR);
+include 'bootstrap.php';

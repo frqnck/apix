@@ -19,39 +19,11 @@ use Apix\Request,
 
 class HttpRequest extends Request
 {
-
-    /**
-     * TEMP: The singleton instance.
-     * @var Request
-     */
-    private static $instance = null;
-
     /**
      * List of supported input formats.
      * @var array
      */
     protected $formats = array('post', 'json', 'xml');
-
-    /**
-     * TEMP: Returns as a singleton instance.
-     *
-     * @return Request
-     */
-    public static function getInstance()
-    {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-
-        return self::$instance;
-    }
-
-    /**
-     * TEMP: disalow cloning.
-     *
-     * @codeCoverageIgnore
-     */
-    final private function __clone() {}
 
     /**
      * Returns the format from an HTTP context.

@@ -34,9 +34,9 @@ class Exception extends \Exception
             $msg = preg_replace('@to\s.*::\w+\(\)@', '', $msg, 1);
             // $code = 400;
         }
-        if( null !== $ctx && !($ctx instanceof \Exception) ) {
+        if ( null !== $ctx && !($ctx instanceof \Exception) ) {
             $ctx = null;
-        } 
+        }
 
         throw new \ErrorException($msg, 500, 0, $file, $line, $ctx);
     }
@@ -108,7 +108,7 @@ class Exception extends \Exception
     /**
      * Returns this exception as an associative array.
      *
-     * @param \Exception $e
+     * @param  \Exception $e
      * @return array
      */
     public static function toArray(\Exception $e)
@@ -122,9 +122,9 @@ class Exception extends \Exception
             'stack trace'   => $e->getTraceAsString(),
         );
 
-        if(method_exists($e, 'getPrevious')) {
+        if (method_exists($e, 'getPrevious')) {
             $p = $e->getPrevious();
-            if(method_exists($p, 'getTraceAsString')) {
+            if (method_exists($p, 'getTraceAsString')) {
                 $array['prev'] = $p->getTraceAsString();
             }
         }

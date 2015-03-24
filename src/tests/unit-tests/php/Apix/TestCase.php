@@ -12,10 +12,6 @@
 
 namespace Apix;
 
-// Makes sure the cache is off for all test.
-$config = Config::getInstance();
-$config->set('cache_annotation', false);
-
 class TestCase extends \PHPUnit_Framework_TestCase
 {
 

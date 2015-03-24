@@ -35,15 +35,19 @@ class Help
      * This resource entity provides documentation and in-line referencial to this API's resources.
      * By specify a resource and method you can narrow down to specific section.
      *
-     * @param string $resource   Optional. A string of characters used to identify a resource.
-     * @param array  $filters     Optional. Some filters to narrow down the resultset.
-     * @global string $method    Default "GET". The resource HTTP method to interact. 
-     * @return array  An array of documentation data.
+     * @param  string $resource Optional. A string of characters used to identify
+     *                                    a specific resource entity.
+     *                                    e.g. /help/resource
+     * @param  array  $filters  Optional. Some filters to narrow down the resultset.
+     * @global string $method    Default "GET". The resource HTTP method to interact.
+     * @return array  An array documentating either all the available resources
+     *                or if provided, the specified <b>:resource</b>.
      *
-     * @example 
-     * <pre>GET /help/path_to_resource
-     *    - also -
-     * OPTIONS /path_to_resource</pre>
+     * @example <p><pre>apixs:
+     *    help:
+     *       title: Help - Provides in-line referencial to this API.
+     *       description: This resource entity provides documentation and ...
+     * </pre></p>
      * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html#sec9.2
      */
     public function onRead($resource=null, array $filters=null)
@@ -120,7 +124,7 @@ class Help
         } else {
             $docs = self::getEntityDocs(
                 $entity,
-                $server->request->getParam('method') ? : 'GET',
+                $server->request->getParam('method') ?: 'GET',
                 $route->getName()
             );
         }
@@ -132,9 +136,9 @@ class Help
      * Get the documentation of all the resource entities.
      *
      * @param  Server $server
-     * @return array           The documentation for all resource entities.
+     * @return array  The documentation for all resource entities.
      */
-    static function getResourcesDocs(Server $server)
+    public static function getResourcesDocs(Server $server)
     {
         $docs = array();
         $redir = array();
@@ -158,12 +162,12 @@ class Help
     /**
      * Get the documentation for the provided entity and method.
      *
-     * @param  EntityInterface $entity  The Entity object to interact with.
-     * @param  string|null     $method  Optional. The Request-method or all.
-     * @param  string|null     $path    Optional. Request-URI for that entity.
-     * @return array                    The entity array documentation.
+     * @param  EntityInterface $entity The Entity object to interact with.
+     * @param  string|null     $method Optional. The Request-method or all.
+     * @param  string|null     $path   Optional. Request-URI for that entity.
+     * @return array           The entity array documentation.
      */
-    static function getEntityDocs(Entity $entity, $method=null, $path=null)
+    public static function getEntityDocs(Entity $entity, $method=null, $path=null)
     {
         $docs = $entity->getDocs($method);
         // $docs = (null !== $method || $entity->hasMethod($method))

@@ -91,19 +91,20 @@ class Help extends Common
                             // . $this->path
                             . $this->options['rel_path'];
 
-            if(isset($this->params)) {
-                foreach($this->params as $var) {
-                    if(!$var['required'])
-                        $this->usage .= '/:' . $var['name'];
+            if (isset($this->params)) {
+                foreach ($this->params as $var) {
+                    $this->usage .= !$var['required']
+                        ? '<span>:' . $var['name'] . '</span>'
+                        : '/:' .$var['name'];
                 }
             }
             $this->usage .= '</dt><dd>';
-            if(isset($this->globals)) {
-                foreach($this->globals as $param) {
+            if (isset($this->globals)) {
+                foreach ($this->globals as $param) {
                     $types = explode('|', $param['type']);
-                    if(! in_array('null', $types) ) {
+                    if (! in_array('null', $types) ) {
                         $this->usage .= '<span>' . $param['name'];
-                        if($param['type'] != 'null') {
+                        if ($param['type'] != 'null') {
                             $this->usage .= '=<i>' . $param['type'] . '</i>';
                         }
                         $this->usage .= '</span>';
@@ -145,7 +146,7 @@ class Help extends Common
     {
         $formatted = array();
         sort($this->config['routing']['formats']);
-        foreach($this->config['routing']['formats'] as $k) {
+        foreach ($this->config['routing']['formats'] as $k) {
             $item = &$this->format_defs[$k];
             $formatted[] = sprintf(
                 '<td><a href="%s">%s</a></td><td>%s</td><td>%s</td><td>%s</td>',
@@ -162,7 +163,7 @@ class Help extends Common
     //     $formats = &$this->format_defs;
     //     $formatted = array();
     //     sort($this->config['routing']['formats']);
-    //     foreach($this->config['routing']['formats'] as $k) {
+    //     foreach ($this->config['routing']['formats'] as $k) {
     //         $ext = $formats[$k]['ext'];
     //         $formatted[] = sprintf(
     //             '<a href="/help/:path%s">/help<b>%s</b></a>', $ext, $ext
@@ -181,7 +182,7 @@ class Help extends Common
     {
         $formats = &$this->format_defs;
         $formatted = array();
-        foreach($this->config['input_formats'] as $k) {
+        foreach ($this->config['input_formats'] as $k) {
             $formatted[] = sprintf(
                 '"<var>%s</var>" for <a href="%s">%s</a> %s',
                 isset($formats[$k]['mime']) ? $formats[$k]['mime'] : 'n/a',
@@ -225,7 +226,7 @@ class Help extends Common
     }
 
     /**
-     * Deals with the request params/filters definitions.
+     * Returns the response entries.
      *
      * @return array
      */
@@ -246,7 +247,7 @@ class Help extends Common
     public function getVersion()
     {
         if (isset($this->version)) {
-            if(is_array($this->version)) {
+            if (is_array($this->version)) {
                 $this->version = 'version <b>'
                         . implode('</b>, version <b>', $this->version)
                         . '</b>';
@@ -254,48 +255,6 @@ class Help extends Common
 
             return $this->version;
         }
-    }
-
-    /**
-     * Deals with the request params/filters definitions.
-     *
-     * @return array
-     */
-    public function getOptions()
-    {
-        return $this->options;
-    }
-
-    /**
-     * Deals with the resource groups definitions.
-     *
-     * @return array
-     */
-    public function getResourceGroups()
-    {
-        #$ignore = array('internal', 'id', 'toc', 'todo', 'method');
-        $titles = array(
-            'example'   => $this->hasMany('example') ? 'Examples' : 'Example',
-            'see'       => 'See also',
-            'link'      => $this->hasMany('link') ? 'Links' : 'Link',
-            'copyright' => 'Copyright',
-            'license'   => 'Licensing',
-            // 'throws'    => 'Failure responses'
-        );
-        $groups = array();
-
-        foreach ($titles as $key => $title) {
-            if(
-                isset($this->{$key}) #&& !in_array($key, $ignore)
-            ) {
-                $groups[] = array(
-                    'title' => $title,
-                    'items' => (array) $this->get($key)
-                );
-            }
-        }
-
-        return $groups;
     }
 
 }

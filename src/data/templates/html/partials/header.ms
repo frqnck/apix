@@ -6,7 +6,7 @@
     {{^ title }}API manpages for "{{ config.api_realm }}"{{/ title }}
     {{# title  }}{{.}} ({{ config.api_realm }}){{/ title }}
   </title>
-<meta content="API manpage for {{ config.api_realm }}/ " name="description">
+  <meta content="API manpage for {{ config.api_realm }}/ " name="description">
   <style type='text/css' media='all'>
   /*
     <em>  Renders as emphasized text
@@ -23,12 +23,14 @@
   #man h2 {margin:10px 0 0 0;text-transform:uppercase}
   #man > p,#man > pre,#man > ul,#man > ol,#man > dl, #man > table {margin-left:8ex}
 
-  /*#man samp{float:left;border:1px solid red; display:inline-block;}*/
+  #man samp span {display:inline;} 
+  #man samp span::after {content:"]";color:grey;} 
 
-#man samp span {display:inline-block;} 
-#man samp span:first-child::before {content:"?[";color:grey;} 
-#man samp span::before {content:"&[";color:grey;} 
-#man samp span::after {content:"]";color:grey;} 
+  #man dd samp span:first-child::before {content:"[?";color:grey;} 
+  #man dd samp span::before {content:"[&";color:grey;} 
+  
+  #man dt samp span:first-child::before,
+  #man dt samp span::before{content:"[/";color:grey;} 
 
   #man h3 {margin:0 0 0 4ex}
 
@@ -94,9 +96,11 @@
   ol.man-decor li.tc {text-align:center;letter-spacing:4px}
   ol.man-decor li.tr {text-align:right;float:right}
 
-/*    #man ol.man a { color:#999 }
+/*  
+    #man ol.man a { color:#999 }
     #man ol.man a:hover { color:#333231 }
 */
+
     #man .bold {font-weight: bold}
     #man .uppercase {text-transform:uppercase}
     #man .center {text-align:center}
@@ -130,20 +134,18 @@
       font-weight: bold;
     }
 
-
 /*
-#man td:first-child {
-    border-left:1.8ex solid #ddd;
-}
+  #man td:first-child {
+      border-left:1.8ex solid #ddd;
+  }
 */
 
 /* -- COMPENSATE -- */
 
-#man p+pre {margin-left:5em;margin-top:.5em;}
+  #man p+pre {margin-left:5em;margin-top:.5em;}
   /*#man p+pre {margin-top:-1em;}*/
   /*#man p+table {margin-top:-.5em;margin-bottom:.5em;}*/
   /*#man p+pre {margin-top:-1em;}*/
-
   </style>
 </head>
 <body>
@@ -154,7 +156,7 @@
     </h1>
 
     <ol class='man-decor man head'>
-      <li class='tl'>{{ getCmdSection }}</li>
+      <li class='tl'>{{ getManTocSection }}</li>
       <li class='tc'>API Manual</li>
-      <li class='tr'>{{ getCmdSection }}</li>
+      <li class='tr'>{{ getManTocSection }}</li>
     </ol>

@@ -41,7 +41,7 @@ class UploadResource
     }
 
     /**
-     * Post
+     * GET
      *
      * @param  string $type
      * @param  string $debug
@@ -56,7 +56,7 @@ class UploadResource
     }
 
     /**
-     * Post
+     * POST
      *
      * @param  string $type
      * @return array
@@ -66,53 +66,9 @@ class UploadResource
      */
     public function onCreate($type, $debug=false)
     {
-        #$request = $request === null ? Request::getInstance() : $request;
-
         return array(
             'body'      => $this->server->request->getBody(),
             'params'    => $this->server->getBodyData()
-        );
-    }
-
-    public function OffonCreate($type, $debug=false, Request $request=null)
-    {
-        $request = $request === null ? Request::getInstance() : $request;
-
-        if ($debug==true) {
-            $results['debug'] = $request->getHeaders();
-        }
-
-        if ( $request->hasHeader('CONTENT_TYPE') && $request->hasBody() ) {
-
-            $ct = $request->getHeader('CONTENT_TYPE');
-
-            switch (true) {
-
-                // application/x-www-form-urlencoded
-                case (strstr($ct, '/x-www-form-urlencoded')):
-                break;
-
-                // 'application/json'
-                case (strstr($ct, '/json')):
-                    $input = new Input\Json();
-                    $r = $input->decode($request->getBody(), true);
-                    $request->setParams($r);
-                break;
-
-                // 'text/xml', 'application/xml'
-                case (strstr($ct, '/xml')
-                    && (!strstr($ct, 'html'))):
-                    $input = new Input\Xml();
-                    $r = $input->decode($request->getBody(), true);
-                    $request->setParams($r);
-            }
-
-        }
-
-        return array(
-            'ct' => $ct,
-            'body'      => $request->getBody(),
-            'params'    => $request->getParams()
         );
     }
 

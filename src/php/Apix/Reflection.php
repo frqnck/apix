@@ -53,8 +53,8 @@ class Reflection
     /**
      * Extract PHPDOCs
      *
-     * @param  \Reflection|string $mix A reflection object or a PHPDoc string
-     * @param array|null $requireds An array of param name that are required. 
+     * @param  \Reflection|string $mix       A reflection object or a PHPDoc string
+     * @param  array|null         $requireds An array of param name that are required.
      * @return array
      */
     public static function parsePhpDoc($mix, array $requireds=null)
@@ -110,7 +110,8 @@ class Reflection
 
             if ($grp == 'param' || $grp == 'global') {
                 // "@param string $param description of param"
-                preg_match('/(?P<t>\S+)\s+\$(?P<name>\S+)(?P<d>\s+(?:.+))?/', $v, $m);
+                preg_match('/(?P<t>\S+)\s+\$(?P<name>\S+)(?P<d>\s+(?:[\w\W_\s]*))?/', $v, $m);
+
                 $t = $grp == 'param' ? 'params' : 'globals';
                 $docs[$t][$m['name']] = array(
                     'type'        => $m['t'],
@@ -130,12 +131,13 @@ class Reflection
         if (isset($docs['return'])) {
             $returns = array();
             foreach ($docs['return'] as $v) {
-                preg_match('/(?P<t>\S+)(?P<d>\s+(?:.+))?(?P<x>(?:.|\s)*)/', $v, $m);
-                if( isset($m['t']) ) {
+                // preg_match('/(?P<t>\S+)(?P<d>\s+(?:.+))?(?P<x>(?:.|\s)*)/', $v, $m); // with extar
+                preg_match('/(?P<t>\S+)(?P<d>\s+(?:.|\s)*)/', $v, $m);
+                if ( isset($m['t']) ) {
                     $returns[] = array(
                         'type'        => $m['t'],
                         'description' => trim($m['d']),
-                        'extra'       => trim($m['x']),
+                        // 'extra'       => trim($m['x']),
                     );
                 }
             }

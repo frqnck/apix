@@ -130,11 +130,11 @@ class Server extends Main
         );
     }
 
-    public function setGroupInfo($path, array $docs=null)
-    {
-        var_dump( $this->resources); exit;
-        $this->group = $infos;
-    }
+    // public function setGroupInfo($path, array $docs=null)
+    // {
+    //     var_dump( $this->resources); exit;
+    //     $this->group = $infos;
+    // }
 
     /**
      * TODO: Test Read from a group.

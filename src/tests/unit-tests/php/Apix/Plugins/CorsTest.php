@@ -24,7 +24,7 @@ class CorsTest extends TestCase
 
     public function setUp()
     {
-        $_SERVER['HTTP_ORIGIN'] = "https://foo.bar";
+        $_SERVER['HTTP_ORIGIN'] = 'https://foo.bar';
 
         $this->request = new HttpRequest();
         $this->response = new Response($this->request);

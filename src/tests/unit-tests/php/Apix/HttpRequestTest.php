@@ -19,7 +19,7 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->request = HttpRequest::getInstance();
+        $this->request = new HttpRequest();
     }
 
     protected function tearDown()
@@ -30,29 +30,6 @@ class HttpRequestTest extends \PHPUnit_Framework_TestCase
     public function testIsExtendingFromRequest()
     {
         $this->assertInstanceOf(__NAMESPACE__ . '\Request', $this->request);
-    }
-
-    /**
-     * TEMP
-     */
-    public function testIsSingleton()
-    {
-        $req = HttpRequest::getInstance();
-        $req2 = HttpRequest::getInstance();
-
-        $this->assertSame($req, $req2);
-    }
-
-    /**
-     * TEMP
-     * @covers Apix\HttpRequest::__clone
-     */
-    public function testIsSingletonIsNotClonable()
-    {
-        // $r = clone $this->request;
-        $r = new \ReflectionClass($this->request);
-        $p = $r->getMethods(\ReflectionMethod::IS_PRIVATE|\ReflectionMethod::IS_FINAL);
-        $this->assertSame('__clone', $p[0]->name);
     }
 
     public function testGetFormatFromHttpAccept()

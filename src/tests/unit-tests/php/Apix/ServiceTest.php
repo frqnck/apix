@@ -35,4 +35,10 @@ class ServiceTest extends TestCase
         );
     }
 
+    public function testDebug()
+    {
+        Service::debug('logger');
+        $this->expectOutputRegex('@^<pre>class Apix(.*)</pre>$@s');
+    }
+
 }

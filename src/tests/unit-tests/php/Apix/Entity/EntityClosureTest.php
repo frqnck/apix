@@ -129,13 +129,12 @@ class EntityClosureTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-
     public function testParseDocsGroupLevel()
     {
         $this->entity->group("TODO!");
         $docs = $this->entity->parseDocs();
         $this->assertSame("TODO!", $docs['title']);
-        
+
         $this->assertSame(1, count($docs['methods']));
     }
 

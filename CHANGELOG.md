@@ -3,11 +3,10 @@ APIx changelog
 
 Version 0.4.0
 -------------
-* Added Plugin\Manual
-* Added Exception debug output.
-* Changed The file extension is the resource enpoint rather the
-* Fixeded extension is now set from the resource enpoint rather the
-
+* Added Plugin\ManPage
+* Added APIs now have a debug Exception output.
+* Changed the file extension handler built from the last resource segment rather
+  instead of the first. e.g. /foo/bar.json instead of /foo.json/bar
 
 Version 0.3.8
 -------------

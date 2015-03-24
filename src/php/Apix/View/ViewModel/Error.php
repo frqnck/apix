@@ -28,7 +28,7 @@ class Error extends Common
 
     public function description()
     {
-        return $this->message ? : Response::getStatusPrases($this->code, true);
+        return $this->message ?: Response::getStatusPrases($this->code, true);
     }
 
     // // deals with groups definitions

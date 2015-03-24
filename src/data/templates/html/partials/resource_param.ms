@@ -20,7 +20,7 @@
        {{# type }}<i>{{ type }}</i>{{/ type }}
     </td>
     <td>
-      {{# description }}{{ description }}{{/ description }}
+      {{# description }}{{{ description }}}{{/ description }}
     </td>
     </tr>
   {{/ items }}

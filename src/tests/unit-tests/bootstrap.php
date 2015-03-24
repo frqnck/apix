@@ -13,9 +13,9 @@
 namespace Apix;
 
 define('DEBUG', true);
-
 define('UNIT_TEST', true);
-define('APP_TOPDIR', realpath(__DIR__ . '/../../php'));
+
+// define('APP_TOPDIR', realpath(__DIR__ . '/../../php'));
 define('APP_TESTDIR', realpath(__DIR__ . '/php'));
 define('APP_VENDOR', realpath(__DIR__ . '/../../../vendor'));
 
@@ -23,8 +23,8 @@ define('APP_VENDOR', realpath(__DIR__ . '/../../../vendor'));
 $loader = require APP_VENDOR . '/autoload.php';
 $loader->add('Apix', APP_TESTDIR);
 
-// Apix Autoloader (PEAR)
-// require APP_VENDOR . '/apix/autoloader/src/php/Apix/Autoloader.php';
-// Autoloader::init(
-//     array(APP_TOPDIR, APP_TESTDIR, APP_VENDOR)
-// );
+// Makes sure the cache is off for all test.
+// $config = Config::getInstance();
+// $config = new Config();
+// $config->set('cache_annotation', false);
+// Service::set('config', $config);

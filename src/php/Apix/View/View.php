@@ -12,8 +12,6 @@
 
 namespace Apix\View;
 
-use \Apix\View\ViewModel;
-
 class View
 {
 
@@ -30,11 +28,11 @@ class View
     protected $template;
 
     /**
-     * View constructor, sets the ViewModel. 
+     * View constructor, sets the ViewModel.
      *
      * @see http://en.wikipedia.org/wiki/Model_View_ViewModel
-     * @param ViewModel $view_model     Optional. The view model to set.
-     * @param array     $model_data     Optional. An array of data to model.
+     * @param ViewModel $view_model Optional. The view model to set.
+     * @param array     $model_data Optional. An array of data to model.
      */
     public function __construct(ViewModel $view_model = null, array $model_data = null)
     {
@@ -50,8 +48,8 @@ class View
     /**
      * Sets the ViewModel object.
      *
-     * @param  ViewModel $view_model    The view model to set.
-     * @return ViewModel                Provides method chaining.
+     * @param  ViewModel $view_model The view model to set.
+     * @return ViewModel Provides method chaining.
      */
     public function setViewModel(ViewModel $view_model)
     {
@@ -75,7 +73,7 @@ class View
      * then it will be used a the path to the template and a Template
      * instance will be created using [Template::$default_class].
      *
-     * @param   Template|string|null  $template   A string or an instance of Template.
+     * @param Template|string|null $template A string or an instance of Template.
      */
     public function setTemplate($template, array $options = null)
     {

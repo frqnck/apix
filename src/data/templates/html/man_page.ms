@@ -48,12 +48,8 @@
     {{> resource_param }}
 {{/ getQueryParams }}
 
-{{# return }}
-    <h2>Successful response</h2>
-    <p>
-        When a request is successful, the following is returned:
-    </p>
-    {{# . }}
+{{# getReturns }}
+    <h2>Response{{# items.1 }}s{{/ items.1 }}</h2>
     <table>
       <colgroup>
         <col width="25%"><col width="75%">
@@ -64,25 +60,17 @@
           <th>Description</th>
         </tr>
       </thead>
-      <tr>
-        <td>
-           {{# type }}<i>{{ type }}</i>{{/ type }}
-        </td>
-        <td>
-          {{# description }}{{ description }}{{/ description }}
-        </td>
-     </tr>
+      {{# items }}
+        <tr>
+            <td>
+               {{# type }}<i>{{ type }}</i>{{/ type }}
+            </td>
+            <td>
+              {{# description }}{{{ description }}}{{/ description }}
+            </td>
+        </tr>
+        {{/ items }}
     </table>
-    <p>
-        {{{ extra }}}
-    </p>
-    {{/ . }}
-{{/ return }}
-
-{{# getResourceGroups }}
-    {{# . }}
-      {{> resource_group }}
-    {{/ . }}
-{{/ getResourceGroups }}
+{{/ getReturns }}
 
 {{> footer }}

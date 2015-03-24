@@ -69,13 +69,13 @@ class EntityTest extends TestCase
 
     public function testGetDocsRetrievesAllTheApiDocsWithInternalCache()
     {
-        $this->skipIfMissing('apc');
+        // $this->skipIfMissing('apc');
 
-        // if (!ini_get('apc.enable_cli')) {
-        //     self::markTestSkipped(
-        //         'apc.enable_cli MUST be enabled in order to run this unit test'
-        //     );
-        // }
+        if (!ini_get('apc.enable_cli')) {
+            self::markTestSkipped(
+                'apc.enable_cli MUST be enabled in order to run this unit test'
+            );
+        }
 
         $config = \Apix\Config::getInstance();
         $config->set('cache_annotation', true);

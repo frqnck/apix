@@ -305,7 +305,7 @@ class Response extends Listener
         // $out = $this->sendheader("Status: $http_code " . static::getStatusPrases($http_code));
         // //$out = $this->sendheader("HTTP/1.0 $http_code " . static::getStatusPrases($http_code), true);
         // $out[] = array( $this->sendHeader('X-Powered-By: ' . $version_string) );
-        
+
         $out = array(
             $this->sendHeader('X-Powered-By: ' . $version, true, $http_code)
         );

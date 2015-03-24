@@ -23,9 +23,7 @@ class OutputDebugSignTest extends TestCase
 
     public function setUp()
     {
-        $this->response = new Response(
-            HttpRequest::GetInstance()
-        );
+        $this->response = new Response(new HttpRequest);
         $this->response->unit_test = true;
 
         $route = $this->getMock('Apix\Router');

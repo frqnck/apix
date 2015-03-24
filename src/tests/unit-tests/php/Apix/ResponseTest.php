@@ -23,11 +23,10 @@ class ResponseTest extends TestCase
     protected function setUp()
     {
         // Empty the plugins array from the main config.
-        $config = Config::getInstance();
-        $config->set('plugins', array());
+        // $config = new Config::getInstance();
+        // $config->set('plugins', array());
 
-        $request = HttpRequest::GetInstance();
-        $this->response = new Response($request);
+        $this->response = new Response(new HttpRequest());
         $this->response->unit_test = true;
 
         $this->route = $this->getMock('Apix\Router');

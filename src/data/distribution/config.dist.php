@@ -52,7 +52,7 @@ $c = array(
     'input_formats'     => array('post', 'json', 'xml'),
 
     // Wether to cache the collection and parsing of the entity' documentations.
-    // This requires the APC extension to be enable. In order to clear the cache,
+    // This requires the APC or APCu extension. In order to clear the cache,
     // e.g. when deploying a new version, (gracefully) restart the Web server.
     'cache_annotation'  => !DEBUG // don't cache while developing!
                             && extension_loaded('apc'),
@@ -220,7 +220,7 @@ $c['services'] = array(
     // Note: Apix\Plugin\Auth currently needs 'Apix\Session' from this container.
     'session' => function ($user) {
         $session = new Session($user['username'], $user['group']);
-        
+
         if (isset($user['ips'])) {
             $session->setTrustedIps((array) $user['ips']);
         }

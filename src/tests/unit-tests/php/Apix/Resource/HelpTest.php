@@ -102,14 +102,15 @@ class HelpTest extends TestCase
 
         $results = $this->help->onRead($this->api);
 
-        $this->assertArrayHasKey('path', $results, "Should always have a path field.");
+        $this->assertArrayHasKey('title', $results);
+        $this->assertArrayHasKey('description', $results);
+        $this->assertArrayHasKey('return', $results);
+        $this->assertArrayHasKey('method', $results);
+
+        $this->assertArrayHasKey('path', $results, 'Should have a path field.');
         $this->assertSame('/unit/:test', $results['path']);
 
-        $this->assertArrayHasKey('methods', $results, "Should always have a methods field.");
-        $this->assertArrayHasKey('GET', $results['methods']);
-        $this->assertArrayHasKey('PATCH', $results['methods']);
-
-        $this->assertEquals(2, count($results)); // ?4
+        $this->assertEquals(5, count($results));
     }
 
     protected function genericTest($items)

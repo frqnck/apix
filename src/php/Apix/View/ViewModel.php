@@ -20,6 +20,28 @@ abstract class ViewModel
 {
 
     /**
+     * Option variable exposed to the templates.
+     * @var array
+     */
+    public $options = array();
+
+    /**
+     * Config variable exposed to the templates.
+     * @var array|null
+     */
+    public $config = null;
+
+    /**
+     * Deals with the request params/filters definitions.
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
      * Assigns a property.
      *
      *     // This value can be accessed as {{foo}} within the template
@@ -47,10 +69,24 @@ abstract class ViewModel
         return $this;
     }
 
-    public function get($key)
+    public function get($key, $htmlize=true)
     {
-        $v = is_array($this->{$key}) ? $this->{$key} : (array) $this->{$key};
-        array_walk_recursive($v, function (&$v) {$v=ViewModel::htmlizer($v);});
+        $v = isset($this->{$key}) ? (array) $this->{$key} : array();
+
+        if (isset($this->options[$key])) {
+            array_push($v,
+                // is_array($this->options[$key])
+                // ? $this->options[$key][0]
+                // :
+                 $this->options[$key]
+            );
+    }
+
+        if ($htmlize) {
+            array_walk_recursive($v, function (&$v) {
+                $v = ViewModel::htmlizer($v);
+            });
+        }
 
         return $v;
     }

@@ -81,7 +81,7 @@ class ReflectionTest extends TestCase
         $this->assertInternalType('array', $grp);
     }
 
-    /** 
+    /**
      * @group tt
      */
    public function testClassPrefixedParamsAsStrings()

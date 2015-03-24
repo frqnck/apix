@@ -113,7 +113,7 @@ class EntityClosure extends Entity implements EntityInterface
 
             $_docs = Reflection::parsePhpDoc($ref); // <- TODO (required args)
             $_docs['method'] = $key;
-            // $_docs['path'] = $key . ' '; //. $this->getAction($key); // tood here 
+            // $_docs['path'] = $key . ' '; //. $this->getAction($key); // tood here
 
             $docs['methods'][$key] = $_docs;
         }

@@ -61,7 +61,7 @@ class ServerTest extends TestCase
     //     $entity = $this->server->onRead('/path', $this->closure);
 
     //     // $entity = $this->server->setGroup('dddd');
-        
+
     //     $entity->group = 'test';
     //     // $this->assertInstanceOf('Apix\Entity', $entity);
 

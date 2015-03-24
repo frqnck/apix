@@ -60,9 +60,9 @@ class Service
      */
     public static function debug($key=null)
     {
-        echo "<pre>";
+        echo '<pre>';
         var_dump( Config::getInstance()->getServices($key) );
+        echo '</pre>';
     }
-
 
 }

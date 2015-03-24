@@ -65,4 +65,16 @@ class ExceptionTest extends TestCase
         $this->expectOutputString('<h1>500 Internal Server Error</h1>');
     }
 
+    public function testExceptionToArray()
+    {
+        $r = Exception::toArray(
+            new Exception('msg', 123, new Exception('prev'))
+        );
+
+        $this->assertSame('msg', $r['message']);
+        $this->assertSame(123, $r['code']);
+        $this->assertSame('Apix\Exception', $r['type']);
+        $this->assertArrayHasKey('stack trace', $r);
+    }
+
 }

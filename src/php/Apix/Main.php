@@ -69,16 +69,16 @@ class Main extends Listener
         // Set and intialise the config
         $c = $config instanceof Config ? $config : Config::getInstance($config);
         $this->config = $c->get();
-        Service::set('config', $this->config);
 
         $this->initSet($this->config);
 
         // Load all the plugins
-        $this->loadPlugins($c->get('plugins'));
+        // $this->loadPlugins($c->get('plugins'));
+        $this->loadPlugins($this->config['plugins']);
 
         // Set the current request
         $this->request =    null === $request
-                            ? HttpRequest::getInstance()
+                            ? new HttpRequest()
                             : $request;
 
         if ($this->request instanceof HttpRequest) {
@@ -101,6 +101,7 @@ class Main extends Listener
         }
 
         // Set some generic services
+        Service::set('config', $this->config);
         Service::set('response', $this->response);
         Service::set('request', $this->request);
         Service::set('server', $this);
@@ -161,7 +162,7 @@ class Main extends Listener
                 'code'      => $http_code,
             );
 
-            if(DEBUG) {
+            if (DEBUG) {
                 $error['exception'] = Exception::toArray($e);
             }
 

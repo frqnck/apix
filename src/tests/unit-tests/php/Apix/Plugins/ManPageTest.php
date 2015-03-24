@@ -27,6 +27,7 @@ class ManPageTest extends TestCase
 
         $this->request = new HttpRequest();
         $this->response = new Response($this->request);
+        $this->response->results['help'] = array();
         $this->response->unit_test = true;
 
         Service::set('response', $this->response);
@@ -43,17 +44,17 @@ class ManPageTest extends TestCase
 
         $this->response->setRoute($this->route);
 
-        $options = array(
+        $this->options = array(
             'enable'   => true,
-            'view_dir' => '/tmp',
+            // 'view_dir' => '/tmp',
         );
 
-        $this->plugin = new ManPage($options);
+        $this->plugin = new ManPage($this->options);
     }
 
     protected function tearDown()
     {
-        unset($this->plugin, $this->response, $this->route);
+        unset($this->plugin, $this->response, $this->route, $this->options);
     }
 
     public function testIsDisable()
@@ -63,7 +64,6 @@ class ManPageTest extends TestCase
     }
 
     /**
-     * @group test
      * @dataProvider urlsProvider
      */
     public function testGetUrlApiAndVersion($uri, $exp)
@@ -71,28 +71,41 @@ class ManPageTest extends TestCase
         // $this->assertSame($exp, ManPage::getUrlApiAndVersion($uri, '/h'));
         $_SERVER['SCRIPT_URI'] = $uri;
 
-        $plugin = new ManPage;
+        $plugin = new ManPage($this->options);
         $opts = $plugin->getOptions();
-
-        $this->assertSame($exp, $opts);
+        $this->assertSame($exp[0], $opts['url_api'], "Extracted 'url_api' failed.");
+        $this->assertSame($exp[1], $opts['version'], "Extracted 'version' failed.");
     }
 
     public function urlsProvider()
     {
         return array(
-            // array(
-            //     'uri' => '',
-            //     'exp' => array()
-            // ),
             array(
-                'uri' => 'foo/v33/h',
-                'exp' => array('foo/v33/h', 'foo/v33', 'v33')
+                'uri' => '/',
+                'exp' => array(null, 'v1')
             ),
-            // array(
-            //     'uri' => '/x/y/h',
-            //     'exp' => array('/x/y/h', '/x/y')
-            // ),
+            array(
+                'uri' => '/help/foo',
+                'exp' => array(null, 'v1')
+            ),
+            array(
+                'uri' => 'foo/v1/help/bar',
+                'exp' => array('foo/v1', 'v1')
+            ),
+            array(
+                'uri' => '/v333/help/bar',
+                'exp' => array('/v333', 'v333')
+            )
         );
+    }
+
+    /**
+     * @group test
+     */
+    public function testUpdate()
+    {
+        $this->plugin->update($this->response);
+        // $this->assertSame($exp, ManPage::getUrlApiAndVersion($uri, '/h'));
     }
 
 }
