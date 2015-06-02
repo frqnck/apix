@@ -2,7 +2,7 @@
 
 #### Version 0.3.10 (2-Jun-2015)
 - CHANGED: Exception handler set to log critical error.
-- FIXED: The unit test extension loader so it check for the file existence.
+- FIXED: Unit test extension loader skip if the PHP extension file is missing.
 - FIXED: Unit tests bootstrap now sets a default timezone.
 
 
