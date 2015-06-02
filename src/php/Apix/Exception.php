@@ -12,6 +12,8 @@
 
 namespace Apix;
 
+use Apix\Service;
+
 class Exception extends \Exception
 {
 
@@ -43,13 +45,13 @@ class Exception extends \Exception
      *  Startup Exception handler
      *
      * @param \Exception $e
-     * @see errorOutput
+     * @see criticalError
      */
     public static function startupException(\Exception $e)
     {
-        self::errorOutput(
+        self::criticalError(
             $e->getCode(),
-            (DEBUG ? 'Startup:- ' : null) . $e->getMessage(),
+            (DEBUG ? 'Startup: ' : null) . $e->getMessage(),
             $e->getFile(),
             $e->getLine()
         );
@@ -58,15 +60,15 @@ class Exception extends \Exception
     /**
      *  Shutdown / Fatal error handler
      *
-     * @see errorOutput
+     * @see criticalError
      * @codeCoverageIgnore
      */
     public static function shutdownHandler()
     {
         if ($e = error_get_last()) {
-            self::errorOutput(
+            self::criticalError(
                 $e['type'],
-                (DEBUG ? 'Shutdown:- ' : null) . $e['message'],
+                (DEBUG ? 'Shutdown: ' : null) . $e['message'],
                 $e['file'],
                 $e['line']
             );
@@ -74,7 +76,7 @@ class Exception extends \Exception
     }
 
     /**
-     * Output the error.
+     * Critical Error Output and log.
      *
      * @param int    $code    The error number.
      * @param string $message The error message.
@@ -82,24 +84,24 @@ class Exception extends \Exception
      * @param int    $line    The line number where it happened.
      * @codeCoverageIgnore
      */
-    public static function errorOutput($code, $message, $file, $line)
+    public static function criticalError($code, $message, $file, $line)
     {
+        $msg = '500 Internal Server Error';
         if (!defined('UNIT_TEST')) {
             $proto = isset($_SERVER['SERVER_PROTOCOL'])
                         ? $_SERVER['SERVER_PROTOCOL']
                         : 'http:1/1';
-            header($proto . ' 500 Internal Server Error', true, 500);
+            header($proto . ' ' . $msg, true, 500);
         }
-        echo '<h1>500 Internal Server Error</h1>';
+        printf('<h1>%s</h1>', $msg);
+
+        $info = sprintf("#%d %s @ %s:%d", $code, $message, $file, $line);
+        Service::get('logger')->critical('{msg} [{info}]',
+            array('msg'=>$msg, 'info'=>$info)
+        );
+
         if (DEBUG && !defined('UNIT_TEST')) {
-            $info = sprintf(
-                "#%d %s @ %s:%d",
-                $code,
-                $message,
-                $file,
-                $line
-            );
-            die($info);
+            die(array($info));
         }
     }
 
