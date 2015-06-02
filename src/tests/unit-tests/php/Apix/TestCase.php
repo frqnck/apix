@@ -23,9 +23,11 @@ class TestCase extends \PHPUnit_Framework_TestCase
     {
         if (!extension_loaded($name)) {
             $prefix = (PHP_SHLIB_SUFFIX === 'dll') ? 'php_' : '';
+            $extension = $prefix . "$name." . PHP_SHLIB_SUFFIX;
             if (
                 !ini_get('enable_dl')
-                || !dl($prefix . "$name." . PHP_SHLIB_SUFFIX)) {
+                || !( file_exists($extension) && dl($extension) )
+            ) {
                 self::markTestSkipped(
                     sprintf('The "%s" extension is required.', $name)
                 );
