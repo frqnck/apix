@@ -12,6 +12,8 @@
 
 namespace Apix;
 
+date_default_timezone_set('UTC');
+
 define('DEBUG', true);
 define('UNIT_TEST', true);
 

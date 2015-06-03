@@ -268,7 +268,7 @@ Integration and functional tests are also available in the `src/tests`.
 
 License
 -------
-APIx Cache is licensed under the New BSD license -- see the `LICENSE.txt` for the full license details.
+APIx is licensed under the New BSD license -- see the [LICENSE.txt][licence] for the full license details.
 
 <pre>
   _|_|    _|_|    _|     _|      _|
@@ -279,6 +279,7 @@ _|    _| _|       _|      _|    _|
 _|    _| _|       _|     _|      _|
 </pre>
 
+[licence]: https://github.com/frqnck/apix/blob/master/LICENSE.txt "APIx License."
 [doc]: http://apix.readthedocs.org/en/latest/        "APIx Official Documentaion."
 [phar]: http://api.ouarz.net/v1/download/apix.phar   "Download the Phar file."
 [pear]: http://pear.ouarz.net                        "PEAR (TODO add to OUARZ)"
