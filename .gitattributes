@@ -8,4 +8,3 @@
 /phpunit.xml.dist   export-ignore
 /src/bin            export-ignore
 /src/tests          export-ignore
-/src/docs           export-ignore
