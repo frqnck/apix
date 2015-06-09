@@ -39,7 +39,7 @@ class MainTest extends TestCase
     {
         $c = array(
             'default_format'    => 'defaultExt',
-            'controller_ext'    => false,
+            'allow_extension'    => false,
             'format_override'   => false,
             'http_accept'       => false,
         );
@@ -54,12 +54,12 @@ class MainTest extends TestCase
     public function negotiateFormatProvider()
     {
         return array(
-            'controller_ext (from end) set to true' => array(
+            'allow_extension (from end) set to true' => array(
                 'uri' => '/index.php/api/v1/foo/bar/baz.xml',
                 'options' => array(
                     'path_prefix'       => '@^(/index.php)?/api/v(\d*)@i',
                     'default_format'    => 'xml',
-                    'controller_ext'    => true,
+                    'allow_extension'    => true,
                     'format_override'   => false,
                     'http_accept'       => false,
                 ),
@@ -68,12 +68,12 @@ class MainTest extends TestCase
                     'format' => 'xml',
                 )
             ),
-            'controller_ext set to false' => array(
+            'allow_extension set to false' => array(
                 'uri' => '/api/v1/foo/bar/baz.json',
                 'options' => array(
                     'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'json',
-                    'controller_ext'    => false,
+                    'allow_extension'    => false,
                     'format_override'   => false,
                     'http_accept'       => false,
                 ),
@@ -87,7 +87,7 @@ class MainTest extends TestCase
                 'options' => array(
                     'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'json',
-                    'controller_ext'    => false,
+                    'allow_extension'    => false,
                     'format_override'   => 'html',
                     'http_accept'       => false,
                 ),
@@ -101,7 +101,7 @@ class MainTest extends TestCase
                 'options' => array(
                     'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'xml',
-                    'controller_ext'    => false,
+                    'allow_extension'    => false,
                     'format_override'   => false,
                     'http_accept'       => true,
                 ),
@@ -115,7 +115,7 @@ class MainTest extends TestCase
                 'options' => array(
                     'path_prefix'       => '@/api/v(\d*)@i',
                     'default_format'    => 'xml',
-                    'controller_ext'    => false,
+                    'allow_extension'    => false,
                     'format_override'   => false,
                     'http_accept'       => false,
                 ),
@@ -163,7 +163,7 @@ class MainTest extends TestCase
         $uri = 'api/v1/foo/bar/baz';
         $options = array(
             'default_format'    => 'xml',
-            'controller_ext'    => false,
+            'allow_extension'    => false,
             'format_override'   => false,
             'http_accept'       => true,
         );
@@ -195,7 +195,7 @@ class MainTest extends TestCase
 
         $options = array(
             'default_format'    => 'jsonp',
-            'controller_ext'    => false,
+            'allow_extension'    => false,
             'format_override'   => false,
             'http_accept'       => true,
         );
@@ -213,7 +213,7 @@ class MainTest extends TestCase
     {
         $options = array(
             'default_format'    => 'jsonp',
-            'controller_ext'    => false,
+            'allow_extension'    => false,
             'format_override'   => false,
             'http_accept'       => false,
         );

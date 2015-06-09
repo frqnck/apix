@@ -87,22 +87,25 @@ $c = array(
         // case, JSON is favored.
         'default_format'    => 'json',
 
-        // Wether to enable the negotiation of output format from an HTTP accept
+        // Wether to enable the negotiation of output format from a HTTP accept
         // header. This is the expected and most RESTful way to set the
-        // output format. http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+        // output format http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+        // http_accept: boolean
         'http_accept'       => true,
 
         // Wether to allow the output format to be set from the Request-URI
         // using a file extension such as '/foo/bar/baz.xml'.
         // This is handy and common practice but fairly un-RESTful...
-        // The extension overrides the http_accept negotiation.
-        'controller_ext'    => true, // TODO rename this option
+        // The extension overrides the http_accept negotiation set above.
+        // allow_extension: boolean
+        'allow_extension'   => true,
 
         // Forces the output format to the string provided and overrides the
         // format negotiation process. Set to false to disable. Can be use to
         // set the format from a request parameter, or any other arbitrary
         // methods, etc... Using $_REQUEST is considered un-RESTful but can be
         // handy some use cases e.g. forms handling.
+        // format_override: string|false
         'format_override'   => isset($_REQUEST['_format'])
                                 ? $_REQUEST['_format']
                                 : false
@@ -292,7 +295,7 @@ $c['plugins'] = array(
     'Apix\Plugin\OutputDebug' => array('enable' => DEBUG),
 
     // Plugin that generates manual pages of the whole API and its resources.
-    'Apix\Plugin\ManPage'
+    // 'Apix\Plugin\ManPage' // BETA
 );
 
 // Init is an associative array of specific PHP directives. They are

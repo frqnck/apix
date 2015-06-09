@@ -248,12 +248,12 @@ class Main extends Listener
             $path = '/';
         }
 
-        // check controller_ext
-        if ($opts['controller_ext']) {
+        // check allow_extension
+        if ($opts['allow_extension']) {
             $info = pathinfo($path);
 
             // use the first path entry to extratc the extension
-            // if ($opts['controller_ext']) {
+            // if ($opts['allow_extension']) {
             //     $parts = explode('/', $path);
             //     $info = pathinfo(isset($parts[1]) ? $parts[1] : $parts[0] );
             // }
@@ -312,7 +312,7 @@ class Main extends Listener
     *
     * @param array $opts    Options are:
     *                          - [default] => string e.g. 'json',
-    *                          - [controller_ext] => boolean,
+    *                          - [allow_extension] => boolean,
     *                          - [override] => false or $_REQUEST['format'],
     *                          - [http_accept] => boolean.
     * @param  string|false $ext The contoller defined extension.
@@ -322,7 +322,7 @@ class Main extends Listener
     public function negotiateFormat(array $opts, $ext=false)
     {
         switch (true) {
-            case $opts['controller_ext']
+            case $opts['allow_extension']
                 && $format = $ext:
             break;
 
