@@ -17,7 +17,6 @@ use Apix\TestCase,
 
 class TidyTest extends TestCase
 {
-
     protected $tidy, $response;
 
     public function setUp()
