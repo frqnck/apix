@@ -12,9 +12,8 @@
 
 namespace Apix\Plugin;
 
-use Apix\HttpRequest,
-    Apix\Response,
-    Apix\TestCase;
+use Apix\TestCase,
+    Apix\Service;
 
 class TidyTest extends TestCase
 {
@@ -24,12 +23,12 @@ class TidyTest extends TestCase
     public function setUp()
     {
         $this->skipIfMissing('tidy');
-
-        $this->response = new Response(new HttpRequest());
-        $this->response->unit_test = true;
-
+        $this->setGenericServices();
+        
+        $this->response = Service::get('response');
+        
         $this->route = $this->getMock('Apix\Router');
-
+        
         $this->route->expects($this->any())
             ->method('getName')
             ->will($this->returnValue('/resource'));
@@ -43,8 +42,8 @@ class TidyTest extends TestCase
         $options = array(
             'enable'    => true,
             'generic'   => array(
-                'indent'        => true,
-                'indent-spaces' => 2,
+                'indent'         => true,
+                'indent-spaces'  => 2,
                 'show-body-only' => true
             )
         );

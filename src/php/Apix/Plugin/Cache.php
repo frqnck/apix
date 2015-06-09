@@ -56,7 +56,7 @@ class Cache extends PluginAbstractEntity
             $this->flushAnnotatedTags($this->options['runtime_flush']);
 
             // the cache id is simply the entity route name for now!
-            $id = Service::get('response')->getRequest()->getRequestUri();
+            $id = Service::get('request')->getRequestedUri();
 
             // 1.) use the cache if present
             if ($data = $this->adapter->loadKey($id)) {

@@ -15,6 +15,18 @@ namespace Apix;
 class TestCase extends \PHPUnit_Framework_TestCase
 {
 
+    public function setGenericServices()
+    {
+        $request = new HttpRequest();
+        Service::set('request', $request);
+
+        $response = new Response($request);
+        $response->unit_test = true;
+        Service::set('response', $response);
+
+        Service::set('config', new Config);
+    }
+
     public function skipIfMissing($name)
     {
         if (!extension_loaded($name)) {

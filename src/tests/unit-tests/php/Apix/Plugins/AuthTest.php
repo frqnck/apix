@@ -12,22 +12,16 @@
 
 namespace Apix\Plugin;
 
-use Apix\HttpRequest,
-    Apix\Response,
-    Apix\TestCase,
+use Apix\TestCase,
     Apix\Service;
 
 class AuthTest extends TestCase
 {
-    protected $plugin, $request, $response, $opts, $authAdapter;
+    protected $plugin, $opts, $authAdapter;
 
     public function setUp()
     {
-        $this->request = new HttpRequest();
-        $this->response = new Response($this->request);
-        $this->response->unit_test = true;
-
-        Service::set('response', $this->response);
+        $this->setGenericServices();
 
         $this->entity = $this->getMock('Apix\Entity');
 
@@ -48,10 +42,7 @@ class AuthTest extends TestCase
 
     protected function tearDown()
     {
-        unset(
-            $this->plugin, $this->request, $this->response, $this->opts,
-            $this->authAdapter
-        );
+        unset($this->plugin, $this->opts, $this->authAdapter);
     }
 
     public function testIsDisableWhenBotGroupAndUserAreNotSet()

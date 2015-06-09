@@ -12,25 +12,20 @@
 
 namespace Apix\Plugin;
 
-use Apix\HttpRequest,
-    Apix\Response,
-    Apix\TestCase,
+use Apix\TestCase,
     Apix\Service;
 
 class CorsTest extends TestCase
 {
-
-    protected $plugin, $request, $response, $opts;
+    protected $plugin, $opts;
 
     public function setUp()
     {
+        $this->setGenericServices();
+        $this->request = Service::get('request');
+        $this->response = Service::get('response');
+        
         $_SERVER['HTTP_ORIGIN'] = 'https://foo.bar';
-
-        $this->request = new HttpRequest();
-        $this->response = new Response($this->request);
-        $this->response->unit_test = true;
-
-        Service::set('response', $this->response);
 
         $this->entity = $this->getMock('Apix\Entity');
 
@@ -43,7 +38,7 @@ class CorsTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->plugin, $this->request, $this->response, $this->opts);
+        unset($this->plugin, $this->opts);
     }
 
     public function testIsDisable()

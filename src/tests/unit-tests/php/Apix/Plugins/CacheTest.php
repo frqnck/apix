@@ -12,22 +12,16 @@
 
 namespace Apix\Plugin;
 
-use Apix\HttpRequest,
-    Apix\Response,
-    Apix\TestCase,
+use Apix\TestCase,
     Apix\Service;
 
 class CacheTest extends TestCase
 {
-    protected $plugin, $request, $response, $opts;
+    protected $plugin, $opts;
 
     public function setUp()
     {
-        $this->request = new HttpRequest();
-        $this->response = new Response($this->request);
-        $this->response->unit_test = true;
-
-        Service::set('response', $this->response);
+        $this->setGenericServices();
 
         $this->entity = $this->getMock('Apix\Entity');
 
@@ -40,7 +34,7 @@ class CacheTest extends TestCase
 
     protected function tearDown()
     {
-        unset($this->plugin, $this->request, $this->response, $this->opts);
+        unset($this->plugin, $this->opts);
     }
 
     public function testIsDisable()
@@ -78,21 +72,24 @@ class CacheTest extends TestCase
 
     public function testReturnFreshData()
     {
-        $val = 'fresh method value';
+        $value = 'fresh method value';
         $this->entity->expects($this->any())
                 ->method('call')
-                ->will($this->returnValue($val));
+                ->will($this->returnValue($value));
 
         $data = $this->plugin->update($this->entity);
-        $this->assertSame($val, $data);
+        $this->assertSame($value, $data);
     }
 
     public function testReturnCachedData()
     {
-        $this->plugin->getAdapter()->save('foo value from cache', '/');
+        $_SERVER['REQUEST_URI'] = '/qwerty';
+        $value = 'cached foo value';
+
+        $this->plugin->getAdapter()->save($value, $_SERVER['REQUEST_URI']);
 
         $data = $this->plugin->update($this->entity);
-        $this->assertSame('foo value from cache', $data);
+        $this->assertSame($value, $data);
     }
 
     /**

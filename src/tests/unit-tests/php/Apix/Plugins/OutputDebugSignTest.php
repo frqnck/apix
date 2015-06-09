@@ -13,7 +13,7 @@
 namespace Apix\Plugin;
 
 use Apix\HttpRequest,
-    Apix\Response,
+    Apix\Service,
     Apix\TestCase;
 
 class OutputDebugSignTest extends TestCase
@@ -23,8 +23,8 @@ class OutputDebugSignTest extends TestCase
 
     public function setUp()
     {
-        $this->response = new Response(new HttpRequest);
-        $this->response->unit_test = true;
+        $this->setGenericServices();
+        $this->response = Service::get('response');
 
         $route = $this->getMock('Apix\Router');
 

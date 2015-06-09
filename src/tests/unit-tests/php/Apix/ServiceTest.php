@@ -38,7 +38,7 @@ class ServiceTest extends TestCase
     public function testDebug()
     {
         Service::debug('logger');
-        $this->expectOutputRegex('@^<pre>object\(Apix\\\Log\\\.*</pre>$@s');
+        $this->expectOutputRegex('@^<pre>.*Apix\\\Log\\\.*</pre>$@s');
     }
 
 }
