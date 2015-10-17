@@ -30,11 +30,22 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         unset($this->request);
     }
 
-    public function testGetSetUri()
+    public function testGetUriDefaultToSlash()
     {
         $this->assertSame('/', $this->request->getUri() );
-        $this->request->setUri('/qwerty/');
-        $this->assertSame('/qwerty', $this->request->getUri() );
+    }
+
+    public function testSetUri()
+    {
+        $uri = '/query';
+        $this->request->setUri($uri);
+        $this->assertSame($uri, $this->request->getUri() );
+    }
+
+    public function testSetUriRemoveTheTrailingSlash()
+    {
+        $this->request->setUri('/query/');
+        $this->assertSame('/query', $this->request->getUri() );
     }
 
     /**

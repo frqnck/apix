@@ -14,7 +14,8 @@ namespace Apix;
 
 use Apix\Entity,
     Apix\Router,
-    Apix\Entity\EntityInterface;
+    Apix\Entity\EntityInterface,
+    Apix\Service;
 
 class EntityTest extends TestCase
 {
@@ -77,7 +78,7 @@ class EntityTest extends TestCase
             );
         }
 
-        $config = \Apix\Config::getInstance();
+        $config = new Config;
         $config->set('cache_annotation', true);
 
         $this->testGetDocsRetrievesAllTheApiDocs();

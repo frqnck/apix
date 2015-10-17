@@ -50,7 +50,7 @@ class OutputDebug extends PluginAbstract
             'timestamp'     => gmdate($this->options['timestamp']),
             'request'       => sprintf('%s %s%s',
                                     $request->getMethod(),
-                                    $request->getRequestUri(),
+                                    $request->getRequestedUri(),
                                     isset($_SERVER['SERVER_PROTOCOL'])
                                     ? ' ' . $_SERVER['SERVER_PROTOCOL'] : null
                                ),

@@ -24,9 +24,3 @@ define('APP_VENDOR', realpath(__DIR__ . '/../../../vendor'));
 // Composer
 $loader = require APP_VENDOR . '/autoload.php';
 $loader->add('Apix', APP_TESTDIR);
-
-// Makes sure the cache is off for all test.
-// $config = Config::getInstance();
-// $config = new Config();
-// $config->set('cache_annotation', false);
-// Service::set('config', $config);

@@ -63,9 +63,10 @@ class Request
      */
     public function setUri($uri=false)
     {
-        $uri = false === $uri ? $this->getRequestUri() : $uri;
+        $uri = false === $uri ? $this->getRequestedUri() : $uri;
         $uri = parse_url($uri, PHP_URL_PATH);
 
+        // remove a trailing slash
         if ( $uri != '/' && substr($uri, -1) == '/' ) {
             $uri = substr($uri, 0, -1);
         }
@@ -74,11 +75,25 @@ class Request
     }
 
     /**
-     * Extacts the request URI $_SERVER variables enviroment
+     * Gets the current URI, if undefined guess and set one up.
      *
      * @return string
      */
-    public function getRequestUri()
+    public function getUri()
+    {
+        if (null === $this->uri) {
+            $this->setUri();
+        }
+
+        return $this->uri;
+    }
+
+    /**
+     * Gets the requested URI (from client, spoofable).
+     *
+     * @return string
+     */
+    public function getRequestedUri()
     {
         if (isset($_SERVER['HTTP_X_REWRITE_URL'])) {
             $uri = $_SERVER['HTTP_X_REWRITE_URL'];
@@ -100,17 +115,59 @@ class Request
     }
 
     /**
-     * Gets the current URI, if undefined guess and set one up.
+     * Gets the requested Scheme (from server).
      *
      * @return string
      */
-    public function getUri()
+    public function getRequestedScheme()
     {
-        if (null === $this->uri) {
-            $this->setUri();
+        return isset($_SERVER['HTTPS']) ? 'https' : 'http';
+    }
+
+    /**
+     * Gets the requested host (from client, spoofable).
+     *
+     * @return string
+     */
+    public function getRequestedHost()
+    {
+        $s = $_SERVER;
+        $host = '';
+        if ( !empty($s['HTTP_X_FORWARDED_HOST']) ) {
+            $host = $s['HTTP_X_FORWARDED_HOST'];
+            // handles multiple forwarders.
+            if (strpos($host, ',') !== false) {
+                $host = trim(array_pop( explode(',', $host) ));
+            }
+        } elseif ( !empty($s['HTTP_HOST']) ) {
+            $host = $s['HTTP_HOST'];
+        } elseif ( !empty($s['SERVER_NAME']) ) {
+            $host = $s['SERVER_NAME'];
+            $host .= !empty($s['SERVER_PORT'])
+                        ? ':' . $s['SERVER_PORT']
+                        : '';
         }
 
-        return $this->uri;
+        return rtrim($host, '/');
+    }
+
+    /**
+     * Gets the request Url.
+     *
+     * @return string
+     */
+    public function getRequestedUrl()
+    {
+        // TODO here
+        echo $this->getRequestedHost();
+        if($host = $this->getRequestedHost() ) {
+            $host = $this->getRequestedScheme() . '://' . $host;
+        }
+        return $host . $this->getRequestedUri();
+
+        // return 'http' . (isset($_SERVER['HTTPS']) ? 's' : '') . '://'
+        //         . $this->getRequestedHost()
+        //         . $this->getRequestedUri();
     }
 
     /**
