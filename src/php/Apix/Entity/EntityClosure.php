@@ -173,7 +173,7 @@ class EntityClosure extends Entity implements EntityInterface
         // TODO retrive phpdoc coment strinfg here!
 
         // group test
-        $this->group = ['title'=>$title];
+        $this->group = array('title' => $title);
 
         return $this;
     }
