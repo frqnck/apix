@@ -188,7 +188,7 @@ class Reflection
         if( !file_exists( $ref->getFileName() ) ) return false;
 
         $start_offset = $ref->getStartLine();
-        $end_offset   = $ref->getEndLine()-$ref->getStartLine();
+        $end_offset   = $ref->getEndLine()-$start_offset;
 
         return join('',
             array_slice(
