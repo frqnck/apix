@@ -1,31 +1,34 @@
-# APIx changelog
+# APIx-server changelog
 
 ### Version 0.4.0 (xx-xxx-2015)
-- Added Plugin\ManPage
-- Added APIs now have a debug Exception output.
-- Changed the file extension handler built from the last resource segment rather
-  instead of the first. e.g. /foo/bar.json instead of /foo.json/bar
+- Added `Exception::toArray`.
+- Added support for APCu ($config->cache_annotation benefits from APC/APCu, recommended).
+- Modified `Apix\Config` class now implements `\ArrayAccess`.
+- Fix the extension handler. Now properly set from the last resource segment and not the first. e.g. /foo/bar.json instead of /foo.json/bar
+- Renamed `$config->routing->controller_ext` to `$config->routing->allow_extension`.
+- Fix: [\#5](https://github.com/frqnck/apix/issues/5)
 
 #### Version 0.3.10 (2-Jun-2015)
-- CHANGED: Exception handler set to log critical error.
-- FIXED: Unit test extension loader skip if the PHP extension file is missing.
-- FIXED: Unit tests bootstrap now sets a default timezone.
+- Added `.gitattributes` file.
+- Added PSR3 log handlers to `Apix\Exception`.
+- Fix to the unit test extension loader, skip if the PHP extension file is not readable/available.
+- Added a default timezone to the unit tests bootstraper.
 
 #### Version 0.3.9 (2-Oct-2014)
-- Bug #4: $_SERVER headers incorrectly read due to uppercase/lowercase mixup
-- Modified slightly Plugin\OutputDebug so it is in parity with the other plugins.
+- Fix: $_SERVER headers was incorrectly read due to uppercase/lowercase mixup [\#4](https://github.com/frqnck/apix/issues/4)
+- Modified slightly `Plugin\OutputDebug` so it is in parity with the other plugins.
 
 #### Version 0.3.8 (30-Sept-2014)
 - Added Service 'logger' PSR3 logger aware using by default Apix\Log.
-- Plugin\Cache unit-tested and updated to Apix\Cache v1.2
-- Plugin\Auth unit-tested.
+- `Plugin\Cache` unit-tested and updated to Apix\Cache v1.2
+- Added `Plugin\Auth` is now unit-tested.
 - Many bug fixes and additional unit-tests.
 - Added Scrutinizer checks.
 
 #### Version 0.3.7 (5-Sept-2014)
 - Added an internal cache (reflection/parsing of annotation).
 - Added CORS ([Cross-Origin Resource Sharing](http://www.w3.org/TR/cors)) plugin.
-- Bug #3: Improvement to the Exception handler.
+- Fix: Improvement to the Exception handler [\#3](https://github.com/frqnck/apix/issues/3).
 - Many bug fixes and additional unit-tests.
 
 #### Version 0.3.6 (10-May-2013)
