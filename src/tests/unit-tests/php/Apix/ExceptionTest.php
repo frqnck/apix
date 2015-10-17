@@ -83,9 +83,11 @@ class ExceptionTest extends TestCase
         $this->assertArrayHasKey('msg', $res);
         $this->assertArrayHasKey('ctx', $res);
 
+        $items = $this->logger->getItems();
+
         $this->assertRegExp(
             '@^\[.*\] CRITICAL ' . $str . ' - #0 Startup.*:\d+$@s',
-            $this->logger->getItems()[0]
+            $items[0]
         );
     }
 
