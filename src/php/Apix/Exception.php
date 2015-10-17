@@ -16,99 +16,105 @@ use Apix\Service;
 
 class Exception extends \Exception
 {
+    const CRITICAL_ERROR_STRING = '500 Internal Server Error';
 
     /**
-     *  E_RECOVERABLE_ERROR handler
+     *  E_RECOVERABLE_ERROR handler.
      *
      *  Use to re-throw E_RECOVERABLE_ERROR as they occur.
      *
-     * @param  int              $code The error number.
-     * @param  string           $msg  The error message.
-     * @param  string           $file The filename where the error occured.
-     * @param  int              $line The line number where it happened.
-     * @param  array|\Exception $ctx  The context array or previous Exception.
+     * @param  int             $code     The error number.
+     * @param  string          $msg      The error message.
+     * @param  string          $file     The filename where the error occured.
+     * @param  int             $line     The line number where it happened.
+     * @param  \Exception|null $previous The previous chaining Exception.
      * @throws \ErrorException
      */
     public static function errorHandler(
-        $code, $msg='', $file=__FILE__, $line=__LINE__, $ctx=null
+        $code, $msg = '', $file = __FILE__, $line = __LINE__, $previous = null
     ) {
         if (E_RECOVERABLE_ERROR == $code) {
             $msg = preg_replace('@to\s.*::\w+\(\)@', '', $msg, 1);
-            // $code = 400;
+            // $code = 400; // Due to a client error, recoverable.
         }
-        if ( null !== $ctx && !($ctx instanceof \Exception) ) {
-            $ctx = null;
+        $code = 500; // Set as a HTTP Internal Server Error.
+
+        if ( null !== $previous && !($previous instanceof \Exception) ) {
+
+            Service::get('logger')->error(
+                '{0} - {1}:{2} {3}',
+                array($msg, $file, $line, $previous)
+            );
+
+            $previous = null;
         }
 
-        throw new \ErrorException($msg, 500, 0, $file, $line, $ctx);
+        throw new \ErrorException($msg, $code, 0, $file, $line, $previous);
     }
 
     /**
-     *  Startup Exception handler
+     * Startup exception handler.
      *
      * @param \Exception $e
-     * @see criticalError
+     * @return array
      */
     public static function startupException(\Exception $e)
     {
-        self::criticalError(
-            $e->getCode(),
-            (DEBUG ? 'Startup: ' : null) . $e->getMessage(),
-            $e->getFile(),
-            $e->getLine()
-        );
+        return self::criticalError($e, 'Startup Exception');
     }
 
     /**
-     *  Shutdown / Fatal error handler
+     * Shutdown/fatal exceptions handler.
      *
      * @see criticalError
+     * @return void
      * @codeCoverageIgnore
      */
     public static function shutdownHandler()
     {
         if ($e = error_get_last()) {
-            self::criticalError(
-                $e['type'],
-                (DEBUG ? 'Shutdown: ' : null) . $e['message'],
-                $e['file'],
-                $e['line']
-            );
+            self::criticalError($e, 'Shutdown Exception');
         }
     }
 
     /**
-     * Critical Error Output and log.
+     * Handles critical errors (output and logging).
      *
-     * @param int    $code    The error number.
-     * @param string $message The error message.
-     * @param string $file    The filename where the error occured.
-     * @param int    $line    The line number where it happened.
-     * @codeCoverageIgnore
+     * @param \Exception $e
+     * @return array
      */
-    public static function criticalError($code, $message, $file, $line)
+    public static function criticalError(\Exception $e, $alt_msg) 
     {
-        $msg = '500 Internal Server Error';
+        $err = array(
+            'msg' => self::CRITICAL_ERROR_STRING,
+            'ctx' => sprintf(
+                        '#%d %s @ %s:%d',
+                        $e->code,
+                        $e->message ? $e->message : $alt_msg,
+                        $e->file,
+                        $e->line
+                    )
+        );
+        printf('<h1>%s</h1>', $err['msg']);
+
+        Service::get('logger')->critical('{msg} - {ctx}', $err);
+
+        // @codeCoverageIgnoreStart
+        // TODO: Move the following crap in the Response object...
         if (!defined('UNIT_TEST')) {
             $proto = isset($_SERVER['SERVER_PROTOCOL'])
                         ? $_SERVER['SERVER_PROTOCOL']
-                        : 'http:1/1';
-            header($proto . ' ' . $msg, true, 500);
+                        : 'HTTP/1.1';
+            header($proto . ' ' . $err['msg'], true, 500);
+            if(DEBUG) var_dump( $err );
         }
-        printf('<h1>%s</h1>', $msg);
+        // @codeCoverageIgnoreEnd
 
-        $info = sprintf("#%d %s @ %s:%d", $code, $message, $file, $line);
-        Service::get('logger')->critical('{msg} [{info}]',
-            array('msg'=>$msg, 'info'=>$info)
-        );
-
-        if (DEBUG && !defined('UNIT_TEST')) {
-            die(array($info));
-        }
+        return $err;
     }
 
     /**
-     * Returns this exception as an associative array.
+     * Returns the provided exception as a normalize associative array.
      *
      * @param  \Exception $e
      * @return array
@@ -121,7 +127,7 @@ class Exception extends \Exception
             'type'    => get_class($e),
             'file'    => $e->getFile(),
             'line'    => $e->getLine(),
-            'stack trace'   => $e->getTraceAsString(),
+            'trace'   => $e->getTraceAsString(),
         );
 
         if (method_exists($e, 'getPrevious')) {

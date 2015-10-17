@@ -17,6 +17,9 @@ class ExceptionTest extends TestCase
 
     protected function setUp()
     {
+        $this->logger = new Log\Logger\Runtime();
+        Service::set('logger', $this->logger);
+
         set_error_handler(array('Apix\Exception', 'errorHandler'), E_ALL);
     }
 
@@ -57,24 +60,45 @@ class ExceptionTest extends TestCase
         // trigger_error("boo!", \E_USER_ERROR);
         Exception::errorHandler(4096, 'boo!');
     }
-
-    public function testStartupException()
-    {
-        // trigger_error("boo!", E_CORE_ERROR);
-        Exception::startupException(new Exception());
-        $this->expectOutputString('<h1>500 Internal Server Error</h1>');
-    }
-
+    
     public function testExceptionToArray()
     {
         $r = Exception::toArray(
-            new Exception('msg', 123, new Exception('prev'))
+            new Exception('some msg', 123, new Exception('prev'))
         );
 
-        $this->assertSame('msg', $r['message']);
+        $this->assertSame('some msg', $r['message']);
         $this->assertSame(123, $r['code']);
         $this->assertSame('Apix\Exception', $r['type']);
-        $this->assertArrayHasKey('stack trace', $r);
+        $this->assertArrayHasKey('trace', $r);
     }
+
+    public function testStartupException()
+    {
+        $str = Exception::CRITICAL_ERROR_STRING;
+
+        $res = Exception::startupException( new Exception() );
+        $this->expectOutputString('<h1>' . $str . '</h1>');
+       
+        $this->assertArrayHasKey('msg', $res);
+        $this->assertArrayHasKey('ctx', $res);
+
+        $this->assertRegExp(
+            '@^\[.*\] CRITICAL ' . $str . ' - #0 Startup.*:\d+$@s',
+            $this->logger->getItems()[0]
+        );
+    }
+
+    /**
+     * @expectedException           \ErrorException
+     * @_expectedExceptionCode       500
+     * @_expectedExceptionMessage    boo!
+     */
+    // public function testRegressionGitHub5()
+    // {
+    //     Exception::errorHandler(4096, 'boo!');
+
+    //     // throw new Exception("an oops occurred");
+    // }
 
 }
