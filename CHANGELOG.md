@@ -6,7 +6,7 @@
 - Modified `Apix\Config` class now implements `\ArrayAccess`.
 - Fix the extension handler. Now properly set from the last resource segment and not the first. e.g. /foo/bar.json instead of /foo.json/bar
 - Renamed `$config->routing->controller_ext` to `$config->routing->allow_extension`.
-- Fix: [\#5](https://github.com/frqnck/apix/issues/5)
+- Fix: [\#5](https://github.com/frqnck/apix/issues/5): Refactored `Apix\Exception`.
 
 #### Version 0.3.10 (2-Jun-2015)
 - Added `.gitattributes` file.
@@ -15,7 +15,7 @@
 - Added a default timezone to the unit tests bootstraper.
 
 #### Version 0.3.9 (2-Oct-2014)
-- Fix: $_SERVER headers was incorrectly read due to uppercase/lowercase mixup [\#4](https://github.com/frqnck/apix/issues/4)
+- Fix [\#4](https://github.com/frqnck/apix/issues/4): $_SERVER headers was incorrectly read due to uppercase/lowercase mixup.
 - Modified slightly `Plugin\OutputDebug` so it is in parity with the other plugins.
 
 #### Version 0.3.8 (30-Sept-2014)
