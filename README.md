@@ -84,13 +84,13 @@ Any returned value emanating from a resource's controller, generally an associat
 
 Essentially, a route is made of:
 
-1.  A **route controller** that corresponds to a HTTP header method as per the table below:
+1.  A **route controller** that corresponds to a HTTP header method:
 
-       <pre>
-onCreate()   =>   POST          |        onModify()   =>   PATCH
-onRead()     =>   GET           |        onHelp()     =>   OPTIONS
-onUpdate()   =>   PUT           |        onTest()     =>   HEAD
-onDelete()   =>   DELETE        |        onTrace()    =>   TRACE
+<pre>
+    onCreate()   ->   POST          |        onModify()   ->   PATCH
+    onRead()     ->   GET           |        onHelp()     ->   OPTIONS
+    onUpdate()   ->   PUT           |        onTest()     ->   HEAD
+    onDelete()   ->   DELETE        |        onTrace()    ->   TRACE
 </pre>
 
 2.  A **route path** corresponding to a Request-URI.
