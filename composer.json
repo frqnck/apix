@@ -23,9 +23,5 @@
     },
     "autoload": {
         "psr-0": { "Apix": "src/php" }
-    },
-    "provide": {
-        "psr/log-implementation": "~1.0",
-        "psr/cache-implementation": "~1.0"
     }
 }
