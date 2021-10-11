@@ -1,4 +1,4 @@
-APIx, RESTful services for PHP 5.3+ [![Build Status](https://travis-ci.org/frqnck/apix.png?branch=master)](https://travis-ci.org/frqnck/apix)
+APIx, RESTful services for PHP [![Build Status](https://travis-ci.org/frqnck/apix.png?branch=master)](https://travis-ci.org/frqnck/apix)
 ===========================================
 
 [![Latest Stable Version](https://poser.pugx.org/apix/apix/v/stable.svg)](https://packagist.org/packages/apix/apix)  [![Build Status](https://scrutinizer-ci.com/g/frqnck/apix/badges/build.png?b=master)](https://scrutinizer-ci.com/g/frqnck/apix/build-status/master)  [![Code Quality](https://scrutinizer-ci.com/g/frqnck/apix/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/frqnck/apix/?branch=master)  [![Code Coverage](https://scrutinizer-ci.com/g/frqnck/apix/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/frqnck/apix/?branch=master)  [![License](https://poser.pugx.org/apix/apix/license.svg)](https://packagist.org/packages/apix/apix)
@@ -20,7 +20,7 @@ Some of its features:
 * Supports **content negotiation** (which can also be overriden).
 * Take advantages of network caches -- supports HEAD test.
 * Available as a standalone **[PHAR][phar]** file, or via **[Composer][composer]** or as a **[PEAR] [pear]** package.
-* Continuous integration against PHP **5.3**, **5.4**, **5.5** and **5.6**.
+* Continuous integration against PHP **5.x**, and **7.x**.
 * Read the [documentation][doc]!
 
 Todo:
